@@ -2,14 +2,57 @@ import { ActionOrActionReferenceClass, StateOrStatemachineClass } from "./Interf
 import { ContextClass } from "./context/ContextClass.tsx";
 import { GuardClass } from "./guard/GuardClass.tsx";
 
+/**
+ * State machine construct. Represents a state machine within a collaborative state machine.
+ * Example:
+ * {
+ *   name: 'Collaborative State Machine Name',
+ *   states: [...],
+ *   localContext: [...],
+ *   persistentContext: [...],
+ *   guards: [],
+ *   actions: []
+ * }
+ */
+
+
 class Statemachine implements StateOrStatemachineClass {
+
    private _name: string;
+    /**
+   * The states.
+   * At least one initial state must be provided.
+   */
    private _states: Array<StateOrStatemachineClass>;
+
    private _localContext?: ContextClass | undefined;
+
    private _persistentContext?: ContextClass | undefined;
+
+    /**
+   * The optional named guards.
+   * The guards declared here may be used inside this state machine by referencing the names.
+   */
    private _guards?: Array<GuardClass> | undefined;
+
+   /**
+   * The optional named actions.
+   * The actions declared here may be used inside this state machine by referencing the names.
+   */
    private _actions?: Array<ActionOrActionReferenceClass> | undefined;
+
+   /**
+   * The optional inherited state machine name.
+   * The state machine inherits from this state machine, copies all its properties and allows them to be overwritten. States can only be
+   * overridden if they are defined as virtual or abstract.
+   */
    private _inherit?: string | undefined;
+
+    /**
+   * The optional abstract modifier.
+   * If a state machine is defined as abstract, it cannot be instantiated and is never executed by nested state machines. Abstract state
+   * machines can be inherited and can have abstract states.
+   */
    private _isAbstract?: boolean | undefined;
 
 

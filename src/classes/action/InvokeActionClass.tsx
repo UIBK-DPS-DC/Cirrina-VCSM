@@ -9,6 +9,11 @@ export class InvokeActionClass implements ActionOrActionReferenceClass{
     private _isLocal: boolean;
     private _input: Array<ContextVariableClass>;
     private _done: Array<EventClass>;
+
+    /**
+   * The optional output variable.
+   * Used to automatically store service output to a local context variable. The variable must exist at runtime.
+   */
     private _output?: ContextVariableReference | undefined;
 
     

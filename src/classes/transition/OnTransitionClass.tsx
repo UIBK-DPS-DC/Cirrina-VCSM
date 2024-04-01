@@ -1,6 +1,20 @@
 import { TransitionClass } from "./TransitionClass";
 
+/**
+ * On transition construct. Represents a transition that is to be taken based on a received event.
+ * Example:
+ * {
+ *   target: 'State Name',
+ *   guards: [...],
+ *   actions: [...],
+ *   event: 'Event Name'
+ * }
+ */
+
 export class OnTransitionClass extends TransitionClass{
+/*
+   * The event that triggers this on transition.
+*/
     private _event: string;
     
 
