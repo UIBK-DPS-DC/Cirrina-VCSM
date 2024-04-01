@@ -11,6 +11,20 @@ export class InvokeActionClass implements ActionOrActionReferenceClass{
     private _done: Array<EventClass>;
     private _output?: ContextVariableReference | undefined;
 
+    
+
+    constructor();
+    constructor(serviceType: string, isLocal: boolean);
+    constructor(serviceType: string, isLocal: boolean, input: Array<ContextVariableClass>)
+
+    constructor(serviceType?: string, isLocal?: boolean, input?: Array<ContextVariableClass>){
+        this._serviceType = serviceType || "";
+        this._isLocal = isLocal || false
+        this._input = input || new Array<ContextVariableClass>();
+        this._done = new Array<EventClass>();
+
+    }
+
     public get serviceType(): string {
         return this._serviceType;
     }
@@ -44,18 +58,6 @@ export class InvokeActionClass implements ActionOrActionReferenceClass{
     }
     public set output(value: ContextVariableReference | undefined) {
         this._output = value;
-    }
-
-    constructor();
-    constructor(serviceType: string, isLocal: boolean);
-    constructor(serviceType: string, isLocal: boolean, input: Array<ContextVariableClass>)
-
-    constructor(serviceType?: string, isLocal?: boolean, input?: Array<ContextVariableClass>){
-        this._serviceType = serviceType || "";
-        this._isLocal = isLocal || false
-        this._input = input || new Array<ContextVariableClass>();
-        this._done = new Array<EventClass>();
-
     }
 
 
