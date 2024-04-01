@@ -6,6 +6,17 @@ export class EventClass {
     private _channel: EventChannel;
     private _data: Array<ContextVariableClass>;
     
+ 
+    constructor()
+    constructor(name: string, channel: EventChannel)
+    constructor(name: string, channel: EventChannel, data: Array<ContextVariableClass>)
+
+    constructor(name?: string, channel?: EventChannel,data?: Array<ContextVariableClass>){
+        this._name = name || "";
+        this._channel = channel || EventChannel.UNDEFINED;
+        this._data = data || new Array<ContextVariableClass>();
+    }
+    
     public get name(): string {
         return this._name;
     }
@@ -26,16 +37,6 @@ export class EventClass {
     public set data(value: Array<ContextVariableClass>) {
         this._data = value;
     }
-
-    constructor()
-    constructor(name: string, channel: EventChannel)
-    constructor(name: string, channel: EventChannel, data: Array<ContextVariableClass>)
-
-    constructor(name?: string, channel?: EventChannel,data?: Array<ContextVariableClass>){
-        this._name = name || "";
-        this._channel = channel || EventChannel.UNDEFINED;
-        this._data = data || new Array<ContextVariableClass>();
-    } 
 
 
 
