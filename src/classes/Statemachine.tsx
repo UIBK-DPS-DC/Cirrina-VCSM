@@ -1,10 +1,10 @@
-import { StateOrStatemachine } from "./Interfaces.tsx";
+import { StateOrStatemachineClass } from "./Interfaces.tsx";
 import { ContextClass } from "./context/ContextClass.tsx";
 import { GuardClass } from "./guard/GuardClass.tsx";
 
-class Statemachine implements StateOrStatemachine {
+class Statemachine implements StateOrStatemachineClass {
    name : string;
-   states : Array<StateOrStatemachine>;
+   states : Array<StateOrStatemachineClass>;
    localContext?: ContextClass;
    presistentContext?: ContextClass;
    guards?: Array<GuardClass>

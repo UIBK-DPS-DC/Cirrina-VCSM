@@ -1,7 +1,11 @@
-export interface StateOrStatemachine {
+export interface StateOrStatemachineClass {
 
 }
 
-export interface ActionClass {
+export interface ActionOrActionReferenceClass{
 
+}
+
+export interface Builder<T>{
+    build(): T;
 }
