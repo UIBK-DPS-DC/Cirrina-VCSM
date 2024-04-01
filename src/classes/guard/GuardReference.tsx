@@ -1,7 +1,8 @@
-export class GuardReference {
+import { GuardOrGuardReferenceClass } from "../Interfaces";
+
+export class GuardReference implements GuardOrGuardReferenceClass{
     private _reference: string;
    
-
     constructor();
     constructor(reference: string);
 
