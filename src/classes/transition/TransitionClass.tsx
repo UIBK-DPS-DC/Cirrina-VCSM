@@ -1,9 +1,36 @@
 import { ActionOrActionReferenceClass, GuardOrGuardReferenceClass } from "../Interfaces";
 
+/**
+ * Transition construct. Represents a transition that is to be taken regardless of an event.
+ * Example:
+ * {
+ *   target: 'State Name',
+ *   guards: [...],
+ *   actions: [...]
+ * }
+ */
+
 export class TransitionClass {
     private _target: string;
+
+    /**
+   * The optional guards. All guard expression need to evaluate to true before a transitions can be taken. Can be provided as guard
+   * references to previously declared guards, or inline guards.
+   *
+   */
     private _guards?: Array<GuardOrGuardReferenceClass> | undefined;
+
+    /**
+   * The optional actions. These actions are executed during the transition, if the transition is taken. Can be provided as action
+   * references to previously declared actions, or inline actions.
+   *
+   */
+
     private _actions?: Array<ActionOrActionReferenceClass> | undefined;
+
+    /**
+   * The optional else target. If the guards evaluate to false, the state machine ends up in this target state.
+   */
     private _else?: string | undefined;
   
 
@@ -13,7 +40,7 @@ export class TransitionClass {
     constructor(target?: string){
         this._target = target || "";
     }
-    
+
 
     public get target(): string {
         return this._target;

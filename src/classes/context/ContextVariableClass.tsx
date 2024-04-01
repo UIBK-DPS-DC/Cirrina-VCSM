@@ -1,7 +1,12 @@
 import { ContextVariableReference } from "./ContextVariableReference";
 export class ContextVariableClass {
-    private _name: string;
 
+    /**
+   * The name.
+   * Can be referenced in an expression.
+   */
+    private _name: string;
+    
     private _value: ContextVariableReference;
    
 
