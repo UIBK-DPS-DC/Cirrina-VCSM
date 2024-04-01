@@ -1,6 +1,7 @@
+import { ActionOrActionReferenceClass } from "../Interfaces";
 import { EventClass } from "../event/EventClass";
 
-export class RaiseActionClass {
+export class RaiseActionClass implements ActionOrActionReferenceClass{
     private _event: EventClass;
 
     constructor();
