@@ -1,4 +1,6 @@
-export class GuardClass {
+import { GuardOrGuardReferenceClass } from "../Interfaces";
+
+export class GuardClass implements GuardOrGuardReferenceClass{
     private _expression: string;
     private _guardName?: string | undefined;
 
