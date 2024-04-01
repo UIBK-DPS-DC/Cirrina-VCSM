@@ -3,7 +3,7 @@ import { GuardOrGuardReferenceClass } from "../Interfaces";
 /**
  * Guard construct. Represents a conditional (if) that determines if a transition can be taken. Guards can be declared and referenced as
  * part of a state machine, or be declared inline.
- * 
+ * Example:
  * {
  *   name: 'Guard Name',
  *   expression: 'a==5'
@@ -22,7 +22,6 @@ export class GuardClass implements GuardOrGuardReferenceClass{
    * The optional name.
    * If present, can be referenced from within a state machine component when declared as part of the state machine's guards.
    */
-
     private _guardName?: string | undefined;
 
     constructor();
