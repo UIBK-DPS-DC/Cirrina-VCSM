@@ -4,7 +4,7 @@ import { GuardClass } from "./guard/GuardClass.tsx";
 
 class Statemachine implements StateOrStatemachine {
    name : string;
-   states : Array<StateOrStateMachine>;
+   states : Array<StateOrStatemachine>;
    localContext?: ContextClass;
    presistentContext?: ContextClass;
    guards?: Array<GuardClass>
