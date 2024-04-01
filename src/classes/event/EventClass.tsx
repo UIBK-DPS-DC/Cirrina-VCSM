@@ -27,11 +27,19 @@ export class EventClass {
         this._data = value;
     }
 
-    constructor(name: string, channel: EventChannel){
-        this._data = new Array<ContextVariableClass>;
-        this._name = name;
-        this._channel = channel;
-    }
+    constructor()
+    constructor(name: string, channel: EventChannel)
+    constructor(name: string, channel: EventChannel, data: Array<ContextVariableClass>)
+
+    constructor(name?: string, channel?: EventChannel,data?: Array<ContextVariableClass>){
+        this._name = name || "";
+        this._channel = channel || EventChannel.UNDEFINED;
+        this._data = data || new Array<ContextVariableClass>();
+    } 
+
+
+
+
 
 
 }
