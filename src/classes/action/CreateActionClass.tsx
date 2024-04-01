@@ -6,6 +6,13 @@ export class CreateActionClass implements ActionOrActionReferenceClass{
     private _variable: ContextVariableClass;
     private _isPersistent: boolean;
 
+   
+    constructor(variable: ContextVariableClass, isPersistent: boolean){
+        this._variable = variable;
+        this._isPersistent = isPersistent;
+
+    }
+
     public get variable(): ContextVariableClass {
         return this._variable;
     }
@@ -19,12 +26,6 @@ export class CreateActionClass implements ActionOrActionReferenceClass{
     }
     public set isPersistent(value: boolean) {
         this._isPersistent = value;
-    }
-
-    constructor(variable: ContextVariableClass, isPersistent: boolean){
-        this._variable = variable;
-        this._isPersistent = isPersistent;
-
     }
 
 
