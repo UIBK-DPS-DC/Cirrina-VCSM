@@ -1,10 +1,10 @@
 import { ContextVariableReference } from "./ContextVariableReference";
 export class ContextVariableClass {
-    name: string;
-    value: ContextVariableReference;
+    private _name: string;
+    private _value: ContextVariableReference;
 
     constructor(name:string, value : ContextVariableReference){
-        this.name = name;
-        this.value = value
+        this._name = name;
+        this._value = value
     }
 }
