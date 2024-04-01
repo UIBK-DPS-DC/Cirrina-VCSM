@@ -7,5 +7,11 @@ export enum EventChannel{
 
 export enum MemoryMode {
     DISTRIBUTED = "distributed",
-    SHARED = "shared"
+    SHARED = "shared",
+    UNDEFINED = "undefined"
+}
+
+export enum Version {
+    ZERO_ONE = "0.1",
+    UNDEFINED = "undefined"
 }

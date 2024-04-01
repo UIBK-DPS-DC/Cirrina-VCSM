@@ -16,7 +16,7 @@ import { GuardClass } from "./guard/GuardClass.tsx";
  */
 
 
-export class Statemachine implements StateOrStatemachineClass {
+export class StatemachineClass implements StateOrStatemachineClass {
 
    private _name: string;
     /**
