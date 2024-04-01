@@ -1,9 +1,10 @@
+import { ActionOrActionReferenceClass } from "../Interfaces";
 import { ContextVariableClass } from "../context/ContextVariableClass";
 import { ContextVariableReference } from "../context/ContextVariableReference";
 import { EventClass } from "../event/EventClass";
 
 
-export class InvokeActionClass{
+export class InvokeActionClass implements ActionOrActionReferenceClass{
     private _serviceType: string;
     private _isLocal: boolean;
     private _input: Array<ContextVariableClass>;

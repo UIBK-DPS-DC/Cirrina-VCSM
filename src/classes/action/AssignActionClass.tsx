@@ -1,4 +1,6 @@
-export class AssignActionClass {
+import { ActionOrActionReferenceClass } from "../Interfaces";
+
+export class AssignActionClass implements ActionOrActionReferenceClass{
     private _variable: string;
 
     public get variable(): string {
