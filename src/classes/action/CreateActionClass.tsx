@@ -1,6 +1,7 @@
+import { ActionOrActionReferenceClass } from "../Interfaces";
 import { ContextVariableClass } from "../context/ContextVariableClass"
 
-export class CreateActionClass{
+export class CreateActionClass implements ActionOrActionReferenceClass{
 
     private _variable: ContextVariableClass;
     private _isPersistent: boolean;
@@ -25,7 +26,7 @@ export class CreateActionClass{
         this._isPersistent = isPersistent;
 
     }
-    
+
 
     
 
