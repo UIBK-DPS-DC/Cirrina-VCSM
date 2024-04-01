@@ -1,14 +1,16 @@
 export class ContextVariableReference {
     private _reference: string
     
-    constructor(reference: string){
-        this._reference = reference
+    constructor();
+    constructor(reference:string)
+    constructor(reference?: string){
+        this._reference = reference || ""
     }
 
-    public get reference_1(): string {
+    public get reference(): string {
         return this._reference
     }
-    public set reference_1(value: string) {
+    public set reference(value: string) {
         this._reference = value
     }
 }
