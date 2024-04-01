@@ -1,8 +1,22 @@
 export class GuardReference {
-     public reference: string;
+    private _reference: string;
+   
 
-    constructor(reference: string){
-        this.reference = reference
+    constructor();
+    constructor(reference: string);
+
+    constructor(reference?: string){
+        this._reference = reference || "";
     }
+
+
+    public get reference(): string {
+        return this._reference;
+    }
+    public set reference(value: string) {
+        this._reference = value;
+    }
+
+    
 
 }
