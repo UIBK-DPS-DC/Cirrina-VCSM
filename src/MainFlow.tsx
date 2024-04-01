@@ -6,7 +6,8 @@ import ReactFlow, {
     Background,
     useNodesState,
     useEdgesState,
-    addEdge,
+    ReactFlowProvider,
+    useNodes,
   } from 'reactflow';
 
 import "./MainFlow.css"
@@ -72,6 +73,25 @@ function MainFlow(){
     }
 
 
+    function NodeSidebar() {
+        // This hook will only work if the component it's used in is a child of a
+        // <ReactFlowProvider />.
+        const nodes = useNodes()
+       
+        return (
+          <aside>
+            {nodes.map((node) => (
+              <div key={node.id}>
+                Node {node.id} -
+                  x: {node.position.x.toFixed(2)},
+                  y: {node.position.y.toFixed(2)}
+              </div>
+            ))}
+          </aside>
+        )
+      }
+
+
     
 
 
@@ -80,18 +100,21 @@ function MainFlow(){
     return(
         <div id = "flow-container" onDrop={onNodeDrop}
         onDragOver={(event) => event.preventDefault()}>
+            <ReactFlowProvider>
             <div id ="sidebar-container"><Sidebar></Sidebar></div>
+            <NodeSidebar></NodeSidebar>
             <div id = "main-flow">
             <ReactFlow 
             nodes={nodes}
             edges={edges}
             onNodesChange={onNodesChange}
-            onEdgesChange={onEdgesChange}>
+            onEdgesChange={onEdgesChange} fitView>
             <Controls />
             <MiniMap />
             <Background variant="dots" gap={12} size={1} />
             </ReactFlow>
             </div>
+            </ReactFlowProvider>
         </div>
     );
 }
