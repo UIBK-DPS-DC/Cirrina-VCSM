@@ -1,5 +1,7 @@
 import {StateBuilder} from "../src/classes/builders/StateBuilder"
 import {StateClass} from "../src/classes/StateClass"
+import {ActionReferenceClass} from "../src/classes/action/ActionReferenceClass"
+import { ActionOrActionReferenceClass } from "../src/classes/Interfaces";
 
 let stateBuilder = new StateBuilder();
 
@@ -48,6 +50,55 @@ test("The statebuilders set function for isTerminal and isInitial should initial
     expect(state?.isInitial == isInitial);
     expect(state?.isTerminal == isTerminal);
     
+})
+
+test("The statebuilder should initialize actions in the state correctly",() => {
+    const referenceName: string = "name";
+    const action1: ActionReferenceClass = new ActionReferenceClass(referenceName);
+    const action2: ActionReferenceClass = new ActionReferenceClass(referenceName);
+    const action3: ActionReferenceClass = new ActionReferenceClass(referenceName);
+
+    const entryActions: Array<ActionOrActionReferenceClass> = new Array<ActionOrActionReferenceClass>();
+    entryActions.push(action1);
+
+    const exitActions: Array<ActionOrActionReferenceClass> = new Array<ActionOrActionReferenceClass>();
+    exitActions.push([action1,action2]);
+
+    const whileActions: Array<ActionOrActionReferenceClass> = new Array<ActionOrActionReferenceClass>();
+    whileActions.push([action1,action2,action3]);
+
+    const state: StateClass | undefined = stateBuilder
+    .setEntryActions(entryActions)
+    .setExitActions(exitActions)
+    .setWhileActions(whileActions)
+    .setName(referenceName)
+    .build();
+
+    if(state != undefined){
+        entryActions.forEach((x) => {
+            expect(state.entry).toContain(x)
+        })
+    
+        exitActions.forEach((x) => {
+            expect(state.exit).toContain(x)
+        })
+    
+        whileActions.forEach((x) => {
+            expect(state.while).toContain(x)
+        })
+    }
+    else{
+        console.log("State initialization failed");
+        expect(false);
+    }
+
+   
+
+
+
+
+
+
 }
 
 )
