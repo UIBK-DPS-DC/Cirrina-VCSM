@@ -18,6 +18,11 @@ export class StateBuilder implements Builder<StateClass>{
         
     }
 
+    public reset(): void {
+        this._state = new StateClass();
+        console.log("Builder has been reset");
+    }
+
     private validate() :boolean {
         return (this._state.name != "");
     }
