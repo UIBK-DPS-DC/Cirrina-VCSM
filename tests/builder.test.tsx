@@ -2,14 +2,20 @@ import {StateBuilder} from "../src/classes/builders/StateBuilder"
 import {StateClass} from "../src/classes/StateClass"
 import {ActionReferenceClass} from "../src/classes/action/ActionReferenceClass"
 import { ActionOrActionReferenceClass } from "../src/classes/Interfaces";
+import { OnTransitionClass } from "../src/classes/transition/OnTransitionClass";
+import { TransitionClass } from "../src/classes/transition/TransitionClass";
+import { ContextClass } from "../src/classes/context/ContextClass";
 
 let stateBuilder = new StateBuilder();
+const stateName: string = "state";
 
 beforeEach(() => {
     stateBuilder.reset();
+    stateBuilder.setName(stateName);
   });
 
 test("The statebuilder's build function should return undefined if no name is set", () => {
+    stateBuilder.reset();
     const state: StateClass | undefined = stateBuilder.build();
     expect(state).toBeUndefined();
 
@@ -71,7 +77,6 @@ test("The statebuilder should initialize actions in the state correctly",() => {
     .setEntryActions(entryActions)
     .setExitActions(exitActions)
     .setWhileActions(whileActions)
-    .setName(referenceName)
     .build();
 
     if(state != undefined){
@@ -90,15 +95,86 @@ test("The statebuilder should initialize actions in the state correctly",() => {
     else{
         console.log("State initialization failed");
         expect(false);
-    }
+    }})
 
-   
+test("The statebuilder should initialize transitions in the state correctly", () => {
+    const onTransition: Array<OnTransitionClass> = new Array<OnTransitionClass>();
+    const alwaysTransitions: Array<TransitionClass> = new Array<TransitionClass>();
+
+    const ot1 = new OnTransitionClass();
+    const ot2 = new OnTransitionClass();
+
+    const at1 = new TransitionClass();
+    const at2 = new TransitionClass();
+    const at3 = new TransitionClass();
+
+    onTransition.push(ot1);
+    onTransition.push(ot2);
+
+    alwaysTransitions.push(at1);
+    alwaysTransitions.push(at2);
+    alwaysTransitions.push(at3);
+
+    const state: StateClass | undefined = stateBuilder
+    .setOnEventTransitions(onTransition)
+    .setAlwaysTransitions(alwaysTransitions)
+    .build();
+
+    onTransition.forEach((x) => {
+        expect(state?.on).toContain(x);
+    })
+
+    alwaysTransitions.forEach((x) => {
+        expect(state?.always).toContain(x);
+    })
+
+
+})
+
+
+test("The statebuilder should initialize the states context correctly", () => {
+    const persistentContext = new ContextClass();
+    const localContext = new ContextClass();
+
+    const state: StateClass | undefined = stateBuilder
+    .setPersistentContext(persistentContext)
+    .setLocalContext(localContext)
+    .build();
+
+    expect(state?.persistentContext).toBe(persistentContext);
+    expect(state?.localContext).toBe(localContext);
+
+
+    
+})
+
+test("The statebuilder should initialize the states isVirtual and isAbstract fields correctly", () => {
+    let isVirtual: boolean = true;
+    let isAbstract: boolean = false;
+
+    let state: StateClass | undefined = stateBuilder
+    .setIsVirtual(isVirtual)
+    .setIsAbstract(isAbstract)
+    .build();
+
+    expect(state?.isVirtual).toBe(isVirtual);
+    expect(state?.isAbstract).toBe(isAbstract);
+
+    stateBuilder.reset
+    isVirtual = false;
+    isAbstract = true;
+
+    state = stateBuilder
+    .setIsVirtual(isVirtual)
+    .setIsAbstract(isAbstract)
+    .build();
+
+    expect(state?.isVirtual).toBe(isVirtual);
+    expect(state?.isAbstract).toBe(isAbstract);
 
 
 
 
+})
 
 
-}
-
-)
