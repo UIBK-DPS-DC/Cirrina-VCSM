@@ -28,8 +28,9 @@ export class StateBuilder implements Builder<StateClass>{
     }
 
 
-    public setName(name: string): void {
+    public setName(name: string): StateBuilder {
         this._state.name = name;
+        return this;
     }
 
 
