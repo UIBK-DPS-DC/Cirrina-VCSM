@@ -51,6 +51,16 @@ export class StateBuilder implements Builder<StateClass>{
         return this;
     }
 
+    public setExitActions(actions: Array<ActionOrActionReferenceClass>) : StateBuilder{
+        this._state.exit = actions;
+        return this;
+    }
+
+    public setWhileActions(actions: Array<ActionOrActionReferenceClass>): StateBuilder {
+        this._state.while = actions;
+        return this;
+    }
+
     public setOnEventTransitions(transitions: Array<OnTransitionClass>): StateBuilder{
         this._state.on = transitions;
         return this;
@@ -85,7 +95,7 @@ export class StateBuilder implements Builder<StateClass>{
         this._state.isAbstract = value;
         return this;
     }
-    
+
 
 
 
