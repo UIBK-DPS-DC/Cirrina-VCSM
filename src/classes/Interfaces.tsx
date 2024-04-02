@@ -12,4 +12,5 @@ export interface GuardOrGuardReferenceClass {
 
 export interface Builder<T>{
     build(): T | undefined;
+    reset(): void;
 }
