@@ -2,6 +2,7 @@ import { ActionOrActionReferenceClass, Builder } from "../Interfaces";
 import { StateClass } from "../StateClass";
 import { ContextClass } from "../context/ContextClass";
 import { OnTransitionClass } from "../transition/OnTransitionClass";
+import { TransitionClass } from "../transition/TransitionClass";
 
 export class StateBuilder implements Builder<StateClass>{
     private _state : StateClass;
@@ -66,7 +67,7 @@ export class StateBuilder implements Builder<StateClass>{
         return this;
     }
 
-    public setAlwaysTransitions(transitions : Array<OnTransitionClass>): StateBuilder{
+    public setAlwaysTransitions(transitions : Array<TransitionClass>): StateBuilder{
         this._state.always = transitions;
         return this;
     }
