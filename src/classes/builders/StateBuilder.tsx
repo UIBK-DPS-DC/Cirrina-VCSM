@@ -15,7 +15,7 @@ export class StateBuilder implements Builder<StateClass>{
         if(this.validate()){
             return this._state;
         }
-        throw new Error("State cannot be empty");
+        throw new Error("State name cannot be empty");
 
         
     }
