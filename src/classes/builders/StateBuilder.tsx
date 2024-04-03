@@ -11,12 +11,11 @@ export class StateBuilder implements Builder<StateClass>{
         this._state = new StateClass();
     }
 
-    public build(): StateClass | undefined{
+    public build(): StateClass{
         if(this.validate()){
             return this._state;
         }
-        console.log("Sate name cannot be empty");
-        return undefined;
+        throw new Error("State cannot be empty");
 
         
     }
