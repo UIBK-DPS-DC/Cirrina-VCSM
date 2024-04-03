@@ -1,5 +1,6 @@
 import { ActionOrActionReferenceClass, Builder, StateOrStatemachineClass } from "../Interfaces";
 import { StatemachineClass } from "../StatemachineClass";
+import { ContextClass } from "../context/ContextClass";
 import { GuardClass } from "../guard/GuardClass";
 
 export class StatemachineBuilder implements Builder<StatemachineClass>{
@@ -24,6 +25,16 @@ export class StatemachineBuilder implements Builder<StatemachineClass>{
 
     public setName(name: string): StatemachineBuilder {
         this._statemachine.name = name;
+        return this;
+    }
+
+    public setLocalContext(context: ContextClass): StatemachineBuilder{
+        this._statemachine.localContext = context;
+        return this;
+    }
+
+    public setPersistentContext(context: ContextClass): StatemachineBuilder{
+        this._statemachine.persistentContext = context;
         return this;
     }
 
