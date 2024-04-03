@@ -40,9 +40,9 @@ export class CollaborativeStatemachineClass implements StateOrStatemachineClass{
 
     constructor(name?: string, version?: Version, memoryMode?:MemoryMode){
         this._name = name || "";
-        this._version = version || Version.UNDEFINED
-        this._memoryMode = memoryMode || MemoryMode.UNDEFINED
-        this._stateMachines = new Array<StatemachineClass>
+        this._version = version || Version.UNDEFINED;
+        this._memoryMode = memoryMode || MemoryMode.UNDEFINED;
+        this._stateMachines = new Array<StatemachineClass>();
     }
 
     public get name(): string {
