@@ -25,11 +25,11 @@ export class GuardClass implements GuardOrGuardReferenceClass{
     private _guardName?: string | undefined;
 
     constructor();
-    constructor(expression: string, guardName:string);
+    constructor(expression: string);
 
-    constructor(expression?: string, guardName?: string ){
+    constructor(expression?: string){
         this._expression = expression || "";
-        this._guardName = guardName || undefined;
+        
         
     }
 
