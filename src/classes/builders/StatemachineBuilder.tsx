@@ -9,10 +9,9 @@ export class StatemachineBuilder implements Builder<StatemachineClass>{
         this._statemachine = new StatemachineClass();
     }
 
-    public build(): StatemachineClass | undefined {
+    public build(): StatemachineClass {
         if(this._statemachine.name == "" || this._statemachine.states.length < 1){
-            console.log("Statemachine must have a name and at least one state");
-            return undefined;
+            throw new Error("Statemachine must have a name and at least one state");
         }
         else{
             return this._statemachine;
@@ -53,7 +52,7 @@ export class StatemachineBuilder implements Builder<StatemachineClass>{
         return this;
     }
 
-    
+
 
 
 

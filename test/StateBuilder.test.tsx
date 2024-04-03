@@ -5,6 +5,7 @@ import { ActionOrActionReferenceClass } from "../src/classes/Interfaces";
 import { OnTransitionClass } from "../src/classes/transition/OnTransitionClass";
 import { TransitionClass } from "../src/classes/transition/TransitionClass";
 import { ContextClass } from "../src/classes/context/ContextClass";
+import {expect, test, beforeEach} from '@jest/globals';
 
 let stateBuilder = new StateBuilder();
 const stateName: string = "state";
@@ -14,10 +15,11 @@ beforeEach(() => {
     stateBuilder.setName(stateName);
   });
 
-test("The statebuilder's build function should return undefined if no name is set", () => {
+test("The statebuilder's build function should throw an error if no name is set", () => {
     stateBuilder.reset();
-    const state: StateClass | undefined = stateBuilder.build();
-    expect(state).toBeUndefined();
+    expect(() => {
+        stateBuilder.build()
+    }).toThrow();
 
 });
 
@@ -51,6 +53,7 @@ test("The statebuilders set function for isTerminal and isInitial should initial
     state = stateBuilder
     .setIsInitial(isInitial)
     .setIsTerminal(isTerminal)
+    .setName("name")
     .build();
 
     expect(state?.isInitial == isInitial);
@@ -73,7 +76,7 @@ test("The statebuilder should initialize actions in the state correctly",() => {
     const whileActions: Array<ActionOrActionReferenceClass> = new Array<ActionOrActionReferenceClass>();
     whileActions.push([action1,action2,action3]);
 
-    const state: StateClass | undefined = stateBuilder
+    const state: StateClass = stateBuilder
     .setEntryActions(entryActions)
     .setExitActions(exitActions)
     .setWhileActions(whileActions)
