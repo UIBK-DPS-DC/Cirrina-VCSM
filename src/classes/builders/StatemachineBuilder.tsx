@@ -11,11 +11,11 @@ export class StatemachineBuilder implements Builder<StatemachineClass>{
     }
 
     public build(): StatemachineClass {
-        if(this._statemachine.name == "" || this._statemachine.states.length < 1){
-            throw new Error("Statemachine must have a name and at least one state");
+        if(this.validate()){
+            return this._statemachine;
         }
         else{
-            return this._statemachine;
+            throw new Error("Statemachine must have a name and at least one state");
         }
     }
 
@@ -61,6 +61,10 @@ export class StatemachineBuilder implements Builder<StatemachineClass>{
     public setIsAbstract(value: boolean): StatemachineBuilder {
         this._statemachine.isAbstract = value;
         return this;
+    }
+
+    private validate(): boolean{
+        return (!(this._statemachine.name == "" || this._statemachine.states.length < 1))
     }
 
 
