@@ -16,7 +16,7 @@ export class CollaborativeStatemachineBuilder implements Builder<CollaborativeSt
             return this._collaborativeSatemachine;
         }
         throw new Error("Invalid Collaborative Statemachine cannot be constructed");
-        
+         
         
     }
 

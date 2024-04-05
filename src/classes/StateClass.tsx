@@ -126,6 +126,7 @@ export class StateClass implements StateOrStatemachineClass{
         return this._name;
     }
     public set name(value: string) {
+        console.log("Hello from set name");
         this._name = value;
     }
 
