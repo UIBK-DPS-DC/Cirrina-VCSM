@@ -1,23 +1,45 @@
-import { NodeProps, NodeToolbar,useReactFlow, useNodeId } from "reactflow";
+import { NodeProps, NodeToolbar,useReactFlow, useNodeId, Node } from "reactflow";
 import { useState } from "react";
 import { StateData } from "./types";
 import "../StateNode.css"
+import { StateBuilder } from "./builders/StateBuilder";
+import { StateClass } from "./StateClass";
 
+
+// Used to generate numbers for newly created unnamed states
+export class StateNameNumber {
+    static stateNameNumber: number = 0;
+
+    // Gets the current number without incrementing it
+    static getCurrentNumber(): number{
+        return this.stateNameNumber;
+    }
+
+    //Increments the internal counter and generates new number
+    static getNewNumber(): number {
+        this.stateNameNumber++;
+        return this.stateNameNumber;
+    }
+
+}
 
 export default function StateNode(props: NodeProps<StateData>){
     const [stateName, setStateName] = useState(props.data.state.name);
+    const [tempStateName, setTempStateName] = useState(props.data.state.name);
     const [nodeData, setNodeData] = useState(props.data.state)
     const [isEditing, setIsEditing] = useState(false);
     const [toolbarIsVisible, setToolbarIsVisible] = useState(false);
+
     const reactFlow = useReactFlow();
+    const stateBuilder: StateBuilder = new StateBuilder();
+
+
 
 
     const handleStateNameChange = (e : React.ChangeEvent<HTMLInputElement>) =>{
         const name: string = e.target.value;
-        setStateName(name);
-        nodeData.name = name
-        console.log("My name is," ,name);
-        setNodeData(nodeData);
+        setTempStateName(name);
+        console.log("Temp name set", tempStateName);
         
     }
 
@@ -27,38 +49,98 @@ export default function StateNode(props: NodeProps<StateData>){
 
     const handleBlur = () => {
         setIsEditing(false);
-        console.log(nodeData);
+        
+        if(StateClass.nameIsUnique(tempStateName)){
+
+            StateClass.unregisterName(stateName);
+            StateClass.registerName(tempStateName);
+
+            nodeData.name = tempStateName;
+            setStateName(tempStateName);
+            setNodeData(nodeData);
+            
+        }
+        else {
+            console.log("Name not unique");
+        }
+
     }
 
     const handleKeyPress = (event: React.KeyboardEvent<HTMLInputElement>) => {
         if (event.key === 'Enter') {
           setIsEditing(false);
+          if(StateClass.nameIsUnique(tempStateName)){
+
+            StateClass.unregisterName(stateName);
+            StateClass.registerName(tempStateName);
+
+            nodeData.name = tempStateName;
+            setNodeData(nodeData);
+            setStateName(tempStateName);
+          }
+          else{
+            console.log("Name not unique");
+          }
           console.log(nodeData);
         }
 
       };
 
     
-    const handleOnClick = () => {
+    const handleRightClick = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+        event.preventDefault();
         setToolbarIsVisible(!toolbarIsVisible);
 
      };
 
 
-    const handleButtonClick = (id: string | null) => {
+    const handleButtonClick = () => {
+        const newState: StateClass = createNewState();
+        const newNode: Node<StateData> = {
+            id: newState.name,
+            type: "stateNode",
+            position: {
+                x: props.xPos + 30,
+                y: props.yPos + 30,
+            },
+            data: {
+                state : newState
+            }
+
+        }
+
+        reactFlow.addNodes(newNode);
         
     }
 
 
+    function createNewState(): StateClass{
+        let newStateName: string = "state - " + StateNameNumber.getNewNumber().toString();
+        while(!StateClass.nameIsUnique(newStateName)){
+            newStateName = "state - " + StateNameNumber.getNewNumber().toString();
+        }
+        console.log("New unique name", newStateName);
+        StateClass.registerName(newStateName);
+
+        const newState: StateClass = stateBuilder.setName(newStateName).build();
+        return newState;
+    }
+    
+
+
+
+
+
+
 
     return(
-        <div className = "state-node" onDoubleClick={handleDoubleClick} onClick={handleOnClick} style={{border: nodeData.isInitial ? "2px solid green" : "none"}}>
+        <div id = {stateName} className = "state-node" onDoubleClick={handleDoubleClick} onContextMenu={handleRightClick} style={{border: nodeData.isInitial ? "2px solid green" : nodeData.isTerminal ? "2px solid red" : "none"}}>
             {isEditing? (
-                <input className = "node-name-field" type = "text" value = {stateName} onChange={handleStateNameChange} onBlur={handleBlur} onKeyDown={handleKeyPress}></input>
+                <input className = "node-name-field" type = "text" value = {tempStateName} onChange={handleStateNameChange} onBlur={handleBlur} onKeyDown={handleKeyPress}></input>
             ) : ( <div>{stateName}</div>
             )}
             <NodeToolbar isVisible = {toolbarIsVisible}>
-                <button onClick={handleButtonClick(useNodeId())}></button>
+                <button onClick={handleButtonClick}>Add connected State</button>
             </NodeToolbar>
             
         </div>

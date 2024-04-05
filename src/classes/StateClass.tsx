@@ -21,6 +21,26 @@ import { TransitionClass } from "./transition/TransitionClass";
  * }
  */
 export class StateClass implements StateOrStatemachineClass{
+
+    static stateNames: Array<string> = new Array<string>();
+
+    static registerName(name: string): void{
+        this.stateNames.push(name);
+    }
+
+    static unregisterName(name: string): void{
+        this.stateNames = this.stateNames.filter((e) => {
+            e != name;
+        })
+    }
+
+    static nameIsUnique(name : string): boolean {
+        return !this.stateNames.includes(name);
+    }
+
+
+    
+
     private _name: string;
 
      /**

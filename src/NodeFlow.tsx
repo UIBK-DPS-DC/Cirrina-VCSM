@@ -17,21 +17,23 @@ const nodeTypes = {
     stateNode: StateNode
 }
 
+const initialStateName = "Initial";
+
 const stateBuilder: StateBuilder = new StateBuilder();
-const initialState: StateClass = stateBuilder.setName("Initial").setIsInitial(true).build();
+const initialState: StateClass = stateBuilder.setName(initialStateName).setIsInitial(true).build();
+StateClass.registerName(initialStateName);
 console.log(initialState);
 
 
 
 const initialNodes = [
-    {id: "0", type: 'stateNode',
+    {id: initialState.name, type: 'stateNode',
     position:{x: 0, y: 0},
     data: { state: initialState} }
 ]
 
 function Flow() {
     const [nodes, setNodes] = useState(initialNodes);
-    const [c,setC] = useState(0);
 
     const onNodesChange: OnNodesChange = useCallback(
         (changes) => setNodes((nds) => applyNodeChanges(changes, nds)),
