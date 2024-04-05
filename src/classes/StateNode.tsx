@@ -1,9 +1,10 @@
-import { NodeProps, NodeToolbar,useReactFlow, useNodeId, Node } from "reactflow";
+import { NodeProps, NodeToolbar,useReactFlow, Handle, Node, Position } from "reactflow";
 import { useState } from "react";
 import { StateData } from "./types";
 import "../StateNode.css"
 import { StateBuilder } from "./builders/StateBuilder";
 import { StateClass } from "./StateClass";
+
 
 
 // Used to generate numbers for newly created unnamed states
@@ -29,10 +30,13 @@ export default function StateNode(props: NodeProps<StateData>){
     const [nodeData, setNodeData] = useState(props.data.state)
     const [isEditing, setIsEditing] = useState(false);
     const [toolbarIsVisible, setToolbarIsVisible] = useState(false);
+    const [sourceHandleId, setSourceHandleId] = useState(createSourceHandleId(stateName));
+    const [targetHandleId, setTargetHandleId] = useState(createTargetHandleId(stateName));
 
     const reactFlow = useReactFlow();
     const stateBuilder: StateBuilder = new StateBuilder();
 
+    
 
 
 
@@ -58,6 +62,8 @@ export default function StateNode(props: NodeProps<StateData>){
             nodeData.name = tempStateName;
             setStateName(tempStateName);
             setNodeData(nodeData);
+            setSourceHandleId(createSourceHandleId(tempStateName));
+            setTargetHandleId(createTargetHandleId(tempStateName));
             
         }
         else {
@@ -77,11 +83,14 @@ export default function StateNode(props: NodeProps<StateData>){
             nodeData.name = tempStateName;
             setNodeData(nodeData);
             setStateName(tempStateName);
+            setSourceHandleId(createSourceHandleId(tempStateName));
+            setTargetHandleId(createTargetHandleId(tempStateName));
           }
           else{
             console.log("Name not unique");
           }
           console.log(nodeData);
+
         }
 
       };
@@ -123,8 +132,21 @@ export default function StateNode(props: NodeProps<StateData>){
         StateClass.registerName(newStateName);
 
         const newState: StateClass = stateBuilder.setName(newStateName).build();
+        stateBuilder.reset();
+        console.log(newState);
         return newState;
     }
+
+
+
+    function createSourceHandleId(stateName: string): string {
+        return (stateName) + "-" +"source";
+    }
+
+    function createTargetHandleId(stateName: string): string {
+        return (stateName) + "-" + "target";
+    }
+
     
 
 
@@ -135,6 +157,7 @@ export default function StateNode(props: NodeProps<StateData>){
 
     return(
         <div id = {stateName} className = "state-node" onDoubleClick={handleDoubleClick} onContextMenu={handleRightClick} style={{border: nodeData.isInitial ? "2px solid green" : nodeData.isTerminal ? "2px solid red" : "none"}}>
+            <Handle type = "target" position = {Position.Top} id = {targetHandleId}></Handle>
             {isEditing? (
                 <input className = "node-name-field" type = "text" value = {tempStateName} onChange={handleStateNameChange} onBlur={handleBlur} onKeyDown={handleKeyPress}></input>
             ) : ( <div>{stateName}</div>
@@ -142,6 +165,7 @@ export default function StateNode(props: NodeProps<StateData>){
             <NodeToolbar isVisible = {toolbarIsVisible}>
                 <button onClick={handleButtonClick}>Add connected State</button>
             </NodeToolbar>
+            <Handle type="source" position={Position.Bottom} id = {sourceHandleId}/>
             
         </div>
     )
