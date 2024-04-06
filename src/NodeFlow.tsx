@@ -12,6 +12,7 @@ import ReactFlow, {
     OnNodesChange,
     applyNodeChanges,
     ReactFlowProvider,
+    applyEdgeChanges,
   } from 'reactflow';
 import { TransitionClass } from './classes/transition/TransitionClass';
 
@@ -63,6 +64,12 @@ function Flow() {
         [setNodes],
       );
 
+    
+    const onEdgesChange = useCallback(
+        (changes) => setEdges((eds) => applyEdgeChanges(changes, eds)),
+        [],
+      );
+
 
     
   
@@ -77,6 +84,7 @@ function Flow() {
         edgeTypes= {edgeTypes}
         fitView
         onNodesChange = {onNodesChange}
+        onEdgesChange = {onEdgesChange}
         >
         <Controls></Controls>
         <MiniMap />

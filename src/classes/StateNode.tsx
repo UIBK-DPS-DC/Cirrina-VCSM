@@ -1,13 +1,15 @@
-import { NodeProps, NodeToolbar,useReactFlow, Handle, Node, Position } from "reactflow";
+import { NodeProps, NodeToolbar,useReactFlow, Handle, Node, Position} from "reactflow";
 import { useState } from "react";
 import { StateData } from "./types";
 import "../StateNode.css"
 import { StateBuilder } from "./builders/StateBuilder";
 import { StateClass } from "./StateClass";
+import { TransitionClass } from "./transition/TransitionClass";
 
 
 
 // Used to generate numbers for newly created unnamed states
+// See @createNewState()
 export class StateNameNumber {
     static stateNameNumber: number = 0;
 
@@ -67,6 +69,7 @@ export default function StateNode(props: NodeProps<StateData>){
             
         }
         else {
+            // TODO: implement some sort of popup notification
             console.log("Name not unique");
         }
 
@@ -104,6 +107,8 @@ export default function StateNode(props: NodeProps<StateData>){
 
 
     const handleButtonClick = () => {
+
+
         const newState: StateClass = createNewState();
         const newNode: Node<StateData> = {
             id: newState.name,
@@ -120,14 +125,20 @@ export default function StateNode(props: NodeProps<StateData>){
 
         reactFlow.addNodes(newNode);
         
+        const newEdge = createNewEdge(stateName, newState.name);
+        console.log("NEW EDGE", newEdge);
+        reactFlow.addEdges(newEdge);
+        
     }
 
 
     function createNewState(): StateClass{
-        let newStateName: string = "state - " + StateNameNumber.getNewNumber().toString();
+        let newStateName: string = "state-" + StateNameNumber.getNewNumber().toString();
+
         while(!StateClass.nameIsUnique(newStateName)){
-            newStateName = "state - " + StateNameNumber.getNewNumber().toString();
+            newStateName = "state-" + StateNameNumber.getNewNumber().toString();
         }
+
         console.log("New unique name", newStateName);
         StateClass.registerName(newStateName);
 
@@ -135,6 +146,21 @@ export default function StateNode(props: NodeProps<StateData>){
         stateBuilder.reset();
         console.log(newState);
         return newState;
+    }
+
+    function createNewEdge(source: string, target: string){
+        const transition: TransitionClass = new TransitionClass(target);
+        const newEdge = {
+            id: source + '->' + target,
+            type: 'stateEdge',
+            source: source,
+            target: target,
+            data: {
+                transition: transition
+            }
+        }
+        return newEdge
+
     }
 
 
@@ -162,7 +188,7 @@ export default function StateNode(props: NodeProps<StateData>){
                 <input className = "node-name-field" type = "text" value = {tempStateName} onChange={handleStateNameChange} onBlur={handleBlur} onKeyDown={handleKeyPress}></input>
             ) : ( <div>{stateName}</div>
             )}
-            <NodeToolbar isVisible = {toolbarIsVisible}>
+            <NodeToolbar isVisible = {toolbarIsVisible && ! nodeData.isTerminal}>
                 <button onClick={handleButtonClick}>Add connected State</button>
             </NodeToolbar>
             <Handle type="source" position={Position.Bottom} id = {sourceHandleId}/>
