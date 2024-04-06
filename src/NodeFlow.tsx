@@ -50,7 +50,7 @@ const initialNodes = [
 ]
 
 const initialEdges = [
-  { id: 'a->b', type: 'stateEdge', source: initialStateName, target: terminalStateName, data: {transition: new TransitionClass(terminalStateName)} },
+  { id: initialStateName + "->" + terminalStateName, type: 'stateEdge', source: initialStateName, target: terminalStateName, data: {transition: new TransitionClass(terminalStateName)} },
 ];
 
 
