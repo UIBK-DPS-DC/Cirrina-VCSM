@@ -6,8 +6,6 @@ import {
   MiniMap,
   Controls,
   Background,
-  useNodesState,
-  useEdgesState,
   addEdge,
   type Node,
   type Edge,
