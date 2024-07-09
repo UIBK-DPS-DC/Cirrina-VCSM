@@ -87,6 +87,7 @@ export default function App() {
       defaultEdgeOptions={defaultEdgeOptions}>
         <Controls></Controls>
         <Background></Background>
+        <MiniMap></MiniMap>
       </ReactFlow>
     </div>
   );
