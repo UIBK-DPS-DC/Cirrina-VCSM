@@ -1,0 +1,23 @@
+#main-flow{
+    width: 100vh;
+    height: 100vh;
+    background-color: white;
+    display: block;
+    
+}
+
+#flow-container{
+    border: 0.05em solid white;
+    width:100%;
+    display: flex;
+    justify-content:center;
+}
+
+#sidebar-container{
+    height: 100%;
+    display: flex;
+    justify-content: left;
+    border: 2px solid green;
+    position: absolute;
+    left:20px;
+}
