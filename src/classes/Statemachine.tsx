@@ -17,7 +17,7 @@ export default class StateMachine extends StateOrStatemachine {
         return this.name
     }
 
-    public setName(statemachineName: string){
+    public setName(statemachineName: string): void{
         this.name = statemachineName
     }
 
