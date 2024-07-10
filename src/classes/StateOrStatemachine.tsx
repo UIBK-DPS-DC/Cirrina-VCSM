@@ -5,24 +5,34 @@ export default class StateOrStatemachine {
 
 
     public static registerName(name: string): boolean {
-        if(StateOrStatemachine.stateOrStatemachineNames.has(name)){
+        if(this.isNameUnique(name)){
             console.log(name + " already exists");
             return false
         }
 
-        StateOrStatemachine.stateOrStatemachineNames.add(name)
+        this.stateOrStatemachineNames.add(name)
         return true
+    }
+
+    public static unregisterName(name: string): void {
+        this.stateOrStatemachineNames.delete(name)
     }
 
     public static getCurrentIdCount(): number {
         return StateOrStatemachine.idCount
     }
 
-    public static getNewId(){
-        const id = StateOrStatemachine.idCount
-        StateOrStatemachine.idCount+= 1
+    public static getNewId(): number{
+        const id = this.idCount
+        this.idCount+= 1
         return id
     }
+
+    public static isNameUnique(name: string): boolean {
+        return this.stateOrStatemachineNames.has(name)
+    }
+
+
 
 
 
