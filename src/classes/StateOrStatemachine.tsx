@@ -5,7 +5,7 @@ export default class StateOrStatemachine {
 
 
     public static registerName(name: string): boolean {
-        if(this.isNameUnique(name)){
+        if(! this.isNameUnique(name)){
             console.log(name + " already exists");
             return false
         }
@@ -29,7 +29,7 @@ export default class StateOrStatemachine {
     }
 
     public static isNameUnique(name: string): boolean {
-        return this.stateOrStatemachineNames.has(name)
+        return ! this.stateOrStatemachineNames.has(name)
     }
 
 
