@@ -11,6 +11,7 @@ test("Statemachine names should be unique", () => {
     expect(res).toBe(false)
 
     StateOrStatemachine.unregisterName(statemachineName)
+    expect(StateOrStatemachine.isNameUnique(statemachineName)).toBe(true)
 
 })
 
@@ -24,6 +25,7 @@ test("Statemachine names should register correctly", () => {
     names.forEach((e) => {
         expect(StateOrStatemachine.registerName(e)).toBe(false)
         StateOrStatemachine.unregisterName(e)
+        expect(StateOrStatemachine.isNameUnique(e)).toBe(true)
     })
 
 })
