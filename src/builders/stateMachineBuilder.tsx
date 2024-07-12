@@ -20,8 +20,6 @@ export default class StateMachineBuilder implements Builder<StateMachine> {
         return this.stateMachine.getName() != ""
     }
 
-    
-
 
     
     
