@@ -21,10 +21,15 @@ import {
 import '@xyflow/react/dist/style.css';
 import StateMachineNode from './components/stateMachineNodeComponent';
 import StateMachine from './classes/statemachine';
+import CsmEdge from './components/csmEdgeComponent';
 
 
 const nodeTypes = {
   stateMachine: StateMachineNode
+}
+
+const edgeTypes = {
+  csmEdge : CsmEdge
 }
 
 
@@ -39,7 +44,7 @@ const initialNodes: Node[] = [
   { id: '2', data: { stateMachine: sm2 }, position: { x: 5, y: 100 }, type: "stateMachine"},
 ];
  
-const initialEdges: Edge[] = [{ id: 'e1-2', source: '1', target: '2'}];
+const initialEdges: Edge[] = [];
  
 const fitViewOptions: FitViewOptions = {
   padding: 0.2,
@@ -75,6 +80,7 @@ export default function App() {
      <ReactFlow
       nodes={nodes}
       nodeTypes={nodeTypes}
+      edgeTypes={edgeTypes}
       edges={edges}
       onNodesChange={onNodesChange}
       onEdgesChange={onEdgesChange}
