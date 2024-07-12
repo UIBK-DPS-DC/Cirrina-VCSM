@@ -19,7 +19,7 @@ import {
 } from '@xyflow/react';
  
 import '@xyflow/react/dist/style.css';
-import StateMachineNode from './classes/stateMachineNode';
+import StateMachineNode from './components/stateMachineNodeComponent';
 import StateMachine from './classes/statemachine';
 
 
