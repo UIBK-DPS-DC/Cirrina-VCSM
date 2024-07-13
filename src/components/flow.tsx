@@ -80,7 +80,7 @@ export default function Flow() {
                 id: getNewId(),
                 type,
                 position,
-                data: { name: `${type}` },
+                data: { name: `${type + " " + id}` },
             };
 
             // TODO add this to stylesheet
