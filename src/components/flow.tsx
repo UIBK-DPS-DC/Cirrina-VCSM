@@ -1,4 +1,4 @@
-import React, { useCallback, createContext } from 'react';
+import React, {useCallback, createContext, useMemo} from 'react';
 import {
     ReactFlow,
     Background,
@@ -41,7 +41,7 @@ export default function Flow() {
     const {getIntersectingNodes, screenToFlowPosition } = useReactFlow();
 
 
-    const stateOrStateMachineService = new StateOrStateMachineService()
+    const stateOrStateMachineService: StateOrStateMachineService = useMemo( () => new StateOrStateMachineService(), []);
     const contextValue = {
         nodes,
         setNodes,
