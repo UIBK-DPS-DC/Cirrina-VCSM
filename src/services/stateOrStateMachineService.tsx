@@ -28,6 +28,7 @@ export default class StateOrStateMachineService {
         }
 
         this.stateOrStatemachineNames.add(stateOrStatemachineName);
+        console.log(stateOrStatemachineName + " has been registered!");
         return true;
     }
 
