@@ -139,6 +139,17 @@ export default function Flow() {
         [setNodes, getIntersectingNodes],
     );
 
+    const onNodesDelete = useCallback(
+        (deletedNodes: Node[]) => {
+            deletedNodes.map(
+                (node) => {
+                    stateOrStateMachineService.unregisterName(node.data.name);
+                }
+            )
+        },[stateOrStateMachineService]
+    )
+
+
     return (
         <ReactFlowContext.Provider value={contextValue}>
             <ReactFlow
@@ -148,6 +159,7 @@ export default function Flow() {
                 edges={edges}
                 onEdgesChange={onEdgesChange}
                 onConnect={onConnect}
+                onNodesDelete={onNodesDelete}
                 onDragOver={onDragOver}
                 onDrop={onDrop}
                 onNodeDragStop={onNodeDragStop}

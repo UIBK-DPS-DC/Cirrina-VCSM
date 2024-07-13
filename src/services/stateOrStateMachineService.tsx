@@ -41,8 +41,15 @@ export default class StateOrStateMachineService {
      *
      * @param {string} stateOrStatemachineName - The name of the state or state machine to unregister.
      */
-    public unregisterName(stateOrStatemachineName: string): void {
-        this.stateOrStatemachineNames.delete(stateOrStatemachineName);
+    public unregisterName(stateOrStatemachineName: string | unknown): void {
+        if(typeof stateOrStatemachineName === "string" ){
+            this.stateOrStatemachineNames.delete(stateOrStatemachineName);
+            console.log(stateOrStatemachineName + " has been unregistered!");
+        }
+        else {
+            console.warn("Invalid name type: unable to unregister", stateOrStatemachineName);
+        }
+
     }
 
     /**
