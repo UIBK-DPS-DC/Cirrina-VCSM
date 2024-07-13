@@ -61,6 +61,17 @@ export default class StateOrStateMachineService {
         return ! this.stateOrStatemachineNames.has(stateOrStatemachineName);
     }
 
+    /**
+     * Generates a unique name for a state or state machine.
+     *
+     * This method constructs a unique identifier by concatenating the provided `type`
+     * with an incrementing `id`. It checks the generated name against the collection
+     * of already registered names to ensure uniqueness. If a collision is found,
+     * it continues to increment the `id` and check again until a unique name is generated.
+     *
+     * @param {string} type - The type of the state or state machine (e.g., 'state', 'custom').
+     * @returns {string} - Returns a unique name in the format `type id`.
+     */
     public generateUniqueName(type: string): string {
         let newId: string = type + " " + `${this.id++}`
         while(!this.isNameUnique(newId)){
