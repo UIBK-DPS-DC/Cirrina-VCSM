@@ -8,6 +8,11 @@ export default class StateMachineBuilder implements Builder<StateMachine> {
         this.stateMachine = new StateMachine("");
     }
 
+
+    public setStateMachineName(stateMachineName: string){
+        this.stateMachine._name = stateMachineName
+    }
+
     public build(): StateMachine {
         return this.stateMachine
     }
@@ -17,8 +22,9 @@ export default class StateMachineBuilder implements Builder<StateMachine> {
     }
 
     public validate(): boolean {
-        return this.stateMachine.getName() != ""
+        return this.stateMachine.name != ""
     }
+
 
 
     
