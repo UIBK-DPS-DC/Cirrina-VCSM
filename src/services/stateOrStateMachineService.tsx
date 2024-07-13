@@ -2,6 +2,7 @@
 // All functions related to this objective should live here
 
 export default class StateOrStateMachineService {
+    private id: number = 0
     private stateOrStatemachineNames : Set<string>;
 
     public constructor() {
@@ -59,6 +60,17 @@ export default class StateOrStateMachineService {
     public isNameUnique(stateOrStatemachineName: string): boolean {
         return ! this.stateOrStatemachineNames.has(stateOrStatemachineName);
     }
+
+    public generateUniqueName(type: string): string {
+        let newId: string = type + " " + `${this.id++}`
+        while(!this.isNameUnique(newId)){
+            newId = type + " " + `${this.id++}`
+        }
+
+        return newId
+
+    }
+
 
 
 
