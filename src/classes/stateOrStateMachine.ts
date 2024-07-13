@@ -1,4 +1,4 @@
-export default class StateOrStatemachine {
+export default class StateOrStateMachine {
     private static stateOrStatemachineNames: Set<string> = new Set()
     private static idCount: number = 0
 
@@ -19,7 +19,7 @@ export default class StateOrStatemachine {
     }
 
     public static getCurrentIdCount(): number {
-        return StateOrStatemachine.idCount
+        return StateOrStateMachine.idCount
     }
 
     public static getNewId(): number{
