@@ -76,12 +76,19 @@ export default function Flow() {
                 y: event.clientY,
             });
 
+            // TODO: Move id generation to service and create function to generate new names
+            const new_id: string = getNewId()
+            const new_name: string = type + " " + id
+            stateOrStateMachineService.registerName(new_name)
+
             const newNode : Node = {
-                id: getNewId(),
+                id: new_id,
                 type,
                 position,
-                data: { name: `${type + " " + id}` },
+                data: { name: new_name},
             };
+
+
 
             // TODO add this to stylesheet
             if(type === 'state-machine-node') {
