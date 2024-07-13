@@ -2,10 +2,10 @@
 // All functions related to this objective should live here
 
 export default class StateOrStateMachineService {
-    private stateOrStatemachineNames : Set<string>
+    private stateOrStatemachineNames : Set<string>;
 
     public constructor() {
-        this.stateOrStatemachineNames = new Set()
+        this.stateOrStatemachineNames = new Set();
 
     }
 
@@ -23,12 +23,12 @@ export default class StateOrStateMachineService {
      */
     public registerName(stateOrStatemachineName: string): boolean {
         if(!this.isNameUnique(stateOrStatemachineName)){
-            console.error("StateOrStateMachine name already exists!")
+            console.error("StateOrStateMachine name already exists!");
             return false;
         }
 
-        this.stateOrStatemachineNames.add(stateOrStatemachineName)
-        return true
+        this.stateOrStatemachineNames.add(stateOrStatemachineName);
+        return true;
     }
 
     /**
@@ -40,7 +40,7 @@ export default class StateOrStateMachineService {
      * @param {string} stateOrStatemachineName - The name of the state or state machine to unregister.
      */
     public unregisterName(stateOrStatemachineName: string): void {
-        this.stateOrStatemachineNames.delete(stateOrStatemachineName)
+        this.stateOrStatemachineNames.delete(stateOrStatemachineName);
     }
 
     /**
@@ -56,7 +56,7 @@ export default class StateOrStateMachineService {
      *                      otherwise returns `false`.
      */
     public isNameUnique(stateOrStatemachineName: string): boolean {
-        return ! this.stateOrStatemachineNames.has(stateOrStatemachineName)
+        return ! this.stateOrStatemachineNames.has(stateOrStatemachineName);
     }
 
 
