@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, createContext } from 'react';
 import {
     ReactFlow,
     Background,
@@ -15,6 +15,7 @@ import {EntryNode} from "./Nodes/entryNode.tsx";
 import {ExitNode} from "./Nodes/exitNode.tsx";
 import {StateNode} from "./Nodes/stateNode.tsx";
 import {StateMachineNode} from "./Nodes/stateMachineNode.tsx";
+import StateOrStateMachineService from "../services/stateOrStateMachineService.tsx";
 
 
 const nodeTypes = {
@@ -27,6 +28,8 @@ const nodeTypes = {
 const initialNodes: Node[] = [];
 const initialEdges: Edge[] = [];
 
+const ReactFlowContext = createContext({});
+
 let id = 0;
 const getNewId = () => `node_${id++}`;
 
@@ -36,6 +39,17 @@ export default function Flow() {
     const [nodes, setNodes , onNodesChange] = useNodesState(initialNodes);
     const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
     const {getIntersectingNodes, screenToFlowPosition } = useReactFlow();
+
+
+    const stateOrStateMachineService = new StateOrStateMachineService()
+    const contextValue = {
+        nodes,
+        setNodes,
+        edges,
+        setEdges,
+        stateOrStateMachineService,
+    }
+
 
     const onConnect: OnConnect = useCallback(
         (connection) => setEdges((edges) => addEdge(connection, edges)),
@@ -120,21 +134,23 @@ export default function Flow() {
     );
 
     return (
-        <ReactFlow
-            nodes={nodes}
-            nodeTypes={nodeTypes}
-            onNodesChange={onNodesChange}
-            edges={edges}
-            onEdgesChange={onEdgesChange}
-            onConnect={onConnect}
-            onDragOver={onDragOver}
-            onDrop={onDrop}
-            onNodeDragStop={onNodeDragStop}
-            fitView
-        >
-            <Background />
-            <MiniMap />
-            <Controls />
-        </ReactFlow>
+        <ReactFlowContext.Provider value={contextValue}>
+            <ReactFlow
+                nodes={nodes}
+                nodeTypes={nodeTypes}
+                onNodesChange={onNodesChange}
+                edges={edges}
+                onEdgesChange={onEdgesChange}
+                onConnect={onConnect}
+                onDragOver={onDragOver}
+                onDrop={onDrop}
+                onNodeDragStop={onNodeDragStop}
+                fitView
+            >
+                <Background />
+                <MiniMap />
+                <Controls />
+            </ReactFlow>
+        </ReactFlowContext.Provider>
     );
 }
