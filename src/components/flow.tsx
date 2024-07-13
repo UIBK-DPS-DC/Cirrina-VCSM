@@ -104,7 +104,7 @@ export default function Flow() {
 
             setNodes((nds) => nds.concat(newNode));
         },
-        [screenToFlowPosition, setNodes],
+        [screenToFlowPosition, setNodes, stateOrStateMachineService],
     );
 
     const onNodeDragStop = useCallback(
