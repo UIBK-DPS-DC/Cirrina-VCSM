@@ -49,7 +49,8 @@ describe('stateOrStateMachineService', () => {
         expect(result).toBe(false);
     });
 
-    // Name Generation Tests
+
+    // ############################## Name Generation Tests ############################################################
 
     test('generateUniqueName should generate a unique name when no names are registered', () => {
         const uniqueName = service.generateUniqueName('state');
