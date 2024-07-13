@@ -2,6 +2,7 @@
 // All functions related to this objective should live here
 
 export default class StateOrStateMachineService {
+    private id: number = 0
     private stateOrStatemachineNames : Set<string>;
 
     public constructor() {
@@ -40,8 +41,15 @@ export default class StateOrStateMachineService {
      *
      * @param {string} stateOrStatemachineName - The name of the state or state machine to unregister.
      */
-    public unregisterName(stateOrStatemachineName: string): void {
-        this.stateOrStatemachineNames.delete(stateOrStatemachineName);
+    public unregisterName(stateOrStatemachineName: string | unknown): void {
+        if(typeof stateOrStatemachineName === "string" ){
+            this.stateOrStatemachineNames.delete(stateOrStatemachineName);
+            console.log(stateOrStatemachineName + " has been unregistered!");
+        }
+        else {
+            console.warn("Invalid name type: unable to unregister", stateOrStatemachineName);
+        }
+
     }
 
     /**
@@ -59,6 +67,28 @@ export default class StateOrStateMachineService {
     public isNameUnique(stateOrStatemachineName: string): boolean {
         return ! this.stateOrStatemachineNames.has(stateOrStatemachineName);
     }
+
+    /**
+     * Generates a unique name for a state or state machine.
+     *
+     * This method constructs a unique identifier by concatenating the provided `type`
+     * with an incrementing `id`. It checks the generated name against the collection
+     * of already registered names to ensure uniqueness. If a collision is found,
+     * it continues to increment the `id` and check again until a unique name is generated.
+     *
+     * @param {string} type - The type of the state or state machine (e.g., 'state', 'custom').
+     * @returns {string} - Returns a unique name in the format `type id`.
+     */
+    public generateUniqueName(type: string): string {
+        let newId: string = type + " " + `${this.id++}`
+        while(!this.isNameUnique(newId)){
+            newId = type + " " + `${this.id++}`
+        }
+
+        return newId
+
+    }
+
 
 
 

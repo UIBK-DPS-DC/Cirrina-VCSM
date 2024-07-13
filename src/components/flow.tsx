@@ -35,13 +35,14 @@ const getNewId = () => `node_${id++}`;
 
 export default function Flow() {
 
+    const stateOrStateMachineService: StateOrStateMachineService = useMemo( () => new StateOrStateMachineService(), []);
 
     const [nodes, setNodes , onNodesChange] = useNodesState(initialNodes);
     const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
     const {getIntersectingNodes, screenToFlowPosition } = useReactFlow();
 
 
-    const stateOrStateMachineService: StateOrStateMachineService = useMemo( () => new StateOrStateMachineService(), []);
+
     const contextValue = {
         nodes,
         setNodes,
@@ -76,13 +77,11 @@ export default function Flow() {
                 y: event.clientY,
             });
 
-            // TODO: Move id generation to service and create function to generate new names
-            const new_id: string = getNewId()
-            const new_name: string = type + " " + id
+            const new_name: string  = stateOrStateMachineService.generateUniqueName(type)
             stateOrStateMachineService.registerName(new_name)
 
             const newNode : Node = {
-                id: new_id,
+                id: getNewId(),
                 type,
                 position,
                 data: { name: new_name},
@@ -140,6 +139,17 @@ export default function Flow() {
         [setNodes, getIntersectingNodes],
     );
 
+    const onNodesDelete = useCallback(
+        (deletedNodes: Node[]) => {
+            deletedNodes.map(
+                (node) => {
+                    stateOrStateMachineService.unregisterName(node.data.name);
+                }
+            )
+        },[stateOrStateMachineService]
+    )
+
+
     return (
         <ReactFlowContext.Provider value={contextValue}>
             <ReactFlow
@@ -149,6 +159,7 @@ export default function Flow() {
                 edges={edges}
                 onEdgesChange={onEdgesChange}
                 onConnect={onConnect}
+                onNodesDelete={onNodesDelete}
                 onDragOver={onDragOver}
                 onDrop={onDrop}
                 onNodeDragStop={onNodeDragStop}
