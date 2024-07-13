@@ -1,4 +1,4 @@
-import StateMachine from "../classes/statemachine";
+import StateMachine from "../classes/stateMachine.ts";
 import { Builder } from "../interfaces";
 
 export default class StateMachineBuilder implements Builder<StateMachine> {
