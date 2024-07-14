@@ -14,9 +14,6 @@ export type NodeType =
 
 export type EntryNode = Node<{name: string}, 'entry-node'>;
 
-//export type StateNode = Node<CsmNodeProps, 'state-node'>;
-
-//export type StateMachineNode = Node<CsmNodeProps, 'state-machine-node'>;
 
 export type StateNode = Node<{
    state : State
@@ -30,18 +27,13 @@ export type StateMachineNode = Node<{
 export type ExitNode = Node<{name: string}, 'exit-node'>;
 
 
-// Node Types with classes. Unsure if needed
 export type CsmEdgeProps = Edge<{
     transition: Transition
 }, 'csmEdge'>;
 
-export type StateMachineProps = Node<{
-    stateMachine: StateMachine
-}>
 
 
 
-// Guards
 
 // Type guards
 
