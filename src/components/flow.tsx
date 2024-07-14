@@ -1,4 +1,4 @@
-import React, {useCallback, createContext, useMemo} from 'react';
+import React, {useCallback, createContext, useMemo, useState} from 'react';
 import {
     ReactFlow,
     Background,
@@ -16,6 +16,9 @@ import {ExitNode} from "./Nodes/exitNode.tsx";
 import {StateNode} from "./Nodes/stateNode.tsx";
 import {StateMachineNode} from "./Nodes/stateMachineNode.tsx";
 import StateOrStateMachineService from "../services/stateOrStateMachineService.tsx";
+import {CsmNodeProps} from "../types.ts";
+
+import "../css/nodeForm.css"
 
 
 const nodeTypes = {
@@ -25,7 +28,7 @@ const nodeTypes = {
     'state-machine-node': StateMachineNode,
 } satisfies NodeTypes;
 
-const initialNodes: Node[] = [];
+const initialNodes: Node<CsmNodeProps>[] = [];
 const initialEdges: Edge[] = [];
 
 const ReactFlowContext = createContext({});
@@ -39,7 +42,11 @@ export default function Flow() {
 
     const [nodes, setNodes , onNodesChange] = useNodesState(initialNodes);
     const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
+    const [selectedNode, setSelectedNode] = useState<Node<CsmNodeProps> | null>(null)
+    const [showSidebar, setShowSidebar] = useState(false);
     const {getIntersectingNodes, screenToFlowPosition } = useReactFlow();
+
+
 
 
 
@@ -80,7 +87,7 @@ export default function Flow() {
             const new_name: string  = stateOrStateMachineService.generateUniqueName(type)
             stateOrStateMachineService.registerName(new_name)
 
-            const newNode : Node = {
+            const newNode : Node<CsmNodeProps> = {
                 id: getNewId(),
                 type,
                 position,
@@ -149,6 +156,20 @@ export default function Flow() {
         },[stateOrStateMachineService]
     )
 
+    const onNodeClick =
+        useCallback((_: React.MouseEvent, node: Node<CsmNodeProps>) => {
+            setSelectedNode(node);
+            setShowSidebar(true);
+        },[])
+
+    const onPaneClick =
+        useCallback(() => {
+            setShowSidebar(false);
+        },[])
+
+
+
+
 
     return (
         <ReactFlowContext.Provider value={contextValue}>
@@ -159,6 +180,8 @@ export default function Flow() {
                 edges={edges}
                 onEdgesChange={onEdgesChange}
                 onConnect={onConnect}
+                onPaneClick={onPaneClick}
+                onNodeClick={onNodeClick}
                 onNodesDelete={onNodesDelete}
                 onDragOver={onDragOver}
                 onDrop={onDrop}
@@ -169,6 +192,18 @@ export default function Flow() {
                 <MiniMap />
                 <Controls />
             </ReactFlow>
+            {showSidebar && selectedNode && (
+                <div className = "node-form">
+                    <form>
+                        <h3>Hi mom! Its me {selectedNode.data.name}!</h3>
+                    </form>
+
+                </div>
+            )
+
+            }
+
+
         </ReactFlowContext.Provider>
     );
 }
