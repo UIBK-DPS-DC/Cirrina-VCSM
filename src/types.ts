@@ -2,8 +2,6 @@ import {Edge, Node} from "@xyflow/react";
 import Transition from "./classes/transition.ts";
 import StateMachine from "./classes/stateMachine.ts";
 import State from "./classes/state.ts";
-import React from "react";
-import StateOrStateMachineService from "./services/stateOrStateMachineService.tsx";
 
 // One Type to avoid repeating ourselves. Can be expanded/unionized as needed.
 export type CsmNodeProps = {state: State} | {stateMachine: StateMachine} | {name: string};
@@ -32,21 +30,6 @@ export type ExitNode = Node<{name: string}, 'exit-node'>;
 export type CsmEdgeProps = Edge<{
     transition: Transition
 }, 'csmEdge'>;
-
-
-export type ReactFlowContextProps = {
-    nodes: Node<CsmNodeProps>[]
-    setNodes: React.Dispatch<React.SetStateAction<Node<CsmNodeProps>[]>>;
-    edges: Edge<CsmEdgeProps>[]
-    setEdges:  React.Dispatch<React.SetStateAction<Edge<CsmEdgeProps>[]>>;
-    selectedNode: Node<CsmNodeProps> | null
-    setSelectedNode: React.Dispatch<React.SetStateAction<Node<CsmNodeProps> | null>>
-    showSidebar: boolean
-    setShowSidebar:  React.Dispatch<React.SetStateAction<boolean>>
-    nameInput: string,
-    setNameInput: React.Dispatch<React.SetStateAction<string>>
-    stateOrStateMachineService: StateOrStateMachineService
-}
 
 
 
