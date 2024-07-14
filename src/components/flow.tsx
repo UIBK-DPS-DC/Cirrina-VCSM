@@ -16,7 +16,8 @@ import {ExitNode} from "./Nodes/exitNode.tsx";
 import {StateNode} from "./Nodes/stateNode.tsx";
 import {StateMachineNode} from "./Nodes/stateMachineNode.tsx";
 import StateOrStateMachineService from "../services/stateOrStateMachineService.tsx";
-import {CsmNodeProps} from "../types.ts";
+import {CsmNodeProps, isState, isStateMachine, isExitOrEntry} from "../types.ts";
+
 
 import "../css/nodeForm.css"
 
@@ -91,7 +92,7 @@ export default function Flow() {
                 id: getNewId(),
                 type,
                 position,
-                data: { name: new_name},
+                data: stateOrStateMachineService.getDefaultData(type, new_name),
             };
 
 
@@ -147,10 +148,19 @@ export default function Flow() {
     );
 
     const onNodesDelete = useCallback(
-        (deletedNodes: Node[]) => {
+        (deletedNodes: Node<CsmNodeProps>[]) => {
             deletedNodes.map(
                 (node) => {
-                    stateOrStateMachineService.unregisterName(node.data.name);
+                    if(isStateMachine(node.data)){
+                        stateOrStateMachineService.unregisterName(node.data.stateMachine._name);
+                    }
+                    if(isState(node.data)){
+                        stateOrStateMachineService.unregisterName(node.data.state._name);
+                    }
+                    if(isExitOrEntry(node.data)) {
+                        stateOrStateMachineService.unregisterName(node.data.name)
+                    }
+
                 }
             )
         },[stateOrStateMachineService]
@@ -195,7 +205,11 @@ export default function Flow() {
             {showSidebar && selectedNode && (
                 <div className = "node-form">
                     <form>
-                        <h3>Hi mom! Its me {selectedNode.data.name}!</h3>
+                        <h3>Hi mom! It's me {
+                            isState(selectedNode.data) ? selectedNode.data.state.name :
+                                isStateMachine(selectedNode.data) ? selectedNode.data.stateMachine.name :
+                                    selectedNode.data.name
+                        }!</h3>
                     </form>
 
                 </div>

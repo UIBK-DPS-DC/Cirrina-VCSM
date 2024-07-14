@@ -1,6 +1,9 @@
 // This is a service related to managing our States and Statemachines
 // All functions related to this objective should live here
 
+import State from "../classes/state.ts";
+import StateMachine from "../classes/stateMachine.ts";
+
 export default class StateOrStateMachineService {
     private id: number = 0
     private stateOrStatemachineNames : Set<string>;
@@ -89,11 +92,41 @@ export default class StateOrStateMachineService {
 
     }
 
+    public getDefaultState(name: string): State {
+        // add default config here
+        return new State(name);
+    }
 
+    public getDefaultStateMachine(name: string): StateMachine {
+        // add default config here
+        return new StateMachine(name);
+    }
 
+    public getDefaultData(type: string, name :string) {
+        switch (type) {
+            case "state-node":
+                return {
+                    "state": this.getDefaultState(name ? name : "" ),
+                };
+            case "state-machine-node":
+                return {
+                    "stateMachine": this.getDefaultStateMachine(name ? name : ""),
+                };
+            case "entry-node":
+                return {
+                    "name": name ? name : "",
+                };
+            case "exit-node":
+                return {
+                    "name": name ? name : "",
+                };
+            default:
+                return{
+                    "name": name ? name : "",
+                };
 
-
-
+        }
+    }
 
 }
 
