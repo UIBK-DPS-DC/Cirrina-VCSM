@@ -91,7 +91,7 @@ export default function Flow() {
                 id: getNewId(),
                 type,
                 position,
-                data: { name: new_name},
+                data: stateOrStateMachineService.getDefaultData(type, new_name),
             };
 
 
