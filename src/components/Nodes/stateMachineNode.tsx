@@ -10,7 +10,7 @@ export function StateMachineNode ({data, selected}: NodeProps<StateMachineNode>)
                 minWidth={200}
                 minHeight={300}
             />
-            {data.name && <div>{data.name}</div>}
+            {data.stateMachine.name && <div>{data.stateMachine.name}</div>}
             <div>
             </div>
         </div>
