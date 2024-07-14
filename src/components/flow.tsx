@@ -16,10 +16,12 @@ import {ExitNode} from "./Nodes/exitNode.tsx";
 import {StateNode} from "./Nodes/stateNode.tsx";
 import {StateMachineNode} from "./Nodes/stateMachineNode.tsx";
 import StateOrStateMachineService from "../services/stateOrStateMachineService.tsx";
-import {CsmNodeProps, isState, isStateMachine, isExitOrEntry} from "../types.ts";
+import {CsmNodeProps, isState, isStateMachine} from "../types.ts";
 
 
 import "../css/nodeForm.css"
+import StateMachine from "../classes/stateMachine.ts";
+import State from "../classes/state.ts";
 
 
 const nodeTypes = {
@@ -148,19 +150,19 @@ export default function Flow() {
     );
 
     const onNodesDelete = useCallback(
-        (deletedNodes: Node<CsmNodeProps>[]) => {
+        (deletedNodes: Node []) => {
             deletedNodes.map(
                 (node) => {
-                    if(isStateMachine(node.data)){
-                        stateOrStateMachineService.unregisterName(node.data.stateMachine._name);
+                    switch (node.type) {
+                        case "state-machine-node":
+                            stateOrStateMachineService.unregisterName((node.data.stateMachine as StateMachine).name);
+                            break;
+                        case "state-node":
+                            stateOrStateMachineService.unregisterName((node.data.state as State).name);
+                            break;
+                        default:
+                            stateOrStateMachineService.unregisterName(node.data.name);
                     }
-                    if(isState(node.data)){
-                        stateOrStateMachineService.unregisterName(node.data.state._name);
-                    }
-                    if(isExitOrEntry(node.data)) {
-                        stateOrStateMachineService.unregisterName(node.data.name)
-                    }
-
                 }
             )
         },[stateOrStateMachineService]
