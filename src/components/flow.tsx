@@ -19,6 +19,8 @@ import StateOrStateMachineService from "../services/stateOrStateMachineService.t
 import {CsmNodeProps} from "../types.ts";
 
 import "../css/nodeForm.css"
+import StateMachine from "../classes/stateMachine.ts";
+import State from "../classes/state.ts";
 
 
 const nodeTypes = {
