@@ -1,6 +1,7 @@
 import {Edge, Node} from "@xyflow/react";
 import Transition from "./classes/transition.ts";
 import StateMachine from "./classes/stateMachine.ts";
+import State from "./classes/state.ts";
 
 export type NodeType =
     | 'entry-node'
@@ -13,11 +14,11 @@ export type EntryNode = Node<{
 }, 'entry-node'>;
 
 export type StateNode = Node<{
-    name : string
+    state : State
 }, 'state-node'>;
 
 export type StateMachineNode = Node<{
-    name : string
+    stateMachine : StateMachine
 }, 'state-machine-node'>;
 
 export type ExitNode = Node<{
