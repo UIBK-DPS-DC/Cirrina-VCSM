@@ -23,7 +23,6 @@ export type StateMachineNode = Node<CsmNodeProps, 'state-machine-node'>;
 export type ExitNode = Node<CsmNodeProps, 'exit-node'>;
 
 
-// Node Types with classes. Unsure if needed
 export type CsmEdgeProps = Edge<{
     transition: Transition
 }, 'csmEdge'>;
