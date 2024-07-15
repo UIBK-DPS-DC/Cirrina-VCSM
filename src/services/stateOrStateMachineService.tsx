@@ -3,6 +3,7 @@
 
 import State from "../classes/state.ts";
 import StateMachine from "../classes/stateMachine.ts";
+import {CsmNodeProps, isExitOrEntry, isState, isStateMachine} from "../types.ts";
 
 export default class StateOrStateMachineService {
     private id: number = 0
@@ -91,6 +92,60 @@ export default class StateOrStateMachineService {
         return newId
 
     }
+
+    /**
+     * Retrieves the name from the provided data object.
+     *
+     * This function determines the type of the provided `data` object and extracts the name accordingly.
+     * The `data` object can be one of the following types:
+     * - `{ state: State }`
+     * - `{ stateMachine: StateMachine }`
+     * - `{ name: string }`
+     *
+     * If the `data` object contains a `state` property, it returns the `name` property of the `state` object.
+     * If the `data` object contains a `stateMachine` property, it returns the `name` property of the `stateMachine` object.
+     * If the `data` object contains a `name` property directly, it returns that `name`.
+     *
+     * @param {CsmNodeProps} data - The data object from which to retrieve the name.
+     * @returns {string} The name retrieved from the data object.
+     */
+    public getName(data: CsmNodeProps): string  {
+        return(isState(data) ? data.state.name :
+            isStateMachine(data) ? data.stateMachine.name :
+                data.name)
+    }
+
+    /**
+     * Updates the name property in the provided data object.
+     *
+     * This function determines the type of the provided `data` object and updates the name accordingly.
+     * The `data` object can be one of the following types:
+     * - `{ state: State }`
+     * - `{ stateMachine: StateMachine }`
+     * - `{ name: string }`
+     *
+     * If the `data` object contains a `state` property, it creates a new `data` object with the updated `state.name` property.
+     * If the `data` object contains a `stateMachine` property, it creates a new `data` object with the updated `stateMachine.name` property.
+     * If the `data` object contains a `name` property directly, it creates a new `data` object with the updated `name`.
+     * If the `data` object does not match any of these types, it returns the original `data` object.
+     *
+     * @param {string} newName - The new name to be set.
+     * @param {CsmNodeProps} data - The data object in which to update the name.
+     * @returns {CsmNodeProps} A new data object with the updated name.
+     */
+    public setName(newName: string, data: CsmNodeProps): CsmNodeProps {
+        if (isState(data)) {
+            return { ...data, state: { ...data.state, name: newName } };
+        }
+        if (isStateMachine(data)) {
+            return { ...data, stateMachine: { ...data.stateMachine, name: newName } };
+        }
+        if (isExitOrEntry(data)) {
+            return { ...data, name: newName };
+        }
+        return data;
+    }
+
 
     public getDefaultState(name: string): State {
         // add default config here
