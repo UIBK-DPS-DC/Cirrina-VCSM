@@ -1,5 +1,7 @@
-import { expect, test, beforeEach } from '@jest/globals';
+import StateMachine from "../src/classes/stateMachine";
+import {CsmNodeProps} from "../src/types";
 import StateOrStateMachineService from "../src/services/stateOrStateMachineService";
+import State from "../src/classes/state";
 
 let service = new StateOrStateMachineService();
 
@@ -49,7 +51,6 @@ describe('stateOrStateMachineService', () => {
         expect(result).toBe(false);
     });
 
-
     // ############################## Name Generation Tests ############################################################
 
     test('generateUniqueName should generate a unique name when no names are registered', () => {
@@ -98,4 +99,47 @@ describe('stateOrStateMachineService', () => {
         expect(uniqueName).toBe('custom 1'); // The next name should be 'custom 1'
         expect(uniqueName).not.toBe('custom 0'); // The name should be different from the registered one
     });
+
+    // ############################## Get and Set Name Tests ############################################################
+
+    test('getName should return the name from state', () => {
+        const state = new State('stateName'); // Create instance of State
+        const data: CsmNodeProps = { state };
+        const name = service.getName(data);
+        expect(name).toBe('stateName');
+    });
+
+    test('getName should return the name from stateMachine', () => {
+        const stateMachine = new StateMachine('stateMachineName'); // Create instance of StateMachine
+        const data: CsmNodeProps = { stateMachine };
+        const name = service.getName(data);
+        expect(name).toBe('stateMachineName');
+    });
+
+    test('getName should return the name from exit or entry', () => {
+        const data: CsmNodeProps = { name: 'entryName' };
+        const name = service.getName(data);
+        expect(name).toBe('entryName');
+    });
+
+    test('setName should update the name in state', () => {
+        const state = new State('oldName'); // Create instance of State
+        const data: CsmNodeProps = { state };
+        const updatedData = service.setName('newName', data);
+        expect(updatedData).toEqual({ state: { ...state, name: 'newName' } });
+    });
+
+    test('setName should update the name in stateMachine', () => {
+        const stateMachine = new StateMachine('oldName'); // Create instance of StateMachine
+        const data: CsmNodeProps = { stateMachine };
+        const updatedData = service.setName('newName', data);
+        expect(updatedData).toEqual({ stateMachine: { ...stateMachine, name: 'newName' } });
+    });
+
+    test('setName should update the name in exit or entry', () => {
+        const data: CsmNodeProps = { name: 'oldName' };
+        const updatedData = service.setName('newName', data);
+        expect(updatedData).toEqual({ name: 'newName' });
+    });
+
 });
