@@ -51,6 +51,16 @@ describe('stateOrStateMachineService', () => {
         expect(result).toBe(false);
     });
 
+    // New Test for Name Registration
+    test('registerName should handle multiple unique names correctly', () => {
+        const name1 = 'uniqueState1';
+        const name2 = 'uniqueState2';
+        service.registerName(name1);
+        service.registerName(name2);
+        expect(service.isNameUnique(name1)).toBe(false);
+        expect(service.isNameUnique(name2)).toBe(false);
+    });
+
     // ############################## Name Generation Tests ############################################################
 
     test('generateUniqueName should generate a unique name when no names are registered', () => {
@@ -100,6 +110,18 @@ describe('stateOrStateMachineService', () => {
         expect(uniqueName).not.toBe('custom 0'); // The name should be different from the registered one
     });
 
+    // New Test for Name Generation
+    test('generateUniqueName should generate unique names with different types', () => {
+        const uniqueName1 = service.generateUniqueName('state');
+        const uniqueName2 = service.generateUniqueName('custom');
+        expect(service.isNameUnique(uniqueName1)).toBe(true);
+        expect(service.isNameUnique(uniqueName2)).toBe(true);
+        service.registerName(uniqueName1);
+        service.registerName(uniqueName2);
+        expect(service.isNameUnique(uniqueName1)).toBe(false);
+        expect(service.isNameUnique(uniqueName2)).toBe(false);
+    });
+
     // ############################## Get and Set Name Tests ############################################################
 
     test('getName should return the name from state', () => {
@@ -142,4 +164,21 @@ describe('stateOrStateMachineService', () => {
         expect(updatedData).toEqual({ name: 'newName' });
     });
 
+    test('setName should return the same data if no matching type', () => {
+        const data: CsmNodeProps = { other: { name: 'otherName' } } as any;
+        const updatedData = service.setName('newName', data);
+        expect(updatedData).toEqual(data);
+    });
+
+    // New Test for Setting Name
+    test('setName should handle updating the name correctly when changing types', () => {
+        const state = new State('oldStateName'); // Create instance of State
+        const stateMachine = new StateMachine('oldStateMachineName'); // Create instance of StateMachine
+        let data: CsmNodeProps = { state };
+        data = service.setName('newStateName', data);
+        expect(service.getName(data)).toBe('newStateName');
+        data = { stateMachine };
+        data = service.setName('newStateMachineName', data);
+        expect(service.getName(data)).toBe('newStateMachineName');
+    });
 });
