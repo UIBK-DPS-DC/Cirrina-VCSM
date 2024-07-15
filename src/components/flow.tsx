@@ -1,4 +1,4 @@
-import React, {useCallback, createContext, useMemo, useState} from 'react';
+import React, {useCallback, createContext, useMemo, useState, useEffect} from 'react';
 import {
     ReactFlow,
     Background,
@@ -47,8 +47,15 @@ export default function Flow() {
     const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
     const [selectedNode, setSelectedNode] = useState<Node<CsmNodeProps> | null>(null)
     const [showSidebar, setShowSidebar] = useState(false);
+    const [nameInput, setNameInput] = useState<string>("");
     const {getIntersectingNodes, screenToFlowPosition } = useReactFlow();
 
+
+    useEffect(() => {
+        if(selectedNode){
+            setNameInput(stateOrStateMachineService.getName(selectedNode.data))
+        }
+    },[selectedNode,stateOrStateMachineService])
 
 
 
@@ -210,6 +217,10 @@ export default function Flow() {
         }
     }, [nodes, setNodes, selectedNode, stateOrStateMachineService]);
 
+    const onNameInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setNameInput(event.target.value);
+    };
+
 
 
 
@@ -240,7 +251,7 @@ export default function Flow() {
                     <form onSubmit={onFormSubmit}>
                         <h3>Hi mom! It's me {stateOrStateMachineService.getName(selectedNode.data)}!</h3>
                         <label htmlFor="name" >Name: </label>
-                        <input type = "text" id="name" name = "name" defaultValue={stateOrStateMachineService.getName(selectedNode.data)}
+                        <input type = "text" id="name" name = "name" value={nameInput} onChange={onNameInputChange}
                         />
                         <button type={"submit"}>Save Changes</button>
 
