@@ -1,4 +1,4 @@
-import React, {useCallback, createContext, useMemo, useState} from 'react';
+import React, {useCallback, createContext, useMemo, useState, useEffect} from 'react';
 import {
     ReactFlow,
     Background,
@@ -46,8 +46,15 @@ export default function Flow() {
     const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
     const [selectedNode, setSelectedNode] = useState<Node<CsmNodeProps> | null>(null)
     const [showSidebar, setShowSidebar] = useState(false);
+    const [nameInput, setNameInput] = useState<string>("");
     const {getIntersectingNodes, screenToFlowPosition } = useReactFlow();
 
+
+    useEffect(() => {
+        if(selectedNode){
+            setNameInput(stateOrStateMachineService.getName(selectedNode.data))
+        }
+    },[selectedNode,stateOrStateMachineService])
 
 
 
@@ -199,6 +206,10 @@ export default function Flow() {
             setNodes(newNodes);
         }
     }, [nodes, setNodes, selectedNode, stateOrStateMachineService]);
+
+    const onNameInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setNameInput(event.target.value);
+    };
 
 
 
