@@ -169,6 +169,37 @@ export default function Flow() {
             setShowSidebar(false);
         },[])
 
+    const onFormSubmit = useCallback((event: React.FormEvent<HTMLFormElement>) => {
+        event.preventDefault();
+        if (!selectedNode) return;
+
+        const formElements = event.currentTarget.elements as typeof event.currentTarget.elements & {
+            name: HTMLInputElement
+        };
+
+        const newName = formElements.name.value;
+        const oldName = stateOrStateMachineService.getName(selectedNode.data);
+
+        if (!stateOrStateMachineService.isNameUnique(newName) && newName !== oldName) {
+            console.error(`StateOrStateMachine name ${newName} already exists!`);
+            return;
+        }
+
+        if (newName !== oldName) {
+            const newNodes = nodes.map(node => {
+                if (node.id === selectedNode.id) {
+                    const newData = stateOrStateMachineService.setName(newName, node.data);
+                    return { ...node, data: newData };
+                }
+                return node;
+            });
+
+            stateOrStateMachineService.unregisterName(oldName);
+            stateOrStateMachineService.registerName(newName);
+            setNodes(newNodes);
+        }
+    }, [nodes, setNodes, selectedNode, stateOrStateMachineService]);
+
 
 
 
