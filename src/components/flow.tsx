@@ -16,7 +16,7 @@ import {ExitNode} from "./Nodes/exitNode.tsx";
 import {StateNode} from "./Nodes/stateNode.tsx";
 import {StateMachineNode} from "./Nodes/stateMachineNode.tsx";
 import StateOrStateMachineService from "../services/stateOrStateMachineService.tsx";
-import {CsmNodeProps, isState, isStateMachine} from "../types.ts";
+import {CsmNodeProps} from "../types.ts";
 
 
 import "../css/nodeForm.css"
@@ -114,7 +114,7 @@ export default function Flow() {
                         border: '1px solid black',
                         padding: 5,
                         borderRadius: 15,
-                        height: 100,
+                        height: 150,
                 }
             }
 
