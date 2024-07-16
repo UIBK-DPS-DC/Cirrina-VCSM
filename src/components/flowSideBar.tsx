@@ -9,19 +9,19 @@ export default function FlowSideBar () {
     };
 
     return (
-        <div>
+        <div className={"flowSideBar"}>
         <aside>
-            <div>You can drag these nodes to the pane on the right.</div>
-            <div onDragStart={(event) => onDragStart(event, 'entry-node')} draggable>
+            <div className="description">You can drag these nodes to the pane on the right.</div>
+            <div className="dndnode" onDragStart={(event) => onDragStart(event, 'entry-node')} draggable>
                 Entry Node
             </div>
-            <div onDragStart={(event) => onDragStart(event, 'state-machine-node')} draggable>
+            <div className="dndnode" onDragStart={(event) => onDragStart(event, 'state-machine-node')} draggable>
                 State Machine Node
             </div>
-            <div onDragStart={(event) => onDragStart(event, 'state-node')} draggable>
+            <div className="dndnode" onDragStart={(event) => onDragStart(event, 'state-node')} draggable>
                 State Node
             </div>
-            <div onDragStart={(event) => onDragStart(event, 'exit-node')} draggable>
+            <div className="dndnode" onDragStart={(event) => onDragStart(event, 'exit-node')} draggable>
                 Exit Node
             </div>
         </aside>
