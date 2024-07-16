@@ -7,8 +7,8 @@ export function StateMachineNode ({data, selected}: NodeProps<StateMachineNode>)
             <NodeResizer
                 color="#ff0071"
                 isVisible={selected}
-                minWidth={200}
-                minHeight={300}
+                minWidth={183}
+                minHeight={150}
             />
             {data.stateMachine.name && <div>{data.stateMachine.name}</div>}
             <div>

@@ -6,8 +6,11 @@ import {ReactFlowProvider} from "@xyflow/react";
 export default function VisualEditor () {
     return (
         <ReactFlowProvider>
-            <FlowSideBar/>
-            <Flow/>
+            <div className={"visualEditor"}>
+                <FlowSideBar/>
+                <Flow/>
+            </div>
         </ReactFlowProvider>
+
     )
 }
