@@ -113,7 +113,7 @@ export default function Flow() {
                         border: '1px solid black',
                         padding: 5,
                         borderRadius: 15,
-                        height: 100,
+                        height: 150,
                 }
             }
 
