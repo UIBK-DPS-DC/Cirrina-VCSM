@@ -1,4 +1,4 @@
-import React, {useCallback, createContext, useMemo, useState} from 'react';
+import React, { useCallback, createContext, useMemo, useState } from 'react';
 import {
     ReactFlow,
     Background,
@@ -11,19 +11,17 @@ import {
 } from '@xyflow/react';
 
 import '@xyflow/react/dist/style.css';
-import {EntryNode} from "./Nodes/entryNode.tsx";
-import {ExitNode} from "./Nodes/exitNode.tsx";
-import {StateNode} from "./Nodes/stateNode.tsx";
-import {StateMachineNode} from "./Nodes/stateMachineNode.tsx";
+import { EntryNode } from "./Nodes/entryNode.tsx";
+import { ExitNode } from "./Nodes/exitNode.tsx";
+import { StateNode } from "./Nodes/stateNode.tsx";
+import { StateMachineNode } from "./Nodes/stateMachineNode.tsx";
 import StateOrStateMachineService from "../services/stateOrStateMachineService.tsx";
-import {CsmNodeProps, ReactFlowContextProps} from "../types.ts";
-
+import { CsmNodeProps, ReactFlowContextProps } from "../types.ts";
 
 import "../css/nodeForm.css"
 import StateMachine from "../classes/stateMachine.ts";
 import State from "../classes/state.ts";
 import NodeInfoForm from "./nodeInfoForm.tsx";
-
 
 const nodeTypes = {
     'entry-node': EntryNode,
@@ -42,19 +40,14 @@ const getNewId = () => `node_${id++}`;
 
 export default function Flow() {
 
-    const stateOrStateMachineService: StateOrStateMachineService = useMemo( () => new StateOrStateMachineService(), []);
+    const stateOrStateMachineService: StateOrStateMachineService = useMemo(() => new StateOrStateMachineService(), []);
 
-    const [nodes, setNodes , onNodesChange] = useNodesState(initialNodes);
+    const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
     const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
     const [selectedNode, setSelectedNode] = useState<Node<CsmNodeProps> | null>(null)
     const [showSidebar, setShowSidebar] = useState(false);
     const [nameInput, setNameInput] = useState<string>("");
-    const {getIntersectingNodes, screenToFlowPosition } = useReactFlow();
-
-
-
-
-
+    const { getIntersectingNodes, screenToFlowPosition } = useReactFlow();
 
     const contextValue: ReactFlowContextProps = {
         nodes,
@@ -70,19 +63,19 @@ export default function Flow() {
         stateOrStateMachineService
     }
 
-
     const onConnect: OnConnect = useCallback(
         (connection) => setEdges((edges) => addEdge(connection, edges)),
         [setEdges]
     );
 
-    const onDragOver = useCallback((event:React.DragEvent<HTMLDivElement>) => {
+    const onDragOver = useCallback((event: React.DragEvent<HTMLDivElement>) => {
         event.preventDefault();
         event.dataTransfer.dropEffect = 'move';
     }, []);
 
     const onDrop = useCallback(
-        (event:React.DragEvent<HTMLDivElement>) => {
+        (event: React.DragEvent<HTMLDivElement>) => {
+            console.log("Entering onDrop");
             event.preventDefault();
 
             const type = event.dataTransfer.getData('application/reactflow');
@@ -96,45 +89,58 @@ export default function Flow() {
                 y: event.clientY,
             });
 
-            const new_name: string  = stateOrStateMachineService.generateUniqueName(type)
-            stateOrStateMachineService.registerName(new_name)
+            const new_name: string = stateOrStateMachineService.generateUniqueName(type);
+            stateOrStateMachineService.registerName(new_name);
 
-            const newNode : Node<CsmNodeProps> = {
+            const newNode: Node<CsmNodeProps> = {
                 id: getNewId(),
                 type,
                 position,
                 data: stateOrStateMachineService.getDefaultData(type, new_name),
             };
 
-
-
             // TODO add this to stylesheet
-            if(type === 'state-machine-node') {
+            if (type === 'state-machine-node') {
                 newNode.style = {
                     background: 'transparent',
-                        fontSize: 12,
-                        border: '1px solid black',
-                        padding: 5,
-                        borderRadius: 15,
-                        height: 150,
-                }
+                    fontSize: 12,
+                    border: '1px solid black',
+                    padding: 5,
+                    borderRadius: 15,
+                    height: 150,
+                };
             }
 
-            setNodes((nds) => nds.concat(newNode));
+            console.log(`Created ${newNode.id}`);
+
+            setNodes((nds) => {
+                if (type === 'state-machine-node') {
+                    return [newNode, ...nds]; // Prepend state-machine-nodes to the beginning
+                } else {
+                    return [...nds, newNode]; // Append other nodes to the end
+                }
+            });
         },
         [screenToFlowPosition, setNodes, stateOrStateMachineService],
     );
 
+
     const onNodeDragStop = useCallback(
         (_: React.MouseEvent, node: Node) => {
+            console.log("Entering onNodeDragStop");
             const intersections = getIntersectingNodes(node, false);
             const intersectedBlock = intersections.findLast(
                 (n) => n.type === "state-machine-node"
             );
+            console.log(intersectedBlock);
+
             if (intersectedBlock) {
                 setNodes((ns) =>
                     ns.map((n) => {
+                        console.log("Entering map")
                         if (n.id === node.id) {
+                            console.log("Found node")
+                            console.log(`Intersected parent id = ${intersectedBlock.id}`)
                             return {
                                 ...n,
                                 parentId: intersectedBlock.id,
@@ -147,6 +153,8 @@ export default function Flow() {
                                 }),
                             };
                         }
+                        console.log(`Not found for node ${n.id}`)
+                        console.log(n.data)
                         return {
                             ...n,
                             className: "",
@@ -159,7 +167,7 @@ export default function Flow() {
     );
 
     const onNodesDelete = useCallback(
-        (deletedNodes: Node []) => {
+        (deletedNodes: Node[]) => {
             deletedNodes.map(
                 (node) => {
                     switch (node.type) {
@@ -174,20 +182,19 @@ export default function Flow() {
                     }
                 }
             )
-        },[stateOrStateMachineService]
+        }, [stateOrStateMachineService]
     )
 
     const onNodeClick =
         useCallback((_: React.MouseEvent, node: Node<CsmNodeProps>) => {
             setSelectedNode(node);
             setShowSidebar(true);
-        },[])
+        }, [])
 
     const onPaneClick =
         useCallback(() => {
             setShowSidebar(false);
-        },[])
-
+        }, [])
 
     return (
         <ReactFlowContext.Provider value={contextValue}>
@@ -211,8 +218,6 @@ export default function Flow() {
                 <Controls />
             </ReactFlow>
             <NodeInfoForm></NodeInfoForm>
-
-
         </ReactFlowContext.Provider>
     );
 }
