@@ -2,6 +2,8 @@ import {Edge, Node} from "@xyflow/react";
 import Transition from "./classes/transition.ts";
 import StateMachine from "./classes/stateMachine.ts";
 import State from "./classes/state.ts";
+import React from "react";
+import StateOrStateMachineService from "./services/stateOrStateMachineService.tsx";
 
 // One Type to avoid repeating ourselves. Can be expanded/unionized as needed.
 export type CsmNodeProps = {
