@@ -137,6 +137,7 @@ export default function Flow() {
 
     const onNodeDragStop = useCallback(
         (_: React.MouseEvent, node: Node) => {
+            console.log("Entering onNodeDragStop");
             const intersections = getIntersectingNodes(node, false);
             const intersectedBlock = intersections.findLast(
                 (n) => n.type === "state-machine-node"
@@ -145,7 +146,10 @@ export default function Flow() {
             if (intersectedBlock) {
                 setNodes((ns) =>
                     ns.map((n) => {
+                        console.log("Entering map")
                         if (n.id === node.id) {
+                            console.log("Found node")
+                            console.log(`Intersected parent id = ${intersectedBlock.id}`)
                             return {
                                 ...n,
                                 parentId: intersectedBlock.id,
@@ -158,6 +162,8 @@ export default function Flow() {
                                 }),
                             };
                         }
+                        console.log(`Not found for node ${n.id}`)
+                        console.log(n.data)
                         return {
                             ...n,
                             className: "",
