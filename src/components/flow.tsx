@@ -114,8 +114,9 @@ export default function Flow() {
             console.log(`Created ${newNode.id}`);
 
             setNodes((nds) => {
+                // Order is important for nesting to work. See https://reactflow.dev/learn/layouting/sub-flows
                 if (type === 'state-machine-node') {
-                    return [newNode, ...nds]; // Prepend state-machine-nodes to the beginning
+                    return [newNode, ...nds]; // Prepend state-machine-nodes to the beginning.
                 } else {
                     return [...nds, newNode]; // Append other nodes to the end
                 }
