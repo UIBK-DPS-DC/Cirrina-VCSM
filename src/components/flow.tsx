@@ -1,4 +1,4 @@
-import React, {useCallback, createContext, useMemo, useState, useEffect} from 'react';
+import React, {useCallback, createContext, useMemo, useState} from 'react';
 import {
     ReactFlow,
     Background,
@@ -16,12 +16,13 @@ import {ExitNode} from "./Nodes/exitNode.tsx";
 import {StateNode} from "./Nodes/stateNode.tsx";
 import {StateMachineNode} from "./Nodes/stateMachineNode.tsx";
 import StateOrStateMachineService from "../services/stateOrStateMachineService.tsx";
-import {CsmNodeProps} from "../types.ts";
+import {CsmNodeProps, ReactFlowContextProps} from "../types.ts";
 
 
 import "../css/nodeForm.css"
 import StateMachine from "../classes/stateMachine.ts";
 import State from "../classes/state.ts";
+import NodeInfoForm from "./nodeInfoForm.tsx";
 
 
 const nodeTypes = {
@@ -34,7 +35,7 @@ const nodeTypes = {
 const initialNodes: Node<CsmNodeProps>[] = [];
 const initialEdges: Edge[] = [];
 
-const ReactFlowContext = createContext({});
+export const ReactFlowContext = createContext({});
 
 let id = 0;
 const getNewId = () => `node_${id++}`;
@@ -51,21 +52,22 @@ export default function Flow() {
     const {getIntersectingNodes, screenToFlowPosition } = useReactFlow();
 
 
-    useEffect(() => {
-        if(selectedNode){
-            setNameInput(stateOrStateMachineService.getName(selectedNode.data))
-        }
-    },[selectedNode,stateOrStateMachineService])
 
 
 
 
-    const contextValue = {
+    const contextValue: ReactFlowContextProps = {
         nodes,
         setNodes,
         edges,
         setEdges,
-        stateOrStateMachineService,
+        selectedNode,
+        setSelectedNode,
+        showSidebar,
+        setShowSidebar,
+        nameInput,
+        setNameInput,
+        stateOrStateMachineService
     }
 
 
@@ -186,44 +188,6 @@ export default function Flow() {
             setShowSidebar(false);
         },[])
 
-    const onFormSubmit = useCallback((event: React.FormEvent<HTMLFormElement>) => {
-        event.preventDefault();
-        if (!selectedNode) return;
-
-        const formElements = event.currentTarget.elements as typeof event.currentTarget.elements & {
-            name: HTMLInputElement
-        };
-
-        const newName = formElements.name.value;
-        const oldName = stateOrStateMachineService.getName(selectedNode.data);
-
-        if (!stateOrStateMachineService.isNameUnique(newName) && newName !== oldName) {
-            console.error(`StateOrStateMachine name ${newName} already exists!`);
-            return;
-        }
-
-        if (newName !== oldName) {
-            const newNodes = nodes.map(node => {
-                if (node.id === selectedNode.id) {
-                    const newData = stateOrStateMachineService.setName(newName, node.data);
-                    return { ...node, data: newData };
-                }
-                return node;
-            });
-
-            stateOrStateMachineService.unregisterName(oldName);
-            stateOrStateMachineService.registerName(newName);
-            setNodes(newNodes);
-        }
-    }, [nodes, setNodes, selectedNode, stateOrStateMachineService]);
-
-    const onNameInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setNameInput(event.target.value);
-    };
-
-
-
-
 
     return (
         <ReactFlowContext.Provider value={contextValue}>
@@ -246,21 +210,7 @@ export default function Flow() {
                 <MiniMap />
                 <Controls />
             </ReactFlow>
-            {showSidebar && selectedNode && (
-                <div className = "node-form">
-                    <form onSubmit={onFormSubmit}>
-                        <h3>Hi mom! It's me {stateOrStateMachineService.getName(selectedNode.data)}!</h3>
-                        <label htmlFor="name" >Name: </label>
-                        <input type = "text" id="name" name = "name" value={nameInput} onChange={onNameInputChange}
-                        />
-                        <button type={"submit"}>Save Changes</button>
-
-                    </form>
-
-                </div>
-            )
-
-            }
+            <NodeInfoForm></NodeInfoForm>
 
 
         </ReactFlowContext.Provider>
