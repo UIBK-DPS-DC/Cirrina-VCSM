@@ -37,8 +37,8 @@ export type CsmEdgeProps = Edge<{
 export type ReactFlowContextProps = {
     nodes: Node<CsmNodeProps>[]
     setNodes: React.Dispatch<React.SetStateAction<Node<CsmNodeProps>[]>>;
-    edges: Edge[]
-    setEdges:  React.Dispatch<React.SetStateAction<Edge[]>>
+    edges: Edge<CsmEdgeProps>[]
+    setEdges:  React.Dispatch<React.SetStateAction<Edge<CsmEdgeProps>[]>>;
     selectedNode: Node<CsmNodeProps> | null
     setSelectedNode: React.Dispatch<React.SetStateAction<Node<CsmNodeProps> | null>>
     showSidebar: boolean
