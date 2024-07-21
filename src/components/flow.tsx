@@ -7,7 +7,7 @@ import {
     addEdge,
     useNodesState,
     useEdgesState,
-    type OnConnect, type NodeTypes, useReactFlow, Edge, Node
+    type OnConnect, type NodeTypes, useReactFlow, Edge, Node, Connection
 } from '@xyflow/react';
 
 import '@xyflow/react/dist/style.css';
@@ -16,12 +16,13 @@ import { ExitNode } from "./Nodes/exitNode.tsx";
 import { StateNode } from "./Nodes/stateNode.tsx";
 import { StateMachineNode } from "./Nodes/stateMachineNode.tsx";
 import StateOrStateMachineService from "../services/stateOrStateMachineService.tsx";
-import { CsmNodeProps, ReactFlowContextProps } from "../types.ts";
+import {CsmEdgeProps, CsmNodeProps, ReactFlowContextProps} from "../types.ts";
 
 import "../css/nodeForm.css"
 import StateMachine from "../classes/stateMachine.ts";
 import State from "../classes/state.ts";
 import NodeInfoForm from "./nodeInfoForm.tsx";
+import CsmEdge from "./csmEdgeComponent.tsx";
 
 const nodeTypes = {
     'entry-node': EntryNode,
@@ -30,13 +31,19 @@ const nodeTypes = {
     'state-machine-node': StateMachineNode,
 } satisfies NodeTypes;
 
+const edgeTypes = {
+    'csm-edge': CsmEdge,
+}
+
 const initialNodes: Node<CsmNodeProps>[] = [];
-const initialEdges: Edge[] = [];
+const initialEdges: Edge<CsmEdgeProps>[] = [];
 
 export const ReactFlowContext = createContext({});
 
-let id = 0;
-const getNewId = () => `node_${id++}`;
+let nodeId = 0;
+let edgeId = 0
+const getNewNodeId = () => `node_${nodeId++}`;
+const getNewEdgeId = () => `edge_${edgeId++}`;
 
 export default function Flow() {
 
@@ -64,8 +71,11 @@ export default function Flow() {
     }
 
     const onConnect: OnConnect = useCallback(
-        (connection) => setEdges((edges) => addEdge(connection, edges)),
-        [setEdges]
+        (connection: Connection) => {
+            const edge: Edge<CsmEdgeProps> = {id: getNewEdgeId(), ...connection, type: 'csm-edge' };
+            setEdges((eds) => addEdge(edge, eds));
+        },
+        [setEdges],
     );
 
     const onDragOver = useCallback((event: React.DragEvent<HTMLDivElement>) => {
@@ -93,7 +103,7 @@ export default function Flow() {
             stateOrStateMachineService.registerName(new_name);
 
             const newNode: Node<CsmNodeProps> = {
-                id: getNewId(),
+                id: getNewNodeId(),
                 type,
                 position,
                 data: stateOrStateMachineService.getDefaultData(type, new_name),
@@ -205,6 +215,7 @@ export default function Flow() {
                 onNodesChange={onNodesChange}
                 edges={edges}
                 onEdgesChange={onEdgesChange}
+                edgeTypes={edgeTypes}
                 onConnect={onConnect}
                 onPaneClick={onPaneClick}
                 onNodeClick={onNodeClick}
