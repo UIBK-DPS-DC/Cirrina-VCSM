@@ -5,6 +5,18 @@ export default class EventService {
         this.eventNames = new Set<string>();
     }
 
+    /**
+     * Registers an event name.
+     *
+     * This method checks if the provided `eventName` is unique by comparing it against
+     * a collection of already registered names. If the name is not unique, it logs an
+     * error message to the console and returns `false`. If the name is unique, it adds
+     * the name to the collection and returns `true`.
+     *
+     * @param {string} eventName - The name of the event to register.
+     * @returns {boolean} - Returns `true` if the name is unique and successfully registered,
+     *                      otherwise returns `false`.
+     */
     public registerName(eventName: string): boolean {
         if(!this.isNameUnique(eventName)){
             console.error("Event name already exists!");
@@ -16,6 +28,14 @@ export default class EventService {
         return true;
     }
 
+    /**
+     * Unregisters an event name.
+     *
+     * This method removes the provided `eventName` from the collection of registered names.
+     * If the name is not of type `string`, it logs a warning message to the console.
+     *
+     * @param {string | unknown} eventName - The name of the event to unregister.
+     */
     public unregisterName(eventName: string | unknown): void {
         if(typeof eventName === "string" ){
             this.eventNames.delete(eventName);
@@ -27,6 +47,17 @@ export default class EventService {
 
     }
 
+    /**
+     * Checks if an event name is unique.
+     *
+     * This method determines whether the provided `eventName` is unique by checking its
+     * presence in the collection of registered names. It returns `true` if the name is
+     * not found in the collection, indicating that it is unique. Otherwise, it returns `false`.
+     *
+     * @param {string} eventName - The name of the event to check for uniqueness.
+     * @returns {boolean} - Returns `true` if the name is unique (i.e., not found in the collection),
+     *                      otherwise returns `false`.
+     */
     public isNameUnique(eventName: string): boolean {
         return ! this.eventNames.has(eventName);
     }
