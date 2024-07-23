@@ -1,4 +1,4 @@
-import React, { useCallback, createContext, useMemo, useState } from 'react';
+import React, {useCallback, createContext, useMemo, useState} from 'react';
 import {
     ReactFlow,
     Background,
@@ -70,6 +70,7 @@ export default function Flow() {
         stateOrStateMachineService
     }
 
+
     const onConnect: OnConnect = useCallback(
         (connection: Connection) => {
             const edge: Edge<CsmEdgeProps> = {id: getNewEdgeId(), ...connection, type: 'csm-edge' };
@@ -121,10 +122,12 @@ export default function Flow() {
             }
 
             console.log(`Created ${newNode.id}`);
+            console.log(nodes)
 
             setNodes((nds) => {
                 // Order is important for nesting to work. See https://reactflow.dev/learn/layouting/sub-flows
                 if (type === 'state-machine-node') {
+
                     return [newNode, ...nds]; // Prepend state-machine-nodes to the beginning.
                 } else {
                     return [...nds, newNode]; // Append other nodes to the end
@@ -138,11 +141,24 @@ export default function Flow() {
     const onNodeDragStop = useCallback(
         (_: React.MouseEvent, node: Node) => {
             const intersections = getIntersectingNodes(node, false);
+            console.log("Intersection:", intersections)
             const intersectedBlock = intersections.findLast(
                 (n) => n.type === "state-machine-node"
             );
 
+
+            /** The parent always needs to before the child in the nodes array.
+             * This bock moves the child node to the front of the parent node in the array to always ensure this*/
             if (intersectedBlock) {
+                setNodes((ns: Node<CsmNodeProps> []) => {
+                    ns = ns.filter(i => i.id !== node.id)
+                    const index = ns.findIndex(i => i.id === intersectedBlock.id)
+                    const firstPart = ns.slice(0, index + 1); // index + 1 because it splits at the index meaning the parent would be in the second part if not for the + 1
+                    const secondPart = ns.slice(index + 1);
+                    return [...firstPart, node as Node<CsmNodeProps>, ...secondPart];
+                })
+
+
                 setNodes((ns) =>
                     ns.map((n) => {
                         if (n.id === node.id) {
