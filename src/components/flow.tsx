@@ -16,7 +16,7 @@ import { ExitNode } from "./Nodes/exitNode.tsx";
 import { StateNode } from "./Nodes/stateNode.tsx";
 import { StateMachineNode } from "./Nodes/stateMachineNode.tsx";
 import StateOrStateMachineService from "../services/stateOrStateMachineService.tsx";
-import {CsmNodeProps, ReactFlowContextProps} from "../types.ts";
+import {CsmEdgeProps, CsmNodeProps, ReactFlowContextProps} from "../types.ts";
 
 import "../css/nodeForm.css"
 import StateMachine from "../classes/stateMachine.ts";
@@ -173,7 +173,16 @@ export default function Flow() {
         (deletedNodes: Node[]) => {
             deletedNodes.map(
                 (node) => {
-                    stateOrStateMachineService.unregisterName(node.data.name);
+                    switch (node.type) {
+                        case "state-machine-node":
+                            stateOrStateMachineService.unregisterName((node.data.stateMachine as StateMachine).name);
+                            break;
+                        case "state-node":
+                            stateOrStateMachineService.unregisterName((node.data.state as State).name);
+                            break;
+                        default:
+                            stateOrStateMachineService.unregisterName(node.data.name);
+                    }
                 }
             )
         }, [stateOrStateMachineService]
@@ -212,18 +221,7 @@ export default function Flow() {
                 <MiniMap />
                 <Controls />
             </ReactFlow>
-            {showSidebar && selectedNode && (
-                <div className = "node-form">
-                    <form>
-                        <h3>Hi mom! Its me {selectedNode.data.name}!</h3>
-                    </form>
-
-                </div>
-            )
-
-            }
-
-
+            <NodeInfoForm></NodeInfoForm>
         </ReactFlowContext.Provider>
     );
 }
