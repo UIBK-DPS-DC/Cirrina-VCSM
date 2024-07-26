@@ -48,6 +48,7 @@ const getNewNodeId = () => `node_${nodeId++}`;
 const getNewEdgeId = () => `edge_${edgeId++}`;
 
 export default function Flow() {
+
     const stateOrStateMachineService: StateOrStateMachineService = useMemo(() => new StateOrStateMachineService(), []);
 
     const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
@@ -84,6 +85,7 @@ export default function Flow() {
         });
     }, []);
 
+
     const onConnect: OnConnect = useCallback(
         (connection: Connection) => {
             const edge: Edge<CsmEdgeProps> = { id: getNewEdgeId(), ...connection, type: 'csm-edge' };
@@ -118,6 +120,7 @@ export default function Flow() {
                 data: stateOrStateMachineService.getDefaultData(type, new_name),
             };
 
+            // TODO add this to stylesheet
             if (type === 'state-machine-node') {
                 newNode.style = {
                     background: 'transparent',
@@ -142,14 +145,30 @@ export default function Flow() {
         [screenToFlowPosition, setNodes, stateOrStateMachineService, updateNodeHistory]
     );
 
+
     const onNodeDragStop = useCallback(
         (_: React.MouseEvent, node: Node) => {
             const intersections = getIntersectingNodes(node, false);
-            const intersectedBlock = intersections.findLast(n => n.type === "state-machine-node");
+            console.log("Intersection:", intersections)
+            const intersectedBlock = intersections.findLast(
+                (n) => n.type === "state-machine-node"
+            );
 
+
+            /** The parent always needs to before the child in the nodes array.
+             * This bock moves the child node to the front of the parent node in the array to always ensure this*/
             if (intersectedBlock) {
-                setNodes(ns =>
-                    ns.map(n => {
+                setNodes((ns: Node<CsmNodeProps> []) => {
+                    ns = ns.filter(i => i.id !== node.id)
+                    const index = ns.findIndex(i => i.id === intersectedBlock.id)
+                    const firstPart = ns.slice(0, index + 1); // index + 1 because it splits at the index meaning the parent would be in the second part if not for the + 1
+                    const secondPart = ns.slice(index + 1);
+                    return [...firstPart, node as Node<CsmNodeProps>, ...secondPart];
+                })
+
+
+                setNodes((ns) =>
+                    ns.map((n) => {
                         if (n.id === node.id) {
                             return {
                                 ...n,
