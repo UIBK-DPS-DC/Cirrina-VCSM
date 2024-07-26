@@ -10,14 +10,38 @@ import {Node} from "@xyflow/react";
 export default function UndoButton() {
 
     const context: ReactFlowContextProps = useContext(ReactFlowContext) as ReactFlowContextProps;
-    const {nodeHistory
+    const {setNodes, nodeHistory
     } = context;
 
+    let currentIndex: number | undefined = undefined
 
 
 
     const onClick = useCallback(() => {
-        console.log('Undo');
+        console.log("Entering undo");
+        if (currentIndex === undefined) {
+            currentIndex = nodeHistory.length - 1
+        }
+        currentIndex = currentIndex -1;
+        console.log(`Current index : ${currentIndex}`);
+
+        if(currentIndex <= 0){
+            console.log("Beginning of array");
+            return;
+        }
+
+        setNodes((prev) => {
+            if(currentIndex !== undefined){
+                return(nodeHistory[currentIndex]);
+            }
+            return prev
+
+        })
+
+
+
+
+
         console.log(nodeHistory);
     }, [nodeHistory]);
 
