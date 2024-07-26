@@ -4,6 +4,7 @@ import StateMachine from "./classes/stateMachine.ts";
 import State from "./classes/state.ts";
 import React from "react";
 import StateOrStateMachineService from "./services/stateOrStateMachineService.tsx";
+import Action from "./classes/action.tsx";
 
 // One Type to avoid repeating ourselves. Can be expanded/unionized as needed.
 export type CsmNodeProps = {state: State} | {stateMachine: StateMachine} | {name: string};
@@ -15,6 +16,19 @@ export type NodeType =
     | 'state-machine-node'
 
 export type EntryNode = Node<{name: string}, 'entry-node'>;
+
+export type Transitionn = {
+    target?: string;
+    guards: string[]; //string placeholder for now
+    actions: Action[];
+    else?: string[];
+    event?: string;
+}
+
+export type Context = {
+    name: string;
+    value: string;
+}
 
 
 export type StateNode = Node<{
