@@ -23,6 +23,7 @@ import StateMachine from "../classes/stateMachine.ts";
 import State from "../classes/state.ts";
 import NodeInfoForm from "./nodeInfoForm.tsx";
 import CsmEdge from "./csmEdgeComponent.tsx";
+import UndoButton from "./undoButton.tsx";
 
 const nodeTypes = {
     'entry-node': EntryNode,
@@ -35,6 +36,7 @@ const edgeTypes = {
     'csm-edge': CsmEdge,
 }
 
+const NODE_HISTORY_LENGTH = 10;
 const initialNodes: Node<CsmNodeProps>[] = [];
 const initialEdges: Edge<CsmEdgeProps>[] = [];
 
@@ -54,11 +56,14 @@ export default function Flow() {
     const [selectedNode, setSelectedNode] = useState<Node<CsmNodeProps> | null>(null)
     const [showSidebar, setShowSidebar] = useState(false);
     const [nameInput, setNameInput] = useState<string>("");
+    const [nodeHistory, setNodeHistory] = useState<Node<CsmNodeProps>[][]>([[]]);
     const { getIntersectingNodes, screenToFlowPosition } = useReactFlow();
 
     const contextValue: ReactFlowContextProps = {
         nodes,
         setNodes,
+        nodeHistory,
+        setNodeHistory,
         edges,
         setEdges,
         selectedNode,
@@ -69,6 +74,22 @@ export default function Flow() {
         setNameInput,
         stateOrStateMachineService
     }
+
+    const updateNodeHistory = useCallback((nodes: Node<CsmNodeProps>[]) => {
+        setNodeHistory(
+            (prev) => {
+                if (prev && prev.length < NODE_HISTORY_LENGTH) {
+                    return [...prev, nodes]
+                }
+                else {
+                    console.log("Slicing...")
+                    return [...prev.slice(1), nodes]
+                }
+            }
+        )
+
+
+    },[nodeHistory])
 
     const onConnect: OnConnect = useCallback(
         (connection: Connection) => {
@@ -125,14 +146,17 @@ export default function Flow() {
             setNodes((nds) => {
                 // Order is important for nesting to work. See https://reactflow.dev/learn/layouting/sub-flows
                 if (type === 'state-machine-node') {
+                    updateNodeHistory([newNode,...nds])
                     return [newNode, ...nds]; // Prepend state-machine-nodes to the beginning.
                 } else {
+                    updateNodeHistory([...nds,newNode])
                     return [...nds, newNode]; // Append other nodes to the end
                 }
             });
         },
         [screenToFlowPosition, setNodes, stateOrStateMachineService],
     );
+
 
 
     const onNodeDragStop = useCallback(
@@ -221,6 +245,7 @@ export default function Flow() {
                 <MiniMap />
                 <Controls />
             </ReactFlow>
+            <UndoButton></UndoButton>
             <NodeInfoForm></NodeInfoForm>
         </ReactFlowContext.Provider>
     );
