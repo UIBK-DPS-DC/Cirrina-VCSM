@@ -196,6 +196,7 @@ export default function Flow() {
 
     return (
         <ReactFlowContext.Provider value={contextValue}>
+            <RedoAndUndoButton />
             <ReactFlow
                 nodes={nodes}
                 nodeTypes={nodeTypes}
@@ -216,7 +217,6 @@ export default function Flow() {
                 <MiniMap />
                 <Controls />
             </ReactFlow>
-            <RedoAndUndoButton />
             <NodeInfoForm />
         </ReactFlowContext.Provider>
     );

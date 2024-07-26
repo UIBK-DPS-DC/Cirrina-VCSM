@@ -8,7 +8,6 @@ import {differenceWith} from "lodash"
 import {nodeIsEqual} from "../utils.tsx"
 
 
-
 export default function RedoAndUndoButton() {
     const context = useContext(ReactFlowContext) as ReactFlowContextProps;
     const { setNodes, nodeHistory, stateOrStateMachineService } = context;
