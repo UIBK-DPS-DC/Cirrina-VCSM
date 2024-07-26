@@ -16,25 +16,21 @@ export default function RedoAndUndoButton() {
     const currentIndex = useRef<number | undefined>(undefined);
 
     const onUndoClick = useCallback(() => {
-        console.log("Entering undo");
 
         if (currentIndex.current === undefined) {
-            console.log("index is undefined");
             currentIndex.current = nodeHistory.length - 1;
         }
 
         if (currentIndex.current <= 0) {
-            console.log("Beginning of array");
+            console.log("Beginning of history")
             return;
         }
 
         currentIndex.current = currentIndex.current - 1;
-        console.log(`Current index : ${currentIndex.current}`);
 
         setNodes((prev) => {
             if (currentIndex.current !== undefined) {
                 const diff = differenceWith(prev, nodeHistory[currentIndex.current], nodeIsEqual);
-                console.log("DIFF", diff);
                 diff.forEach((node) => {
                     stateOrStateMachineService.unregisterName(stateOrStateMachineService.getName(node.data));
                 });
@@ -47,27 +43,21 @@ export default function RedoAndUndoButton() {
 
 
     const onRedoClick = useCallback(() => {
-        console.log(`Current index : ${currentIndex.current}`);
-        console.log("Entering redo");
-        console.log(nodeHistory);
 
         if (currentIndex.current === undefined) {
-            console.log("index is undefined");
             currentIndex.current = nodeHistory.length - 1;
         }
 
         if (currentIndex.current >= nodeHistory.length - 1) {
-            console.log("End of array");
+            console.log("End of History");
             return;
         }
 
         currentIndex.current = currentIndex.current + 1;
-        console.log(`Current index : ${currentIndex.current}`);
 
         setNodes((prev) => {
             if (currentIndex.current !== undefined) {
                 const diff = differenceWith(nodeHistory[currentIndex.current], prev, nodeIsEqual);
-                console.log("DIFF", diff);
                 diff.forEach((node) => {
                     stateOrStateMachineService.registerName(stateOrStateMachineService.getName(node.data));
                 });
