@@ -22,13 +22,14 @@ export default function UndoButton() {
         if (currentIndex === undefined) {
             currentIndex = nodeHistory.length - 1
         }
-        currentIndex = currentIndex -1;
-        console.log(`Current index : ${currentIndex}`);
 
         if(currentIndex <= 0){
             console.log("Beginning of array");
             return;
         }
+
+        currentIndex = currentIndex -1;
+        console.log(`Current index : ${currentIndex}`);
 
         setNodes((prev) => {
             if(currentIndex !== undefined){
