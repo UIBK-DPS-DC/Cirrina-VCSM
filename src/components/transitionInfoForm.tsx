@@ -18,10 +18,11 @@ export default function TransitionInfoForm() {
 
 
         return(
+            showSidebar && selectedTransition && (
             <div>
                 <p>This is the transition info form for</p>
             </div>
-        )
+        ))
 
 
 
