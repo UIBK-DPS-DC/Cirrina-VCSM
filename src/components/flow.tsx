@@ -90,7 +90,7 @@ export default function Flow() {
 
     const onConnect: OnConnect = useCallback(
         (connection: Connection) => {
-            //TODO: DELETE WHEN DONE
+            // TODO: Link NodeId to stateOrStatemachine
             const edge: Edge<CsmEdgeProps> = { id: getNewEdgeId(), ...connection, type: 'csm-edge' };
             setEdges(eds => addEdge(edge, eds));
         },
