@@ -17,10 +17,15 @@ export default function TransitionInfoForm() {
 
 
 
+
+
+
         return(
             showSidebar && selectedTransition && (
-            <div>
-                <p>This is the transition info form for</p>
+            <div className="edge-form">
+                <form>
+                    <h3>Hi dad! Its me {selectedTransition.id}</h3>
+                </form>
             </div>
         ))
 

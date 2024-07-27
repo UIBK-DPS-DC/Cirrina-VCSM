@@ -45,8 +45,8 @@ export type ReactFlowContextProps = {
     setNodes: React.Dispatch<React.SetStateAction<Node<CsmNodeProps>[]>>;
     nodeHistory: Node<CsmNodeProps>[][];
     setNodeHistory: React.Dispatch<React.SetStateAction<Node<CsmNodeProps>[][]>>;
-    selectedTransition: Edge<CsmEdgeProps> | undefined;
-    setSelectedTransition: React.Dispatch<React.SetStateAction<Edge<CsmEdgeProps> | undefined>>;
+    selectedTransition: Edge<CsmEdgeProps> | null;
+    setSelectedTransition: React.Dispatch<React.SetStateAction<Edge<CsmEdgeProps> | null>>
     edges: Edge<CsmEdgeProps>[];
     setEdges:  React.Dispatch<React.SetStateAction<Edge<CsmEdgeProps>[]>>;
     selectedNode: Node<CsmNodeProps> | null;

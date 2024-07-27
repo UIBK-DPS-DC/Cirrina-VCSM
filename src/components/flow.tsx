@@ -17,9 +17,12 @@ import StateOrStateMachineService from "../services/stateOrStateMachineService.t
 import { CsmEdgeProps, CsmNodeProps, ReactFlowContextProps } from "../types.ts";
 
 import "../css/nodeForm.css";
+import "../css/edgeForm.css"
+
 import StateMachine from "../classes/stateMachine.ts";
 import State from "../classes/state.ts";
 import NodeInfoForm from "./nodeInfoForm.tsx";
+import TransitionInfoForm from "./transitionInfoForm.tsx";
 import CsmEdge from "./csmEdgeComponent.tsx";
 
 const nodeTypes = {
@@ -49,7 +52,7 @@ export default function Flow() {
     const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
     const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
     const [selectedNode, setSelectedNode] = useState<Node<CsmNodeProps> | null>(null);
-    const [selectedTransition, setSelectedTransition] = useState<Edge<CsmEdgeProps>>()
+    const [selectedTransition, setSelectedTransition] = useState<Edge<CsmEdgeProps> | null>(null)
     const [showSidebar, setShowSidebar] = useState(false);
     const [nameInput, setNameInput] = useState<string>("");
     const [nodeHistory, setNodeHistory] = useState<Node<CsmNodeProps>[][]>([[]]);
@@ -203,15 +206,21 @@ export default function Flow() {
     );
 
     const onNodeClick = useCallback((_: React.MouseEvent, node: Node<CsmNodeProps>) => {
+        if(selectedTransition){
+            setSelectedTransition(null)
+        }
         setSelectedNode(node);
         setShowSidebar(true);
-    }, []);
+    }, [selectedNode, selectedTransition]);
 
     const onEdgeClick = useCallback(
         (_: React.MouseEvent, edge: Edge<CsmEdgeProps>) => {
+            if(selectedNode){
+                setSelectedNode(null)
+            }
             setSelectedTransition(edge)
             setShowSidebar(true);
-        }, []
+        }, [selectedNode, selectedTransition]
     )
 
     const onPaneClick = useCallback(() => {
@@ -230,6 +239,7 @@ export default function Flow() {
                 onConnect={onConnect}
                 onPaneClick={onPaneClick}
                 onNodeClick={onNodeClick}
+                onEdgeClick={onEdgeClick}
                 onNodesDelete={onNodesDelete}
                 onDragOver={onDragOver}
                 onDrop={onDrop}
@@ -241,6 +251,7 @@ export default function Flow() {
                 <Controls />
             </ReactFlow>
             <NodeInfoForm />
+            <TransitionInfoForm/>
         </ReactFlowContext.Provider>
     );
 }
