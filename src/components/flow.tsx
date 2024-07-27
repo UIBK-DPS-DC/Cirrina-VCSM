@@ -149,6 +149,9 @@ export default function Flow() {
                     return [...nds, newNode];
                 }
             });
+
+            stateOrStateMachineService.linkNode(newNode.id, newNode.data);
+
         },
         [screenToFlowPosition, setNodes, stateOrStateMachineService, updateNodeHistory]
     );

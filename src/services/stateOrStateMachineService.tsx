@@ -4,15 +4,20 @@
 import State from "../classes/state.ts";
 import StateMachine from "../classes/stateMachine.ts";
 import {CsmNodeProps, isState, isStateMachine} from "../types.ts";
+import StateOrStateMachine from "../classes/stateOrStateMachine.ts";
 
 export default class StateOrStateMachineService {
     private id: number = 0
     private stateOrStatemachineNames : Set<string>;
+    private nodeIdToStateOrStatemachineMap = new Map<string,StateOrStateMachine>
 
     public constructor() {
         this.stateOrStatemachineNames = new Set();
+        this.nodeIdToStateOrStatemachineMap = new Map();
 
     }
+
+
 
     /**
      * Registers a state or state machine name.
@@ -141,6 +146,23 @@ export default class StateOrStateMachineService {
             return { ...data, stateMachine: { ...data.stateMachine, name: newName } };
         }
         return data;
+    }
+
+    public linkNode(nodeId: string, data: CsmNodeProps) {
+        if(isState(data)) {
+            this.nodeIdToStateOrStatemachineMap.set(nodeId, data.state);
+            console.log(`Linked ${nodeId} to ${data.state.name}`)
+            return;
+        }
+        if(isStateMachine(data)){
+            this.nodeIdToStateOrStatemachineMap.set(nodeId,data.stateMachine);
+            console.log(`Linked ${nodeId} to ${data.stateMachine.name}`)
+            return;
+        }
+
+        console.error(`Node could not be linked, unknown type of data ${data}`);
+        return;
+
     }
 
 
