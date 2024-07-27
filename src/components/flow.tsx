@@ -49,6 +49,7 @@ export default function Flow() {
     const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
     const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
     const [selectedNode, setSelectedNode] = useState<Node<CsmNodeProps> | null>(null);
+    const [selectedTransition, setSelectedTransition] = useState<Edge<CsmEdgeProps>>()
     const [showSidebar, setShowSidebar] = useState(false);
     const [nameInput, setNameInput] = useState<string>("");
     const [nodeHistory, setNodeHistory] = useState<Node<CsmNodeProps>[][]>([[]]);
@@ -63,6 +64,8 @@ export default function Flow() {
         setEdges,
         selectedNode,
         setSelectedNode,
+        selectedTransition,
+        setSelectedTransition,
         showSidebar,
         setShowSidebar,
         nameInput,
