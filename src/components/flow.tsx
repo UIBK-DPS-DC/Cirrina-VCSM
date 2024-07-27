@@ -207,6 +207,13 @@ export default function Flow() {
         setShowSidebar(true);
     }, []);
 
+    const onEdgeClick = useCallback(
+        (_: React.MouseEvent, edge: Edge<CsmEdgeProps>) => {
+            setSelectedTransition(edge)
+            setShowSidebar(true);
+        }, []
+    )
+
     const onPaneClick = useCallback(() => {
         setShowSidebar(false);
     }, []);
