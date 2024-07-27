@@ -21,7 +21,6 @@ import StateMachine from "../classes/stateMachine.ts";
 import State from "../classes/state.ts";
 import NodeInfoForm from "./nodeInfoForm.tsx";
 import CsmEdge from "./csmEdgeComponent.tsx";
-import RedoAndUndoButton from "./redoAndUndoButton.tsx";
 
 const nodeTypes = {
     'state-node': StateNode,
@@ -211,7 +210,6 @@ export default function Flow() {
 
     return (
         <ReactFlowContext.Provider value={contextValue}>
-            <RedoAndUndoButton />
             <ReactFlow
                 nodes={nodes}
                 nodeTypes={nodeTypes}

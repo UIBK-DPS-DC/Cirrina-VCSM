@@ -15,7 +15,6 @@ export default function RedoAndUndoButton() {
     const currentIndex = useRef<number | undefined>(undefined);
 
     const onUndoClick = useCallback(() => {
-
         if (currentIndex.current === undefined) {
             currentIndex.current = nodeHistory.length - 1;
         }
