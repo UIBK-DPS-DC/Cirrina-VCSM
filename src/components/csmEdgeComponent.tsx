@@ -4,7 +4,7 @@ import {
     type EdgeProps,
   } from '@xyflow/react';
 
-import { CsmEdgeProps } from '../types';
+import { TransitionEdge } from '../types';
 
 export default function CsmEdge({
     id,
@@ -13,7 +13,7 @@ export default function CsmEdge({
     targetX,
     targetY,
     data
-  }: EdgeProps<CsmEdgeProps>) {
+  }: EdgeProps<TransitionEdge>) {
     console.log(data?.transition); // we will use data later, this is just for verifying functionality atm
     const [edgePath] = getBezierPath({ sourceX, sourceY, targetX, targetY });
    

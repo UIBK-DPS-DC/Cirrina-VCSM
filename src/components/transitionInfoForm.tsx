@@ -8,10 +8,7 @@ export default function TransitionInfoForm() {
         const context = useContext(ReactFlowContext) as ReactFlowContextProps;
         const {
             selectedTransition,
-            setSelectedTransition,
-            setSelectedNode,
             showSidebar,
-            setShowSidebar,
         } = context;
 
 

@@ -8,6 +8,7 @@ import Action from "./classes/action.tsx";
 
 // One Type to avoid repeating ourselves. Can be expanded/unionized as needed.
 export type CsmNodeProps = {state: State} | {stateMachine: StateMachine} | {name: string};
+export type CsmEdgeProps = {transition: Transition}
 
 export type NodeType =
     | 'state-node'
@@ -35,7 +36,7 @@ export type StateMachineNode = Node<{
    stateMachine : StateMachine
 }, 'state-machine-node'>;
 
-export type CsmEdgeProps = Edge<{
+export type TransitionEdge = Edge<{
     transition: Transition
 }, 'csmEdge'>;
 
@@ -45,10 +46,10 @@ export type ReactFlowContextProps = {
     setNodes: React.Dispatch<React.SetStateAction<Node<CsmNodeProps>[]>>;
     nodeHistory: Node<CsmNodeProps>[][];
     setNodeHistory: React.Dispatch<React.SetStateAction<Node<CsmNodeProps>[][]>>;
-    selectedTransition: Edge<CsmEdgeProps> | null;
+    selectedTransition: Edge<CsmEdgeProps> | null
     setSelectedTransition: React.Dispatch<React.SetStateAction<Edge<CsmEdgeProps> | null>>
     edges: Edge<CsmEdgeProps>[];
-    setEdges:  React.Dispatch<React.SetStateAction<Edge<CsmEdgeProps>[]>>;
+    setEdges: React.Dispatch<React.SetStateAction<Edge<CsmEdgeProps>[]>>
     selectedNode: Node<CsmNodeProps> | null;
     setSelectedNode: React.Dispatch<React.SetStateAction<Node<CsmNodeProps> | null>>;
     showSidebar: boolean;

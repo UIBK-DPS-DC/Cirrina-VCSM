@@ -14,7 +14,7 @@ import '@xyflow/react/dist/style.css';
 import { StateNode } from "./Nodes/stateNode.tsx";
 import { StateMachineNode } from "./Nodes/stateMachineNode.tsx";
 import StateOrStateMachineService from "../services/stateOrStateMachineService.tsx";
-import { CsmEdgeProps, CsmNodeProps, ReactFlowContextProps } from "../types.ts";
+import {CsmNodeProps, ReactFlowContextProps, CsmEdgeProps, isState, isStateMachine} from "../types.ts";
 
 import "../css/nodeForm.css";
 import "../css/edgeForm.css"
@@ -24,6 +24,7 @@ import State from "../classes/state.ts";
 import NodeInfoForm from "./nodeInfoForm.tsx";
 import TransitionInfoForm from "./transitionInfoForm.tsx";
 import CsmEdge from "./csmEdgeComponent.tsx";
+
 
 const nodeTypes = {
     'state-node': StateNode,
@@ -89,6 +90,7 @@ export default function Flow() {
 
     const onConnect: OnConnect = useCallback(
         (connection: Connection) => {
+            //TODO: DELETE WHEN DONE
             const edge: Edge<CsmEdgeProps> = { id: getNewEdgeId(), ...connection, type: 'csm-edge' };
             setEdges(eds => addEdge(edge, eds));
         },
@@ -120,6 +122,11 @@ export default function Flow() {
                 position,
                 data: stateOrStateMachineService.getDefaultData(type, new_name),
             };
+
+            // TODO: DELETE WHEN FINISHED
+            console.log(`New State or statemachine : ${isState(newNode.data) ? newNode.data.state.name : 
+                isStateMachine(newNode.data)? newNode.data.stateMachine.name : "none"}`)
+
 
             // TODO add this to stylesheet
             if (type === 'state-machine-node') {
