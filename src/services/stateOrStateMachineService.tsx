@@ -3,7 +3,7 @@
 
 import State from "../classes/state.ts";
 import StateMachine from "../classes/stateMachine.ts";
-import {CsmNodeProps, isExitOrEntry, isState, isStateMachine} from "../types.ts";
+import {CsmNodeProps, isState, isStateMachine} from "../types.ts";
 
 export default class StateOrStateMachineService {
     private id: number = 0
@@ -140,9 +140,6 @@ export default class StateOrStateMachineService {
         if (isStateMachine(data)) {
             return { ...data, stateMachine: { ...data.stateMachine, name: newName } };
         }
-        if (isExitOrEntry(data)) {
-            return { ...data, name: newName };
-        }
         return data;
     }
 
@@ -166,14 +163,6 @@ export default class StateOrStateMachineService {
             case "state-machine-node":
                 return {
                     "stateMachine": this.getDefaultStateMachine(name ? name : ""),
-                };
-            case "entry-node":
-                return {
-                    "name": name ? name : "",
-                };
-            case "exit-node":
-                return {
-                    "name": name ? name : "",
                 };
             default:
                 return{

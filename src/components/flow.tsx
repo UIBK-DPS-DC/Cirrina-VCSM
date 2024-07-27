@@ -11,8 +11,6 @@ import {
 } from '@xyflow/react';
 
 import '@xyflow/react/dist/style.css';
-import { EntryNode } from "./Nodes/entryNode.tsx";
-import { ExitNode } from "./Nodes/exitNode.tsx";
 import { StateNode } from "./Nodes/stateNode.tsx";
 import { StateMachineNode } from "./Nodes/stateMachineNode.tsx";
 import StateOrStateMachineService from "../services/stateOrStateMachineService.tsx";
@@ -26,8 +24,6 @@ import CsmEdge from "./csmEdgeComponent.tsx";
 import RedoAndUndoButton from "./redoAndUndoButton.tsx";
 
 const nodeTypes = {
-    'entry-node': EntryNode,
-    'exit-node': ExitNode,
     'state-node': StateNode,
     'state-machine-node': StateMachineNode,
 } satisfies NodeTypes;

@@ -10,12 +10,8 @@ import Action from "./classes/action.tsx";
 export type CsmNodeProps = {state: State} | {stateMachine: StateMachine} | {name: string};
 
 export type NodeType =
-    | 'entry-node'
-    | 'exit-node'
     | 'state-node'
     | 'state-machine-node'
-
-export type EntryNode = Node<{name: string}, 'entry-node'>;
 
 export type Transitionn = {
     target?: string;
@@ -38,10 +34,6 @@ export type StateNode = Node<{
 export type StateMachineNode = Node<{
    stateMachine : StateMachine
 }, 'state-machine-node'>;
-
-
-export type ExitNode = Node<{name: string}, 'exit-node'>;
-
 
 export type CsmEdgeProps = Edge<{
     transition: Transition
@@ -94,17 +86,4 @@ export function isState(data: CsmNodeProps): data is { state: State } {
  */
 export function isStateMachine(data: CsmNodeProps): data is { stateMachine: StateMachine } {
     return (data as { stateMachine: StateMachine }).stateMachine !== undefined;
-}
-
-/**
- * Type guard function to check if the provided data is of type `{ name: string }`.
- *
- * This function takes a `CsmNodeProps` object and checks if it has a `name` property.
- * It returns `true` if the `name` property is defined, indicating that the data is of type `{ name: string }`.
- *
- * @param {CsmNodeProps} data - The data to check.
- * @returns {data is { name: string }} - Returns `true` if the data is of type `{ name: string }`.
- */
-export function isExitOrEntry(data: CsmNodeProps): data is {name: string}{
-    return (data as {name: string}).name !== undefined;
 }
