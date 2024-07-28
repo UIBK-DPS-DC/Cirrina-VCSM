@@ -148,6 +148,18 @@ export default class StateOrStateMachineService {
         return data;
     }
 
+    /**
+     * Links a node to a state or state machine.
+     *
+     * This method associates a given node ID with a corresponding state or state machine based on the provided data.
+     * It updates the internal mapping of node IDs to states or state machines.
+     * If the data represents a state, it links the node to the state.
+     * If the data represents a state machine, it links the node to the state machine.
+     * If the data type is unknown, it logs an error message.
+     *
+     * @param {string} nodeId - The ID of the node to be linked.
+     * @param {CsmNodeProps} data - The data object containing the state or state machine information.
+     */
     public linkNode(nodeId: string, data: CsmNodeProps) {
         if(isState(data)) {
             this.nodeIdToStateOrStatemachineMap.set(nodeId, data.state);
