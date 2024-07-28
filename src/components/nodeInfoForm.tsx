@@ -1,8 +1,6 @@
-import React, {useCallback, useContext, useEffect} from "react";
-import {ReactFlowContext} from "./flow.tsx"
-import {ReactFlowContextProps} from "../types.ts";
-
-
+import React, { useCallback, useContext, useEffect } from "react";
+import { ReactFlowContext } from "./flow.tsx";
+import { ReactFlowContextProps } from "../types.ts";
 
 /**
  * NodeInfoForm Component
@@ -21,26 +19,46 @@ import {ReactFlowContextProps} from "../types.ts";
  */
 export default function NodeInfoForm() {
     const context: ReactFlowContextProps = useContext(ReactFlowContext) as ReactFlowContextProps;
-    const {nodes,
-    setNodes,
-    selectedNode,
-    stateOrStateMachineService,
-    showSidebar,
-    nameInput,
-    setNameInput,
-    } = context
-
+    const {
+        nodes,
+        setNodes,
+        selectedNode,
+        stateOrStateMachineService,
+        showSidebar,
+        nameInput,
+        setNameInput,
+        setEdges
+    } = context;
 
     /**
      * useEffect hook to update the name input field when the selected node changes.
      */
     useEffect(() => {
-        if(selectedNode){
-            setNameInput(stateOrStateMachineService.getName(selectedNode.data))
+        if (selectedNode) {
+            setNameInput(stateOrStateMachineService.getName(selectedNode.data));
         }
-    },[selectedNode, setNameInput, stateOrStateMachineService])
+    }, [selectedNode, setNameInput, stateOrStateMachineService]);
 
-
+    const updateTransitionsOnRename = useCallback((oldName: string, newName: string) => {
+        setEdges(edges => edges.map(edge => {
+            if (edge.data?.transition) {
+                const transition = edge.data.transition;
+                let updated = false;
+                if (transition.getSource() === oldName) {
+                    transition.setSource(newName);
+                    updated = true;
+                }
+                if (transition.getTarget() === oldName) {
+                    transition.setTarget(newName);
+                    updated = true;
+                }
+                if (updated) {
+                    return { ...edge, data: { ...edge.data, transition } };
+                }
+            }
+            return edge;
+        }));
+    }, [setEdges]);
 
     const onFormSubmit = useCallback((event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
@@ -70,33 +88,24 @@ export default function NodeInfoForm() {
             stateOrStateMachineService.unregisterName(oldName);
             stateOrStateMachineService.registerName(newName);
             setNodes(newNodes);
+            updateTransitionsOnRename(oldName, newName);
         }
-    }, [nodes, setNodes, selectedNode, stateOrStateMachineService]);
-
-
+    }, [nodes, setNodes, selectedNode, stateOrStateMachineService, updateTransitionsOnRename]);
 
     const onNameInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setNameInput(event.target.value);
     };
 
-
-
-
     return (
         showSidebar && selectedNode && (
-            <div className = "node-form">
+            <div className="node-form">
                 <form onSubmit={onFormSubmit}>
                     <h3>Hi mom! It's me {stateOrStateMachineService.getName(selectedNode.data)}!</h3>
-                    <label htmlFor="name" >Name: </label>
-                    <input type = "text" id="name" name = "name" value={nameInput} onChange={onNameInputChange}
-                    />
-                    <button type={"submit"}>Save Changes</button>
-
+                    <label htmlFor="name">Name: </label>
+                    <input type="text" id="name" name="name" value={nameInput} onChange={onNameInputChange} />
+                    <button type="submit">Save Changes</button>
                 </form>
-
             </div>
         )
-
-    )
-
+    );
 }

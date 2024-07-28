@@ -22,6 +22,9 @@ export default function TransitionInfoForm() {
             <div className="edge-form">
                 <form>
                     <h3>Hi dad! Its me {selectedTransition.id}</h3>
+                    {selectedTransition.data && (
+                        <h2>I connect {selectedTransition.data.transition.getSource()} to {selectedTransition.data.transition.getTarget()}</h2>
+                    )}
                 </form>
             </div>
         ))

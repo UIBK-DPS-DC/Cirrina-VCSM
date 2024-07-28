@@ -27,7 +27,7 @@ export default class TransitionService {
             return undefined;
         }
 
-        const transition = new Transition(sourceState, targetState);
+        const transition = new Transition(sourceState.name, targetState.name);
         console.log(`Transition created from ${sourceState} to ${targetState}`);
         return transition;
 

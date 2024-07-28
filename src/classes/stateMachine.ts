@@ -2,7 +2,7 @@ import StateOrStateMachine from "./stateOrStateMachine.ts"
 import {Context} from "../types.ts";
 import Action from "./action.tsx";
 
-export default class StateMachine extends StateOrStateMachine {
+export default class StateMachine implements StateOrStateMachine {
 
     private _name: string
     private _states: StateOrStateMachine[] = [];
@@ -13,7 +13,6 @@ export default class StateMachine extends StateOrStateMachine {
     private _abstract = false
 
     public constructor(name: string) {
-        super()
         this._name = name
     }
 

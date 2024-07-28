@@ -24,6 +24,7 @@ import State from "../classes/state.ts";
 import NodeInfoForm from "./nodeInfoForm.tsx";
 import TransitionInfoForm from "./transitionInfoForm.tsx";
 import CsmEdge from "./csmEdgeComponent.tsx";
+import TransitionService from "../services/transitionService.tsx";
 
 
 const nodeTypes = {
@@ -49,6 +50,7 @@ const getNewEdgeId = () => `edge_${edgeId++}`;
 export default function Flow() {
 
     const stateOrStateMachineService: StateOrStateMachineService = useMemo(() => new StateOrStateMachineService(), []);
+    const transitionService: TransitionService = useMemo(() => new TransitionService(stateOrStateMachineService), [stateOrStateMachineService]);
 
     const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
     const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
@@ -90,9 +92,13 @@ export default function Flow() {
 
     const onConnect: OnConnect = useCallback(
         (connection: Connection) => {
-            // TODO: Link NodeId to stateOrStatemachine
-            const edge: Edge<CsmEdgeProps> = { id: getNewEdgeId(), ...connection, type: 'csm-edge' };
-            setEdges(eds => addEdge(edge, eds));
+            // TODO: Add this new transition to the relevant states and statemachines.
+            const newTransition = transitionService.connectionToTransition(connection)
+            if(newTransition) {
+                const edge: Edge<CsmEdgeProps> = { id: getNewEdgeId(), ...connection, type: 'csm-edge', data: {transition: newTransition} };
+                setEdges(eds => addEdge(edge, eds));
+            }
+
         },
         [setEdges]
     );

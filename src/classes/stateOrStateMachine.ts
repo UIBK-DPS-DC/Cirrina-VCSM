@@ -1,3 +1,3 @@
-export default class StateOrStateMachine {
-
+export default interface StateOrStateMachine {
+    get name(): string
 }

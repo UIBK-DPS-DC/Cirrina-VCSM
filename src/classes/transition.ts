@@ -1,28 +1,27 @@
-import StateOrStateMachine from "./stateOrStateMachine.ts"
 
 export default class Transition {
-    private source : StateOrStateMachine
-    private target : StateOrStateMachine
+    private source : string
+    private target : string
 
-    public constructor (sourceState: StateOrStateMachine, targetState: StateOrStateMachine){
+    public constructor (sourceState: string, targetState: string){
         this.source = sourceState
         this.target = targetState
     }
 
 
-    public setSource(sourceState: StateOrStateMachine): void{
+    public setSource(sourceState: string): void{
         this.source = sourceState
     }
 
-    public setTarget(targetState: StateOrStateMachine): void{
+    public setTarget(targetState: string): void{
         this.target = targetState
     }
 
-    public getSource(): StateOrStateMachine{
+    public getSource(): string{
         return this.source
     }
 
-    public getTarget(): StateOrStateMachine{
+    public getTarget(): string{
         return this.target
     }
 
