@@ -177,6 +177,14 @@ export default class StateOrStateMachineService {
 
     }
 
+    /**
+     * Unlinks a node from its associated state or state machine.
+     *
+     * This method removes the association of a given node ID from the internal mapping of node IDs to states or state machines.
+     * If the node ID is not found in the mapping, it logs a message indicating that the node was not found.
+     *
+     * @param {string} nodeId - The ID of the node to be unlinked.
+     */
     public unlinkNode(nodeId: string) {
         const res = this.nodeIdToStateOrStatemachineMap.delete(nodeId)
         if(!res){
