@@ -39,6 +39,16 @@ export default function NodeInfoForm() {
         }
     }, [selectedNode, setNameInput, stateOrStateMachineService]);
 
+    /**
+     * Updates the transitions when a node is renamed.
+     *
+     * This function updates the source and target names of transitions in the edges
+     * whenever a node is renamed. It ensures that any transition involving the renamed
+     * node reflects the new name.
+     *
+     * @param {string} oldName - The old name of the node before renaming.
+     * @param {string} newName - The new name of the node after renaming.
+     */
     const updateTransitionsOnRename = useCallback((oldName: string, newName: string) => {
         setEdges(edges => edges.map(edge => {
             if (edge.data?.transition) {
