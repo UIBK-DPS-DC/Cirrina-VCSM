@@ -5,6 +5,8 @@ import State from "../classes/state.ts";
 import StateMachine from "../classes/stateMachine.ts";
 import {CsmNodeProps, isState, isStateMachine} from "../types.ts";
 import StateOrStateMachine from "../classes/stateOrStateMachine.ts";
+import { cloneDeep } from 'lodash';
+
 
 export default class StateOrStateMachineService {
     private id: number = 0
@@ -140,12 +142,19 @@ export default class StateOrStateMachineService {
      */
     public setName(newName: string, data: CsmNodeProps): CsmNodeProps {
         if (isState(data)) {
-            return { ...data, state: { ...data.state, name: newName } };
+            const newState = cloneDeep(data.state);
+            newState.name = newName;
+            return { ...data, state: newState };
         }
         if (isStateMachine(data)) {
-            return { ...data, stateMachine: { ...data.stateMachine, name: newName } };
+            const newStateMachine = cloneDeep(data.stateMachine);
+            newStateMachine.name = newName;
+            return { ...data, stateMachine: newStateMachine };
         }
-        return data;
+        if (data.name !== undefined) {
+            return { ...data, name: newName };
+        }
+        return data;  // Return original data unchanged if it doesn't match any type
     }
 
     /**

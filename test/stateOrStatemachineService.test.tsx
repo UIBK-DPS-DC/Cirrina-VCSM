@@ -148,14 +148,14 @@ describe('stateOrStateMachineService', () => {
         const state = new State('oldName'); // Create instance of State
         const data: CsmNodeProps = { state };
         const updatedData = service.setName('newName', data);
-        expect(updatedData).toEqual({ state: { ...state, name: 'newName' } });
+        expect(updatedData).toEqual({ state: expect.objectContaining({ ...state, _name: 'newName' }) });
     });
 
     test('setName should update the name in stateMachine', () => {
         const stateMachine = new StateMachine('oldName'); // Create instance of StateMachine
         const data: CsmNodeProps = { stateMachine };
         const updatedData = service.setName('newName', data);
-        expect(updatedData).toEqual({ stateMachine: { ...stateMachine, name: 'newName' } });
+        expect(updatedData).toEqual({ stateMachine: expect.objectContaining({ ...stateMachine, _name: 'newName' }) });
     });
 
     test('setName should update the name in exit or entry', () => {
@@ -170,15 +170,117 @@ describe('stateOrStateMachineService', () => {
         expect(updatedData).toEqual(data);
     });
 
-    // New Test for Setting Name
-    test('setName should handle updating the name correctly when changing types', () => {
-        const state = new State('oldStateName'); // Create instance of State
-        const stateMachine = new StateMachine('oldStateMachineName'); // Create instance of StateMachine
-        let data: CsmNodeProps = { state };
-        data = service.setName('newStateName', data);
-        expect(service.getName(data)).toBe('newStateName');
-        data = { stateMachine };
-        data = service.setName('newStateMachineName', data);
-        expect(service.getName(data)).toBe('newStateMachineName');
+    // Additional Tests for setName
+
+    test('setName should handle multiple updates to state name', () => {
+        const state = new State('initialName');
+        const data: CsmNodeProps = { state };
+        let updatedData = service.setName('firstUpdate', data);
+        updatedData = service.setName('secondUpdate', updatedData);
+        updatedData = service.setName('finalUpdate', updatedData);
+        expect(updatedData).toEqual({ state: expect.objectContaining({ ...state, _name: 'finalUpdate' }) });
     });
+
+    test('setName should handle multiple updates to stateMachine name', () => {
+        const stateMachine = new StateMachine('initialName');
+        const data: CsmNodeProps = { stateMachine };
+        let updatedData = service.setName('firstUpdate', data);
+        updatedData = service.setName('secondUpdate', updatedData);
+        updatedData = service.setName('finalUpdate', updatedData);
+        expect(updatedData).toEqual({ stateMachine: expect.objectContaining({ ...stateMachine, _name: 'finalUpdate' }) });
+    });
+
+    test('setName should not modify other properties in state', () => {
+        const state = new State('oldName');
+        state.initial = true;
+        state.terminal = true;
+        const data: CsmNodeProps = { state };
+        const updatedData = service.setName('newName', data);
+        expect(updatedData).toEqual({
+            state: expect.objectContaining({
+                ...state,
+                _name: 'newName',
+                _initial: true,
+                _terminal: true
+            })
+        });
+    });
+
+    test('setName should not modify other properties in stateMachine', () => {
+        const stateMachine = new StateMachine('oldName');
+        stateMachine.states = [new State('childState')];
+        const data: CsmNodeProps = { stateMachine };
+        const updatedData = service.setName('newName', data);
+        expect(updatedData).toEqual({
+            stateMachine: expect.objectContaining({
+                ...stateMachine,
+                _name: 'newName',
+                _states: expect.arrayContaining([expect.objectContaining({ _name: 'childState' })])
+            })
+        });
+    });
+
+    // ############################## Link and Unlink Node Tests ########################################################
+
+    test('linkNode should link a node to a state', () => {
+        const state = new State('stateName');
+        const data: CsmNodeProps = { state };
+        const nodeId = 'node1';
+        service.linkNode(nodeId, data);
+        const linked = service.getLinkedStateOrStatemachine(nodeId);
+        expect(linked).toBe(state);
+    });
+
+    test('linkNode should link a node to a stateMachine', () => {
+        const stateMachine = new StateMachine('stateMachineName');
+        const data: CsmNodeProps = { stateMachine };
+        const nodeId = 'node2';
+        service.linkNode(nodeId, data);
+        const linked = service.getLinkedStateOrStatemachine(nodeId);
+        expect(linked).toBe(stateMachine);
+    });
+
+    test('linkNode should log an error for unknown data type', () => {
+        const data: CsmNodeProps = { name: 'unknown' };
+        const nodeId = 'node3';
+        console.error = jest.fn();
+        service.linkNode(nodeId, data);
+        expect(console.error).toHaveBeenCalledWith(`Node could not be linked, unknown type of data ${data}`);
+    });
+
+    test('unlinkNode should unlink a node', () => {
+        const state = new State('stateName');
+        const data: CsmNodeProps = { state };
+        const nodeId = 'node4';
+        service.linkNode(nodeId, data);
+        service.unlinkNode(nodeId);
+        const linked = service.getLinkedStateOrStatemachine(nodeId);
+        expect(linked).toBeUndefined();
+    });
+
+    test('unlinkNode should log a message if the node is not found', () => {
+        const nodeId = 'node5';
+        console.log = jest.fn();
+        service.unlinkNode(nodeId);
+        expect(console.log).toHaveBeenCalledWith(`Node: ${nodeId} not found!`);
+    });
+
+    test('getLinkedStateOrStatemachine should retrieve the linked state or stateMachine', () => {
+        const state = new State('stateName');
+        const data: CsmNodeProps = { state };
+        const nodeId = 'node6';
+        service.linkNode(nodeId, data);
+        const linked = service.getLinkedStateOrStatemachine(nodeId);
+        expect(linked).toBe(state);
+    });
+
+    test('getLinkedStateOrStatemachine should log an error if the node is not found', () => {
+        const nodeId = 'node7';
+        console.error = jest.fn();
+        const linked = service.getLinkedStateOrStatemachine(nodeId);
+        expect(linked).toBeUndefined();
+        expect(console.error).toHaveBeenCalledWith(`State or Statemachine with id ${nodeId} could not be found`);
+    });
+
+
 });
