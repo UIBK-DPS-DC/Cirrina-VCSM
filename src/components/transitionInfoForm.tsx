@@ -7,7 +7,7 @@ import {ReactFlowContextProps} from "../types.ts";
 export default function TransitionInfoForm() {
         const context = useContext(ReactFlowContext) as ReactFlowContextProps;
         const {
-            selectedTransition,
+            selectedEdge,
             showSidebar,
         } = context;
 
@@ -18,13 +18,11 @@ export default function TransitionInfoForm() {
 
 
         return(
-            showSidebar && selectedTransition && (
+            showSidebar && selectedEdge && selectedEdge.data &&(
             <div className="edge-form">
                 <form>
-                    <h3>Hi dad! Its me {selectedTransition.id}</h3>
-                    {selectedTransition.data && (
-                        <h2>I connect {selectedTransition.data.transition.getSource()} to {selectedTransition.data.transition.getTarget()}</h2>
-                    )}
+                    <h3>Hi dad! Its me {selectedEdge.id}</h3>
+                    <h2>I connect {selectedEdge.data.transition.getSource()} to {selectedEdge.data.transition.getTarget()}</h2>
                 </form>
             </div>
         ))

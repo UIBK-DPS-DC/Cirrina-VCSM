@@ -55,7 +55,7 @@ export default function Flow() {
     const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
     const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
     const [selectedNode, setSelectedNode] = useState<Node<CsmNodeProps> | null>(null);
-    const [selectedTransition, setSelectedTransition] = useState<Edge<CsmEdgeProps> | null>(null)
+    const [selectedEdge, setSelectedEdge] = useState<Edge<CsmEdgeProps> | null>(null)
     const [showSidebar, setShowSidebar] = useState(false);
     const [nameInput, setNameInput] = useState<string>("");
     const [nodeHistory, setNodeHistory] = useState<Node<CsmNodeProps>[][]>([[]]);
@@ -70,8 +70,8 @@ export default function Flow() {
         setEdges,
         selectedNode,
         setSelectedNode,
-        selectedTransition,
-        setSelectedTransition,
+        selectedEdge,
+        setSelectedEdge,
         showSidebar,
         setShowSidebar,
         nameInput,
@@ -223,21 +223,21 @@ export default function Flow() {
     );
 
     const onNodeClick = useCallback((_: React.MouseEvent, node: Node<CsmNodeProps>) => {
-        if(selectedTransition){
-            setSelectedTransition(null)
+        if(selectedEdge){
+            setSelectedEdge(null)
         }
         setSelectedNode(node);
         setShowSidebar(true);
-    }, [selectedNode, selectedTransition]);
+    }, [selectedNode, selectedEdge]);
 
     const onEdgeClick = useCallback(
         (_: React.MouseEvent, edge: Edge<CsmEdgeProps>) => {
             if(selectedNode){
                 setSelectedNode(null)
             }
-            setSelectedTransition(edge)
+            setSelectedEdge(edge)
             setShowSidebar(true);
-        }, [selectedNode, selectedTransition]
+        }, [selectedNode, selectedEdge]
     )
 
     const onPaneClick = useCallback(() => {
