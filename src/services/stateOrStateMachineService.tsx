@@ -165,6 +165,22 @@ export default class StateOrStateMachineService {
 
     }
 
+    public unlinkNode(nodeId: string) {
+        const res = this.nodeIdToStateOrStatemachineMap.delete(nodeId)
+        if(!res){
+            console.log(`Node: ${nodeId} not found!`);
+        }
+    }
+
+    public getLinkedStateOrStatemachine(nodeId: string): StateOrStateMachine | undefined {
+        const stateOrStateMachine = this.nodeIdToStateOrStatemachineMap.get(nodeId);
+        if(stateOrStateMachine === undefined){
+            console.error(`State or Statemachine with id ${nodeId} could not be found`)
+            return stateOrStateMachine;
+        }
+        return stateOrStateMachine
+    }
+
 
     public getDefaultState(name: string): State {
         // add default config here
