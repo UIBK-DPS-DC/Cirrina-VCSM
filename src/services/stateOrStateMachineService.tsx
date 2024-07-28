@@ -192,6 +192,15 @@ export default class StateOrStateMachineService {
         }
     }
 
+    /**
+     * Retrieves the state or state machine linked to a given node ID.
+     *
+     * This method fetches the state or state machine associated with the provided node ID from the internal mapping.
+     * If the node ID is not found in the mapping, it logs an error message and returns `undefined`.
+     *
+     * @param {string} nodeId - The ID of the node whose linked state or state machine is to be retrieved.
+     * @returns {StateOrStateMachine | undefined} - The state or state machine linked to the node ID, or `undefined` if not found.
+     */
     public getLinkedStateOrStatemachine(nodeId: string): StateOrStateMachine | undefined {
         const stateOrStateMachine = this.nodeIdToStateOrStatemachineMap.get(nodeId);
         if(stateOrStateMachine === undefined){
