@@ -196,7 +196,6 @@ export default function Flow() {
         [setNodes, getIntersectingNodes]
     );
 
-    //TODO: Unlink or remove node ID from map on delete
     const onNodesDelete = useCallback(
         (deletedNodes: Node[]) => {
             deletedNodes.forEach(node => {
