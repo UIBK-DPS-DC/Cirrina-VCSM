@@ -199,6 +199,7 @@ export default class StateOrStateMachineService {
         if(!res){
             console.log(`Node: ${nodeId} not found!`);
         }
+        console.log(`${nodeId} has been unlinked!`);
     }
 
     /**

@@ -200,6 +200,7 @@ export default function Flow() {
     const onNodesDelete = useCallback(
         (deletedNodes: Node[]) => {
             deletedNodes.forEach(node => {
+                stateOrStateMachineService.unlinkNode(node.id)
                 switch (node.type) {
                     case "state-machine-node":
                         stateOrStateMachineService.unregisterName((node.data.stateMachine as StateMachine).name);
