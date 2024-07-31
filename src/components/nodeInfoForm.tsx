@@ -1,7 +1,7 @@
 import React, {useCallback, useContext, useEffect, useState} from "react";
 import { ReactFlowContext } from "./flow.tsx";
 import {CsmNodeProps, isState, isStateMachine, ReactFlowContextProps} from "../types.ts";
-import {ActionType} from "../enums.tsx";
+import {ActionCategory, ActionType} from "../enums.tsx";
 
 /**
  * NodeInfoForm Component
@@ -31,7 +31,11 @@ export default function NodeInfoForm() {
         setEdges
     } = context;
 
-    const [selectedActionType, setSelectedActionType] = useState<string>()
+    const [selectedActionType, setSelectedActionType] = useState<string>("no-new-action")
+    const [selectedActionCategory, setSelectedActionCategory] = useState<string>(ActionCategory.WHILE_ACTION)
+    const [raiseEventSelectedType, setRaiseEventSelectedType] = useState<string>("new-raise-event")
+    const [newEventName, setNewEventName] = useState<string>("New Event Name")
+    const [newActionName, setNewActionName] = useState<string>("New Action Name")
 
     /**
      * useEffect hook to update the name input field when the selected node changes.
@@ -139,6 +143,60 @@ export default function NodeInfoForm() {
         setSelectedActionType(event.target.value);
     }
 
+    const onCategorySelect = (event: React.ChangeEvent<HTMLSelectElement>) => {
+        setSelectedActionCategory(event.target.value);
+    }
+
+    const onRaiseEventSelectChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+        console.log(`RAISE EVENT SELECTION ${event.target.value}`);
+        setRaiseEventSelectedType(event.target.value);
+    }
+
+    const onNewEventNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setNewEventName(event.target.value);
+    }
+
+    const onNewActionNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setNewActionName(event.target.value)
+    }
+
+    const renderActionTypeOptions = () => {
+        return (Object.values(ActionType).map((actionType) => {
+           return <option key={actionType} value={actionType}>{actionType}</option>
+        }))
+    }
+
+    const renderActionCategoryOptions = () => {
+        return (
+            Object.values(ActionCategory).map((category) => {
+                return <option key={category} value={category}>{category}</option>
+            })
+        )
+    }
+
+
+
+    const renderActionProperties = () => {
+        switch (selectedActionType){
+            case ActionType.RAISE_EVENT: {
+                return(
+                    <div className="raise-event-select">
+                        <p>I want to raise an event</p>
+                        <select id="raise-event-props" name="raise-event-props" onChange={onRaiseEventSelectChange} defaultValue={"new-raise-event"}>
+                            <option key="new-raise-event" value="new-raise-event">New Event</option>
+                        </select>
+                        {raiseEventSelectedType === "new-raise-event" && (
+                            <input type="text" id="new-raise-event-input" name ="new-raise-event-input" value={newEventName} onChange={onNewEventNameChange}/>
+                        )}
+                    </div>
+                )
+            }
+            default : {
+                return <></>
+            }
+        }
+    }
+
     return (
         showSidebar && selectedNode && (
             <div className="node-form">
@@ -146,14 +204,30 @@ export default function NodeInfoForm() {
                     <h3>Hi mom! It's me {stateOrStateMachineService.getName(selectedNode.data)}!</h3>
                     <label htmlFor="name">Name: </label>
                     <input type="text" id="name" name="name" value={nameInput} onChange={onNameInputChange} />
-                    <div className= "from-action-section">
+
+                    <div className="from-action-section">
                         <label htmlFor="select-action-type">Add action: </label>
-                        <select id="select-action-type" name="select-action-typ" onChange={onActionTypeSelect}>
-                            <option value={ActionType.ENTRY_ACTION}>{ActionType.ENTRY_ACTION}</option>
-                            <option value={ActionType.WHILE_ACTION}>{ActionType.WHILE_ACTION}</option>
-                            <option value={ActionType.TIMEOUT}>{ActionType.TIMEOUT}</option>
-                            <option value={ActionType.EXIT_ACTION}>{ActionType.EXIT_ACTION}</option>
+                        <select id="select-action-type" name="select-action-type" onChange={onActionTypeSelect}
+                                defaultValue={selectedActionType || "no-new-action"}>
+                            <option key={"no-new-action"} value={"no-new-action"}>No</option>
+                            {renderActionTypeOptions()}
                         </select>
+
+
+                        {selectedActionType && selectedActionType !=="no-new-action" && (
+                            <select id="select-action-category" name="select-action-category"
+                                    onChange={onCategorySelect} defaultValue={selectedActionCategory}>
+                                {renderActionCategoryOptions()}
+                            </select>
+                        )}
+                        {selectedActionType && selectedActionType !== "no-new-action" && renderActionProperties()}
+                        {selectedActionType && selectedActionType !== "no-new-action" && (
+                            <div>
+                            <label htmlFor="new-action-name">Action name: </label>
+                            <input type="text" id="new-action-name" name="new-action-name" value={newActionName}
+                                   onChange={onNewActionNameChange}/>
+                            </div>
+                        )}
                     </div>
                     {showActions(selectedNode.data)}
                     <button type="submit">Save Changes</button>

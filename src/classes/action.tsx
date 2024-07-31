@@ -6,10 +6,12 @@ import {ActionType} from "../enums.tsx";
 export default class Action {
     private _name: string;
     private _type: ActionType
+    private _properties: {}
 
     constructor(name: string, type: ActionType) {
         this._name = name;
         this._type = type;
+        this._properties = this.createActionProperties(type)
 
     }
 
@@ -28,5 +30,28 @@ export default class Action {
     set type(value) {
         this._type = value;
     }
+
+    get properties() {
+        return this._properties;
+    }
+
+    set properties(props) {
+        this._properties = props;
+    }
+
+    private createActionProperties(type: ActionType) {
+        switch (type) {
+            case ActionType.RAISE_EVENT: {
+                return {
+                    event: ""
+                }
+            }
+            default: {
+                return {}
+            }
+        }
+    }
+
+
 
 }
