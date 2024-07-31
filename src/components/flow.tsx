@@ -25,6 +25,8 @@ import NodeInfoForm from "./nodeInfoForm.tsx";
 import TransitionInfoForm from "./transitionInfoForm.tsx";
 import CsmEdge from "./csmEdgeComponent.tsx";
 import TransitionService from "../services/transitionService.tsx";
+import ActionService from "../services/actionService.tsx";
+import EventService from "../services/eventService.tsx";
 
 
 const nodeTypes = {
@@ -51,6 +53,9 @@ export default function Flow() {
 
     const stateOrStateMachineService: StateOrStateMachineService = useMemo(() => new StateOrStateMachineService(), []);
     const transitionService: TransitionService = useMemo(() => new TransitionService(stateOrStateMachineService), [stateOrStateMachineService]);
+    const actionService: ActionService = useMemo(() => new ActionService(),[])
+    const eventService: EventService = useMemo(() => new EventService(),[])
+
 
     const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
     const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
@@ -77,6 +82,8 @@ export default function Flow() {
         nameInput,
         setNameInput,
         stateOrStateMachineService,
+        actionService,
+        eventService,
     };
 
     const updateNodeHistory = useCallback((nodes: Node<CsmNodeProps>[]) => {

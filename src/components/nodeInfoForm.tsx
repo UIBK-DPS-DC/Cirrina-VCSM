@@ -88,12 +88,26 @@ export default function NodeInfoForm() {
         event.preventDefault();
         if (!selectedNode) return;
 
+        console.log(event.currentTarget)
+
         const formElements = event.currentTarget.elements as typeof event.currentTarget.elements & {
-            name: HTMLInputElement
+            name: HTMLInputElement,
+            "select-action-type": HTMLSelectElement,
+            "select-action-category": HTMLSelectElement,
+            "new-raise-event-input": HTMLInputElement,
+            "new-action-name": HTMLInputElement
         };
+
+
+        const newActionType = formElements["select-action-type"]?.value;
+        const newActionCategory = formElements["select-action-category"]?.value;
+        const newRaiseEventName = formElements["new-raise-event-input"]?.value;
+        const newActionName = formElements["new-action-name"]?.value;
 
         const newName = formElements.name.value;
         const oldName = stateOrStateMachineService.getName(selectedNode.data);
+
+        console.log({ newName, newActionType, newActionCategory, newRaiseEventName, newActionName });
 
         if (!stateOrStateMachineService.isNameUnique(newName) && newName !== oldName) {
             console.error(`StateOrStateMachine name ${newName} already exists!`);
