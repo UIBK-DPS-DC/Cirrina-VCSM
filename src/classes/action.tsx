@@ -1,11 +1,16 @@
+import {ActionType} from "../enums.tsx";
+
 /**
  * Placeholder Action class. Expand once we have the Schema
  */
 export default class Action {
     private _name: string;
+    private _type: ActionType
 
-    constructor(name: string) {
+    constructor(name: string, type: ActionType) {
         this._name = name;
+        this._type = type;
+
     }
 
 
@@ -16,4 +21,12 @@ export default class Action {
     set name(value) {
         this._name = value;
     }
+
+    get type(){
+        return this._type;
+    }
+    set type(value) {
+        this._type = value;
+    }
+
 }
