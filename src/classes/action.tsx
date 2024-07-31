@@ -6,12 +6,14 @@ import {ActionType} from "../enums.tsx";
 export default class Action {
     private _name: string;
     private _type: ActionType
+    private _delay: number
     private _properties: {}
 
-    constructor(name: string, type: ActionType) {
+    constructor(name: string, type: ActionType, delay = 0) {
         this._name = name;
         this._type = type;
         this._properties = this.createActionProperties(type)
+        this._delay = delay
 
     }
 
@@ -37,6 +39,14 @@ export default class Action {
 
     set properties(props) {
         this._properties = props;
+    }
+
+    get delay() {
+        return this._delay;
+    }
+
+    set delay(value) {
+        this._delay = value;
     }
 
     private createActionProperties(type: ActionType) {
