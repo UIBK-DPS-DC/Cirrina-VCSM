@@ -135,6 +135,18 @@ export default class State implements StateOrStateMachine {
         this._staticContext = value;
     }
 
+    /**
+     * Retrieves all actions associated with the state.
+     *
+     * This method consolidates all the actions defined for entry, while, after, and exit phases of the state.
+     * It ensures that if any of these arrays are undefined, they are treated as empty arrays.
+     *
+     * @returns {Action[]} An array containing all the actions in the following order:
+     *                     - Entry actions
+     *                     - While actions
+     *                     - After actions
+     *                     - Exit actions
+     */
     public getAllActions(): Action[] {
         return (this._entry || [])
             .concat(this._while || [], this._after || [], this._exit || []);
