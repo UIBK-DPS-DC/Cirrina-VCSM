@@ -113,6 +113,13 @@ export default function NodeInfoForm() {
                     <h3>Hi mom! It's me {stateOrStateMachineService.getName(selectedNode.data)}!</h3>
                     <label htmlFor="name">Name: </label>
                     <input type="text" id="name" name="name" value={nameInput} onChange={onNameInputChange} />
+                    <div className= "from-action-section">
+                        <label htmlFor="add-action" >Add Action:</label>
+                        <input type="text" id = "add-action" name= "add-action" />
+                        && {
+
+                    }
+                    </div>
                     <button type="submit">Save Changes</button>
                 </form>
             </div>

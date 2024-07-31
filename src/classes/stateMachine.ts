@@ -72,4 +72,5 @@ export default class StateMachine implements StateOrStateMachine {
         this._abstract = value;
     }
 
+
 }

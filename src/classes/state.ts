@@ -135,6 +135,13 @@ export default class State implements StateOrStateMachine {
         this._staticContext = value;
     }
 
+    public getAllActions(): Action[] {
+        return (this._entry || [])
+            .concat(this._while || [], this._after || [], this._exit || []);
+    }
+
+
+
 
 
 }
