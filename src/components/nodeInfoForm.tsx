@@ -1,6 +1,7 @@
-import React, { useCallback, useContext, useEffect } from "react";
+import React, {useCallback, useContext, useEffect, useState} from "react";
 import { ReactFlowContext } from "./flow.tsx";
-import { ReactFlowContextProps } from "../types.ts";
+import {CsmNodeProps, isState, isStateMachine, ReactFlowContextProps} from "../types.ts";
+import {ActionType} from "../enums.tsx";
 
 /**
  * NodeInfoForm Component
@@ -30,6 +31,8 @@ export default function NodeInfoForm() {
         setEdges
     } = context;
 
+    const [selectedActionType, setSelectedActionType] = useState<string>()
+
     /**
      * useEffect hook to update the name input field when the selected node changes.
      */
@@ -38,6 +41,13 @@ export default function NodeInfoForm() {
             setNameInput(stateOrStateMachineService.getName(selectedNode.data));
         }
     }, [selectedNode, setNameInput, stateOrStateMachineService]);
+
+    // For logging
+    useEffect(() => {
+        if(selectedActionType){
+            console.log(`Selected Action type changed to ${selectedActionType}`);
+        }
+    }, [selectedActionType]);
 
     /**
      * Updates the transitions when a node is renamed.
@@ -106,6 +116,29 @@ export default function NodeInfoForm() {
         setNameInput(event.target.value);
     };
 
+    const showActions = (data: CsmNodeProps) => {
+        if(isState(data)){
+            return(
+                data.state.getAllActions().map((action) => {
+                   return <p>{action.name}</p>
+                })
+            )
+        }
+        if(isStateMachine(data)){
+            return(
+                data.stateMachine.actions.map((action) => {
+                    return <p>{action.name}</p>
+                })
+            )
+        }
+
+        return (<p>No actions found</p>)
+    }
+
+    const onActionTypeSelect = (event: React.ChangeEvent<HTMLSelectElement>) => {
+        setSelectedActionType(event.target.value);
+    }
+
     return (
         showSidebar && selectedNode && (
             <div className="node-form">
@@ -114,12 +147,15 @@ export default function NodeInfoForm() {
                     <label htmlFor="name">Name: </label>
                     <input type="text" id="name" name="name" value={nameInput} onChange={onNameInputChange} />
                     <div className= "from-action-section">
-                        <label htmlFor="add-action" >Add Action:</label>
-                        <input type="text" id = "add-action" name= "add-action" />
-                        && {
-
-                    }
+                        <label htmlFor="select-action-type">Add action: </label>
+                        <select id="select-action-type" name="select-action-typ" onChange={onActionTypeSelect}>
+                            <option value={ActionType.ENTRY_ACTION}>{ActionType.ENTRY_ACTION}</option>
+                            <option value={ActionType.WHILE_ACTION}>{ActionType.WHILE_ACTION}</option>
+                            <option value={ActionType.TIMEOUT}>{ActionType.TIMEOUT}</option>
+                            <option value={ActionType.EXIT_ACTION}>{ActionType.EXIT_ACTION}</option>
+                        </select>
                     </div>
+                    {showActions(selectedNode.data)}
                     <button type="submit">Save Changes</button>
                 </form>
             </div>

@@ -12,14 +12,14 @@ describe('State Class', () => {
     beforeEach(() => {
         state = new State('TestState');
 
-        entryAction1 = new Action('EntryAction1',ActionType.ENTRY_ACTION);
-        entryAction2 = new Action('EntryAction2',ActionType.ENTRY_ACTION);
-        whileAction1 = new Action('WhileAction1',ActionType.WHILE_ACTION);
-        whileAction2 = new Action('WhileAction2',ActionType.WHILE_ACTION);
-        afterAction1 = new Action('AfterAction1',ActionType.TIMEOUT);
-        afterAction2 = new Action('AfterAction2',ActionType.TIMEOUT);
-        exitAction1 = new Action('ExitAction1',ActionType.EXIT_ACTION);
-        exitAction2 = new Action('ExitAction2',ActionType.EXIT_ACTION);
+        entryAction1 = new Action('EntryAction1',ActionType.RAISE_EVENT);
+        entryAction2 = new Action('EntryAction2',ActionType.RAISE_EVENT);
+        whileAction1 = new Action('WhileAction1',ActionType.RAISE_EVENT);
+        whileAction2 = new Action('WhileAction2',ActionType.RAISE_EVENT);
+        afterAction1 = new Action('AfterAction1',ActionType.RAISE_EVENT);
+        afterAction2 = new Action('AfterAction2',ActionType.RAISE_EVENT);
+        exitAction1 = new Action('ExitAction1',ActionType.RAISE_EVENT);
+        exitAction2 = new Action('ExitAction2',ActionType.RAISE_EVENT);
 
         state.entry = [entryAction1, entryAction2];
         state.while = [whileAction1, whileAction2];
@@ -56,7 +56,7 @@ describe('State Class', () => {
     });
 
     test('should correctly reflect updates to action arrays', () => {
-        const newEntryAction = new Action('NewEntryAction',ActionType.ENTRY_ACTION);
+        const newEntryAction = new Action('NewEntryAction',ActionType.RAISE_EVENT);
         state.entry = [newEntryAction];
         const allActions = state.getAllActions();
         expect(allActions).toEqual([newEntryAction, whileAction1, whileAction2, afterAction1, afterAction2, exitAction1, exitAction2]);
