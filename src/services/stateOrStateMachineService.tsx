@@ -6,6 +6,8 @@ import StateMachine from "../classes/stateMachine.ts";
 import {CsmNodeProps, isState, isStateMachine} from "../types.ts";
 import StateOrStateMachine from "../classes/stateOrStateMachine.ts";
 import { cloneDeep } from 'lodash';
+import Action from "../classes/action.tsx";
+import {ActionCategory} from "../enums.tsx";
 
 
 export default class StateOrStateMachineService {
@@ -155,6 +157,38 @@ export default class StateOrStateMachineService {
             return { ...data, name: newName };
         }
         return data;  // Return original data unchanged if it doesn't match any type
+    }
+
+    public addActionToState(data: CsmNodeProps, action: Action, actionCategory: ActionCategory): CsmNodeProps {
+            if(isState(data)) {
+                switch (actionCategory) {
+                    case ActionCategory.ENTRY_ACTION: {
+                        data.state.entry.push(action);
+                        break;
+                    }
+                    case ActionCategory.EXIT_ACTION: {
+                        data.state.exit.push(action);
+                        break;
+                    }//TODO: Handle timeout stuff
+                    case ActionCategory.TIMEOUT: {
+                        data.state.after.push(action)
+                        break;
+                    }
+                    case ActionCategory.WHILE_ACTION: {
+                        data.state.while.push(action);
+                        break;
+                    }
+                    default:
+                        break;
+
+                }
+                return data;
+            }
+
+            // TODO: Separate logic for statemachines ?
+            return data;
+
+
     }
 
     /**

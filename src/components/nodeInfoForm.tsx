@@ -2,6 +2,7 @@ import React, {useCallback, useContext, useEffect, useState} from "react";
 import { ReactFlowContext } from "./flow.tsx";
 import {CsmNodeProps, isState, isStateMachine, ReactFlowContextProps} from "../types.ts";
 import {ActionCategory, ActionType} from "../enums.tsx";
+import Action from "../classes/action.tsx";
 
 /**
  * NodeInfoForm Component
@@ -28,7 +29,9 @@ export default function NodeInfoForm() {
         showSidebar,
         nameInput,
         setNameInput,
-        setEdges
+        setEdges,
+        actionService,
+        eventService,
     } = context;
 
     const [selectedActionType, setSelectedActionType] = useState<string>("no-new-action")
@@ -84,11 +87,11 @@ export default function NodeInfoForm() {
         }));
     }, [setEdges]);
 
+
+    // TODO: REFACTOR
     const onFormSubmit = useCallback((event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         if (!selectedNode) return;
-
-        console.log(event.currentTarget)
 
         const formElements = event.currentTarget.elements as typeof event.currentTarget.elements & {
             name: HTMLInputElement,
@@ -114,6 +117,32 @@ export default function NodeInfoForm() {
             return;
         }
 
+        let newAction = undefined;
+
+        if(newActionType !== "no-new-action") {
+            if(newActionName && (!actionService.isNameUnique(newActionName))) {
+                console.error("Action name already exists!");
+                return;
+            }
+            if(newEventName && (!eventService.isNameUnique(newRaiseEventName))) {
+                console.error("Event name already exists!")
+                return;
+            }
+
+            newAction = new Action(newActionName, newActionType as ActionType);
+
+            switch (newActionType) {
+                case ActionType.RAISE_EVENT: {
+                    newAction.properties = {"event": newEventName};
+                    break;
+                }
+                default: break;
+            }
+
+
+
+        }
+
         if (newName !== oldName) {
             const newNodes = nodes.map(node => {
                 if (node.id === selectedNode.id) {
@@ -128,6 +157,24 @@ export default function NodeInfoForm() {
             setNodes(newNodes);
             updateTransitionsOnRename(oldName, newName);
         }
+
+        if(newAction) {
+            const newNodes = nodes.map(node => {
+                if (node.id === selectedNode.id) {
+                    const newData = stateOrStateMachineService.addActionToState(node.data, newAction, newActionCategory as ActionCategory);
+                    return { ...node, data: newData };
+                }
+                return node;
+            });
+
+            actionService.registerName(newAction.name);
+            if(newRaiseEventName){
+                eventService.registerName(newRaiseEventName);
+            }
+            setNodes(newNodes)
+        }
+
+
     }, [nodes, setNodes, selectedNode, stateOrStateMachineService, updateTransitionsOnRename]);
 
     const onNameInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -135,22 +182,23 @@ export default function NodeInfoForm() {
     };
 
     const showActions = (data: CsmNodeProps) => {
+
         if(isState(data)){
             return(
                 data.state.getAllActions().map((action) => {
-                   return <p>{action.name}</p>
+                   return <p key={action.name}>{action.name}</p>
                 })
             )
         }
         if(isStateMachine(data)){
             return(
                 data.stateMachine.actions.map((action) => {
-                    return <p>{action.name}</p>
+                    return <p key={action.name}>{action.name}</p>
                 })
             )
         }
 
-        return (<p>No actions found</p>)
+        return (<p>Unknown type</p>)
     }
 
     const onActionTypeSelect = (event: React.ChangeEvent<HTMLSelectElement>) => {
@@ -199,6 +247,7 @@ export default function NodeInfoForm() {
                         <select id="raise-event-props" name="raise-event-props" onChange={onRaiseEventSelectChange} defaultValue={"new-raise-event"}>
                             <option key="new-raise-event" value="new-raise-event">New Event</option>
                         </select>
+                        // TODO: Implement a drop down menu with all existing events so that you can choose one of those.
                         {raiseEventSelectedType === "new-raise-event" && (
                             <input type="text" id="new-raise-event-input" name ="new-raise-event-input" value={newEventName} onChange={onNewEventNameChange}/>
                         )}
@@ -211,7 +260,7 @@ export default function NodeInfoForm() {
             }
         }
     }
-
+    //TODO: Make this look good
     return (
         showSidebar && selectedNode && (
             <div className="node-form">
@@ -244,6 +293,7 @@ export default function NodeInfoForm() {
                             </div>
                         )}
                     </div>
+                    <h3>Actions: </h3>
                     {showActions(selectedNode.data)}
                     <button type="submit">Save Changes</button>
                 </form>
