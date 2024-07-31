@@ -56,6 +56,7 @@ export default class Action {
                     event: ""
                 }
             }
+            //TODO: OTHER TYPES
             default: {
                 return {}
             }

@@ -205,6 +205,7 @@ export default function NodeInfoForm() {
                     </div>
                 )
             }
+            // TODO: Other Types.
             default : {
                 return <></>
             }
