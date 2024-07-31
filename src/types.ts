@@ -14,6 +14,7 @@ export type NodeType =
     | 'state-node'
     | 'state-machine-node'
 
+
 export type Transitionn = {
     target?: string;
     guards: string[]; //string placeholder for now
