@@ -5,7 +5,6 @@ import State from "../classes/state.ts";
 import StateMachine from "../classes/stateMachine.ts";
 import {CsmNodeProps, isState, isStateMachine} from "../types.ts";
 import StateOrStateMachine from "../classes/stateOrStateMachine.ts";
-import { cloneDeep } from 'lodash';
 import Action from "../classes/action.tsx";
 import {ActionCategory} from "../enums.tsx";
 
@@ -144,14 +143,14 @@ export default class StateOrStateMachineService {
      */
     public setName(newName: string, data: CsmNodeProps): CsmNodeProps {
         if (isState(data)) {
-            const newState = cloneDeep(data.state);
-            newState.name = newName;
-            return { ...data, state: newState };
+            const updatedState = data.state
+            updatedState.name = newName;
+            return { ...data, state: updatedState };
         }
         if (isStateMachine(data)) {
-            const newStateMachine = cloneDeep(data.stateMachine);
-            newStateMachine.name = newName;
-            return { ...data, stateMachine: newStateMachine };
+            const updatedStatemachine = data.stateMachine
+            updatedStatemachine.name = newName;
+            return { ...data, stateMachine: updatedStatemachine };
         }
         if (data.name !== undefined) {
             return { ...data, name: newName };
