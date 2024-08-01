@@ -5,7 +5,8 @@ import State from "../classes/state.ts";
 import StateMachine from "../classes/stateMachine.ts";
 import {CsmNodeProps, isState, isStateMachine} from "../types.ts";
 import StateOrStateMachine from "../classes/stateOrStateMachine.ts";
-import { cloneDeep } from 'lodash';
+import Action from "../classes/action.tsx";
+import {ActionCategory} from "../enums.tsx";
 
 
 export default class StateOrStateMachineService {
@@ -142,19 +143,63 @@ export default class StateOrStateMachineService {
      */
     public setName(newName: string, data: CsmNodeProps): CsmNodeProps {
         if (isState(data)) {
-            const newState = cloneDeep(data.state);
-            newState.name = newName;
-            return { ...data, state: newState };
+            const updatedState = data.state
+            updatedState.name = newName;
+            return { ...data, state: updatedState };
         }
         if (isStateMachine(data)) {
-            const newStateMachine = cloneDeep(data.stateMachine);
-            newStateMachine.name = newName;
-            return { ...data, stateMachine: newStateMachine };
+            const updatedStatemachine = data.stateMachine
+            updatedStatemachine.name = newName;
+            return { ...data, stateMachine: updatedStatemachine };
         }
         if (data.name !== undefined) {
             return { ...data, name: newName };
         }
         return data;  // Return original data unchanged if it doesn't match any type
+    }
+
+    /**
+     * Adds an action to the specified category of a state.
+     *
+     * This method adds an `Action` to a specified category within a `State` object contained in the `data` parameter.
+     * It modifies the `State` object directly, adding the `Action` to the appropriate array (entry, exit, after, while)
+     * based on the provided `actionCategory`.
+     *
+     * @param {CsmNodeProps} data - The data object containing the state or state machine.
+     * @param {Action} action - The action to be added to the state.
+     * @param {ActionCategory} actionCategory - The category to which the action belongs (entry, exit, timeout, or while).
+     * @returns {CsmNodeProps} - The modified data object with the action added to the appropriate category.
+     */
+    public addActionToState(data: CsmNodeProps, action: Action, actionCategory: ActionCategory): CsmNodeProps {
+            if(isState(data)) {
+                switch (actionCategory) {
+                    case ActionCategory.ENTRY_ACTION: {
+                        data.state.entry.push(action);
+                        break;
+                    }
+                    case ActionCategory.EXIT_ACTION: {
+                        data.state.exit.push(action);
+                        break;
+                    }//TODO: Handle timeout stuff
+                    case ActionCategory.TIMEOUT: {
+                        data.state.after.push(action)
+                        break;
+                    }
+                    case ActionCategory.WHILE_ACTION: {
+                        data.state.while.push(action);
+                        break;
+                    }
+                    default:
+                        break;
+
+                }
+                return data;
+            }
+
+            // TODO: Separate logic for statemachines ?
+            return data;
+
+
     }
 
     /**

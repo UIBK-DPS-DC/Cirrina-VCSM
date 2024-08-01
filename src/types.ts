@@ -5,6 +5,8 @@ import State from "./classes/state.ts";
 import React from "react";
 import StateOrStateMachineService from "./services/stateOrStateMachineService.tsx";
 import Action from "./classes/action.tsx";
+import ActionService from "./services/actionService.tsx";
+import EventService from "./services/eventService.tsx";
 
 // One Type to avoid repeating ourselves. Can be expanded/unionized as needed.
 export type CsmNodeProps = {state: State} | {stateMachine: StateMachine} | {name: string};
@@ -13,6 +15,7 @@ export type CsmEdgeProps = {transition: Transition}
 export type NodeType =
     | 'state-node'
     | 'state-machine-node'
+
 
 export type Transitionn = {
     target?: string;
@@ -57,6 +60,8 @@ export type ReactFlowContextProps = {
     nameInput: string;
     setNameInput: React.Dispatch<React.SetStateAction<string>>;
     stateOrStateMachineService: StateOrStateMachineService;
+    actionService: ActionService;
+    eventService: EventService;
 }
 
 

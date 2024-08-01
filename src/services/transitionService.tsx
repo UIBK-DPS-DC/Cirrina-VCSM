@@ -10,6 +10,16 @@ export default class TransitionService {
         this._stateOrStatemachineService = stateOrStatemachineService;
     }
 
+    /**
+     * Creates a transition between two states or state machines based on the provided connection.
+     *
+     * This function retrieves the source and target states or state machines linked to the given connection.
+     * If both the source and target states are found, it creates a new `Transition` object from the source to the target.
+     * If either the source or target state is not found, it logs an error message and returns `undefined`.
+     *
+     * @param {Connection} connection - The connection object containing the source and target names.
+     * @returns {Transition | undefined} - A new `Transition` object if both states are found, otherwise `undefined`.
+     */
     public connectionToTransition(connection: Connection): Transition | undefined {
         const sourceName = connection.source
         const targetName = connection.target
