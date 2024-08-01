@@ -181,6 +181,7 @@ export default function NodeInfoForm() {
         setNameInput(event.target.value);
     };
 
+    // TODO: Style to make it more readable
     const showActions = (data: CsmNodeProps) => {
 
         if(isState(data)){
