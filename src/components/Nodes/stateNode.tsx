@@ -14,6 +14,7 @@ export function StateNode ({data}: NodeProps<StateNode>) {
 
     const renderAssociatedEvents = () => {
 
+        // TODO: Style this
         return(
             <div className="raised-event-display">
                 <h4>Raised Events: </h4>
