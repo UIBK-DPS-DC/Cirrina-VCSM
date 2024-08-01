@@ -142,6 +142,7 @@ export default function NodeInfoForm() {
 
             newAction = new Action(newActionName, newActionType as ActionType);
 
+            // TODO: Extend to other types
             switch (newActionType) {
                 case ActionType.RAISE_EVENT: {
                     newAction.properties = {"event": newRaiseEventName};
