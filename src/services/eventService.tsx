@@ -71,13 +71,23 @@ export default class EventService {
     }
 
 
-    public getAllEventsRaised(data: CsmNodeProps) {
+    /**
+     * Retrieves all unique events raised by actions of type `RAISE_EVENT` within the given data.
+     *
+     * This function checks if the provided data represents a state or a state machine. It then filters
+     * the actions to find those of type `RAISE_EVENT`, extracts their event properties, and returns
+     * a list of unique event names.
+     *
+     * @param {CsmNodeProps} data - The data of the node, which can represent a state or a state machine.
+     * @returns {string[]} A list of unique event names raised by actions of type `RAISE_EVENT`.
+     */
+    public getAllEventsRaised(data: CsmNodeProps): string[] {
         if(isState(data)){
             const actions = data.state.getAllActions().filter((action: Action) => action.type === ActionType.RAISE_EVENT);
             return actions.map((action: Action) => {
                 const props = action.properties as { event: string } // TODO: This probably needs to be dynamic once we have the schema
                 return props.event
-            });
+            }).filter((value, index, array) => array.indexOf(value) === index);
 
         }
         if(isStateMachine(data)){
@@ -85,7 +95,7 @@ export default class EventService {
             return actions.map((action: Action) => {
                 const props = action.properties as { event: string } // TODO: This probably needs to be dynamic once we have the schema
                 return props.event
-            });
+            }).filter((value, index, array) => array.indexOf(value) === index);
         }
         return []
 

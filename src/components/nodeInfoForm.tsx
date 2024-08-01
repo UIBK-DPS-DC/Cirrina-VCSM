@@ -107,21 +107,22 @@ export default function NodeInfoForm() {
             "select-action-type": HTMLSelectElement,
             "select-action-category": HTMLSelectElement,
             "new-raise-event-input": HTMLInputElement,
+            "raise-event-props": HTMLSelectElement,
             "new-action-name": HTMLInputElement
         };
 
-        console.log(formElements);
 
 
         const newActionType = formElements["select-action-type"]?.value;
         const newActionCategory = formElements["select-action-category"]?.value;
         const newRaiseEventName = formElements["new-raise-event-input"]?.value;
         const newActionName = formElements["new-action-name"]?.value;
+        const existingEventName: string = formElements["raise-event-props"]?.value;
 
         const newName = formElements.name.value;
         const oldName = stateOrStateMachineService.getName(selectedNode.data);
 
-        console.log({ newName, newActionType, newActionCategory, newRaiseEventName, newActionName });
+        console.log({ newName, newActionType, newActionCategory, newRaiseEventName, newActionName, existingEventName });
 
         if (!stateOrStateMachineService.isNameUnique(newName) && newName !== oldName) {
             console.error(`StateOrStateMachine name ${newName} already exists!`);
@@ -145,7 +146,7 @@ export default function NodeInfoForm() {
             // TODO: Extend to other types
             switch (newActionType) {
                 case ActionType.RAISE_EVENT: {
-                    newAction.properties = {"event": newRaiseEventName};
+                    newAction.properties = {"event": newRaiseEventName? newRaiseEventName : existingEventName};
                     break;
                 }
                 default: break;
