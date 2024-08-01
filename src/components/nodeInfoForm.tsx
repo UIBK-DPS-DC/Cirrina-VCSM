@@ -89,6 +89,15 @@ export default function NodeInfoForm() {
 
 
     // TODO: REFACTOR
+    /**
+     * Handles form submission for updating node properties and adding actions.
+     *
+     * This function is triggered when the form is submitted. It prevents the default form submission behavior,
+     * retrieves form element values, validates the new name, creates and validates a new action if specified,
+     * updates the node's name, and adds the new action to the node if applicable.
+     *
+     * @param {React.FormEvent<HTMLFormElement>} event - The form submission event.
+     */
     const onFormSubmit = useCallback((event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         if (!selectedNode) return;
