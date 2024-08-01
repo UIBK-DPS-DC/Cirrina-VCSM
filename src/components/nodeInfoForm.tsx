@@ -110,6 +110,8 @@ export default function NodeInfoForm() {
             "new-action-name": HTMLInputElement
         };
 
+        console.log(formElements);
+
 
         const newActionType = formElements["select-action-type"]?.value;
         const newActionCategory = formElements["select-action-category"]?.value;
@@ -142,7 +144,7 @@ export default function NodeInfoForm() {
 
             switch (newActionType) {
                 case ActionType.RAISE_EVENT: {
-                    newAction.properties = {"event": newEventName};
+                    newAction.properties = {"event": newRaiseEventName};
                     break;
                 }
                 default: break;
@@ -247,7 +249,7 @@ export default function NodeInfoForm() {
     }
 
 
-
+    // TODO: Implement a drop down menu with all existing events so that you can choose one of those.
     const renderActionProperties = () => {
         switch (selectedActionType){
             case ActionType.RAISE_EVENT: {
@@ -257,7 +259,6 @@ export default function NodeInfoForm() {
                         <select id="raise-event-props" name="raise-event-props" onChange={onRaiseEventSelectChange} defaultValue={"new-raise-event"}>
                             <option key="new-raise-event" value="new-raise-event">New Event</option>
                         </select>
-                        // TODO: Implement a drop down menu with all existing events so that you can choose one of those.
                         {raiseEventSelectedType === "new-raise-event" && (
                             <input type="text" id="new-raise-event-input" name ="new-raise-event-input" value={newEventName} onChange={onNewEventNameChange}/>
                         )}

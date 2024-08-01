@@ -1,3 +1,7 @@
+import {CsmNodeProps, isState, isStateMachine} from "../types.ts";
+import Action from "../classes/action.tsx";
+import {ActionType} from "../enums.tsx";
+
 export default class EventService {
     private eventNames: Set<string>;
 
@@ -61,6 +65,30 @@ export default class EventService {
     public isNameUnique(eventName: string): boolean {
         return ! this.eventNames.has(eventName);
     }
+
+
+    public getAllEventsRaised(data: CsmNodeProps) {
+        if(isState(data)){
+            const actions = data.state.getAllActions().filter((action: Action) => action.type === ActionType.RAISE_EVENT);
+            return actions.map((action: Action) => {
+                const props = action.properties as { event: string } // TODO: This probably needs to be dynamic once we have the schema
+                return props.event
+            });
+
+        }
+        if(isStateMachine(data)){
+            const actions = data.stateMachine.actions.filter((action: Action) => {action.type = ActionType.RAISE_EVENT;})
+            return actions.map((action: Action) => {
+                const props = action.properties as { event: string } // TODO: This probably needs to be dynamic once we have the schema
+                return props.event
+            });
+        }
+        return []
+
+    }
+
+
+
 
 
 
