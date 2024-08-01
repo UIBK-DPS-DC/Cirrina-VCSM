@@ -158,6 +158,18 @@ export default class StateOrStateMachineService {
         return data;  // Return original data unchanged if it doesn't match any type
     }
 
+    /**
+     * Adds an action to the specified category of a state.
+     *
+     * This method adds an `Action` to a specified category within a `State` object contained in the `data` parameter.
+     * It modifies the `State` object directly, adding the `Action` to the appropriate array (entry, exit, after, while)
+     * based on the provided `actionCategory`.
+     *
+     * @param {CsmNodeProps} data - The data object containing the state or state machine.
+     * @param {Action} action - The action to be added to the state.
+     * @param {ActionCategory} actionCategory - The category to which the action belongs (entry, exit, timeout, or while).
+     * @returns {CsmNodeProps} - The modified data object with the action added to the appropriate category.
+     */
     public addActionToState(data: CsmNodeProps, action: Action, actionCategory: ActionCategory): CsmNodeProps {
             if(isState(data)) {
                 switch (actionCategory) {
