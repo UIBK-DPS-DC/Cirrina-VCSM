@@ -261,7 +261,7 @@ export default function NodeInfoForm() {
     }
 
 
-    // TODO: Implement a drop down menu with all existing events so that you can choose one of those.
+    // TODO: Refactor ids/values to be more self explanatory
     const renderActionProperties = () => {
         switch (selectedActionType){
             case ActionType.RAISE_EVENT: {
