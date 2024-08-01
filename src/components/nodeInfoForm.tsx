@@ -249,6 +249,16 @@ export default function NodeInfoForm() {
         )
     }
 
+    const renderEventsAsOptions = () => {
+        return (
+            eventService.getAllEvents().map((event: string) => {
+                return(
+                    <option key={event} value={event}>{event}</option>
+                )
+            })
+        )
+    }
+
 
     // TODO: Implement a drop down menu with all existing events so that you can choose one of those.
     const renderActionProperties = () => {
@@ -258,6 +268,7 @@ export default function NodeInfoForm() {
                     <div className="raise-event-select">
                         <p>I want to raise an event</p>
                         <select id="raise-event-props" name="raise-event-props" onChange={onRaiseEventSelectChange} defaultValue={"new-raise-event"}>
+                            {renderEventsAsOptions()}
                             <option key="new-raise-event" value="new-raise-event">New Event</option>
                         </select>
                         {raiseEventSelectedType === "new-raise-event" && (

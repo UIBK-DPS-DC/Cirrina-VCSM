@@ -66,6 +66,10 @@ export default class EventService {
         return ! this.eventNames.has(eventName);
     }
 
+    public getAllEvents() {
+        return Array.from(this.eventNames.values());
+    }
+
 
     public getAllEventsRaised(data: CsmNodeProps) {
         if(isState(data)){
