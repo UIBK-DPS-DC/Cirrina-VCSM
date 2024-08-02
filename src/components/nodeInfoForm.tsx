@@ -264,45 +264,11 @@ export default function NodeInfoForm() {
     }
 
 
-    const renderActionTypeOptions = () => {
-        return (Object.values(ActionType).map((actionType) => {
-           return <option key={actionType} value={actionType}>{actionType}</option>
-        }))
-    }
-
-    const renderActionCategoryOptions = () => {
-        return (
-            Object.values(ActionCategory).map((category) => {
-                return <option key={category} value={category}>{category}</option>
-            })
-        )
-    }
-
     const renderEventsAsOptions = () => {
         return (
             eventService.getAllEvents().map((event: string) => {
                 return(
                     <option key={event} value={event}>{event}</option>
-                )
-            })
-        )
-    }
-
-    const renderServiceTypesAsOptions = () => {
-        return(
-            Object.values(ServiceType).map((serviceType) => {
-                return(
-                    <option key={serviceType} value={serviceType}>{serviceType}</option>
-                )
-            })
-        )
-    }
-
-    const renderServiceLevelAsOptions = () => {
-        return (
-            Object.values(ServiceLevel).map((serviceLevel: ServiceLevel) => {
-                return (
-                    <option key={serviceLevel} value={serviceLevel}> {serviceLevel}</option>
                 )
             })
         )
