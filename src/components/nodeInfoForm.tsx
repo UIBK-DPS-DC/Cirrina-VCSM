@@ -1,7 +1,7 @@
 import React, {useCallback, useContext, useEffect, useState} from "react";
 import { ReactFlowContext } from "./flow.tsx";
 import {CsmNodeProps, isState, isStateMachine, ReactFlowContextProps} from "../types.ts";
-import {ActionCategory, ActionType} from "../enums.tsx";
+import {ActionCategory, ActionType, ServiceLevel, ServiceType} from "../enums.tsx";
 import Action from "../classes/action.tsx";
 
 /**
@@ -36,9 +36,13 @@ export default function NodeInfoForm() {
 
     const [selectedActionType, setSelectedActionType] = useState<string>("no-new-action")
     const [selectedActionCategory, setSelectedActionCategory] = useState<string>(ActionCategory.WHILE_ACTION)
+    const [selectedServiceType, setSelectedServiceType] = useState<string>(ServiceType.LOCAL)
+    const [selectedServiceLevel, setSelectedServiceLevel] = useState<string>(ServiceLevel.GLOBAL)
     const [raiseEventSelectedType, setRaiseEventSelectedType] = useState<string>("new-raise-event")
     const [newEventName, setNewEventName] = useState<string>("New Event Name")
     const [newActionName, setNewActionName] = useState<string>("New Action Name")
+    const [invokeDescriptionInput, setInvokeDescriptionInput] = useState<string>("")
+
 
     /**
      * useEffect hook to update the name input field when the selected node changes.
@@ -55,6 +59,14 @@ export default function NodeInfoForm() {
             console.log(`Selected Action type changed to ${selectedActionType}`);
         }
     }, [selectedActionType]);
+
+    useEffect(() => {
+        console.log(`Selected Service Type changed to ${selectedServiceType}`);
+    }, [selectedServiceType]);
+
+    useEffect(() => {
+        console.log(`Selected Service Level changed to ${selectedServiceLevel}`);
+    }, [selectedServiceLevel]);
 
     /**
      * Updates the transitions when a node is renamed.
@@ -236,6 +248,19 @@ export default function NodeInfoForm() {
         setNewActionName(event.target.value)
     }
 
+    const onInvokeDescriptionInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setInvokeDescriptionInput(event.target.value);
+    }
+
+    const onSelectedServiceTypeChange =(event: React.ChangeEvent<HTMLSelectElement>) => {
+        setSelectedServiceType(event.target.value);
+    }
+
+    const onSelectedServiceLevelChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+        setSelectedServiceLevel(event.target.value);
+    }
+
+
     const renderActionTypeOptions = () => {
         return (Object.values(ActionType).map((actionType) => {
            return <option key={actionType} value={actionType}>{actionType}</option>
@@ -260,13 +285,33 @@ export default function NodeInfoForm() {
         )
     }
 
+    const renderServiceTypesAsOptions = () => {
+        return(
+            Object.values(ServiceType).map((serviceType) => {
+                return(
+                    <option key={serviceType} value={serviceType}>{serviceType}</option>
+                )
+            })
+        )
+    }
+
+    const renderServiceLevelAsOptions = () => {
+        return (
+            Object.values(ServiceLevel).map((serviceLevel: ServiceLevel) => {
+                return (
+                    <option key={serviceLevel} value={serviceLevel}> {serviceLevel}</option>
+                )
+            })
+        )
+    }
+
 
     // TODO: Refactor ids/values to be more self explanatory
     const renderActionProperties = () => {
         switch (selectedActionType){
             case ActionType.RAISE_EVENT: {
                 return(
-                    <div className="raise-event-select">
+                    <div className="raise-event-form">
                         <p>I want to raise an event</p>
                         <select id="raise-event-props" name="raise-event-props" onChange={onRaiseEventSelectChange} defaultValue={"new-raise-event"}>
                             {renderEventsAsOptions()}
@@ -278,7 +323,20 @@ export default function NodeInfoForm() {
                     </div>
                 )
             }
-            // TODO: Other Types.
+            case ActionType.INVOKE: {
+                return(
+                    <div className="invoke-event-form">
+                        <input type="text" id="invoke-description-input" name="invoke-description-input"
+                               value={invokeDescriptionInput} onChange={onInvokeDescriptionInputChange}/>
+                        <select id="invoke-service-type-select" name="invoke-service-type-select" value={selectedServiceType} onChange={onSelectedServiceTypeChange}>
+                            {renderServiceTypesAsOptions()}
+                        </select>
+                        <select id="invoke-service-level-select" name="invoke-service-level-select" value={selectedServiceLevel} onChange={onSelectedServiceLevelChange}>
+                            {renderServiceLevelAsOptions()}
+                        </select>
+                    </div>
+                )
+            }
             default : {
                 return <></>
             }
