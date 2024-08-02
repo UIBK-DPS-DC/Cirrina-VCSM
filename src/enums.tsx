@@ -23,3 +23,13 @@ export enum ServiceType {
     "REMOTE" ="Remote",
     "LOCAL" ="Local"
 }
+
+/**
+ * This enum is used for describing the various valid service levels related to the ActionType Invoke.
+ */
+export enum ServiceLevel {
+    "INSTANCE" ="Instance",
+    "GLOBAL" = "Global"
+}
+
+
