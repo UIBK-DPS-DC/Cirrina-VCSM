@@ -34,6 +34,7 @@ export default function NodeInfoForm() {
         eventService,
     } = context;
 
+
     const [selectedActionType, setSelectedActionType] = useState<string>("no-new-action")
     const [selectedActionCategory, setSelectedActionCategory] = useState<string>(ActionCategory.WHILE_ACTION)
     const [selectedServiceType, setSelectedServiceType] = useState<string>(ServiceType.LOCAL)
@@ -42,6 +43,8 @@ export default function NodeInfoForm() {
     const [newEventName, setNewEventName] = useState<string>("New Event Name")
     const [newActionName, setNewActionName] = useState<string>("New Action Name")
     const [invokeDescriptionInput, setInvokeDescriptionInput] = useState<string>("")
+
+    type OptionEnums = typeof ActionType | typeof ServiceType | typeof ServiceLevel | typeof ActionCategory
 
 
     /**
@@ -305,6 +308,13 @@ export default function NodeInfoForm() {
         )
     }
 
+    const renderEnumAsOptions = (enumObject: OptionEnums) => {
+        return (
+            Object.values(enumObject).map((value) => {
+                return <option key={value} value={value}>{value}</option>
+            })
+        );
+    }
 
     // TODO: Refactor ids/values to be more self explanatory
     const renderActionProperties = () => {
@@ -329,10 +339,10 @@ export default function NodeInfoForm() {
                         <input type="text" id="invoke-description-input" name="invoke-description-input"
                                value={invokeDescriptionInput} onChange={onInvokeDescriptionInputChange}/>
                         <select id="invoke-service-type-select" name="invoke-service-type-select" value={selectedServiceType} onChange={onSelectedServiceTypeChange}>
-                            {renderServiceTypesAsOptions()}
+                            {renderEnumAsOptions(ServiceType)}
                         </select>
                         <select id="invoke-service-level-select" name="invoke-service-level-select" value={selectedServiceLevel} onChange={onSelectedServiceLevelChange}>
-                            {renderServiceLevelAsOptions()}
+                            {renderEnumAsOptions(ServiceLevel)}
                         </select>
                     </div>
                 )
@@ -356,14 +366,14 @@ export default function NodeInfoForm() {
                         <select id="select-action-type" name="select-action-type" onChange={onActionTypeSelect}
                                 defaultValue={selectedActionType || "no-new-action"}>
                             <option key={"no-new-action"} value={"no-new-action"}>No</option>
-                            {renderActionTypeOptions()}
+                            {renderEnumAsOptions(ActionType)}
                         </select>
 
 
                         {selectedActionType && selectedActionType !=="no-new-action" && (
                             <select id="select-action-category" name="select-action-category"
                                     onChange={onCategorySelect} defaultValue={selectedActionCategory}>
-                                {renderActionCategoryOptions()}
+                                {renderEnumAsOptions(ActionCategory)}
                             </select>
                         )}
                         {selectedActionType && selectedActionType !== "no-new-action" && renderActionProperties()}
