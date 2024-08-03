@@ -354,6 +354,7 @@ export default function NodeInfoForm() {
             case ActionType.CREATE: {
                 return (
                     <div className="create-action-form">
+
                     </div>
                 )
             }
