@@ -43,7 +43,7 @@ export default function NodeInfoForm() {
     const [newEventName, setNewEventName] = useState<string>("New Event Name")
     const [newActionName, setNewActionName] = useState<string>("New Action Name")
     const [invokeDescriptionInput, setInvokeDescriptionInput] = useState<string>("")
-
+    const [createDescriptionInput, setCreateDescriptionInput] = useState<string>("")
     type OptionEnums = typeof ActionType | typeof ServiceType | typeof ServiceLevel | typeof ActionCategory
 
 
@@ -256,6 +256,9 @@ export default function NodeInfoForm() {
         return (<p>Unknown type</p>)
     }
 
+
+    // All these on change functions could be refactored into inline functions.
+    // Well keep them for now should we ever want for complicated logic.
     const onActionTypeSelect = (event: React.ChangeEvent<HTMLSelectElement>) => {
         setSelectedActionType(event.target.value);
     }
@@ -279,6 +282,10 @@ export default function NodeInfoForm() {
 
     const onInvokeDescriptionInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setInvokeDescriptionInput(event.target.value);
+    }
+
+    const onCreateDescriptionChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setCreateDescriptionInput(event.target.value);
     }
 
     const onSelectedServiceTypeChange =(event: React.ChangeEvent<HTMLSelectElement>) => {
@@ -354,6 +361,9 @@ export default function NodeInfoForm() {
             case ActionType.CREATE: {
                 return (
                     <div className="create-action-form">
+                        <label htmlFor="create-description-input">Description: </label>
+                        <input type="text" id="create-description-input" name="create-description-input" value={createDescriptionInput}
+                        onChange={onCreateDescriptionChange}/>
 
                     </div>
                 )
