@@ -1,9 +1,9 @@
-import React, {ChangeEvent, useCallback, useContext, useEffect, useState} from "react";
+import React, {useCallback, useContext, useEffect, useState} from "react";
 import { ReactFlowContext } from "./flow.tsx";
 import {CsmNodeProps, isState, isStateMachine, ReactFlowContextProps} from "../types.ts";
 import {ActionCategory, ActionType, ServiceLevel, ServiceType} from "../enums.tsx";
 import Action from "../classes/action.tsx";
-import {b} from "vite/dist/node/types.d-aGj9QkWt";
+
 
 /**
  * NodeInfoForm Component
@@ -164,11 +164,6 @@ export default function NodeInfoForm() {
        const createVariableValue: string = formElements["create-variable-value-input"]?.value;
        const createVariableIsPersistentCheckbox: boolean = formElements["create-persistent-checkbox"]?.checked;
 
-       console.log(createDescription);
-       console.log(createVariableName);
-       console.log(createVariableValue);
-       console.log(createVariableIsPersistentCheckbox);
-
 
 
         const newName = formElements.name.value;
@@ -207,6 +202,22 @@ export default function NodeInfoForm() {
 
                     }
                     break;
+                }
+                case ActionType.CREATE: {
+                    const newContext = contextService.createContext(createVariableName,createVariableValue)
+                    if(!contextService.isContextNameUnique(newContext)){
+                        return;
+                    }
+
+                    newAction.properties = {
+                        "description": createDescription,
+                        "context": newContext,
+                        "isPersistent" : createVariableIsPersistentCheckbox
+                    }
+
+                    contextService.registerContext(newContext)
+
+                    break
                 }
                 default: break;
             }
@@ -340,6 +351,7 @@ export default function NodeInfoForm() {
         )
     }
 
+    /** For later
     const renderContextNamesAsOptions = () => {
         return(
             contextService.getAllContextNames().map((contextName: string) => {
@@ -347,7 +359,7 @@ export default function NodeInfoForm() {
             })
         )
     }
-
+    */
     const renderEnumAsOptions = (enumObject: OptionEnums) => {
         return (
             Object.values(enumObject).map((value) => {
