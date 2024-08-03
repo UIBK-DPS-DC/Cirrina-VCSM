@@ -29,6 +29,14 @@ export default class ContextService {
         this._contextMap.set(context.name, context);
     }
 
+    /**
+     * Checks if the context name is unique.
+     *
+     * This method checks if a context with the same name already exists in the _contextMap.
+     *
+     * @param {Context} context - The context to check.
+     * @returns {boolean} - Returns true if the context name is unique, false otherwise.
+     */
     public isContextNameUnique(context: Context): boolean {
         return this._contextMap.has(context.name);
     }
