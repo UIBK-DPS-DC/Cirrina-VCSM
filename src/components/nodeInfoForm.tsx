@@ -1,8 +1,9 @@
-import React, {useCallback, useContext, useEffect, useState} from "react";
+import React, {ChangeEvent, useCallback, useContext, useEffect, useState} from "react";
 import { ReactFlowContext } from "./flow.tsx";
 import {CsmNodeProps, isState, isStateMachine, ReactFlowContextProps} from "../types.ts";
 import {ActionCategory, ActionType, ServiceLevel, ServiceType} from "../enums.tsx";
 import Action from "../classes/action.tsx";
+import {b} from "vite/dist/node/types.d-aGj9QkWt";
 
 /**
  * NodeInfoForm Component
@@ -32,6 +33,7 @@ export default function NodeInfoForm() {
         setEdges,
         actionService,
         eventService,
+        contextService
     } = context;
 
 
@@ -44,6 +46,10 @@ export default function NodeInfoForm() {
     const [newActionName, setNewActionName] = useState<string>("New Action Name")
     const [invokeDescriptionInput, setInvokeDescriptionInput] = useState<string>("")
     const [createDescriptionInput, setCreateDescriptionInput] = useState<string>("")
+    const [createVariableNameInput, setCreateVariableInput] = useState<string>("")
+    const [createVariableValueInput, setCreateVariableValueInput] = useState<string>("")
+    const [isPersistentCheckbox, setIsPersistentCheckbox] = useState<boolean>(false);
+
     type OptionEnums = typeof ActionType | typeof ServiceType | typeof ServiceLevel | typeof ActionCategory
 
 
@@ -72,6 +78,10 @@ export default function NodeInfoForm() {
     useEffect(() => {
         console.log(`Selected Service Level changed to ${selectedServiceLevel}`);
     }, [selectedServiceLevel]);
+
+    useEffect(() => {
+        console.log(`Is Persistent Checkbox changed to ${isPersistentCheckbox}`);
+    }, [isPersistentCheckbox]);
     // #######################################################################################
 
     /**
@@ -288,12 +298,24 @@ export default function NodeInfoForm() {
         setCreateDescriptionInput(event.target.value);
     }
 
+    const onCreateVariableNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setCreateVariableInput(event.target.value);
+    }
+
+    const onCreateVariableValueChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setCreateVariableValueInput(event.target.value);
+    }
+
     const onSelectedServiceTypeChange =(event: React.ChangeEvent<HTMLSelectElement>) => {
         setSelectedServiceType(event.target.value);
     }
 
     const onSelectedServiceLevelChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
         setSelectedServiceLevel(event.target.value);
+    }
+
+    const onIsPersistentCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setIsPersistentCheckbox(event.target.checked);
     }
 
 
@@ -309,7 +331,9 @@ export default function NodeInfoForm() {
 
     const renderContextNamesAsOptions = () => {
         return(
-            <div></div>
+            contextService.getAllContextNames().map((contextName: string) => {
+                return <option key={contextName} value={contextName} >{contextName}</option>
+            })
         )
     }
 
@@ -368,8 +392,23 @@ export default function NodeInfoForm() {
                 return (
                     <div className="create-action-form">
                         <label htmlFor="create-description-input">Description: </label>
-                        <input type="text" id="create-description-input" name="create-description-input" value={createDescriptionInput}
-                        onChange={onCreateDescriptionChange}/>
+                        <input type="text" id="create-description-input" name="create-description-input"
+                               value={createDescriptionInput}
+                               onChange={onCreateDescriptionChange}/>
+                        <label htmlFor="create-variable-name-input">Variable Name: </label>
+                        <input type="text" id="create-variable-name-input" name="create-variable-name-input"
+                               value={createVariableNameInput}
+                               onChange={onCreateVariableNameChange}/>
+                        <label htmlFor="create-variable-value-input">Variable Value: </label>
+                        <input type="text" id="create-variable-value-input" name="create-variable-value-input"
+                               value={createVariableValueInput}
+                               onChange={onCreateVariableValueChange}/>
+
+                        <label htmlFor="create-persistent-checkbox">Make Persistent</label>
+                        <input type="checkbox" id="create-persistent-checkbox" name="create-persistent-checkbox"
+                               checked={isPersistentCheckbox}
+                               onChange={onIsPersistentCheckboxChange}/>
+
 
                     </div>
                 )
