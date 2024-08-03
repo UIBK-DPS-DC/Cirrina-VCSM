@@ -56,7 +56,9 @@ export default function NodeInfoForm() {
         }
     }, [selectedNode, setNameInput, stateOrStateMachineService]);
 
-    // For logging
+
+    //################################## For logging #####################################
+    // These exist for logging and debugging purposes, can be deleted later.
     useEffect(() => {
         if(selectedActionType){
             console.log(`Selected Action type changed to ${selectedActionType}`);
@@ -70,6 +72,7 @@ export default function NodeInfoForm() {
     useEffect(() => {
         console.log(`Selected Service Level changed to ${selectedServiceLevel}`);
     }, [selectedServiceLevel]);
+    // #######################################################################################
 
     /**
      * Updates the transitions when a node is renamed.
@@ -123,8 +126,12 @@ export default function NodeInfoForm() {
             "select-action-category": HTMLSelectElement,
             "new-raise-event-input": HTMLInputElement,
             "raise-event-props": HTMLSelectElement,
-            "new-action-name": HTMLInputElement
+            "new-action-name": HTMLInputElement,
+            "invoke-description-input": HTMLInputElement,
+            "invoke-service-type-select": HTMLSelectElement,
+            "invoke-service-level-select": HTMLSelectElement
         };
+
 
 
 
@@ -134,10 +141,17 @@ export default function NodeInfoForm() {
         const newActionName = formElements["new-action-name"]?.value;
         const existingEventName: string = formElements["raise-event-props"]?.value;
 
+        const invokeActionDescription: string = formElements["invoke-description-input"]?.value;
+        const invokeServiceType: string = formElements["invoke-service-type-select"]?.value;
+        const invokeServiceLevel: string = formElements["invoke-service-level-select"]?.value;
+
+        console.log(invokeActionDescription);
+        console.log(invokeServiceType);
+        console.log(invokeServiceLevel);
+
+
         const newName = formElements.name.value;
         const oldName = stateOrStateMachineService.getName(selectedNode.data);
-
-        console.log({ newName, newActionType, newActionCategory, newRaiseEventName, newActionName, existingEventName });
 
         if (!stateOrStateMachineService.isNameUnique(newName) && newName !== oldName) {
             console.error(`StateOrStateMachine name ${newName} already exists!`);
@@ -162,6 +176,15 @@ export default function NodeInfoForm() {
             switch (newActionType) {
                 case ActionType.RAISE_EVENT: {
                     newAction.properties = {"event": newRaiseEventName? newRaiseEventName : existingEventName};
+                    break;
+                }
+                case ActionType.INVOKE: {
+                    newAction.properties = {
+                        "description": invokeActionDescription,
+                        "serviceType": invokeServiceType,
+                        "serviceLevel": invokeServiceLevel
+
+                    }
                     break;
                 }
                 default: break;
@@ -200,6 +223,9 @@ export default function NodeInfoForm() {
                 eventService.registerName(newRaiseEventName);
             }
             setNodes(newNodes)
+
+            console.log(`New action props:`)
+            Object.entries(newAction.properties).map(([key, val]) => console.log(key, '=>', val));
         }
 
 
