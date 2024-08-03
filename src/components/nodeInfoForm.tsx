@@ -332,7 +332,7 @@ export default function NodeInfoForm() {
             }
             case ActionType.INVOKE: {
                 return(
-                    <div className="invoke-event-form">
+                    <div className="invoke-action-form">
                         <label htmlFor="invoke-description-input">Description:  </label>
                         <input type="text" id="invoke-description-input" name="invoke-description-input"
                                value={invokeDescriptionInput} onChange={onInvokeDescriptionInputChange}/>
@@ -348,6 +348,13 @@ export default function NodeInfoForm() {
                                 value={selectedServiceLevel} onChange={onSelectedServiceLevelChange}>
                             {renderEnumAsOptions(ServiceLevel)}
                         </select>
+                    </div>
+                )
+            }
+            case ActionType.CREATE: {
+                return (
+                    <div className="create-action-form">
+
                     </div>
                 )
             }
