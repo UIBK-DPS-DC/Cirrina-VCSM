@@ -57,7 +57,16 @@ export default class ContextService {
         this._contextMap.set(context.name, context);
 
     }
-
+    /**
+     * Creates a new context.
+     *
+     * This method creates a new context with the specified name and value.
+     * The created Context is not registered.
+     *
+     * @param {string} name - The name of the context.
+     * @param {string} value - The value of the context.
+     * @returns {Context} - Returns the created context object.
+     */
     public createContext(name: string, value: string): Context {
         return {
             name: name,
