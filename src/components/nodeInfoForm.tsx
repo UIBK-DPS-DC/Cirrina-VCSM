@@ -314,13 +314,18 @@ export default function NodeInfoForm() {
             case ActionType.RAISE_EVENT: {
                 return(
                     <div className="raise-event-form">
-                        <p>I want to raise an event</p>
-                        <select id="raise-event-props" name="raise-event-props" onChange={onRaiseEventSelectChange} defaultValue={"new-raise-event"}>
+                        <label htmlFor="raise-event-props">Select Event: </label>
+                        <select id="raise-event-props" name="raise-event-props" onChange={onRaiseEventSelectChange}
+                                defaultValue={"new-raise-event"}>
                             {renderEventsAsOptions()}
                             <option key="new-raise-event" value="new-raise-event">New Event</option>
                         </select>
                         {raiseEventSelectedType === "new-raise-event" && (
-                            <input type="text" id="new-raise-event-input" name ="new-raise-event-input" value={newEventName} onChange={onNewEventNameChange}/>
+                            <div className="new-raise-event-input-container">
+                                <label htmlFor="new-raise-event-input">New Event Name:  </label>
+                                <input type="text" id="new-raise-event-input" name="new-raise-event-input"
+                                       value={newEventName} onChange={onNewEventNameChange}/>
+                            </div>
                         )}
                     </div>
                 )
@@ -328,12 +333,19 @@ export default function NodeInfoForm() {
             case ActionType.INVOKE: {
                 return(
                     <div className="invoke-event-form">
+                        <label htmlFor="invoke-description-input">Description:  </label>
                         <input type="text" id="invoke-description-input" name="invoke-description-input"
                                value={invokeDescriptionInput} onChange={onInvokeDescriptionInputChange}/>
-                        <select id="invoke-service-type-select" name="invoke-service-type-select" value={selectedServiceType} onChange={onSelectedServiceTypeChange}>
+                        <br/>
+                        <label htmlFor="invoke-service-type-select">Service Type: </label>
+                        <select id="invoke-service-type-select" name="invoke-service-type-select"
+                                value={selectedServiceType} onChange={onSelectedServiceTypeChange}>
                             {renderEnumAsOptions(ServiceType)}
                         </select>
-                        <select id="invoke-service-level-select" name="invoke-service-level-select" value={selectedServiceLevel} onChange={onSelectedServiceLevelChange}>
+                        <br/>
+                        <label htmlFor="invoke-service-level-select">Service Level: </label>
+                        <select id="invoke-service-level-select" name="invoke-service-level-select"
+                                value={selectedServiceLevel} onChange={onSelectedServiceLevelChange}>
                             {renderEnumAsOptions(ServiceLevel)}
                         </select>
                     </div>
@@ -363,10 +375,13 @@ export default function NodeInfoForm() {
 
 
                         {selectedActionType && selectedActionType !=="no-new-action" && (
-                            <select id="select-action-category" name="select-action-category"
-                                    onChange={onCategorySelect} defaultValue={selectedActionCategory}>
-                                {renderEnumAsOptions(ActionCategory)}
-                            </select>
+                            <div className="from-action-category-section">
+                                <label htmlFor="select-action-category">Action Category: </label>
+                                <select id="select-action-category" name="select-action-category"
+                                        onChange={onCategorySelect} defaultValue={selectedActionCategory}>
+                                    {renderEnumAsOptions(ActionCategory)}
+                                </select>
+                            </div>
                         )}
                         {selectedActionType && selectedActionType !== "no-new-action" && renderActionProperties()}
                         {selectedActionType && selectedActionType !== "no-new-action" && (
