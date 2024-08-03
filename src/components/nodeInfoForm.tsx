@@ -314,13 +314,18 @@ export default function NodeInfoForm() {
             case ActionType.RAISE_EVENT: {
                 return(
                     <div className="raise-event-form">
-                        <p>I want to raise an event</p>
-                        <select id="raise-event-props" name="raise-event-props" onChange={onRaiseEventSelectChange} defaultValue={"new-raise-event"}>
+                        <label htmlFor="raise-event-props">Select Event: </label>
+                        <select id="raise-event-props" name="raise-event-props" onChange={onRaiseEventSelectChange}
+                                defaultValue={"new-raise-event"}>
                             {renderEventsAsOptions()}
                             <option key="new-raise-event" value="new-raise-event">New Event</option>
                         </select>
                         {raiseEventSelectedType === "new-raise-event" && (
-                            <input type="text" id="new-raise-event-input" name ="new-raise-event-input" value={newEventName} onChange={onNewEventNameChange}/>
+                            <div className="new-raise-event-input-container">
+                                <label htmlFor="new-raise-event-input">New Event Name:  </label>
+                                <input type="text" id="new-raise-event-input" name="new-raise-event-input"
+                                       value={newEventName} onChange={onNewEventNameChange}/>
+                            </div>
                         )}
                     </div>
                 )
