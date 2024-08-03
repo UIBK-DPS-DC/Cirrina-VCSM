@@ -41,6 +41,14 @@ export default class ContextService {
         return this._contextMap.has(context.name);
     }
 
+    /**
+     * Updates an existing context.
+     *
+     * This method updates the context in the _contextMap if it already exists.
+     * Logs an error if the context does not exist.
+     *
+     * @param {Context} context - The context to be updated.
+     */
     public updateContext(context: Context): void {
         if(this.isContextNameUnique(context)){
             console.error("Context does not exist");
