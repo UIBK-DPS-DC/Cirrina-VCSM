@@ -330,10 +330,16 @@ export default function NodeInfoForm() {
                     <div className="invoke-event-form">
                         <input type="text" id="invoke-description-input" name="invoke-description-input"
                                value={invokeDescriptionInput} onChange={onInvokeDescriptionInputChange}/>
-                        <select id="invoke-service-type-select" name="invoke-service-type-select" value={selectedServiceType} onChange={onSelectedServiceTypeChange}>
+                        <br/>
+                        <label htmlFor="invoke-service-type-select">Service Type: </label>
+                        <select id="invoke-service-type-select" name="invoke-service-type-select"
+                                value={selectedServiceType} onChange={onSelectedServiceTypeChange}>
                             {renderEnumAsOptions(ServiceType)}
                         </select>
-                        <select id="invoke-service-level-select" name="invoke-service-level-select" value={selectedServiceLevel} onChange={onSelectedServiceLevelChange}>
+                        <br/>
+                        <label htmlFor="invoke-service-level-select">Service Level: </label>
+                        <select id="invoke-service-level-select" name="invoke-service-level-select"
+                                value={selectedServiceLevel} onChange={onSelectedServiceLevelChange}>
                             {renderEnumAsOptions(ServiceLevel)}
                         </select>
                     </div>
