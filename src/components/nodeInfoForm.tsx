@@ -307,6 +307,12 @@ export default function NodeInfoForm() {
         )
     }
 
+    const renderContextNamesAsOptions = () => {
+        return(
+            <div></div>
+        )
+    }
+
     const renderEnumAsOptions = (enumObject: OptionEnums) => {
         return (
             Object.values(enumObject).map((value) => {
