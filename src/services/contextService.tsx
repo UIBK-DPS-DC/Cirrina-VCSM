@@ -22,7 +22,7 @@ export default class ContextService {
      * @param {Context} context - The context to be registered.
      */
     public registerContext(context: Context): void {
-        if(this.isContextNameUnique(context)){
+        if(! this.isContextNameUnique(context)){
             console.error("Context name already exists!");
             return;
         }
@@ -38,7 +38,7 @@ export default class ContextService {
      * @returns {boolean} - Returns true if the context name is unique, false otherwise.
      */
     public isContextNameUnique(context: Context): boolean {
-        return this._contextMap.has(context.name);
+        return ! this._contextMap.has(context.name);
     }
 
     /**
@@ -51,7 +51,8 @@ export default class ContextService {
      */
     public updateContext(context: Context): void {
         if(this.isContextNameUnique(context)){
-            console.error("Context does not exist");
+            console.log(context.name);
+            console.error(`Context does not exist`);
             return;
         }
         this._contextMap.set(context.name, context);
