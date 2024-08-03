@@ -75,6 +75,17 @@ export default class ContextService {
         }
     }
 
+    /**
+     * Retrieves all context names.
+     *
+     * This function returns an array of all the unique context names currently stored in the _contextMap.
+     *
+     * @returns {string[]} An array of context names.
+     */
+    public getAllContextNames(): string[] {
+        return Array.from(this._contextMap.keys());
+    }
+
 
 
 }

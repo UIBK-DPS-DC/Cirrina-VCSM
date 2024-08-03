@@ -27,6 +27,7 @@ import CsmEdge from "./csmEdgeComponent.tsx";
 import TransitionService from "../services/transitionService.tsx";
 import ActionService from "../services/actionService.tsx";
 import EventService from "../services/eventService.tsx";
+import ContextService from "../services/contextService.tsx";
 
 
 const nodeTypes = {
@@ -53,8 +54,9 @@ export default function Flow() {
 
     const stateOrStateMachineService: StateOrStateMachineService = useMemo(() => new StateOrStateMachineService(), []);
     const transitionService: TransitionService = useMemo(() => new TransitionService(stateOrStateMachineService), [stateOrStateMachineService]);
-    const actionService: ActionService = useMemo(() => new ActionService(),[])
-    const eventService: EventService = useMemo(() => new EventService(),[])
+    const actionService: ActionService = useMemo(() => new ActionService(),[]);
+    const eventService: EventService = useMemo(() => new EventService(),[]);
+    const contextService: ContextService = useMemo(() => new ContextService(),[]);
 
 
     const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
@@ -84,6 +86,7 @@ export default function Flow() {
         stateOrStateMachineService,
         actionService,
         eventService,
+        contextService
     };
 
     const updateNodeHistory = useCallback((nodes: Node<CsmNodeProps>[]) => {

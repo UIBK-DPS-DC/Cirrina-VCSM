@@ -4,6 +4,7 @@ import {CsmNodeProps, isState, isStateMachine, ReactFlowContextProps} from "../t
 import {ActionCategory, ActionType, ServiceLevel, ServiceType} from "../enums.tsx";
 import Action from "../classes/action.tsx";
 
+
 /**
  * NodeInfoForm Component
  *
@@ -32,6 +33,7 @@ export default function NodeInfoForm() {
         setEdges,
         actionService,
         eventService,
+        contextService
     } = context;
 
 
@@ -43,6 +45,10 @@ export default function NodeInfoForm() {
     const [newEventName, setNewEventName] = useState<string>("New Event Name")
     const [newActionName, setNewActionName] = useState<string>("New Action Name")
     const [invokeDescriptionInput, setInvokeDescriptionInput] = useState<string>("")
+    const [createDescriptionInput, setCreateDescriptionInput] = useState<string>("")
+    const [createVariableNameInput, setCreateVariableInput] = useState<string>("")
+    const [createVariableValueInput, setCreateVariableValueInput] = useState<string>("")
+    const [isPersistentCheckbox, setIsPersistentCheckbox] = useState<boolean>(false);
 
     type OptionEnums = typeof ActionType | typeof ServiceType | typeof ServiceLevel | typeof ActionCategory
 
@@ -72,6 +78,10 @@ export default function NodeInfoForm() {
     useEffect(() => {
         console.log(`Selected Service Level changed to ${selectedServiceLevel}`);
     }, [selectedServiceLevel]);
+
+    useEffect(() => {
+        console.log(`Is Persistent Checkbox changed to ${isPersistentCheckbox}`);
+    }, [isPersistentCheckbox]);
     // #######################################################################################
 
     /**
@@ -130,6 +140,10 @@ export default function NodeInfoForm() {
             "invoke-description-input": HTMLInputElement,
             "invoke-service-type-select": HTMLSelectElement,
             "invoke-service-level-select": HTMLSelectElement
+            "create-description-input": HTMLInputElement,
+            "create-variable-name-input": HTMLInputElement,
+            "create-variable-value-input": HTMLInputElement,
+            "create-persistent-checkbox": HTMLInputElement,
         };
 
 
@@ -145,9 +159,11 @@ export default function NodeInfoForm() {
         const invokeServiceType: string = formElements["invoke-service-type-select"]?.value;
         const invokeServiceLevel: string = formElements["invoke-service-level-select"]?.value;
 
-        console.log(invokeActionDescription);
-        console.log(invokeServiceType);
-        console.log(invokeServiceLevel);
+       const createDescription: string = formElements["create-description-input"]?.value;
+       const createVariableName: string = formElements["create-variable-name-input"]?.value;
+       const createVariableValue: string = formElements["create-variable-value-input"]?.value;
+       const createVariableIsPersistentCheckbox: boolean = formElements["create-persistent-checkbox"]?.checked;
+
 
 
         const newName = formElements.name.value;
@@ -186,6 +202,22 @@ export default function NodeInfoForm() {
 
                     }
                     break;
+                }
+                case ActionType.CREATE: {
+                    const newContext = contextService.createContext(createVariableName,createVariableValue)
+                    if(!contextService.isContextNameUnique(newContext)){
+                        return;
+                    }
+
+                    newAction.properties = {
+                        "description": createDescription,
+                        "context": newContext,
+                        "isPersistent" : createVariableIsPersistentCheckbox
+                    }
+
+                    contextService.registerContext(newContext)
+
+                    break
                 }
                 default: break;
             }
@@ -256,6 +288,9 @@ export default function NodeInfoForm() {
         return (<p>Unknown type</p>)
     }
 
+
+    // All these on change functions could be refactored into inline functions.
+    // Well keep them for now should we ever want for complicated logic.
     const onActionTypeSelect = (event: React.ChangeEvent<HTMLSelectElement>) => {
         setSelectedActionType(event.target.value);
     }
@@ -281,12 +316,28 @@ export default function NodeInfoForm() {
         setInvokeDescriptionInput(event.target.value);
     }
 
+    const onCreateDescriptionChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setCreateDescriptionInput(event.target.value);
+    }
+
+    const onCreateVariableNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setCreateVariableInput(event.target.value);
+    }
+
+    const onCreateVariableValueChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setCreateVariableValueInput(event.target.value);
+    }
+
     const onSelectedServiceTypeChange =(event: React.ChangeEvent<HTMLSelectElement>) => {
         setSelectedServiceType(event.target.value);
     }
 
     const onSelectedServiceLevelChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
         setSelectedServiceLevel(event.target.value);
+    }
+
+    const onIsPersistentCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setIsPersistentCheckbox(event.target.checked);
     }
 
 
@@ -300,6 +351,15 @@ export default function NodeInfoForm() {
         )
     }
 
+    /** For later
+    const renderContextNamesAsOptions = () => {
+        return(
+            contextService.getAllContextNames().map((contextName: string) => {
+                return <option key={contextName} value={contextName} >{contextName}</option>
+            })
+        )
+    }
+    */
     const renderEnumAsOptions = (enumObject: OptionEnums) => {
         return (
             Object.values(enumObject).map((value) => {
@@ -354,6 +414,23 @@ export default function NodeInfoForm() {
             case ActionType.CREATE: {
                 return (
                     <div className="create-action-form">
+                        <label htmlFor="create-description-input">Description: </label>
+                        <input type="text" id="create-description-input" name="create-description-input"
+                               value={createDescriptionInput}
+                               onChange={onCreateDescriptionChange}/>
+                        <label htmlFor="create-variable-name-input">Variable Name: </label>
+                        <input type="text" id="create-variable-name-input" name="create-variable-name-input"
+                               value={createVariableNameInput}
+                               onChange={onCreateVariableNameChange}/>
+                        <label htmlFor="create-variable-value-input">Variable Value: </label>
+                        <input type="text" id="create-variable-value-input" name="create-variable-value-input"
+                               value={createVariableValueInput}
+                               onChange={onCreateVariableValueChange}/>
+
+                        <label htmlFor="create-persistent-checkbox">Make Persistent</label>
+                        <input type="checkbox" id="create-persistent-checkbox" name="create-persistent-checkbox" checked={isPersistentCheckbox}
+                               onChange={onIsPersistentCheckboxChange}/>
+
 
                     </div>
                 )
