@@ -140,6 +140,10 @@ export default function NodeInfoForm() {
             "invoke-description-input": HTMLInputElement,
             "invoke-service-type-select": HTMLSelectElement,
             "invoke-service-level-select": HTMLSelectElement
+            "create-description-input": HTMLInputElement,
+            "create-variable-name-input": HTMLInputElement,
+            "create-variable-value-input": HTMLInputElement,
+            "create-persistent-checkbox": HTMLInputElement,
         };
 
 
@@ -155,9 +159,16 @@ export default function NodeInfoForm() {
         const invokeServiceType: string = formElements["invoke-service-type-select"]?.value;
         const invokeServiceLevel: string = formElements["invoke-service-level-select"]?.value;
 
-        console.log(invokeActionDescription);
-        console.log(invokeServiceType);
-        console.log(invokeServiceLevel);
+       const createDescription: string = formElements["create-description-input"]?.value;
+       const createVariableName: string = formElements["create-variable-name-input"]?.value;
+       const createVariableValue: string = formElements["create-variable-value-input"]?.value;
+       const createVariableIsPersistentCheckbox: boolean = formElements["create-persistent-checkbox"]?.checked;
+
+       console.log(createDescription);
+       console.log(createVariableName);
+       console.log(createVariableValue);
+       console.log(createVariableIsPersistentCheckbox);
+
 
 
         const newName = formElements.name.value;
@@ -405,8 +416,7 @@ export default function NodeInfoForm() {
                                onChange={onCreateVariableValueChange}/>
 
                         <label htmlFor="create-persistent-checkbox">Make Persistent</label>
-                        <input type="checkbox" id="create-persistent-checkbox" name="create-persistent-checkbox"
-                               checked={isPersistentCheckbox}
+                        <input type="checkbox" id="create-persistent-checkbox" name="create-persistent-checkbox" checked={isPersistentCheckbox}
                                onChange={onIsPersistentCheckboxChange}/>
 
 
