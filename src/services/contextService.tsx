@@ -13,6 +13,14 @@ export default class ContextService {
         this._contextMap = new Map();
     }
 
+    /**
+     * Registers a new context.
+     *
+     * This method adds a new context to the _contextMap if the context name is unique.
+     * Logs an error if the context name already exists.
+     *
+     * @param {Context} context - The context to be registered.
+     */
     public registerContext(context: Context): void {
         if(this.isContextNameUnique(context)){
             console.error("Context name already exists!");
