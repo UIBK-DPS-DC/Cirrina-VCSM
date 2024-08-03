@@ -56,7 +56,9 @@ export default function NodeInfoForm() {
         }
     }, [selectedNode, setNameInput, stateOrStateMachineService]);
 
-    // For logging
+
+    //################################## For logging #####################################
+    // These exist for logging and debugging purposes, can be deleted later.
     useEffect(() => {
         if(selectedActionType){
             console.log(`Selected Action type changed to ${selectedActionType}`);
@@ -70,6 +72,7 @@ export default function NodeInfoForm() {
     useEffect(() => {
         console.log(`Selected Service Level changed to ${selectedServiceLevel}`);
     }, [selectedServiceLevel]);
+    // #######################################################################################
 
     /**
      * Updates the transitions when a node is renamed.
@@ -175,6 +178,15 @@ export default function NodeInfoForm() {
                     newAction.properties = {"event": newRaiseEventName? newRaiseEventName : existingEventName};
                     break;
                 }
+                case ActionType.INVOKE: {
+                    newAction.properties = {
+                        "description": invokeActionDescription,
+                        "serviceType": invokeServiceType,
+                        "serviceLevel": invokeServiceLevel
+
+                    }
+                    break;
+                }
                 default: break;
             }
 
@@ -211,6 +223,9 @@ export default function NodeInfoForm() {
                 eventService.registerName(newRaiseEventName);
             }
             setNodes(newNodes)
+
+            console.log(`New action props:`)
+            Object.entries(newAction.properties).map(([key, val]) => console.log(key, '=>', val));
         }
 
 
