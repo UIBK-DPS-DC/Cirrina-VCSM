@@ -68,4 +68,38 @@ describe('ContextService', () => {
 
         expect(newContext).toEqual({ name, value });
     });
+
+    test('should return an empty array when no contexts are registered', () => {
+        const contextNames = contextService.getAllContextNames();
+        expect(contextNames).toEqual([]);
+    });
+
+    test('should return all registered context names', () => {
+        const context1: Context = { name: 'context1', value: 'value1' };
+        const context2: Context = { name: 'context2', value: 'value2' };
+        contextService.registerContext(context1);
+        contextService.registerContext(context2);
+
+        const contextNames = contextService.getAllContextNames();
+        expect(contextNames).toEqual(['context1', 'context2']);
+    });
+
+    test('should not return duplicate context names', () => {
+        const context: Context = { name: 'uniqueContext', value: 'value' };
+        contextService.registerContext(context);
+        contextService.registerContext(context);  // Attempt to register the same context again
+
+        const contextNames = contextService.getAllContextNames();
+        expect(contextNames).toEqual(['uniqueContext']);
+    });
+
+    test('should return context names after an update', () => {
+        const context: Context = { name: 'contextToUpdate', value: 'initialValue' };
+        contextService.registerContext(context);
+        const updatedContext: Context = { name: 'contextToUpdate', value: 'updatedValue' };
+        contextService.updateContext(updatedContext);
+
+        const contextNames = contextService.getAllContextNames();
+        expect(contextNames).toEqual(['contextToUpdate']);
+    });
 });
