@@ -363,10 +363,13 @@ export default function NodeInfoForm() {
 
 
                         {selectedActionType && selectedActionType !=="no-new-action" && (
-                            <select id="select-action-category" name="select-action-category"
-                                    onChange={onCategorySelect} defaultValue={selectedActionCategory}>
-                                {renderEnumAsOptions(ActionCategory)}
-                            </select>
+                            <div className="from-action-category-section">
+                                <label htmlFor="select-action-category">Action Category: </label>
+                                <select id="select-action-category" name="select-action-category"
+                                        onChange={onCategorySelect} defaultValue={selectedActionCategory}>
+                                    {renderEnumAsOptions(ActionCategory)}
+                                </select>
+                            </div>
                         )}
                         {selectedActionType && selectedActionType !== "no-new-action" && renderActionProperties()}
                         {selectedActionType && selectedActionType !== "no-new-action" && (
