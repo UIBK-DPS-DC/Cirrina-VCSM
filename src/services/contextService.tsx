@@ -1,5 +1,11 @@
 import {Context} from "../types.ts";
 
+/**
+ * ContextService Class
+ *
+ * This class is responsible for managing contexts using a Map. It provides methods
+ * to register, update, and create contexts. Each context is identified by a unique name.
+ */
 export default class ContextService {
     private _contextMap: Map<string, Context>;
 
