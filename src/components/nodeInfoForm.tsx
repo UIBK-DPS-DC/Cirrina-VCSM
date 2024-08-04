@@ -152,6 +152,7 @@ export default function NodeInfoForm() {
             "create-persistent-checkbox": HTMLInputElement,
             "assign-variable-select": HTMLInputElement,
             "assign-action-variable-value-input": HTMLInputElement,
+            "lock-variable-select": HTMLSelectElement,
         };
 
 
@@ -178,8 +179,12 @@ export default function NodeInfoForm() {
         const assignVariableName: string = formElements["assign-variable-select"]?.value;
         const assignVariableValue: string = formElements["assign-action-variable-value-input"]?.value;
 
-        console.log(assignVariableName)
-        console.log(assignVariableValue)
+        // LOCK
+        const lockVariableName: string = formElements["lock-variable-select"]?.value;
+
+        console.log(`Variable to lock ${lockVariableName}`);
+
+
 
 
         const newName = formElements.name.value;
@@ -242,6 +247,12 @@ export default function NodeInfoForm() {
                         "value": assignVariableValue
                     }
                     break
+                }
+                case ActionType.LOCK: {
+                    newAction.properties = {
+                        "variable" : lockVariableName,
+                    }
+                    break;
                 }
                 default: break;
             }
@@ -482,6 +493,23 @@ export default function NodeInfoForm() {
                             </div>
                             )
                         : <p>No Context Variables found</p>}
+                    </div>
+                )
+            }
+            case ActionType.LOCK: {
+                return(
+                    <div className="unlock-action-form">
+                        {contextService.getAllContextNames().length >= 1 ? (
+                            <div className="unlock-action-variable-select-container">
+                            <label htmlFor="lock-variable-select">Variable To Lock: </label>
+                            <select id="lock-variable-select" name="lock-variable-select"
+                                    value={selectedContextVariable} onChange={onSelectedContextVariableChange}>
+                                {renderContextNamesAsOptions()}
+                            </select>
+                            </div>
+                        ): <p>No Context Variables found</p>
+
+                        }
                     </div>
                 )
             }
