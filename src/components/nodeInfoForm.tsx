@@ -248,6 +248,12 @@ export default function NodeInfoForm() {
                     }
                     break
                 }
+                case ActionType.LOCK: {
+                    newAction.properties = {
+                        "variable" : lockVariableName,
+                    }
+                    break;
+                }
                 default: break;
             }
 
