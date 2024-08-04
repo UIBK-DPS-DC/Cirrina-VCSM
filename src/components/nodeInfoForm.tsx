@@ -152,6 +152,7 @@ export default function NodeInfoForm() {
             "create-persistent-checkbox": HTMLInputElement,
             "assign-variable-select": HTMLInputElement,
             "assign-action-variable-value-input": HTMLInputElement,
+            "lock-variable-select": HTMLSelectElement,
         };
 
 
@@ -178,8 +179,12 @@ export default function NodeInfoForm() {
         const assignVariableName: string = formElements["assign-variable-select"]?.value;
         const assignVariableValue: string = formElements["assign-action-variable-value-input"]?.value;
 
-        console.log(assignVariableName)
-        console.log(assignVariableValue)
+        // LOCK
+        const lockVariableName: string = formElements["lock-variable-select"]?.value;
+
+        console.log(`Variable to lock ${lockVariableName}`);
+
+
 
 
         const newName = formElements.name.value;
