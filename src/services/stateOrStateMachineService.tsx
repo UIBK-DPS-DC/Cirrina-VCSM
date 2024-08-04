@@ -265,6 +265,22 @@ export default class StateOrStateMachineService {
         return stateOrStateMachine
     }
 
+    /**
+     * Gets the state or state machine by name.
+     *
+     * @param name - The name of the state or state machine to find.
+     * @returns The state or state machine if found, otherwise undefined.
+     */
+    public getStateOrStateMachineByName(name: string): StateOrStateMachine | undefined {
+        this.nodeIdToStateOrStatemachineMap.forEach(stateOrStateMachine => {
+            if(stateOrStateMachine.name === name){
+                return stateOrStateMachine;
+            }
+        })
+        console.log(`Statemachine ${name} not found!`);
+        return undefined;
+    }
+
 
     public getDefaultState(name: string): State {
         // add default config here
