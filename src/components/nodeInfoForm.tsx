@@ -498,14 +498,31 @@ export default function NodeInfoForm() {
             }
             case ActionType.LOCK: {
                 return(
-                    <div className="unlock-action-form">
+                    <div className="lock-action-form">
                         {contextService.getAllContextNames().length >= 1 ? (
-                            <div className="unlock-action-variable-select-container">
+                            <div className="lock-action-variable-select-container">
                             <label htmlFor="lock-variable-select">Variable To Lock: </label>
                             <select id="lock-variable-select" name="lock-variable-select"
                                     value={selectedContextVariable} onChange={onSelectedContextVariableChange}>
                                 {renderContextNamesAsOptions()}
                             </select>
+                            </div>
+                        ): <p>No Context Variables found</p>
+
+                        }
+                    </div>
+                )
+            }
+            case ActionType.UNLOCK: {
+                return(
+                    <div className="unlock-action-form">
+                        {contextService.getAllContextNames().length >= 1 ? (
+                            <div className="unlock-action-variable-select-container">
+                                <label htmlFor="unlock-variable-select">Variable To Unlock: </label>
+                                <select id="unlock-variable-select" name="unlock-variable-select"
+                                        value={selectedContextVariable} onChange={onSelectedContextVariableChange}>
+                                    {renderContextNamesAsOptions()}
+                                </select>
                             </div>
                         ): <p>No Context Variables found</p>
 
