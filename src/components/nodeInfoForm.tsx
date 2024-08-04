@@ -212,6 +212,7 @@ export default function NodeInfoForm() {
                 case ActionType.CREATE: {
                     const newContext = contextService.createContext(createVariableName,createVariableValue)
                     if(!contextService.isContextNameUnique(newContext)){
+                        console.error(`Context with name ${newContext.name} already exists!`)
                         return;
                     }
 
