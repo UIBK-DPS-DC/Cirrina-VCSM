@@ -318,14 +318,14 @@ export default function NodeInfoForm() {
         if(isState(data)){
             return(
                 data.state.getAllActions().map((action) => {
-                   return <p key={action.name}>{action.name}</p>
+                   return <p key={action.name}>{"Name: " + action.name + ` | type: ${action.type}`}</p>
                 })
             )
         }
         if(isStateMachine(data)){
             return(
                 data.stateMachine.actions.map((action) => {
-                    return <p key={action.name}>{action.name}</p>
+                    return <p key={action.name}>{"Name: " + action.name + ` | type: ${action.type}`}</p>
                 })
             )
         }
