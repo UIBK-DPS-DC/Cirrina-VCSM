@@ -258,6 +258,12 @@ export default function NodeInfoForm() {
                     }
                     break;
                 }
+                case ActionType.UNLOCK: {
+                    newAction.properties = {
+                        "variable" : unlockVariableName,
+                    }
+                    break;
+                }
                 default: break;
             }
 
