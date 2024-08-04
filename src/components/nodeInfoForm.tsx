@@ -394,7 +394,7 @@ export default function NodeInfoForm() {
     }
 
 
-    const renderEventsAsOptions = () => {
+     const renderEventsAsOptions = () => {
         return (
             eventService.getAllEvents().map((event: string) => {
                 return(
