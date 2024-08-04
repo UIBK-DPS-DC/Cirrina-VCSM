@@ -49,6 +49,8 @@ export default function NodeInfoForm() {
     const [createVariableNameInput, setCreateVariableInput] = useState<string>("")
     const [createVariableValueInput, setCreateVariableValueInput] = useState<string>("")
     const [isPersistentCheckbox, setIsPersistentCheckbox] = useState<boolean>(false);
+    const [selectedContextVariable, setSelectedContextVariable] = useState<string>("");
+    const [assignActionValueInput, setAssignActionValueInput] = useState<string>("")
 
     type OptionEnums = typeof ActionType | typeof ServiceType | typeof ServiceLevel | typeof ActionCategory
 
@@ -82,6 +84,10 @@ export default function NodeInfoForm() {
     useEffect(() => {
         console.log(`Is Persistent Checkbox changed to ${isPersistentCheckbox}`);
     }, [isPersistentCheckbox]);
+
+    useEffect(() => {
+        console.log(`Selected Context Variable changed to ${selectedContextVariable}`)
+    }, [selectedContextVariable]);
     // #######################################################################################
 
     /**
@@ -144,26 +150,36 @@ export default function NodeInfoForm() {
             "create-variable-name-input": HTMLInputElement,
             "create-variable-value-input": HTMLInputElement,
             "create-persistent-checkbox": HTMLInputElement,
+            "assign-variable-select": HTMLInputElement,
+            "assign-action-variable-value-input": HTMLInputElement,
         };
 
 
 
-
+        // RAISE EVENT
         const newActionType = formElements["select-action-type"]?.value;
         const newActionCategory = formElements["select-action-category"]?.value;
         const newRaiseEventName = formElements["new-raise-event-input"]?.value;
         const newActionName = formElements["new-action-name"]?.value;
         const existingEventName: string = formElements["raise-event-props"]?.value;
 
+        //INVOKE
         const invokeActionDescription: string = formElements["invoke-description-input"]?.value;
         const invokeServiceType: string = formElements["invoke-service-type-select"]?.value;
         const invokeServiceLevel: string = formElements["invoke-service-level-select"]?.value;
 
-       const createDescription: string = formElements["create-description-input"]?.value;
-       const createVariableName: string = formElements["create-variable-name-input"]?.value;
-       const createVariableValue: string = formElements["create-variable-value-input"]?.value;
-       const createVariableIsPersistentCheckbox: boolean = formElements["create-persistent-checkbox"]?.checked;
+        //CREATE
+        const createDescription: string = formElements["create-description-input"]?.value;
+        const createVariableName: string = formElements["create-variable-name-input"]?.value;
+        const createVariableValue: string = formElements["create-variable-value-input"]?.value;
+        const createVariableIsPersistentCheckbox: boolean = formElements["create-persistent-checkbox"]?.checked;
 
+        //ASSIGN
+        const assignVariableName: string = formElements["assign-variable-select"]?.value;
+        const assignVariableValue: string = formElements["assign-action-variable-value-input"]?.value;
+
+        console.log(assignVariableName)
+        console.log(assignVariableValue)
 
 
         const newName = formElements.name.value;
@@ -206,6 +222,7 @@ export default function NodeInfoForm() {
                 case ActionType.CREATE: {
                     const newContext = contextService.createContext(createVariableName,createVariableValue)
                     if(!contextService.isContextNameUnique(newContext)){
+                        console.error(`Context with name ${newContext.name} already exists!`)
                         return;
                     }
 
@@ -217,6 +234,13 @@ export default function NodeInfoForm() {
 
                     contextService.registerContext(newContext)
 
+                    break
+                }
+                case ActionType.ASSIGN: {
+                    newAction.properties = {
+                        "variable" : assignVariableName,
+                        "value": assignVariableValue
+                    }
                     break
                 }
                 default: break;
@@ -256,7 +280,7 @@ export default function NodeInfoForm() {
             }
             setNodes(newNodes)
 
-            console.log(`New action props:`)
+            console.log(`New action ${newAction.name} props:`)
             Object.entries(newAction.properties).map(([key, val]) => console.log(key, '=>', val));
         }
 
@@ -340,6 +364,14 @@ export default function NodeInfoForm() {
         setIsPersistentCheckbox(event.target.checked);
     }
 
+    const onSelectedContextVariableChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+        setSelectedContextVariable(event.target.value)
+    }
+
+    const onAssignActionValueInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setAssignActionValueInput(event.target.value);
+    }
+
 
     const renderEventsAsOptions = () => {
         return (
@@ -351,7 +383,7 @@ export default function NodeInfoForm() {
         )
     }
 
-    /** For later
+
     const renderContextNamesAsOptions = () => {
         return(
             contextService.getAllContextNames().map((contextName: string) => {
@@ -359,7 +391,7 @@ export default function NodeInfoForm() {
             })
         )
     }
-    */
+
     const renderEnumAsOptions = (enumObject: OptionEnums) => {
         return (
             Object.values(enumObject).map((value) => {
@@ -432,6 +464,24 @@ export default function NodeInfoForm() {
                                onChange={onIsPersistentCheckboxChange}/>
 
 
+                    </div>
+                )
+            }
+            case ActionType.ASSIGN: {
+                return(
+                    <div className="assign-action-form">
+                        {contextService.getAllContextNames().length >= 1 ?
+                            (<div className="asssign-action-variable-select-container">
+                                    <label htmlFor="assign-variable-select">Select Variable</label>
+                                    <select id="assign-variable-select" name="assign-variable-select" value={selectedContextVariable} onChange={onSelectedContextVariableChange}>
+                                    {renderContextNamesAsOptions()}
+                                    </select>
+                                    <br/>
+                                    <label htmlFor="assign-action-variable-value-input">Value To Assign:  </label>
+                                    <input type="text" id="assign-action-variable-value-input" name="assign-action-variable-value-input" value={assignActionValueInput} onChange={onAssignActionValueInputChange}/>
+                            </div>
+                            )
+                        : <p>No Context Variables found</p>}
                     </div>
                 )
             }
