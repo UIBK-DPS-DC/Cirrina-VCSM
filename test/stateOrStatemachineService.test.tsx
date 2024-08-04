@@ -282,5 +282,72 @@ describe('stateOrStateMachineService', () => {
         expect(console.error).toHaveBeenCalledWith(`State or Statemachine with id ${nodeId} could not be found`);
     });
 
+    test('getStateOrStateMachineByName should return the correct state by name', () => {
+        const stateName = 'testState';
+        const state = new State(stateName);
+        const nodeId = 'node1';
+        service.linkNode(nodeId, { state: state });
+
+        const result = service.getStateOrStateMachineByName(stateName);
+        expect(result).toBe(state);
+    });
+
+    test('getStateOrStateMachineByName should return the correct stateMachine by name', () => {
+        const stateMachineName = 'testStateMachine';
+        const stateMachine = new StateMachine(stateMachineName);
+        const nodeId = 'node2';
+        service.linkNode(nodeId, { stateMachine: stateMachine });
+
+        const result = service.getStateOrStateMachineByName(stateMachineName);
+        expect(result).toBe(stateMachine);
+    });
+
+    test('getStateOrStateMachineByName should return undefined for a non-existent name', () => {
+        const result = service.getStateOrStateMachineByName('nonExistentName');
+        expect(result).toBeUndefined();
+    });
+
+    test('getStateOrStateMachineByName should return undefined if no states or stateMachines are linked', () => {
+        const result = service.getStateOrStateMachineByName('anyName');
+        expect(result).toBeUndefined();
+    });
+
+    test('getStateOrStateMachineByName should return the correct state when multiple states are linked', () => {
+        const stateName1 = 'testState1';
+        const stateName2 = 'testState2';
+        const state1 = new State(stateName1);
+        const state2 = new State(stateName2);
+        service.linkNode('node1', { state: state1 });
+        service.linkNode('node2', { state: state2 });
+
+        const result1 = service.getStateOrStateMachineByName(stateName1);
+        const result2 = service.getStateOrStateMachineByName(stateName2);
+
+        expect(result1).toBe(state1);
+        expect(result2).toBe(state2);
+    });
+
+    test('getStateOrStateMachineByName should return the correct stateMachine when multiple stateMachines are linked', () => {
+        const stateMachineName1 = 'testStateMachine1';
+        const stateMachineName2 = 'testStateMachine2';
+        const stateMachine1 = new StateMachine(stateMachineName1);
+        const stateMachine2 = new StateMachine(stateMachineName2);
+        service.linkNode('node3', { stateMachine: stateMachine1 });
+        service.linkNode('node4', { stateMachine: stateMachine2 });
+
+        const result1 = service.getStateOrStateMachineByName(stateMachineName1);
+        const result2 = service.getStateOrStateMachineByName(stateMachineName2);
+
+        expect(result1).toBe(stateMachine1);
+        expect(result2).toBe(stateMachine2);
+    });
+
+    test('getStateOrStateMachineByName should log a message when the stateMachine is not found', () => {
+        console.log = jest.fn();
+        const result = service.getStateOrStateMachineByName('nonExistentName');
+        expect(result).toBeUndefined();
+        expect(console.log).toHaveBeenCalledWith(`Statemachine nonExistentName not found!`);
+    });
+
 
 });
