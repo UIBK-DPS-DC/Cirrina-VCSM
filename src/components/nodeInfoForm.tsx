@@ -150,6 +150,8 @@ export default function NodeInfoForm() {
             "create-variable-name-input": HTMLInputElement,
             "create-variable-value-input": HTMLInputElement,
             "create-persistent-checkbox": HTMLInputElement,
+            "assign-variable-select": HTMLInputElement,
+            "assign-action-variable-value-input": HTMLInputElement,
         };
 
 
@@ -165,11 +167,16 @@ export default function NodeInfoForm() {
         const invokeServiceType: string = formElements["invoke-service-type-select"]?.value;
         const invokeServiceLevel: string = formElements["invoke-service-level-select"]?.value;
 
-       const createDescription: string = formElements["create-description-input"]?.value;
-       const createVariableName: string = formElements["create-variable-name-input"]?.value;
-       const createVariableValue: string = formElements["create-variable-value-input"]?.value;
-       const createVariableIsPersistentCheckbox: boolean = formElements["create-persistent-checkbox"]?.checked;
+        const createDescription: string = formElements["create-description-input"]?.value;
+        const createVariableName: string = formElements["create-variable-name-input"]?.value;
+        const createVariableValue: string = formElements["create-variable-value-input"]?.value;
+        const createVariableIsPersistentCheckbox: boolean = formElements["create-persistent-checkbox"]?.checked;
 
+        const assignVariableName: string = formElements["assign-variable-select"]?.value;
+        const assignVariableValue: string = formElements["assign-action-variable-value-input"]?.value;
+
+        console.log(assignVariableName)
+        console.log(assignVariableValue)
 
 
         const newName = formElements.name.value;
