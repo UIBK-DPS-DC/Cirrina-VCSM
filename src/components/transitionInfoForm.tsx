@@ -1,6 +1,6 @@
 import {ReactFlowContext} from "./flow.tsx";
 import React, {FormEvent, useCallback, useContext, useState} from "react";
-import {ReactFlowContextProps} from "../types.ts";
+import {isState, ReactFlowContextProps} from "../types.ts";
 
 
 
@@ -32,6 +32,16 @@ export default function TransitionInfoForm() {
                 if(!eventService.isNameUnique(newEventName)) {
                     console.error(`Event ${newEventName} is not unique`);
                     return;
+                }
+                const sourceState =
+                    stateOrStateMachineService.getStateOrStateMachineByName(selectedEdge.data.transition.getSource())
+                if(!sourceState) {
+                    console.error(`Source state ${selectedEdge.data.transition.getSource()} could not be found`);
+                    return;
+                }
+                // TODO: Transition class needs to be updated.
+                if(isState(sourceState)) {
+                    sourceState.state.on.push(selectedEdge.data.transition)
                 }
 
             }
