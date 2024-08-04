@@ -49,6 +49,8 @@ export default function NodeInfoForm() {
     const [createVariableNameInput, setCreateVariableInput] = useState<string>("")
     const [createVariableValueInput, setCreateVariableValueInput] = useState<string>("")
     const [isPersistentCheckbox, setIsPersistentCheckbox] = useState<boolean>(false);
+    const [selectedContextVariable, setSelectedContextVariable] = useState<string>("");
+    const [assignActionValueInput, setAssignActionValueInput] = useState<string>("")
 
     type OptionEnums = typeof ActionType | typeof ServiceType | typeof ServiceLevel | typeof ActionCategory
 
@@ -82,6 +84,10 @@ export default function NodeInfoForm() {
     useEffect(() => {
         console.log(`Is Persistent Checkbox changed to ${isPersistentCheckbox}`);
     }, [isPersistentCheckbox]);
+
+    useEffect(() => {
+        console.log(`Selected Context Variable changed to ${selectedContextVariable}`)
+    }, [selectedContextVariable]);
     // #######################################################################################
 
     /**
@@ -340,6 +346,14 @@ export default function NodeInfoForm() {
         setIsPersistentCheckbox(event.target.checked);
     }
 
+    const onSelectedContextVariableChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+        setSelectedContextVariable(event.target.value)
+    }
+
+    const onAssignActionValueInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setAssignActionValueInput(event.target.value);
+    }
+
 
     const renderEventsAsOptions = () => {
         return (
@@ -351,7 +365,7 @@ export default function NodeInfoForm() {
         )
     }
 
-    /** For later
+
     const renderContextNamesAsOptions = () => {
         return(
             contextService.getAllContextNames().map((contextName: string) => {
@@ -359,7 +373,7 @@ export default function NodeInfoForm() {
             })
         )
     }
-    */
+
     const renderEnumAsOptions = (enumObject: OptionEnums) => {
         return (
             Object.values(enumObject).map((value) => {
@@ -432,6 +446,24 @@ export default function NodeInfoForm() {
                                onChange={onIsPersistentCheckboxChange}/>
 
 
+                    </div>
+                )
+            }
+            case ActionType.ASSIGN: {
+                return(
+                    <div className="assign-action-form">
+                        {contextService.getAllContextNames().length >= 1 ?
+                            (<div className="asssign-action-variable-select-container">
+                                    <label htmlFor="assign-variable-select">Select Variable</label>
+                                    <select id="assign-variable-select" name="assign-variable-select" value={selectedContextVariable} onChange={onSelectedContextVariableChange}>
+                                    {renderContextNamesAsOptions()}
+                                    </select>
+                                    <br/>
+                                    <label htmlFor="assign-action-variable-value-input">Value To Assign:  </label>
+                                    <input type="text" id="assign-action-variable-value-input" name="assign-action-variable-value-input" value={assignActionValueInput} onChange={onAssignActionValueInputChange}/>
+                            </div>
+                            )
+                        : <p>No Context Variables found</p>}
                     </div>
                 )
             }
