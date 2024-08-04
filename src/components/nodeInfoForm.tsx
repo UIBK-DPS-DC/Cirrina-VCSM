@@ -153,6 +153,7 @@ export default function NodeInfoForm() {
             "assign-variable-select": HTMLInputElement,
             "assign-action-variable-value-input": HTMLInputElement,
             "lock-variable-select": HTMLSelectElement,
+            "unlock-variable-select": HTMLSelectElement
         };
 
 
@@ -182,7 +183,10 @@ export default function NodeInfoForm() {
         // LOCK
         const lockVariableName: string = formElements["lock-variable-select"]?.value;
 
-        console.log(`Variable to lock ${lockVariableName}`);
+        //UNLOCK
+        const unlockVariableName: string = formElements["unlock-variable-select"]?.value;
+
+        console.log(`Variable to unlock ${unlockVariableName}`);
 
 
 
