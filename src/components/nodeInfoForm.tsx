@@ -156,22 +156,25 @@ export default function NodeInfoForm() {
 
 
 
-
+        // RAISE EVENT
         const newActionType = formElements["select-action-type"]?.value;
         const newActionCategory = formElements["select-action-category"]?.value;
         const newRaiseEventName = formElements["new-raise-event-input"]?.value;
         const newActionName = formElements["new-action-name"]?.value;
         const existingEventName: string = formElements["raise-event-props"]?.value;
 
+        //INVOKE
         const invokeActionDescription: string = formElements["invoke-description-input"]?.value;
         const invokeServiceType: string = formElements["invoke-service-type-select"]?.value;
         const invokeServiceLevel: string = formElements["invoke-service-level-select"]?.value;
 
+        //CREATE
         const createDescription: string = formElements["create-description-input"]?.value;
         const createVariableName: string = formElements["create-variable-name-input"]?.value;
         const createVariableValue: string = formElements["create-variable-value-input"]?.value;
         const createVariableIsPersistentCheckbox: boolean = formElements["create-persistent-checkbox"]?.checked;
 
+        //ASSIGN
         const assignVariableName: string = formElements["assign-variable-select"]?.value;
         const assignVariableValue: string = formElements["assign-action-variable-value-input"]?.value;
 
@@ -233,6 +236,13 @@ export default function NodeInfoForm() {
 
                     break
                 }
+                case ActionType.ASSIGN: {
+                    newAction.properties = {
+                        "variable" : assignVariableName,
+                        "value": assignVariableValue
+                    }
+                    break
+                }
                 default: break;
             }
 
@@ -270,7 +280,7 @@ export default function NodeInfoForm() {
             }
             setNodes(newNodes)
 
-            console.log(`New action props:`)
+            console.log(`New action ${newAction.name} props:`)
             Object.entries(newAction.properties).map(([key, val]) => console.log(key, '=>', val));
         }
 
