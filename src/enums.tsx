@@ -42,4 +42,16 @@ export enum Duration {
     "HOURS" = "hh",
 }
 
+/**
+ * This enum is used for describing the memory requirements of Invoke actions
+ */
+export enum Memory {
+    "BYTES"="B",
+    "KILOBYTES" = "KB",
+    "MEGABYTES" = "MB",
+    "GIGABYTES" = "GB"
+ }
+
+
+
 
