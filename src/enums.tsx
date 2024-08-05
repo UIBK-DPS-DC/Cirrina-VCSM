@@ -32,4 +32,26 @@ export enum ServiceLevel {
     "GLOBAL" = "Global"
 }
 
+/**
+ * This enum is used for describing the duration of Invoke actions
+ */
+export enum TimeUnit {
+    "MILLISECONDS" = "ms",
+    "SECONDS"= "s",
+    "MINUTES" = "min",
+    "HOURS" = "h",
+}
+
+/**
+ * This enum is used for describing the memory requirements of Invoke actions
+ */
+export enum MemoryUnit {
+    "BYTES"="B",
+    "KILOBYTES" = "KB",
+    "MEGABYTES" = "MB",
+    "GIGABYTES" = "GB"
+ }
+
+
+
 
