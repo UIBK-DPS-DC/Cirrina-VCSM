@@ -32,4 +32,14 @@ export enum ServiceLevel {
     "GLOBAL" = "Global"
 }
 
+/**
+ * This enum is used for describing the duration of Invoke actions
+ */
+export enum Duration {
+    "MILLISECONDS" = "ms",
+    "SECONDS"= "s",
+    "MINUTES" = "min",
+    "HOURS" = "hh",
+}
+
 
