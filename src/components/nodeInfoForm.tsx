@@ -1,7 +1,7 @@
 import React, {useCallback, useContext, useEffect, useState} from "react";
 import { ReactFlowContext } from "./flow.tsx";
 import {CsmNodeProps, isState, isStateMachine, ReactFlowContextProps} from "../types.ts";
-import {ActionCategory, ActionType, ServiceLevel, ServiceType, TimeUnit} from "../enums.tsx";
+import {ActionCategory, ActionType, MemoryUnit, ServiceLevel, ServiceType, TimeUnit} from "../enums.tsx";
 import Action from "../classes/action.tsx";
 
 
@@ -46,7 +46,10 @@ export default function NodeInfoForm() {
     const [newActionName, setNewActionName] = useState<string>("New Action Name")
     const [invokeDescriptionInput, setInvokeDescriptionInput] = useState<string>("")
     const [invokeDurationValueInput, setInvokeDurationValueInput] = useState<string>("")
+    const [invokeMemoryValueInput, setInvokeMemoryValueInput] = useState<string>("")
+    const [invokeCpuUtilizationInput, setInvokeCpuUtilizationInput] = useState<number | string>("")
     const [selectedTimeUnit, setSelectedTimeUnit] = useState<string>("ms")
+    const [selectedMemoryUnit, setSelectedMemoryUnit] = useState<string>("KB")
     const [createDescriptionInput, setCreateDescriptionInput] = useState<string>("")
     const [createVariableNameInput, setCreateVariableInput] = useState<string>("")
     const [createVariableValueInput, setCreateVariableValueInput] = useState<string>("")
@@ -54,7 +57,8 @@ export default function NodeInfoForm() {
     const [selectedContextVariable, setSelectedContextVariable] = useState<string>("");
     const [assignActionValueInput, setAssignActionValueInput] = useState<string>("")
 
-    type OptionEnums = typeof ActionType | typeof ServiceType | typeof ServiceLevel | typeof ActionCategory | typeof TimeUnit
+    type OptionEnums = typeof ActionType | typeof ServiceType | typeof ServiceLevel | typeof ActionCategory
+        | typeof TimeUnit | typeof MemoryUnit
 
 
     /**
@@ -94,6 +98,10 @@ export default function NodeInfoForm() {
     useEffect(() => {
         console.log(`Selected Time Unit changed to ${selectedTimeUnit}`);
     },[selectedTimeUnit]);
+
+    useEffect(() => {
+        console.log(`Selected Memory Unit changed to ${selectedMemoryUnit}`)
+    },[selectedMemoryUnit]);
     // #######################################################################################
 
     /**
@@ -407,6 +415,30 @@ export default function NodeInfoForm() {
         setSelectedTimeUnit(event.target.value)
     }
 
+    const onInvokeMemoryValueInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setInvokeMemoryValueInput(event.target.value);
+    }
+
+    const onSelectedMemoryUnitChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+        setSelectedMemoryUnit(event.target.value)
+    }
+
+    const onInvokeCpuUtilizationInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const value = parseFloat(event.target.value);
+        if (!isNaN(value)) {
+            if(value >= 0 && value <= 1) {
+                setInvokeCpuUtilizationInput(value);
+            }
+            else{
+                console.error(`Cpu utilization needs to be between 0 and 1. Received value: ${value}`)
+                setInvokeCpuUtilizationInput("")
+            }
+
+        } else {
+            setInvokeCpuUtilizationInput("");
+        }
+    }
+
 
     const renderEventsAsOptions = () => {
         return (
@@ -476,13 +508,23 @@ export default function NodeInfoForm() {
                             {renderEnumAsOptions(ServiceLevel)}
                         </select>
                         <div className="invoke-action-additional-properties-container">
+                            <hr/>
                             <h4>Additional Properties (Optional)</h4>
                             <label htmlFor="invoke-duration-value-input">Duration: </label>
                             <input type="text" id="invoke-duration-value-input" name="invoke-duration-value-input" value={invokeDurationValueInput} onChange={onInvokeDurationValueInputChange}/>
                             <select id="invoke-duration-timeunit-select" name="invoke-duration-timeunit-select" value={selectedTimeUnit} onChange={onSelectedTimeUnitChange}>
                                 {renderEnumAsOptions(TimeUnit)}
                             </select>
+                            <br/>
+                            <label htmlFor="invoke-memory-input">Memory: </label>
+                            <input type="text" id="invoke-memory-input-value" name="invoke-memory-input-value" value={invokeMemoryValueInput} onChange={onInvokeMemoryValueInputChange}/>
+                            <select id="invoke-memory-unit-select" name="invoke-memory-unit-select" value={selectedMemoryUnit} onChange={onSelectedMemoryUnitChange}>
+                                {renderEnumAsOptions(MemoryUnit)}
+                            </select>
+                            <label htmlFor="invoke-cpu-utilization-input">CPU Utilization: </label>
+                            <input type="number" id="invoke-cpu-utilization-input" name="invoke-cpu-utilization-input" value={invokeCpuUtilizationInput} onChange={onInvokeCpuUtilizationInputChange}/>
                         </div>
+                        <hr/>
 
                     </div>
                 )

@@ -45,7 +45,7 @@ export enum TimeUnit {
 /**
  * This enum is used for describing the memory requirements of Invoke actions
  */
-export enum Memory {
+export enum MemoryUnit {
     "BYTES"="B",
     "KILOBYTES" = "KB",
     "MEGABYTES" = "MB",
