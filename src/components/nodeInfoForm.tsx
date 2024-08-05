@@ -56,7 +56,7 @@ export default function NodeInfoForm() {
     const [isPersistentCheckbox, setIsPersistentCheckbox] = useState<boolean>(false);
     const [selectedContextVariable, setSelectedContextVariable] = useState<string>("");
     const [assignActionValueInput, setAssignActionValueInput] = useState<string>("")
-
+    const [delayValueInput, setDelayValueInput] = useState<string | number>("")
     type OptionEnums = typeof ActionType | typeof ServiceType | typeof ServiceLevel | typeof ActionCategory
         | typeof TimeUnit | typeof MemoryUnit
 
@@ -462,7 +462,24 @@ export default function NodeInfoForm() {
         setSelectedMemoryUnit(event.target.value)
     }
 
+    const onDelayValueInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        if(!event.target.value){
+            setDelayValueInput("");
+        }
+        const value = parseInt(event.target.value);
+        if (!isNaN(value)) {
+            setDelayValueInput(value);
+
+        } else {
+            console.error("Delay needs to be a number")
+            setInvokeCpuUtilizationInput("");
+        }
+    }
+
     const onInvokeCpuUtilizationInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        if(!event.target.value){
+            setDelayValueInput("");
+        }
         const value = parseFloat(event.target.value);
         if (!isNaN(value)) {
             if(value >= 0 && value <= 1) {
@@ -674,6 +691,12 @@ export default function NodeInfoForm() {
                                         onChange={onCategorySelect} defaultValue={selectedActionCategory}>
                                     {renderEnumAsOptions(ActionCategory)}
                                 </select>
+                            </div>
+                        )}
+                        {selectedActionType && selectedActionCategory === ActionCategory.TIMEOUT &&(
+                            <div className="delay-input-container">
+                                <label htmlFor="delay-input-value">Delay: </label>
+                                <input type="text" id="delay-input-value" name ="delay-input-value" value={delayValueInput} onChange={onDelayValueInputChange}/>
                             </div>
                         )}
                         {selectedActionType && selectedActionType !== "no-new-action" && renderActionProperties()}
