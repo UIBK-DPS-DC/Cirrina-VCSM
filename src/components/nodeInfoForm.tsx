@@ -1,7 +1,7 @@
 import React, {useCallback, useContext, useEffect, useState} from "react";
 import { ReactFlowContext } from "./flow.tsx";
 import {CsmNodeProps, isState, isStateMachine, ReactFlowContextProps} from "../types.ts";
-import {ActionCategory, ActionType, ServiceLevel, ServiceType} from "../enums.tsx";
+import {ActionCategory, ActionType, ServiceLevel, ServiceType, TimeUnit} from "../enums.tsx";
 import Action from "../classes/action.tsx";
 
 
@@ -45,6 +45,8 @@ export default function NodeInfoForm() {
     const [newEventName, setNewEventName] = useState<string>("New Event Name")
     const [newActionName, setNewActionName] = useState<string>("New Action Name")
     const [invokeDescriptionInput, setInvokeDescriptionInput] = useState<string>("")
+    const [invokeDurationValueInput, setInvokeDurationValueInput] = useState<string>("")
+    const [selectedTimeUnit, setSelectedTimeUnit] = useState<string>("ms")
     const [createDescriptionInput, setCreateDescriptionInput] = useState<string>("")
     const [createVariableNameInput, setCreateVariableInput] = useState<string>("")
     const [createVariableValueInput, setCreateVariableValueInput] = useState<string>("")
@@ -52,7 +54,7 @@ export default function NodeInfoForm() {
     const [selectedContextVariable, setSelectedContextVariable] = useState<string>("");
     const [assignActionValueInput, setAssignActionValueInput] = useState<string>("")
 
-    type OptionEnums = typeof ActionType | typeof ServiceType | typeof ServiceLevel | typeof ActionCategory
+    type OptionEnums = typeof ActionType | typeof ServiceType | typeof ServiceLevel | typeof ActionCategory | typeof TimeUnit
 
 
     /**
@@ -88,6 +90,10 @@ export default function NodeInfoForm() {
     useEffect(() => {
         console.log(`Selected Context Variable changed to ${selectedContextVariable}`)
     }, [selectedContextVariable]);
+
+    useEffect(() => {
+        console.log(`Selected Time Unit changed to ${selectedTimeUnit}`);
+    },[selectedTimeUnit]);
     // #######################################################################################
 
     /**
@@ -393,6 +399,14 @@ export default function NodeInfoForm() {
         setAssignActionValueInput(event.target.value);
     }
 
+    const onInvokeDurationValueInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setInvokeDurationValueInput(event.target.value);
+    }
+
+    const onSelectedTimeUnitChange = (event: React.ChangeEvent<HTMLSelectElement>) =>{
+        setSelectedTimeUnit(event.target.value)
+    }
+
 
     const renderEventsAsOptions = () => {
         return (
@@ -461,6 +475,15 @@ export default function NodeInfoForm() {
                                 value={selectedServiceLevel} onChange={onSelectedServiceLevelChange}>
                             {renderEnumAsOptions(ServiceLevel)}
                         </select>
+                        <div className="invoke-action-additional-properties-container">
+                            <h4>Additional Properties (Optional)</h4>
+                            <label htmlFor="invoke-duration-value-input">Duration: </label>
+                            <input type="text" id="invoke-duration-value-input" name="invoke-duration-value-input" value={invokeDurationValueInput} onChange={onInvokeDurationValueInputChange}/>
+                            <select id="invoke-duration-timeunit-select" name="invoke-duration-timeunit-select" value={selectedTimeUnit} onChange={onSelectedTimeUnitChange}>
+                                {renderEnumAsOptions(TimeUnit)}
+                            </select>
+                        </div>
+
                     </div>
                 )
             }

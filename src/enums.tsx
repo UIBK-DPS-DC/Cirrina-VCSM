@@ -35,11 +35,11 @@ export enum ServiceLevel {
 /**
  * This enum is used for describing the duration of Invoke actions
  */
-export enum Duration {
+export enum TimeUnit {
     "MILLISECONDS" = "ms",
     "SECONDS"= "s",
     "MINUTES" = "min",
-    "HOURS" = "hh",
+    "HOURS" = "h",
 }
 
 /**
