@@ -151,29 +151,37 @@ export default function NodeInfoForm() {
         if (!selectedNode) return;
 
         const formElements = event.currentTarget.elements as typeof event.currentTarget.elements & {
+            // GENERIC
             name: HTMLInputElement,
+            "delay-input-value": HTMLInputElement,
+            // SELECT ACTION
             "select-action-type": HTMLSelectElement,
             "select-action-category": HTMLSelectElement,
+            // RAISE EVENT ACTION
             "new-raise-event-input": HTMLInputElement,
             "raise-event-props": HTMLSelectElement,
             "new-action-name": HTMLInputElement,
+            // INVOKE ACTION
             "invoke-description-input": HTMLInputElement,
             "invoke-service-type-select": HTMLSelectElement,
             "invoke-service-level-select": HTMLSelectElement,
-
+            // INVOKE OPTIONALS
             "invoke-duration-value-input": HTMLInputElement,
             "invoke-duration-timeunit-select": HTMLSelectElement
             "invoke-memory-input-value": HTMLInputElement,
             "invoke-memory-unit-select": HTMLSelectElement,
             "invoke-cpu-utilization-input": HTMLInputElement,
-
+            //CREATE ACTION
             "create-description-input": HTMLInputElement,
             "create-variable-name-input": HTMLInputElement,
             "create-variable-value-input": HTMLInputElement,
             "create-persistent-checkbox": HTMLInputElement,
+            //ASSIGN ACTION
             "assign-variable-select": HTMLInputElement,
             "assign-action-variable-value-input": HTMLInputElement,
+            // LOCK ACTION
             "lock-variable-select": HTMLSelectElement,
+            // UNLOCK ACTION
             "unlock-variable-select": HTMLSelectElement
         };
 
@@ -215,16 +223,14 @@ export default function NodeInfoForm() {
         //UNLOCK
         const unlockVariableName: string = formElements["unlock-variable-select"]?.value;
 
-        console.log(invokeActionDuration);
-        console.log(invokeActionTimeUnit);
-        console.log(invokeMemoryUtilization)
-        console.log(invokeMemoryUnit);
-        console.log(invokeCpuUtilization)
 
 
 
 
         const newName = formElements.name.value;
+        const delay = formElements["delay-input-value"]?.value
+        console.log("DELAY ",delay)
+
         const oldName = stateOrStateMachineService.getName(selectedNode.data);
 
         if (!stateOrStateMachineService.isNameUnique(newName) && newName !== oldName) {
@@ -245,6 +251,10 @@ export default function NodeInfoForm() {
             }
 
             newAction = new Action(newActionName, newActionType as ActionType);
+
+            if(delay){
+                newAction.delay = parseInt(delay);
+            }
 
             // TODO: Extend to other types
             switch (newActionType) {
@@ -355,6 +365,9 @@ export default function NodeInfoForm() {
             setNodes(newNodes)
 
             console.log(`New action ${newAction.name} props:`)
+            if(delay){
+                console.log(`New Action Delay: ${newAction.delay}`)
+            }
             Object.entries(newAction.properties).map(([key, val]) => console.log(key, '=>', val));
         }
 
