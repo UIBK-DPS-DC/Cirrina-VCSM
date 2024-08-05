@@ -159,7 +159,14 @@ export default function NodeInfoForm() {
             "new-action-name": HTMLInputElement,
             "invoke-description-input": HTMLInputElement,
             "invoke-service-type-select": HTMLSelectElement,
-            "invoke-service-level-select": HTMLSelectElement
+            "invoke-service-level-select": HTMLSelectElement,
+
+            "invoke-duration-value-input": HTMLInputElement,
+            "invoke-duration-timeunit-select": HTMLSelectElement
+            "invoke-memory-input-value": HTMLInputElement,
+            "invoke-memory-unit-select": HTMLSelectElement,
+            "invoke-cpu-utilization-input": HTMLInputElement,
+
             "create-description-input": HTMLInputElement,
             "create-variable-name-input": HTMLInputElement,
             "create-variable-value-input": HTMLInputElement,
@@ -184,6 +191,14 @@ export default function NodeInfoForm() {
         const invokeServiceType: string = formElements["invoke-service-type-select"]?.value;
         const invokeServiceLevel: string = formElements["invoke-service-level-select"]?.value;
 
+        // INVOKE OPTIONALS
+        const invokeActionDuration = formElements["invoke-duration-value-input"]?.value;
+        const invokeActionTimeUnit = formElements["invoke-duration-timeunit-select"]?.value;
+        const invokeMemoryUtilization = formElements["invoke-memory-input-value"]?.value;
+        const invokeMemoryUnit = formElements["invoke-memory-unit-select"]?.value;
+        const invokeCpuUtilization = formElements["invoke-cpu-utilization-input"]?.value;
+
+
         //CREATE
         const createDescription: string = formElements["create-description-input"]?.value;
         const createVariableName: string = formElements["create-variable-name-input"]?.value;
@@ -200,7 +215,11 @@ export default function NodeInfoForm() {
         //UNLOCK
         const unlockVariableName: string = formElements["unlock-variable-select"]?.value;
 
-        console.log(`Variable to unlock ${unlockVariableName}`);
+        console.log(invokeActionDuration);
+        console.log(invokeActionTimeUnit);
+        console.log(invokeMemoryUtilization)
+        console.log(invokeMemoryUnit);
+        console.log(invokeCpuUtilization)
 
 
 
@@ -240,6 +259,26 @@ export default function NodeInfoForm() {
                         "serviceLevel": invokeServiceLevel
 
                     }
+                    if(invokeActionDuration){
+                        newAction.properties = {...newAction.properties,
+                        "duration": {
+                            "value": invokeActionDuration,
+                            "unit": invokeActionTimeUnit
+                        }};
+                    }
+                    if(invokeMemoryUtilization){
+                        newAction.properties = {...newAction.properties,
+                            "memory":{
+                                "value": invokeMemoryUtilization,
+                                "unit": invokeMemoryUnit
+                            }};
+                    }
+
+                    if(invokeCpuUtilization){
+                        newAction.properties = {...newAction.properties,
+                        "cpu": invokeCpuUtilization}
+                    }
+
                     break;
                 }
                 case ActionType.CREATE: {
