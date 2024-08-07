@@ -12,7 +12,6 @@ export default function TransitionInfoForm() {
             eventService,
             stateOrStateMachineService,
             setEdges,
-            setNodes,
             edges
         } = context;
 
