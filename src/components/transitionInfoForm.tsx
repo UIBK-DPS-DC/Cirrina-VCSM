@@ -1,7 +1,7 @@
 import {ReactFlowContext} from "./flow.tsx";
-import React, {FormEvent, useCallback, useContext, useState} from "react";
-import {isState, ReactFlowContextProps} from "../types.ts";
-
+import React, {useCallback, useContext, useState} from "react";
+import {ReactFlowContextProps} from "../types.ts";
+import State from "../classes/state.ts";
 
 
 export default function TransitionInfoForm() {
@@ -10,7 +10,10 @@ export default function TransitionInfoForm() {
             selectedEdge,
             showSidebar,
             eventService,
-            stateOrStateMachineService
+            stateOrStateMachineService,
+            setEdges,
+            setNodes,
+            edges
         } = context;
 
 
@@ -18,7 +21,6 @@ export default function TransitionInfoForm() {
         const [newEventValueInput, setNewEventValueInput] = useState("");
         const onFormSubmit = useCallback((event: React.FormEvent<HTMLFormElement>) => {
             event.preventDefault()
-            console.log("Entering onForm")
             if(!selectedEdge?.data) return;
 
 
@@ -29,29 +31,59 @@ export default function TransitionInfoForm() {
 
             }
 
-            const selectedEvent =formElements["transition-event-select"]?.value
+            const selectedEvent = formElements["transition-event-select"]?.value
             const newEventName = formElements["new-event-input"]?.value
 
+            const sourceState =
+                stateOrStateMachineService.getStateOrStateMachineByName(selectedEdge.data.transition.getSource())
+            if(!sourceState) {
+                console.error(`Source state ${selectedEdge.data.transition.getSource()} could not be found`);
+                return;
+            }
+
             if(selectedEvent === "new-event") {
-                console.log("NEW EVENT")
                 if(!eventService.isNameUnique(newEventName)) {
                     console.error(`Event ${newEventName} is not unique`);
                     return;
                 }
-                const sourceState =
-                    stateOrStateMachineService.getStateOrStateMachineByName(selectedEdge.data.transition.getSource())
-                console.log(sourceState)
-                if(!sourceState) {
-                    console.error(`Source state ${selectedEdge.data.transition.getSource()} could not be found`);
-                    return;
-                }
+                eventService.registerName(newEventName);
                 // TODO: Transition class needs to be updated.
+                selectedEdge.data.transition.setEvent(newEventName);
 
 
             }
+            else {
+                selectedEdge.data.transition.setEvent(selectedEvent);
+            }
+            if(sourceState instanceof State) {
+                sourceState.on.push(selectedEdge.data.transition);
+                console.log(sourceState);
+                console.log(sourceState.on);
+                setEdges(eds => {
+                    return eds.map((e) => {
+                        if(e.id === selectedEdge.id) {
+                            if(selectedEdge.data) {
+                                e.data = {
+                                    ...e.data,
+                                    transition: selectedEdge.data.transition
+                                };
+                                return e;
+
+                            }
+                            return e;
+
+                        }
+                        return e;
+                    })
+                });
+
+            }
+            else{
+                // TODO: Separate logic for Statemachines?
+            }
 
 
-        },[selectedEdge,selectedEvent,eventService,stateOrStateMachineService])
+        },[selectedEdge,selectedEvent,eventService,stateOrStateMachineService,setEdges,edges])
 
 
         const renderEventsAsOptions = () => {
@@ -82,6 +114,7 @@ export default function TransitionInfoForm() {
                         <h3>Hi dad! Its me {selectedEdge.id}</h3>
                         <h2>I
                             connect {selectedEdge.data.transition.getSource()} to {selectedEdge.data.transition.getTarget()}</h2>
+                        <h4>ON: {selectedEdge.data.transition.getEvent()}</h4>
 
                         <label htmlFor="transition-event-select">On : </label>
                         <select id="transition-event-select" name="transition-event-select" onChange={onSelectedEventChange}

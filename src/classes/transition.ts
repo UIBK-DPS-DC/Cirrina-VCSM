@@ -35,35 +35,35 @@ export default class Transition {
     }
 
 
-    get guards(): string[] {
+    public getGuards(): string[] {
         return this._guards;
     }
 
-    set guards(value: string[]) {
+    public setGuards(value: string[]) {
         this._guards = value;
     }
 
-    get actions(): Action[] {
+    public getActions(): Action[] {
         return this._actions;
     }
 
-    set actions(value: Action[]) {
+    public setActions(value: Action[]) {
         this._actions = value;
     }
 
-    get else(): string[] {
+    public getElse(): string[] {
         return this._else;
     }
 
-    set else(value: string[]) {
+     public setElse(value: string[]) {
         this._else = value;
     }
 
-    get event(): string {
+    public getEvent(): string {
         return this._event;
     }
 
-    set event(value: string) {
+    public setEvent(value: string) {
         this._event = value;
     }
 }
