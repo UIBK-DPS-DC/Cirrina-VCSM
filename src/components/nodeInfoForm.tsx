@@ -1,7 +1,7 @@
 import React, {useCallback, useContext, useEffect, useState} from "react";
 import { ReactFlowContext } from "./flow.tsx";
 import {CsmNodeProps, isState, isStateMachine, ReactFlowContextProps} from "../types.ts";
-import {ActionCategory, ActionType, ServiceLevel, ServiceType} from "../enums.tsx";
+import {ActionCategory, ActionType, MemoryUnit, ServiceLevel, ServiceType, TimeUnit} from "../enums.tsx";
 import Action from "../classes/action.tsx";
 
 
@@ -45,14 +45,20 @@ export default function NodeInfoForm() {
     const [newEventName, setNewEventName] = useState<string>("New Event Name")
     const [newActionName, setNewActionName] = useState<string>("New Action Name")
     const [invokeDescriptionInput, setInvokeDescriptionInput] = useState<string>("")
+    const [invokeDurationValueInput, setInvokeDurationValueInput] = useState<string>("")
+    const [invokeMemoryValueInput, setInvokeMemoryValueInput] = useState<string>("")
+    const [invokeCpuUtilizationInput, setInvokeCpuUtilizationInput] = useState<number | string>("")
+    const [selectedTimeUnit, setSelectedTimeUnit] = useState<string>("ms")
+    const [selectedMemoryUnit, setSelectedMemoryUnit] = useState<string>("KB")
     const [createDescriptionInput, setCreateDescriptionInput] = useState<string>("")
     const [createVariableNameInput, setCreateVariableInput] = useState<string>("")
     const [createVariableValueInput, setCreateVariableValueInput] = useState<string>("")
     const [isPersistentCheckbox, setIsPersistentCheckbox] = useState<boolean>(false);
     const [selectedContextVariable, setSelectedContextVariable] = useState<string>("");
     const [assignActionValueInput, setAssignActionValueInput] = useState<string>("")
-
+    const [delayValueInput, setDelayValueInput] = useState<string | number>("")
     type OptionEnums = typeof ActionType | typeof ServiceType | typeof ServiceLevel | typeof ActionCategory
+        | typeof TimeUnit | typeof MemoryUnit
 
 
     /**
@@ -88,6 +94,14 @@ export default function NodeInfoForm() {
     useEffect(() => {
         console.log(`Selected Context Variable changed to ${selectedContextVariable}`)
     }, [selectedContextVariable]);
+
+    useEffect(() => {
+        console.log(`Selected Time Unit changed to ${selectedTimeUnit}`);
+    },[selectedTimeUnit]);
+
+    useEffect(() => {
+        console.log(`Selected Memory Unit changed to ${selectedMemoryUnit}`)
+    },[selectedMemoryUnit]);
     // #######################################################################################
 
     /**
@@ -137,22 +151,37 @@ export default function NodeInfoForm() {
         if (!selectedNode) return;
 
         const formElements = event.currentTarget.elements as typeof event.currentTarget.elements & {
+            // GENERIC
             name: HTMLInputElement,
+            "delay-input-value": HTMLInputElement,
+            // SELECT ACTION
             "select-action-type": HTMLSelectElement,
             "select-action-category": HTMLSelectElement,
+            // RAISE EVENT ACTION
             "new-raise-event-input": HTMLInputElement,
             "raise-event-props": HTMLSelectElement,
             "new-action-name": HTMLInputElement,
+            // INVOKE ACTION
             "invoke-description-input": HTMLInputElement,
             "invoke-service-type-select": HTMLSelectElement,
-            "invoke-service-level-select": HTMLSelectElement
+            "invoke-service-level-select": HTMLSelectElement,
+            // INVOKE OPTIONALS
+            "invoke-duration-value-input": HTMLInputElement,
+            "invoke-duration-timeunit-select": HTMLSelectElement
+            "invoke-memory-input-value": HTMLInputElement,
+            "invoke-memory-unit-select": HTMLSelectElement,
+            "invoke-cpu-utilization-input": HTMLInputElement,
+            //CREATE ACTION
             "create-description-input": HTMLInputElement,
             "create-variable-name-input": HTMLInputElement,
             "create-variable-value-input": HTMLInputElement,
             "create-persistent-checkbox": HTMLInputElement,
+            //ASSIGN ACTION
             "assign-variable-select": HTMLInputElement,
             "assign-action-variable-value-input": HTMLInputElement,
+            // LOCK ACTION
             "lock-variable-select": HTMLSelectElement,
+            // UNLOCK ACTION
             "unlock-variable-select": HTMLSelectElement
         };
 
@@ -170,6 +199,14 @@ export default function NodeInfoForm() {
         const invokeServiceType: string = formElements["invoke-service-type-select"]?.value;
         const invokeServiceLevel: string = formElements["invoke-service-level-select"]?.value;
 
+        // INVOKE OPTIONALS
+        const invokeActionDuration = formElements["invoke-duration-value-input"]?.value;
+        const invokeActionTimeUnit = formElements["invoke-duration-timeunit-select"]?.value;
+        const invokeMemoryUtilization = formElements["invoke-memory-input-value"]?.value;
+        const invokeMemoryUnit = formElements["invoke-memory-unit-select"]?.value;
+        const invokeCpuUtilization = formElements["invoke-cpu-utilization-input"]?.value;
+
+
         //CREATE
         const createDescription: string = formElements["create-description-input"]?.value;
         const createVariableName: string = formElements["create-variable-name-input"]?.value;
@@ -186,12 +223,14 @@ export default function NodeInfoForm() {
         //UNLOCK
         const unlockVariableName: string = formElements["unlock-variable-select"]?.value;
 
-        console.log(`Variable to unlock ${unlockVariableName}`);
 
 
 
 
         const newName = formElements.name.value;
+        const delay = formElements["delay-input-value"]?.value
+        console.log("DELAY ",delay)
+
         const oldName = stateOrStateMachineService.getName(selectedNode.data);
 
         if (!stateOrStateMachineService.isNameUnique(newName) && newName !== oldName) {
@@ -213,6 +252,10 @@ export default function NodeInfoForm() {
 
             newAction = new Action(newActionName, newActionType as ActionType);
 
+            if(delay){
+                newAction.delay = parseInt(delay);
+            }
+
             // TODO: Extend to other types
             switch (newActionType) {
                 case ActionType.RAISE_EVENT: {
@@ -226,6 +269,26 @@ export default function NodeInfoForm() {
                         "serviceLevel": invokeServiceLevel
 
                     }
+                    if(invokeActionDuration){
+                        newAction.properties = {...newAction.properties,
+                        "duration": {
+                            "value": invokeActionDuration,
+                            "unit": invokeActionTimeUnit
+                        }};
+                    }
+                    if(invokeMemoryUtilization){
+                        newAction.properties = {...newAction.properties,
+                            "memory":{
+                                "value": invokeMemoryUtilization,
+                                "unit": invokeMemoryUnit
+                            }};
+                    }
+
+                    if(invokeCpuUtilization){
+                        newAction.properties = {...newAction.properties,
+                        "cpu": invokeCpuUtilization}
+                    }
+
                     break;
                 }
                 case ActionType.CREATE: {
@@ -302,6 +365,9 @@ export default function NodeInfoForm() {
             setNodes(newNodes)
 
             console.log(`New action ${newAction.name} props:`)
+            if(delay){
+                console.log(`New Action Delay: ${newAction.delay}`)
+            }
             Object.entries(newAction.properties).map(([key, val]) => console.log(key, '=>', val));
         }
 
@@ -393,6 +459,55 @@ export default function NodeInfoForm() {
         setAssignActionValueInput(event.target.value);
     }
 
+    const onInvokeDurationValueInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setInvokeDurationValueInput(event.target.value);
+    }
+
+    const onSelectedTimeUnitChange = (event: React.ChangeEvent<HTMLSelectElement>) =>{
+        setSelectedTimeUnit(event.target.value)
+    }
+
+    const onInvokeMemoryValueInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setInvokeMemoryValueInput(event.target.value);
+    }
+
+    const onSelectedMemoryUnitChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+        setSelectedMemoryUnit(event.target.value)
+    }
+
+    const onDelayValueInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        if(!event.target.value){
+            setDelayValueInput("");
+        }
+        const value = parseInt(event.target.value);
+        if (!isNaN(value)) {
+            setDelayValueInput(value);
+
+        } else {
+            console.error("Delay needs to be a number")
+            setInvokeCpuUtilizationInput("");
+        }
+    }
+
+    const onInvokeCpuUtilizationInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        if(!event.target.value){
+            setDelayValueInput("");
+        }
+        const value = parseFloat(event.target.value);
+        if (!isNaN(value)) {
+            if(value >= 0 && value <= 1) {
+                setInvokeCpuUtilizationInput(value);
+            }
+            else{
+                console.error(`Cpu utilization needs to be between 0 and 1. Received value: ${value}`)
+                setInvokeCpuUtilizationInput("")
+            }
+
+        } else {
+            setInvokeCpuUtilizationInput("");
+        }
+    }
+
 
      const renderEventsAsOptions = () => {
         return (
@@ -461,6 +576,25 @@ export default function NodeInfoForm() {
                                 value={selectedServiceLevel} onChange={onSelectedServiceLevelChange}>
                             {renderEnumAsOptions(ServiceLevel)}
                         </select>
+                        <div className="invoke-action-additional-properties-container">
+                            <hr/>
+                            <h4>Additional Properties (Optional)</h4>
+                            <label htmlFor="invoke-duration-value-input">Duration: </label>
+                            <input type="text" id="invoke-duration-value-input" name="invoke-duration-value-input" value={invokeDurationValueInput} onChange={onInvokeDurationValueInputChange}/>
+                            <select id="invoke-duration-timeunit-select" name="invoke-duration-timeunit-select" value={selectedTimeUnit} onChange={onSelectedTimeUnitChange}>
+                                {renderEnumAsOptions(TimeUnit)}
+                            </select>
+                            <br/>
+                            <label htmlFor="invoke-memory-input">Memory: </label>
+                            <input type="text" id="invoke-memory-input-value" name="invoke-memory-input-value" value={invokeMemoryValueInput} onChange={onInvokeMemoryValueInputChange}/>
+                            <select id="invoke-memory-unit-select" name="invoke-memory-unit-select" value={selectedMemoryUnit} onChange={onSelectedMemoryUnitChange}>
+                                {renderEnumAsOptions(MemoryUnit)}
+                            </select>
+                            <label htmlFor="invoke-cpu-utilization-input">CPU Utilization: </label>
+                            <input type="number" id="invoke-cpu-utilization-input" name="invoke-cpu-utilization-input" value={invokeCpuUtilizationInput} onChange={onInvokeCpuUtilizationInputChange}/>
+                        </div>
+                        <hr/>
+
                     </div>
                 )
             }
@@ -570,6 +704,12 @@ export default function NodeInfoForm() {
                                         onChange={onCategorySelect} defaultValue={selectedActionCategory}>
                                     {renderEnumAsOptions(ActionCategory)}
                                 </select>
+                            </div>
+                        )}
+                        {selectedActionType && selectedActionCategory === ActionCategory.TIMEOUT &&(
+                            <div className="delay-input-container">
+                                <label htmlFor="delay-input-value">Delay: </label>
+                                <input type="text" id="delay-input-value" name ="delay-input-value" value={delayValueInput} onChange={onDelayValueInputChange}/>
                             </div>
                         )}
                         {selectedActionType && selectedActionType !== "no-new-action" && renderActionProperties()}
