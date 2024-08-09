@@ -215,6 +215,7 @@ export default class StateOrStateMachineService {
      * @param {CsmNodeProps} data - The data object containing the state or state machine information.
      */
     public linkNode(nodeId: string, data: CsmNodeProps) {
+        console.log("Entering link node")
         if(isState(data)) {
             this.nodeIdToStateOrStatemachineMap.set(nodeId, data.state);
             console.log(`Linked ${nodeId} to ${data.state.name}`)
@@ -263,6 +264,22 @@ export default class StateOrStateMachineService {
             return stateOrStateMachine;
         }
         return stateOrStateMachine
+    }
+
+    /**
+     * Gets the state or state machine by name.
+     *
+     * @param name - The name of the state or state machine to find.
+     * @returns The state or state machine if found, otherwise undefined.
+     */
+    public getStateOrStateMachineByName(name: string): StateOrStateMachine | undefined {
+        for (const stateOrStateMachine of this.nodeIdToStateOrStatemachineMap.values()) {
+            if (stateOrStateMachine.name === name) {
+                return stateOrStateMachine;
+            }
+        }
+        console.log(`Statemachine ${name} not found!`);
+        return undefined;
     }
 
 

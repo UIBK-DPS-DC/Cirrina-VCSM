@@ -1,6 +1,7 @@
 import StateOrStateMachine from "./stateOrStateMachine.ts"
 import Action from "./action.tsx";
-import {Context, Transitionn} from "../types.ts";
+import {Context} from "../types.ts";
+import Transition from "./transition.ts";
 
 export default class State implements StateOrStateMachine {
 
@@ -13,8 +14,8 @@ export default class State implements StateOrStateMachine {
     private _exit: Action[] = [];
     private _while: Action[]  = [];
     private _after: Action[] = [];
-    private _on: Transitionn[] = [];
-    private _always: Transitionn[] = [];
+    private _on: Transition[] = [];
+    private _always: Transition[] = [];
     private _localContext: Context[] = [];
     private _persistentContext: Context[] = [];
     private _staticContext: Context[] = [];
@@ -95,19 +96,19 @@ export default class State implements StateOrStateMachine {
         this._after = value;
     }
 
-    get on(): Transitionn[] {
+    get on(): Transition[] {
         return this._on;
     }
 
-    set on(value: Transitionn[]) {
+    set on(value: Transition[]) {
         this._on = value;
     }
 
-    get always(): Transitionn[] {
+    get always(): Transition[] {
         return this._always;
     }
 
-    set always(value: Transitionn[]) {
+    set always(value: Transition[]) {
         this._always = value;
     }
 
