@@ -18,6 +18,36 @@ export default function TransitionInfoForm() {
 
         const [selectedEvent, setSelectedEvent] = useState<string>("new-event")
         const [newEventValueInput, setNewEventValueInput] = useState("");
+        const [selectedGuardCategory, setSelectedGuardCategory] = useState("new-guard")
+
+
+
+        const renderEventsAsOptions = () => {
+            return (
+                eventService.getAllEvents().map((event: string) => {
+                    return(
+                        <option key={event} value={event}>{event}</option>
+                    )
+                })
+            )
+        }
+
+        const onSelectedEventChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+            setSelectedEvent(event.target.value);
+        }
+
+        const onNewEventInputValueChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+            setNewEventValueInput(event.target.value);
+        }
+
+        const onSelectedGuardCategoryChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+            setSelectedGuardCategory(event.target.value)
+        }
+
+
+
+
+
         const onFormSubmit = useCallback((event: React.FormEvent<HTMLFormElement>) => {
             event.preventDefault()
             if(!selectedEdge?.data) return;
@@ -25,9 +55,11 @@ export default function TransitionInfoForm() {
 
 
             const formElements = event.currentTarget.elements as typeof event.currentTarget.elements & {
+                //EVENT
                 "transition-event-select": HTMLSelectElement,
                 "new-event-input": HTMLInputElement,
 
+                //GUARDS
             }
 
             const selectedEvent = formElements["transition-event-select"]?.value
@@ -54,6 +86,8 @@ export default function TransitionInfoForm() {
             else {
                 selectedEdge.data.transition.setEvent(selectedEvent);
             }
+            // ADD LOGIC FOR GUARDS HERE
+
             if(sourceState instanceof State) {
                 sourceState.on.push(selectedEdge.data.transition);
                 console.log(sourceState);
@@ -85,23 +119,7 @@ export default function TransitionInfoForm() {
         },[selectedEdge,selectedEvent,eventService,stateOrStateMachineService,setEdges,edges])
 
 
-        const renderEventsAsOptions = () => {
-            return (
-                eventService.getAllEvents().map((event: string) => {
-                    return(
-                        <option key={event} value={event}>{event}</option>
-                    )
-                })
-            )
-        }
 
-        const onSelectedEventChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-            setSelectedEvent(event.target.value);
-        }
-
-        const onNewEventInputValueChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-            setNewEventValueInput(event.target.value);
-        }
 
 
 
@@ -128,6 +146,18 @@ export default function TransitionInfoForm() {
                             </div>
                         )}
                         <br/>
+                        <hr/>
+                        <h3>Optional</h3>
+                        <div className="transition-guard-container">
+                            <select id="transition-guard-category-select" name="transition-guard-category-select" value={selectedGuardCategory} onChange={onSelectedGuardCategoryChange}>
+                                <option key="new-guard" value="new-guard">New Guard</option>
+                                <option key="existing-guard" value="existing-guard">Use Existing Guard</option>
+                            </select>
+                            <br/>
+                            <label htmlFor="transition-guard-input">Guard: </label>
+                            <input type="text" name="transition-guard-input" id="transition-guard-input"/>
+                        </div>
+                        <hr/>
                         <button type="submit">Save Changes</button>
                     </form>
                 </div>
