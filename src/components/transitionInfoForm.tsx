@@ -18,7 +18,7 @@ export default function TransitionInfoForm() {
 
         const [selectedEvent, setSelectedEvent] = useState<string>("new-event")
         const [newEventValueInput, setNewEventValueInput] = useState("");
-        const [selectedGuardCategory, setSelectedGuardCategory] = useState("new-guard")
+        const [selectedGuardCategory, setSelectedGuardCategory] = useState("no-guard")
 
 
 
@@ -149,13 +149,19 @@ export default function TransitionInfoForm() {
                         <hr/>
                         <h3>Optional</h3>
                         <div className="transition-guard-container">
+                            <label htmlFor="transition-guard-category-select">Add Guard </label>
                             <select id="transition-guard-category-select" name="transition-guard-category-select" value={selectedGuardCategory} onChange={onSelectedGuardCategoryChange}>
+                                <option key="no-guard" value="no-guard">No</option>
                                 <option key="new-guard" value="new-guard">New Guard</option>
                                 <option key="existing-guard" value="existing-guard">Use Existing Guard</option>
                             </select>
                             <br/>
-                            <label htmlFor="transition-guard-input">Guard: </label>
-                            <input type="text" name="transition-guard-input" id="transition-guard-input"/>
+                            {selectedGuardCategory === "new-guard" && (
+                                <div className="transition-guard-container">
+                                    <label htmlFor="transition-guard-input">Guard: </label>
+                                    <input type="text" name="transition-guard-input" id="transition-guard-input"/>
+                                </div>
+                            )}
                         </div>
                         <hr/>
                         <button type="submit">Save Changes</button>
