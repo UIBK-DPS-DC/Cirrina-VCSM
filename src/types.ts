@@ -8,6 +8,7 @@ import Action from "./classes/action.tsx";
 import ActionService from "./services/actionService.tsx";
 import EventService from "./services/eventService.tsx";
 import ContextService from "./services/contextService.tsx";
+import GuardService from "./services/guardService.tsx";
 
 // One Type to avoid repeating ourselves. Can be expanded/unionized as needed.
 export type CsmNodeProps = {state: State} | {stateMachine: StateMachine} | {name: string};
@@ -63,7 +64,8 @@ export type ReactFlowContextProps = {
     stateOrStateMachineService: StateOrStateMachineService;
     actionService: ActionService;
     eventService: EventService;
-    contextService: ContextService
+    contextService: ContextService;
+    guardService: GuardService;
 }
 
 

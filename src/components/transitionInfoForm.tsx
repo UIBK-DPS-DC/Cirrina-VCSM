@@ -12,14 +12,16 @@ export default function TransitionInfoForm() {
             eventService,
             stateOrStateMachineService,
             setEdges,
-            edges
+            edges,
+            guardService
         } = context;
 
 
         const [selectedEvent, setSelectedEvent] = useState<string>("new-event")
         const [newEventValueInput, setNewEventValueInput] = useState("");
         const [selectedGuardCategory, setSelectedGuardCategory] = useState("no-guard")
-
+        const [transitionGuardInputValue, setTransitionGuardInputValue] = useState<string>("")
+        const [guardSelectionValue, setGuardSelectionValue] = useState<string>("")
 
 
         const renderEventsAsOptions = () => {
@@ -34,7 +36,9 @@ export default function TransitionInfoForm() {
 
         const renderGuardsAsOptions = () => {
             return(
-                <h1>Hi dad</h1>
+                guardService.getAllGuardNames().map((guardName: string) => {
+                    return <option key={guardName} value={guardName}>{guardName + `: ${guardService.getGuardExpression(guardName)}`}</option>
+                })
             )
         }
 
@@ -49,6 +53,15 @@ export default function TransitionInfoForm() {
         const onSelectedGuardCategoryChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
             setSelectedGuardCategory(event.target.value)
         }
+
+        const onTransitionGuardInputValueChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+            setTransitionGuardInputValue(event.target.value);
+        }
+
+        const onGuardSelectionValueChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+            setGuardSelectionValue(event.target.value);
+        }
+
 
 
 
@@ -65,11 +78,29 @@ export default function TransitionInfoForm() {
                 "transition-event-select": HTMLSelectElement,
                 "new-event-input": HTMLInputElement,
 
+
                 //GUARDS
+                "transition-guard-category-select": HTMLSelectElement,
+                "transition-guard-input": HTMLInputElement,
+                "existing-guard-selection": HTMLSelectElement
+
+
             }
 
             const selectedEvent = formElements["transition-event-select"]?.value
             const newEventName = formElements["new-event-input"]?.value
+
+            const guardCategory = formElements["transition-guard-category-select"]?.value
+            const guardExpression = formElements["transition-guard-input"]?.value
+            const existingGuard = formElements["existing-guard-selection"]?.value
+
+
+
+
+            console.log(`Received Guard Category ${guardCategory}`)
+            console.log(guardExpression)
+            console.log(existingGuard)
+
 
             const sourceState =
                 stateOrStateMachineService.getStateOrStateMachineByName(selectedEdge.data.transition.getSource())
@@ -79,6 +110,10 @@ export default function TransitionInfoForm() {
             }
 
             if(selectedEvent === "new-event") {
+                if(! newEventName) {
+                    console.error("New Event Name is missing");
+                    return;
+                }
                 if(!eventService.isNameUnique(newEventName)) {
                     console.error(`Event ${newEventName} is not unique`);
                     return;
@@ -93,6 +128,7 @@ export default function TransitionInfoForm() {
                 selectedEdge.data.transition.setEvent(selectedEvent);
             }
             // ADD LOGIC FOR GUARDS HERE
+
 
             if(sourceState instanceof State) {
                 sourceState.on.push(selectedEdge.data.transition);
@@ -165,16 +201,18 @@ export default function TransitionInfoForm() {
                             {selectedGuardCategory === "new-guard" && (
                                 <div className="transition-guard-input-container">
                                     <label htmlFor="transition-guard-input">Guard: </label>
-                                    <input type="text" name="transition-guard-input" id="transition-guard-input"/>
+                                    <input type="text" name="transition-guard-input" id="transition-guard-input" value={transitionGuardInputValue} onChange={onTransitionGuardInputValueChange}/>
                                 </div>
                             )}
-                            {selectedGuardCategory === "existing-guard" && (
+                            {selectedGuardCategory === "existing-guard" && guardService.getAllGuardNames().length > 0 && (
                                 <div className="existing-guard-select-container">
-                                    <select id="existing-guard-selection" name="existing-guard-selection" >
-
+                                    <select id="existing-guard-selection" name="existing-guard-selection" value={guardSelectionValue} onChange={onGuardSelectionValueChange} >
+                                        {renderGuardsAsOptions()}
                                     </select>
                                 </div>
 
+                            ) || selectedGuardCategory === "existing-guard" && (
+                                <h4>No existing guards found</h4>
                             )
 
                             }
