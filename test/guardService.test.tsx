@@ -54,9 +54,8 @@ describe('GuardService', () => {
         guardService.linkNameToGuard('guardToUpdate', 'initialExpression');
         guardService.linkNameToGuard('guardToUpdate', 'updatedExpression');
 
-        // We can't directly inspect _nameToExpressionMap, so this test assumes further tests or inspections would be done
-        // in a real application to verify that the update occurred correctly.
         expect(guardService.isNameUnique('guardToUpdate')).toBe(false);
+        expect(guardService.getGuardExpression("guardToUpdate")).toEqual("updatedExpression")
     });
 
     test('getAllGuardNames should return an empty array if no guards are registered', () => {
