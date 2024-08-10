@@ -32,6 +32,12 @@ export default function TransitionInfoForm() {
             )
         }
 
+        const renderGuardsAsOptions = () => {
+            return(
+                <h1>Hi dad</h1>
+            )
+        }
+
         const onSelectedEventChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
             setSelectedEvent(event.target.value);
         }
@@ -157,11 +163,21 @@ export default function TransitionInfoForm() {
                             </select>
                             <br/>
                             {selectedGuardCategory === "new-guard" && (
-                                <div className="transition-guard-container">
+                                <div className="transition-guard-input-container">
                                     <label htmlFor="transition-guard-input">Guard: </label>
                                     <input type="text" name="transition-guard-input" id="transition-guard-input"/>
                                 </div>
                             )}
+                            {selectedGuardCategory === "existing-guard" && (
+                                <div className="existing-guard-select-container">
+                                    <select id="existing-guard-selection" name="existing-guard-selection" >
+
+                                    </select>
+                                </div>
+
+                            )
+
+                            }
                         </div>
                         <hr/>
                         <button type="submit">Save Changes</button>

@@ -58,4 +58,32 @@ describe('GuardService', () => {
         // in a real application to verify that the update occurred correctly.
         expect(guardService.isNameUnique('guardToUpdate')).toBe(false);
     });
+
+    test('getAllGuardNames should return an empty array if no guards are registered', () => {
+        const guardNames = guardService.getAllGuardNames();
+        expect(guardNames).toEqual([]); // Expecting an empty array
+    });
+
+    test('getAllGuardNames should return an array of all registered guard names', () => {
+        guardService.registerGuard('guard1', 'expression1');
+        guardService.registerGuard('guard2', 'expression2');
+
+        const guardNames = guardService.getAllGuardNames();
+        expect(guardNames).toContain('guard1');
+        expect(guardNames).toContain('guard2');
+        expect(guardNames.length).toBe(2); // Expecting exactly 2 guards
+    });
+
+    // Tests for getGuardExpression method
+    test('getGuardExpression should return the correct expression for a registered guard', () => {
+        guardService.registerGuard('guard1', 'expression1');
+
+        const expression = guardService.getGuardExpression('guard1');
+        expect(expression).toBe('expression1');
+    });
+
+    test('getGuardExpression should return undefined for a non-existent guard name', () => {
+        const expression = guardService.getGuardExpression('nonExistentGuard');
+        expect(expression).toBeUndefined();
+    });
 });

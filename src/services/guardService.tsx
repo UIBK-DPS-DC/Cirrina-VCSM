@@ -78,4 +78,34 @@ export default class GuardService {
     public linkNameToGuard(guardName: string, expression: string): void {
         this._nameToExpressionMap.set(guardName, expression);
     }
+
+     /**
+      * Retrieves the names of all registered guards.
+      *
+      * This method returns an array containing the names of all guards
+      * currently stored in the `_nameToExpressionMap`. The names are extracted
+      * using the `Object.keys` method, which returns an array of the map's keys.
+      *
+      * @returns {string[]} - An array of strings, each representing a guard name.
+      */
+     public getAllGuardNames(): string[] {
+         return Array.from(this._nameToExpressionMap.keys());
+     }
+
+     /**
+      * Retrieves the expression associated with a given guard name.
+      *
+      * This method looks up the provided `guardName` in the `_nameToExpressionMap`
+      * and returns the corresponding expression. If the guard name is not found,
+      * it will return `undefined`.
+      *
+      * @param {string} guardName - The name of the guard whose expression is to be retrieved.
+      * @returns {any} - The expression associated with the guard name, or `undefined` if the name is not found.
+      */
+     public getGuardExpression(guardName: string): any {
+         return this._nameToExpressionMap.get(guardName);
+     }
+
+
+
 }
