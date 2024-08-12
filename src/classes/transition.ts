@@ -75,7 +75,17 @@ export default class Transition {
         return this.ID;
     }
 
-
+    /**
+     * Adds a guard to the transition.
+     *
+     * This method adds the provided `guard` string to the `_guards` array,
+     * which represents the set of guards associated with this transition.
+     * Before adding, it checks if the guard already exists in the array to
+     * avoid duplicates. If the guard already exists, a warning is logged
+     * and the guard is not added again.
+     *
+     * @param {string} guard - The guard to be added to the transition.
+     */
     public addGuard(guard: string): void {
         if(this._guards.includes(guard)){
             console.warn(`Guard ${guard} already exists on Transition ${this.source} => ${this.target}!`)
