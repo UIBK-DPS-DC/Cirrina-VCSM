@@ -95,7 +95,11 @@ export default function TransitionInfoForm() {
                 //GUARDS
                 "transition-guard-category-select": HTMLSelectElement,
                 "transition-guard-input": HTMLInputElement,
-                "existing-guard-selection": HTMLSelectElement
+                "existing-guard-selection": HTMLSelectElement,
+                "save-named-guard-checkbox" :HTMLInputElement,
+                "new-named-guard-name-input": HTMLInputElement,
+
+
 
 
             }
@@ -106,6 +110,9 @@ export default function TransitionInfoForm() {
             const guardCategory = formElements["transition-guard-category-select"]?.value
             const guardExpression = formElements["transition-guard-input"]?.value
             const existingGuard = formElements["existing-guard-selection"]?.value
+            const saveAsNamedGuard  = formElements["save-named-guard-checkbox"]?.checked
+            const newNamedGuardName = formElements["new-named-guard-name-input"]?.value
+
 
 
 
@@ -113,6 +120,9 @@ export default function TransitionInfoForm() {
             console.log(`Received Guard Category ${guardCategory}`)
             console.log(guardExpression)
             console.log(existingGuard)
+            console.log(saveAsNamedGuard)
+            console.log(newNamedGuardName)
+
 
 
             const sourceState =
