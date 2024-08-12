@@ -66,4 +66,13 @@ export default class Transition {
     public setEvent(value: string) {
         this._event = value;
     }
+
+    public addGuard(guard: string): void {
+        if(this._guards.includes(guard)){
+            console.warn(`Guard ${guard} already exists on Transition ${this.source} => ${this.target}!`)
+            return;
+        }
+        this._guards.push(guard);
+    }
+
 }

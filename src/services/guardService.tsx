@@ -44,7 +44,7 @@ export default class GuardService {
             console.error("Guard name already exists!");
             return false;
         }
-        this._nameToExpressionMap.set(guardName, expression);
+        this.linkNameToGuard(guardName, expression);
         console.log(`${guardName} has been registered and linked to ${expression}!`);
         return true;
     }

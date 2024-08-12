@@ -150,10 +150,27 @@ export default function TransitionInfoForm() {
             else {
                 selectedEdge.data.transition.setEvent(selectedEvent);
             }
-            // TODO: ADD LOGIC FOR GUARDS HERE
+
+            if(guardCategory !== "no-guard"){
+                if(guardCategory === "existing-guard") {
+                    selectedEdge.data.transition.addGuard(existingGuard);
+                }
+                else {
+                    // TODO: VALIDATE EXPRESSION HERE
+                    if(saveAsNamedGuard) {
+                        guardService.registerGuard(newNamedGuardName,guardExpression);
+                        selectedEdge.data.transition.addGuard(newNamedGuardName);
+                    }
+                    else{
+                        selectedEdge.data.transition.addGuard(guardExpression);
+                    }
+
+                }
+            }
 
 
             if(sourceState instanceof State) {
+                // TODO: If source state already has a transition with same source,target and event simply update that transition
                 sourceState.on.push(selectedEdge.data.transition);
                 console.log(sourceState);
                 console.log(sourceState.on);
@@ -179,6 +196,8 @@ export default function TransitionInfoForm() {
             else{
                 // TODO: Separate logic for Statemachines?
             }
+
+            console.log(selectedEdge.data.transition.getGuards());
 
 
         },[selectedEdge,selectedEvent,eventService,stateOrStateMachineService,setEdges,edges])
