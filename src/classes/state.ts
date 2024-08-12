@@ -153,6 +153,16 @@ export default class State implements StateOrStateMachine {
             .concat(this._while || [], this._after || [], this._exit || []);
     }
 
+    /**
+     * Adds a new transition to the state's "on" transitions if it doesn't already exist.
+     *
+     * This method checks if the provided `newTransition` already exists in the state's `_on` array
+     * (which represents the transitions that can occur from this state). The check is based on the transition's ID.
+     * If the transition does not already exist, it is added to the `_on` array, and a message is logged to the console.
+     * Only ever add Transitions to States using this function.
+     *
+     * @param {Transition} newTransition - The transition to be added to the state's "on" transitions.
+     */
     public addOnTransition(newTransition: Transition): void {
         let found = false;
         this._on.forEach((transition: Transition) => {
