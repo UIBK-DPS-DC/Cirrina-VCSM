@@ -1,5 +1,5 @@
 import {ReactFlowContext} from "./flow.tsx";
-import React, {useCallback, useContext, useState} from "react";
+import React, {useCallback, useContext, useEffect, useState} from "react";
 import {ReactFlowContextProps} from "../types.ts";
 import State from "../classes/state.ts";
 
@@ -22,7 +22,12 @@ export default function TransitionInfoForm() {
         const [selectedGuardCategory, setSelectedGuardCategory] = useState("no-guard")
         const [transitionGuardInputValue, setTransitionGuardInputValue] = useState<string>("")
         const [guardSelectionValue, setGuardSelectionValue] = useState<string>("")
+        const [saveAsNamedGuardCheckbox, setSaveAsNamedGuardCheckbox] = useState<boolean>(false);
+        const [newNamedGuardInput, setNewNamedGuardInput] = useState<string>("")
 
+        useEffect(() => {
+            console.log(`Save as named guard checkbox checked: ${saveAsNamedGuardCheckbox}`)
+        }, [saveAsNamedGuardCheckbox]);
 
         const renderEventsAsOptions = () => {
             return (
@@ -60,6 +65,14 @@ export default function TransitionInfoForm() {
 
         const onGuardSelectionValueChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
             setGuardSelectionValue(event.target.value);
+        }
+
+        const onSaveAsNamedGuardCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+            setSaveAsNamedGuardCheckbox(event.target.checked);
+        }
+
+        const onNewNamedGuardInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+            setNewNamedGuardInput(event.target.value);
         }
 
 
@@ -127,7 +140,7 @@ export default function TransitionInfoForm() {
             else {
                 selectedEdge.data.transition.setEvent(selectedEvent);
             }
-            // ADD LOGIC FOR GUARDS HERE
+            // TODO: ADD LOGIC FOR GUARDS HERE
 
 
             if(sourceState instanceof State) {
@@ -202,6 +215,16 @@ export default function TransitionInfoForm() {
                                 <div className="transition-guard-input-container">
                                     <label htmlFor="transition-guard-input">Guard: </label>
                                     <input type="text" name="transition-guard-input" id="transition-guard-input" value={transitionGuardInputValue} onChange={onTransitionGuardInputValueChange}/>
+                                    <br/>
+                                    <label htmlFor="save-named-guard-checkbox">Save as named Guard?  </label>
+                                    <input type="checkbox" name ="save-named-guard-checkbox" id="save-named-guard-checkbox" checked={saveAsNamedGuardCheckbox} onChange={onSaveAsNamedGuardCheckboxChange}/>
+                                    {saveAsNamedGuardCheckbox && (
+                                        <div className="new-named-guard-input-container">
+                                            <label htmlFor="new-named-guard-name-input">Guard Name: </label>
+                                            <input type="text" id="new-named-guard-name-input" name="new-named-guard-name-input"/>
+                                        </div>
+
+                                    )}
                                 </div>
                             )}
                             {selectedGuardCategory === "existing-guard" && guardService.getAllGuardNames().length > 0 && (
