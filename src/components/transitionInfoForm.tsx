@@ -221,9 +221,8 @@ export default function TransitionInfoForm() {
                                     {saveAsNamedGuardCheckbox && (
                                         <div className="new-named-guard-input-container">
                                             <label htmlFor="new-named-guard-name-input">Guard Name: </label>
-                                            <input type="text" id="new-named-guard-name-input" name="new-named-guard-name-input"/>
+                                            <input type="text" id="new-named-guard-name-input" name="new-named-guard-name-input" value={newNamedGuardInput} onChange={onNewNamedGuardInputChange}/>
                                         </div>
-
                                     )}
                                 </div>
                             )}
