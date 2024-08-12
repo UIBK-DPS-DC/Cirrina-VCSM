@@ -153,6 +153,21 @@ export default class State implements StateOrStateMachine {
             .concat(this._while || [], this._after || [], this._exit || []);
     }
 
+    public addOnTransition(newTransition: Transition): void {
+        let found = false;
+        this._on.forEach((transition: Transition) => {
+            if(newTransition.getId() === transition.getId()) {
+                found = true;
+                return;
+            }
+        })
+        if(!found){
+            console.log(`Added Transition ${newTransition.getId()} to State ${this.name}`)
+            this.on.push(newTransition);
+        }
+
+    }
+
 
 
 

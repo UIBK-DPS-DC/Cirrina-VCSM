@@ -1,6 +1,9 @@
 import Action from "./action.tsx";
 
 export default class Transition {
+    private static _TRANSITION_ID_COUNT = 0;
+
+    private readonly ID: number
     private source : string
     private target : string
     private _guards : string[]
@@ -15,6 +18,7 @@ export default class Transition {
         this._actions = []
         this._else = []
         this._event = ""
+        this.ID = this.getNewId()
     }
 
 
@@ -67,12 +71,21 @@ export default class Transition {
         this._event = value;
     }
 
+    public getId() {
+        return this.ID;
+    }
+
+
     public addGuard(guard: string): void {
         if(this._guards.includes(guard)){
             console.warn(`Guard ${guard} already exists on Transition ${this.source} => ${this.target}!`)
             return;
         }
         this._guards.push(guard);
+    }
+
+    private getNewId(){
+        return Transition._TRANSITION_ID_COUNT++;
     }
 
 }

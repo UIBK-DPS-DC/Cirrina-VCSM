@@ -170,8 +170,7 @@ export default function TransitionInfoForm() {
 
 
             if(sourceState instanceof State) {
-                // TODO: If source state already has a transition with same source,target and event simply update that transition
-                sourceState.on.push(selectedEdge.data.transition);
+                sourceState.addOnTransition(selectedEdge.data.transition);
                 console.log(sourceState);
                 console.log(sourceState.on);
                 setEdges(eds => {
