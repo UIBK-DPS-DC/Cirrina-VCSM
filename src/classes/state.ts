@@ -159,7 +159,8 @@ export default class State implements StateOrStateMachine {
      * This method checks if the provided `newTransition` already exists in the state's `_on` array
      * (which represents the transitions that can occur from this state). The check is based on the transition's ID.
      * If the transition does not already exist, it is added to the `_on` array, and a message is logged to the console.
-     * Only ever add Transitions to States using this function.
+     * Only ever add Transitions to States using this function. This is to avoid adding duplicate Transitions to a State
+     * when fields of an existing Transition on a State are updated.
      *
      * @param {Transition} newTransition - The transition to be added to the state's "on" transitions.
      */
