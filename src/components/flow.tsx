@@ -1,20 +1,26 @@
-import React, { useCallback, createContext, useMemo, useState } from 'react';
+import React, {createContext, useCallback, useMemo, useState} from 'react';
 import {
-    ReactFlow,
-    Background,
-    Controls,
-    MiniMap,
     addEdge,
-    useNodesState,
+    Background,
+    Connection,
+    ConnectionLineType,
+    Controls,
+    Edge,
+    MiniMap,
+    Node,
+    type NodeTypes,
+    type OnConnect,
+    ReactFlow,
     useEdgesState,
-    type OnConnect, type NodeTypes, useReactFlow, Edge, Node, Connection
+    useNodesState,
+    useReactFlow
 } from '@xyflow/react';
 
 import '@xyflow/react/dist/style.css';
-import { StateNode } from "./Nodes/stateNode.tsx";
-import { StateMachineNode } from "./Nodes/stateMachineNode.tsx";
+import {StateNode} from "./Nodes/stateNode.tsx";
+import {StateMachineNode} from "./Nodes/stateMachineNode.tsx";
 import StateOrStateMachineService from "../services/stateOrStateMachineService.tsx";
-import {CsmNodeProps, ReactFlowContextProps, CsmEdgeProps, isState, isStateMachine} from "../types.ts";
+import {CsmEdgeProps, CsmNodeProps, isState, isStateMachine, ReactFlowContextProps} from "../types.ts";
 
 import "../css/nodeForm.css";
 import "../css/edgeForm.css"
@@ -275,6 +281,7 @@ export default function Flow() {
                 onDrop={onDrop}
                 onNodeDragStop={onNodeDragStop}
                 fitView
+                connectionLineType={ConnectionLineType.Bezier}
             >
                 <Background />
                 <MiniMap />
