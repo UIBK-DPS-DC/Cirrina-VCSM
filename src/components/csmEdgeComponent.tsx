@@ -1,10 +1,9 @@
-import {
-    getBezierPath,
-    BaseEdge,
-    type EdgeProps,
-  } from '@xyflow/react';
+import {BaseEdge, EdgeLabelRenderer, type EdgeProps, getSmoothStepPath} from '@xyflow/react';
 
-import { TransitionEdge } from '../types';
+import {ReactFlowContextProps, TransitionEdge} from '../types';
+import {useContext, useEffect, useState} from "react";
+import {ReactFlowContext} from "./flow.tsx";
+import Transition from "../classes/transition.ts";
 
 export default function CsmEdge({
     id,
@@ -12,15 +11,63 @@ export default function CsmEdge({
     sourceY,
     targetX,
     targetY,
+    data,
+
   }: EdgeProps<TransitionEdge>) {
-    const [edgePath] = getBezierPath({ sourceX, sourceY, targetX, targetY });
-   
-    return <BaseEdge id={id} path={edgePath} />;
-  }
+    const [edgePath] = getSmoothStepPath({ sourceX, sourceY, targetX, targetY });
+    const [infoString,setInfoString] = useState<string>("");
+
+    const context = useContext(ReactFlowContext) as ReactFlowContextProps;
+    const {edges, setEdges,selectedEdge} = context;
+
+    const generateInfoString = (transition: Transition | undefined) => {
+        if(transition && transition.getEvent()){
+            if(transition.getGuards().length >= 1) {
+                return transition.getEvent() + " / " + transition.getGuards().toString();
+            }
+            else {
+                return transition.getEvent();
+            }
+
+        }
+        return ""
+    }
+
+    useEffect(() => {
+        setInfoString(generateInfoString(data?.transition))
+    }, [edges,setEdges]);
+
+    return (
+        <>
+            <BaseEdge id={id} path={edgePath} />
+            <EdgeLabelRenderer>
+                {selectedEdge?.id === id && infoString && (
+                    <div
+                        style={{
+                            position: 'absolute',
+                            transform: `translate(-50%, -100%) translate(${targetX}px,${targetY}px)`,
+                            background: '#34c9eb',
+                            padding: 10,
+                            borderRadius: 5,
+                            fontSize: 12,
+                            fontWeight: 500,
+                        }}
+                        className="nodrag nopan"
+                    >
+                        {infoString}
+                    </div>
+                )}
+
+            </EdgeLabelRenderer>
+        </>
+    );
 
 
-  
+}
 
-  
+
+
+
+
 
 
