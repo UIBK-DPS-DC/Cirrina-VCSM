@@ -1,4 +1,6 @@
 import ActionService from "../src/services/actionService";
+import Action from "../src/classes/action";
+import {ActionType} from "../src/enums";
 
 let service: ActionService;
 
@@ -11,21 +13,24 @@ describe('ActionService', () => {
 
     test('registerName should register a unique action name', () => {
         const name = 'uniqueAction';
-        const result = service.registerName(name);
+        const newAction = new Action(name,ActionType.INVOKE)
+        const result = service.registerName(name, newAction);
         expect(result).toBe(true);
         expect(service.isNameUnique(name)).toBe(false); // Now the name is not unique
     });
 
     test('registerName should not register a duplicate action name', () => {
         const name = 'duplicateAction';
-        service.registerName(name);
-        const result = service.registerName(name);
+        const newAction = new Action(name,ActionType.INVOKE)
+        service.registerName(name,newAction);
+        const result = service.registerName(name,newAction);
         expect(result).toBe(false);
     });
 
     test('unregisterName should remove a registered action name', () => {
         const name = 'actionToRemove';
-        service.registerName(name);
+        const newAction = new Action(name,ActionType.INVOKE)
+        service.registerName(name,newAction);
         service.unregisterName(name);
         expect(service.isNameUnique(name)).toBe(true); // Now the name is unique
     });
@@ -50,7 +55,8 @@ describe('ActionService', () => {
 
     test('isNameUnique should return false for a non-unique action name', () => {
         const name = 'nonUniqueAction';
-        service.registerName(name);
+        const newAction = new Action(name,ActionType.INVOKE)
+        service.registerName(name,newAction);
         const result = service.isNameUnique(name);
         expect(result).toBe(false);
     });

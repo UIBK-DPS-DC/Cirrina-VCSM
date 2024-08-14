@@ -361,7 +361,7 @@ export default function NodeInfoForm() {
                 return node;
             });
 
-            actionService.registerName(newAction.name);
+            actionService.registerName(newAction.name,newAction);
             if(newRaiseEventName){
                 eventService.registerName(newRaiseEventName);
             }
@@ -521,6 +521,7 @@ export default function NodeInfoForm() {
             })
         )
     }
+
 
 
     const renderContextNamesAsOptions = () => {

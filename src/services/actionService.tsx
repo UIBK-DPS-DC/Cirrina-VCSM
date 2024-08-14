@@ -1,8 +1,10 @@
+import Action from "../classes/action.tsx";
+
 export default class ActionService {
-    private actionNames: Set<string>;
+    private nameToActionMap: Map<string,Action>;
 
     public constructor() {
-        this.actionNames = new Set();
+        this.nameToActionMap = new Map();
     }
 
 
@@ -18,13 +20,13 @@ export default class ActionService {
      * @returns {boolean} - Returns `true` if the name is unique and successfully registered,
      *                      otherwise returns `false`.
      */
-    public registerName(actionName: string): boolean {
+    public registerName(actionName: string, action: Action): boolean {
         if(!this.isNameUnique(actionName)){
             console.error("Action name already exists!");
             return false;
         }
 
-        this.actionNames.add(actionName);
+        this.nameToActionMap.set(actionName,action);
         console.log(actionName + " has been registered!");
         return true;
     }
@@ -39,7 +41,7 @@ export default class ActionService {
      */
     public unregisterName(actionName: string | unknown): void {
         if(typeof actionName === "string" ){
-            this.actionNames.delete(actionName);
+            this.nameToActionMap.delete(actionName);
             console.log(actionName + " has been unregistered!");
         }
         else {
@@ -60,7 +62,8 @@ export default class ActionService {
      *                      otherwise returns `false`.
      */
     public isNameUnique(actionName: string): boolean {
-        return ! this.actionNames.has(actionName);
+        return ! this.nameToActionMap.has(actionName);
     }
+
 
 }
