@@ -35,7 +35,7 @@ import ActionService from "../services/actionService.tsx";
 import EventService from "../services/eventService.tsx";
 import ContextService from "../services/contextService.tsx";
 import GuardService from "../services/guardService.tsx";
-import Export from "./export.tsx";
+
 
 
 const nodeTypes = {
@@ -288,7 +288,6 @@ export default function Flow() {
                 <MiniMap />
                 <Controls />
             </ReactFlow>
-            <Export></Export>
             <NodeInfoForm />
             <TransitionInfoForm/>
         </ReactFlowContext.Provider>
