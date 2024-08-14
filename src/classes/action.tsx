@@ -1,4 +1,6 @@
 import {ActionType} from "../enums.tsx";
+import {Context} from "../types.ts";
+
 
 /**
  * Placeholder Action class. Expand once we have the Schema
@@ -8,12 +10,14 @@ export default class Action {
     private _type: ActionType
     private _delay: number
     private _properties: {}
+    private _context: Context | undefined
 
     constructor(name: string, type: ActionType, delay = 0) {
         this._name = name;
         this._type = type;
         this._properties = this.createActionProperties(type)
         this._delay = delay
+        this._context = undefined
 
     }
 
@@ -49,6 +53,15 @@ export default class Action {
         this._delay = value;
     }
 
+
+    get context(): Context | undefined {
+        return this._context;
+    }
+
+    set context(value: Context | undefined) {
+        this._context = value;
+    }
+
     private createActionProperties(type: ActionType) {
         switch (type) {
             case ActionType.RAISE_EVENT: {
@@ -61,6 +74,17 @@ export default class Action {
                 return {}
             }
         }
+    }
+
+    public toDICT() {
+        this._properties = {...this.properties, type: this.type};
+        let dict = {}
+        if(this.delay > 0){
+            dict = {...dict, delay: this.delay};
+        }
+        dict = {...dict, [this.name]: this.properties};
+
+        return dict;
     }
 
 

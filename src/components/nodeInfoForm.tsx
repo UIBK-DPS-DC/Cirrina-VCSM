@@ -298,9 +298,12 @@ export default function NodeInfoForm() {
                         return;
                     }
 
+                    newAction.context = newContext
+
                     newAction.properties = {
                         "description": createDescription,
-                        "context": newContext,
+                        "variable" : newContext.name,
+                        "value" :newContext.value,
                         "isPersistent" : createVariableIsPersistentCheckbox
                     }
 
@@ -369,6 +372,7 @@ export default function NodeInfoForm() {
                 console.log(`New Action Delay: ${newAction.delay}`)
             }
             Object.entries(newAction.properties).map(([key, val]) => console.log(key, '=>', val));
+            console.log(newAction.toDICT())
         }
 
 
