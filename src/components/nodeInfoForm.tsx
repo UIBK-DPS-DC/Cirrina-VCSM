@@ -160,9 +160,14 @@ export default function NodeInfoForm() {
             // GENERIC
             name: HTMLInputElement,
             "delay-input-value": HTMLInputElement,
+
+            //EXISTING ACTION
+            "existing-action-select": HTMLSelectElement
+
             // SELECT ACTION
             "select-action-type": HTMLSelectElement,
             "select-action-category": HTMLSelectElement,
+
             // RAISE EVENT ACTION
             "new-raise-event-input": HTMLInputElement,
             "raise-event-props": HTMLSelectElement,
@@ -191,7 +196,9 @@ export default function NodeInfoForm() {
             "unlock-variable-select": HTMLSelectElement
         };
 
+        //EXISTING ACTION
 
+        const existingActionName = formElements["existing-action-select"]?.value
 
         // RAISE EVENT
         const newActionType = formElements["select-action-type"]?.value;
@@ -235,7 +242,7 @@ export default function NodeInfoForm() {
 
         const newName = formElements.name.value;
         const delay = formElements["delay-input-value"]?.value
-        console.log("DELAY ",delay)
+        console.log("EXISTING ACTION ",existingActionName)
 
         const oldName = stateOrStateMachineService.getName(selectedNode.data);
 
@@ -244,9 +251,35 @@ export default function NodeInfoForm() {
             return;
         }
 
+        if (newName !== oldName) {
+            const newNodes = nodes.map(node => {
+                if (node.id === selectedNode.id) {
+                    const newData = stateOrStateMachineService.setName(newName, node.data);
+                    return { ...node, data: newData };
+                }
+                return node;
+            });
+
+            stateOrStateMachineService.unregisterName(oldName);
+            stateOrStateMachineService.registerName(newName);
+            setNodes(newNodes);
+            updateTransitionsOnRename(oldName, newName);
+        }
+
         let newAction = undefined;
 
-        if(newActionType !== "no-new-action") {
+        if(newActionType === "use-existing-action" && existingActionName){
+            newAction = actionService.getActionByName(existingActionName);
+            if(!newAction){
+                console.error("Existing action not found")
+                return
+            }
+            if(newActionCategory === ActionCategory.TIMEOUT && delay) {
+                newAction.delay = parseInt(delay);
+            }
+        }
+
+        if(newActionType !== "no-new-action" && newActionType !== "use-existing-action") {
             if(newActionName && (!actionService.isNameUnique(newActionName))) {
                 console.error("Action name already exists!");
                 return;
@@ -343,20 +376,7 @@ export default function NodeInfoForm() {
 
         }
 
-        if (newName !== oldName) {
-            const newNodes = nodes.map(node => {
-                if (node.id === selectedNode.id) {
-                    const newData = stateOrStateMachineService.setName(newName, node.data);
-                    return { ...node, data: newData };
-                }
-                return node;
-            });
 
-            stateOrStateMachineService.unregisterName(oldName);
-            stateOrStateMachineService.registerName(newName);
-            setNodes(newNodes);
-            updateTransitionsOnRename(oldName, newName);
-        }
 
         if(newAction) {
             const newNodes = nodes.map(node => {
@@ -367,7 +387,11 @@ export default function NodeInfoForm() {
                 return node;
             });
 
-            actionService.registerName(newAction.name,newAction);
+            if(newActionType !== "use-existing-action"){
+                console.log(`TYPE: ${selectedActionType}`)
+                actionService.registerName(newAction.name,newAction);
+            }
+
             if(newRaiseEventName){
                 eventService.registerName(newRaiseEventName);
             }
@@ -388,19 +412,20 @@ export default function NodeInfoForm() {
     };
 
     // TODO: Style to make it more readable
+    // Show Category etc.
     const showActions = (data: CsmNodeProps) => {
-
+        let count = 0;
         if(isState(data)){
             return(
                 data.state.getAllActions().map((action) => {
-                   return <p key={action.name}>{"Name: " + action.name + ` | type: ${action.type}`}</p>
+                   return <p key={action.name + count++}>{"Name: " + action.name + ` | type: ${action.type}`}</p>
                 })
             )
         }
         if(isStateMachine(data)){
             return(
                 data.stateMachine.actions.map((action) => {
-                    return <p key={action.name}>{"Name: " + action.name + ` | type: ${action.type}`}</p>
+                    return <p key={action.name + count++}>{"Name: " + action.name + ` | type: ${action.type}`}</p>
                 })
             )
         }
@@ -735,7 +760,7 @@ export default function NodeInfoForm() {
                                 }
                             </div>
                         )}
-                        {selectedActionType && selectedActionType !=="no-new-action"  && selectedActionType!== "use-existing-action" && (
+                        {selectedActionType && selectedActionType !=="no-new-action" &&(
                             <div className="from-action-category-section">
                                 <label htmlFor="select-action-category">Action Category: </label>
                                 <select id="select-action-category" name="select-action-category"
