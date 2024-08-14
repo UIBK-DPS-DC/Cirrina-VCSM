@@ -58,6 +58,7 @@ export default function NodeInfoForm() {
     const [assignActionValueInput, setAssignActionValueInput] = useState<string>("")
     const [delayValueInput, setDelayValueInput] = useState<string | number>("")
     const [selectedExistingAction, setSelectedExistingAction] = useState<string>("")
+    const [saveAsNamedActionCheckbox, setSaveAsNamedActionCheckbox] = useState<boolean>(false);
 
     type OptionEnums = typeof ActionType | typeof ServiceType | typeof ServiceLevel | typeof ActionCategory
         | typeof TimeUnit | typeof MemoryUnit
@@ -108,6 +109,11 @@ export default function NodeInfoForm() {
     useEffect(() => {
         console.log(`Selected Existing Action changed to ${selectedExistingAction}`);
     }, [selectedExistingAction]);
+
+    useEffect(() => {
+        console.log(`SaveAsNamedAction changed to ${saveAsNamedActionCheckbox}`)
+    }, [saveAsNamedActionCheckbox]);
+
     // #######################################################################################
 
     /**
@@ -160,6 +166,7 @@ export default function NodeInfoForm() {
             // GENERIC
             name: HTMLInputElement,
             "delay-input-value": HTMLInputElement,
+            "save-as-named-action-checkbox": HTMLInputElement,
 
             //EXISTING ACTION
             "existing-action-select": HTMLSelectElement
@@ -196,8 +203,8 @@ export default function NodeInfoForm() {
             "unlock-variable-select": HTMLSelectElement
         };
 
-        //EXISTING ACTION
 
+        //EXISTING ACTION
         const existingActionName = formElements["existing-action-select"]?.value
 
         // RAISE EVENT
@@ -242,6 +249,8 @@ export default function NodeInfoForm() {
 
         const newName = formElements.name.value;
         const delay = formElements["delay-input-value"]?.value
+        const saveAsNamedAction = formElements["save-as-named-action-checkbox"]?.checked;
+
         console.log("EXISTING ACTION ",existingActionName)
 
         const oldName = stateOrStateMachineService.getName(selectedNode.data);
@@ -251,7 +260,7 @@ export default function NodeInfoForm() {
             return;
         }
 
-        if (newName !== oldName) {
+        if (newName && newName !== oldName) {
             const newNodes = nodes.map(node => {
                 if (node.id === selectedNode.id) {
                     const newData = stateOrStateMachineService.setName(newName, node.data);
@@ -289,7 +298,8 @@ export default function NodeInfoForm() {
                 return;
             }
 
-            newAction = new Action(newActionName, newActionType as ActionType);
+
+            newAction = new Action(newActionName ? newActionName : "", newActionType as ActionType);
 
             if(delay){
                 newAction.delay = parseInt(delay);
@@ -387,7 +397,7 @@ export default function NodeInfoForm() {
                 return node;
             });
 
-            if(newActionType !== "use-existing-action"){
+            if(newActionType !== "use-existing-action" && saveAsNamedAction){
                 console.log(`TYPE: ${selectedActionType}`)
                 actionService.registerName(newAction.name,newAction);
             }
@@ -403,6 +413,8 @@ export default function NodeInfoForm() {
             }
             Object.entries(newAction.properties).map(([key, val]) => console.log(key, '=>', val));
         }
+
+        setNewActionName("")
 
 
     }, [nodes, setNodes, selectedNode, stateOrStateMachineService, updateTransitionsOnRename]);
@@ -511,6 +523,10 @@ export default function NodeInfoForm() {
 
     const onSelectedExistingActionChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
         setSelectedExistingAction(event.target.value)
+    }
+
+    const onSaveAsNamedActionCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setSaveAsNamedActionCheckbox(event.target.checked);
     }
 
     const onDelayValueInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -778,9 +794,18 @@ export default function NodeInfoForm() {
                         {selectedActionType && selectedActionType !== "no-new-action" && selectedActionType!== "use-existing-action" && renderActionProperties()}
                         {selectedActionType && selectedActionType !== "no-new-action"  && selectedActionType!== "use-existing-action" &&  (
                             <div>
-                            <label htmlFor="new-action-name">Action name: </label>
-                            <input type="text" id="new-action-name" name="new-action-name" value={newActionName}
-                                   onChange={onNewActionNameChange}/>
+                                <label htmlFor="save-as-named-action-checkbox">Save as named action ? </label>
+                                <input type="checkbox" id="save-as-named-action-checkbox" name="save-as-named-action-checkbox" checked={saveAsNamedActionCheckbox} onChange={onSaveAsNamedActionCheckboxChange}/>
+                                <br/>
+                                {saveAsNamedActionCheckbox && (
+                                    <div className="new-action-name-container">
+                                        <label htmlFor="new-action-name">Action name: </label>
+                                        <input type="text" id="new-action-name" name="new-action-name"
+                                               value={newActionName}
+                                               onChange={onNewActionNameChange}/>
+                                    </div>
+                                )
+                                }
                             </div>
                         )}
                     </div>
