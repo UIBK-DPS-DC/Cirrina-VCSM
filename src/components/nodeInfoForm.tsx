@@ -57,6 +57,8 @@ export default function NodeInfoForm() {
     const [selectedContextVariable, setSelectedContextVariable] = useState<string>("");
     const [assignActionValueInput, setAssignActionValueInput] = useState<string>("")
     const [delayValueInput, setDelayValueInput] = useState<string | number>("")
+    const [selectedExistingAction, setSelectedExistingAction] = useState<string>("")
+
     type OptionEnums = typeof ActionType | typeof ServiceType | typeof ServiceLevel | typeof ActionCategory
         | typeof TimeUnit | typeof MemoryUnit
 
@@ -102,6 +104,10 @@ export default function NodeInfoForm() {
     useEffect(() => {
         console.log(`Selected Memory Unit changed to ${selectedMemoryUnit}`)
     },[selectedMemoryUnit]);
+
+    useEffect(() => {
+        console.log(`Selected Existing Action changed to ${selectedExistingAction}`);
+    }, [selectedExistingAction]);
     // #######################################################################################
 
     /**
@@ -478,6 +484,10 @@ export default function NodeInfoForm() {
         setSelectedMemoryUnit(event.target.value)
     }
 
+    const onSelectedExistingActionChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+        setSelectedExistingAction(event.target.value)
+    }
+
     const onDelayValueInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         if(!event.target.value){
             setDelayValueInput("");
@@ -522,7 +532,15 @@ export default function NodeInfoForm() {
         )
     }
 
-
+    const renderActionNamesAsOptions = () => {
+        return(
+            actionService.getAllActionNames().map((action: string) => {
+                return(
+                    <option key={action} value={action}>{action}</option>
+                )
+            })
+        )
+    }
 
     const renderContextNamesAsOptions = () => {
         return(
@@ -697,11 +715,27 @@ export default function NodeInfoForm() {
                         <select id="select-action-type" name="select-action-type" onChange={onActionTypeSelect}
                                 defaultValue={selectedActionType || "no-new-action"}>
                             <option key={"no-new-action"} value={"no-new-action"}>No</option>
-                            {renderEnumAsOptions(ActionType)}
+                            <option key={"use-existing-action"} value={"use-existing-action"}>Use Existing Action</option>
+                            <optgroup label="Create New Action">
+                                {renderEnumAsOptions(ActionType)}
+                            </optgroup>
+
                         </select>
 
-
-                        {selectedActionType && selectedActionType !=="no-new-action" && (
+                        {selectedActionType && selectedActionType === "use-existing-action" && (
+                            <div className="existing-action-section-container">
+                                {actionService.getAllActionNames().length >= 1 &&
+                                    (
+                                    <select id="existing-action-select" name="existing-action-select" value={selectedExistingAction} onChange={onSelectedExistingActionChange}>
+                                        {renderActionNamesAsOptions()}
+                                    </select>)
+                                    || (
+                                        <p>No Existing Actions Found</p>
+                                    )
+                                }
+                            </div>
+                        )}
+                        {selectedActionType && selectedActionType !=="no-new-action"  && selectedActionType!== "use-existing-action" && (
                             <div className="from-action-category-section">
                                 <label htmlFor="select-action-category">Action Category: </label>
                                 <select id="select-action-category" name="select-action-category"
@@ -716,8 +750,8 @@ export default function NodeInfoForm() {
                                 <input type="text" id="delay-input-value" name ="delay-input-value" value={delayValueInput} onChange={onDelayValueInputChange}/>
                             </div>
                         )}
-                        {selectedActionType && selectedActionType !== "no-new-action" && renderActionProperties()}
-                        {selectedActionType && selectedActionType !== "no-new-action" && (
+                        {selectedActionType && selectedActionType !== "no-new-action" && selectedActionType!== "use-existing-action" && renderActionProperties()}
+                        {selectedActionType && selectedActionType !== "no-new-action"  && selectedActionType!== "use-existing-action" &&  (
                             <div>
                             <label htmlFor="new-action-name">Action name: </label>
                             <input type="text" id="new-action-name" name="new-action-name" value={newActionName}
