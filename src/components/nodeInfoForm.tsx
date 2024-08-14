@@ -372,7 +372,6 @@ export default function NodeInfoForm() {
                 console.log(`New Action Delay: ${newAction.delay}`)
             }
             Object.entries(newAction.properties).map(([key, val]) => console.log(key, '=>', val));
-            console.log(newAction.toDICT())
         }
 
 

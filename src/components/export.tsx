@@ -1,6 +1,6 @@
 import {useCallback, useContext} from "react";
 import {ReactFlowContext} from "./flow.tsx";
-import {ReactFlowContextProps} from "../types.ts";
+import {isState, ReactFlowContextProps} from "../types.ts";
 
 export default function Export () {
     const context = useContext(ReactFlowContext) as ReactFlowContextProps;
@@ -9,7 +9,9 @@ export default function Export () {
     const onButtonClick = useCallback(() => {
         console.log("Nodes")
         nodes.forEach((node) => {
-            console.log(node.id)
+            if(isState(node.data)) {
+                console.log(node.data.state.toDICT())
+            }
         })
         console.log("Edges")
         edges.forEach((edge) => {

@@ -180,6 +180,38 @@ export default class State implements StateOrStateMachine {
     }
 
 
+    private actionsAsDictArray (actions: Action[]) {
+        return actions.map((action: Action) => {return action.toDICT()})
+    }
+
+    public toDICT() {
+        let dict = {}
+
+        if(this.entry.length >= 1) {
+            dict = {...dict, entry: this.actionsAsDictArray(this.entry)};
+        }
+
+        if(this.while.length >= 1) {
+            dict = {...dict, while: this.actionsAsDictArray(this.while)};
+        }
+
+        if(this.exit .length >= 1) {
+            dict = {...dict, exit: this.actionsAsDictArray(this.exit)};
+        }
+
+        if(this.after.length >= 1) {
+            dict = {...dict, after: this.actionsAsDictArray(this.after)};
+        }
+
+        if(this.on.length >= 1) {
+            // TODO: Transition to dict
+        }
+
+        return dict;
+
+    }
+
+
 
 
 
