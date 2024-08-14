@@ -66,4 +66,17 @@ export default class ActionService {
     }
 
 
+    public getAllActionNames() {
+        return Array.from(this.nameToActionMap.keys());
+    }
+
+    public getActionByName(name: string): Action | undefined {
+        const res =  this.nameToActionMap.get(name);
+        if(!res) {
+            console.error(`No action named ${name} found!`);
+        }
+        return res;
+    }
+
+
 }
