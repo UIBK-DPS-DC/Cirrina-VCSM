@@ -75,7 +75,7 @@ export default class ActionService {
      *
      * @returns {string[]} - An array of strings, each representing the name of a registered action.
      */
-    public getAllActionNames() {
+    public getAllActionNames(): string[] {
         return Array.from(this.nameToActionMap.keys());
     }
 
