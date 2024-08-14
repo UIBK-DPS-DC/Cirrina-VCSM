@@ -66,10 +66,29 @@ export default class ActionService {
     }
 
 
+    /**
+     * Retrieves the names of all registered actions.
+     *
+     * This method returns an array containing all the keys (names) from the `nameToActionMap`.
+     * The `nameToActionMap` is assumed to be a Map object where the keys are action names and
+     * the values are the corresponding Action objects.
+     *
+     * @returns {string[]} - An array of strings, each representing the name of a registered action.
+     */
     public getAllActionNames() {
         return Array.from(this.nameToActionMap.keys());
     }
 
+    /**
+     * Retrieves an action by its name.
+     *
+     * This method looks up the provided `name` in the `nameToActionMap` and returns the associated
+     * `Action` object if it exists. If no action is found with the given name, it logs an error to the console
+     * and returns `undefined`.
+     *
+     * @param {string} name - The name of the action to retrieve.
+     * @returns {Action | undefined} - The `Action` object associated with the given name, or `undefined` if not found.
+     */
     public getActionByName(name: string): Action | undefined {
         const res =  this.nameToActionMap.get(name);
         if(!res) {
