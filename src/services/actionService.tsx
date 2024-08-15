@@ -1,8 +1,10 @@
+import Action from "../classes/action.tsx";
+
 export default class ActionService {
-    private actionNames: Set<string>;
+    private nameToActionMap: Map<string,Action>;
 
     public constructor() {
-        this.actionNames = new Set();
+        this.nameToActionMap = new Map();
     }
 
 
@@ -18,13 +20,13 @@ export default class ActionService {
      * @returns {boolean} - Returns `true` if the name is unique and successfully registered,
      *                      otherwise returns `false`.
      */
-    public registerName(actionName: string): boolean {
+    public registerName(actionName: string, action: Action): boolean {
         if(!this.isNameUnique(actionName)){
             console.error("Action name already exists!");
             return false;
         }
 
-        this.actionNames.add(actionName);
+        this.nameToActionMap.set(actionName,action);
         console.log(actionName + " has been registered!");
         return true;
     }
@@ -39,7 +41,7 @@ export default class ActionService {
      */
     public unregisterName(actionName: string | unknown): void {
         if(typeof actionName === "string" ){
-            this.actionNames.delete(actionName);
+            this.nameToActionMap.delete(actionName);
             console.log(actionName + " has been unregistered!");
         }
         else {
@@ -60,7 +62,40 @@ export default class ActionService {
      *                      otherwise returns `false`.
      */
     public isNameUnique(actionName: string): boolean {
-        return ! this.actionNames.has(actionName);
+        return ! this.nameToActionMap.has(actionName);
     }
+
+
+    /**
+     * Retrieves the names of all registered actions.
+     *
+     * This method returns an array containing all the keys (names) from the `nameToActionMap`.
+     * The `nameToActionMap` is assumed to be a Map object where the keys are action names and
+     * the values are the corresponding Action objects.
+     *
+     * @returns {string[]} - An array of strings, each representing the name of a registered action.
+     */
+    public getAllActionNames(): string[] {
+        return Array.from(this.nameToActionMap.keys());
+    }
+
+    /**
+     * Retrieves an action by its name.
+     *
+     * This method looks up the provided `name` in the `nameToActionMap` and returns the associated
+     * `Action` object if it exists. If no action is found with the given name, it logs an error to the console
+     * and returns `undefined`.
+     *
+     * @param {string} name - The name of the action to retrieve.
+     * @returns {Action | undefined} - The `Action` object associated with the given name, or `undefined` if not found.
+     */
+    public getActionByName(name: string): Action | undefined {
+        const res =  this.nameToActionMap.get(name);
+        if(!res) {
+            console.error(`No action named ${name} found!`);
+        }
+        return res;
+    }
+
 
 }

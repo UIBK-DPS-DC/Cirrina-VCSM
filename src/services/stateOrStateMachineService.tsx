@@ -174,19 +174,39 @@ export default class StateOrStateMachineService {
             if(isState(data)) {
                 switch (actionCategory) {
                     case ActionCategory.ENTRY_ACTION: {
-                        data.state.entry.push(action);
+                        if(!data.state.entry.includes(action)){
+                            data.state.entry.push(action);
+                        }
+                        else{
+                            console.error(`${action.name} already exists in ${data.state.name}'s ${actionCategory} actions`)
+                        }
                         break;
                     }
                     case ActionCategory.EXIT_ACTION: {
-                        data.state.exit.push(action);
+                        if(!data.state.exit.includes(action)){
+                            data.state.exit.push(action);
+                        }
+                        else{
+                            console.error(`${action.name} already exists in ${data.state.name}'s ${actionCategory} actions`)
+                        }
                         break;
                     }//TODO: Handle timeout stuff
                     case ActionCategory.TIMEOUT: {
-                        data.state.after.push(action)
+                        if(!data.state.after.includes(action)){
+                            data.state.after.push(action);
+                        }
+                        else{
+                            console.error(`${action.name} already exists in ${data.state.name}'s ${actionCategory} actions`)
+                        }
                         break;
                     }
                     case ActionCategory.WHILE_ACTION: {
-                        data.state.while.push(action);
+                        if(!data.state.while.includes(action)){
+                            data.state.while.push(action);
+                        }
+                        else{
+                            console.error(`${action.name} already exists in ${data.state.name}'s ${actionCategory} actions`)
+                        }
                         break;
                     }
                     default:
