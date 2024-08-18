@@ -1,4 +1,4 @@
-import Action from "./action.tsx";
+import Action from "./action.ts";
 
 export default class Transition {
     private static _TRANSITION_ID_COUNT = 0;

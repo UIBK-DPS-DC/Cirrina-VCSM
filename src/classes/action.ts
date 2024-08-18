@@ -1,4 +1,4 @@
-import {ActionType} from "../enums.tsx";
+import {ActionType} from "../enums.ts";
 import {Context} from "../types.ts";
 
 

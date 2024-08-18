@@ -1,7 +1,7 @@
-import {ReactFlowContext} from "./flow.tsx";
 import React, {useCallback, useContext, useEffect, useState} from "react";
-import {ReactFlowContextProps} from "../types.ts";
-import State from "../classes/state.ts";
+import { ReactFlowContextProps} from "../../types.ts";
+import State from "../../classes/state.ts";
+import {ReactFlowContext} from "../../utils.ts";
 
 
 export default function TransitionInfoForm() {

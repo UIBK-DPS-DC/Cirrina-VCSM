@@ -1,4 +1,4 @@
-import React, {createContext, useCallback, useMemo, useState} from 'react';
+import React, { useCallback, useContext} from 'react';
 import {
     addEdge,
     Background,
@@ -11,31 +11,24 @@ import {
     type NodeTypes,
     type OnConnect,
     ReactFlow,
-    useEdgesState,
-    useNodesState,
     useReactFlow
 } from '@xyflow/react';
 
 import '@xyflow/react/dist/style.css';
 import {StateNode} from "./Nodes/stateNode.tsx";
 import {StateMachineNode} from "./Nodes/stateMachineNode.tsx";
-import StateOrStateMachineService from "../services/stateOrStateMachineService.tsx";
-import {CsmEdgeProps, CsmNodeProps, isState, isStateMachine, ReactFlowContextProps} from "../types.ts";
+import {
+    CsmEdgeProps,
+    CsmNodeProps,
+    isState,
+    isStateMachine,
+    ReactFlowContextProps
+} from "../../types.ts";
 
-import "../css/nodeForm.css";
-import "../css/edgeForm.css"
-
-import StateMachine from "../classes/stateMachine.ts";
-import State from "../classes/state.ts";
-import NodeInfoForm from "./nodeInfoForm.tsx";
-import TransitionInfoForm from "./transitionInfoForm.tsx";
+import StateMachine from "../../classes/stateMachine.ts";
+import State from "../../classes/state.ts";
 import CsmEdge from "./csmEdgeComponent.tsx";
-import TransitionService from "../services/transitionService.tsx";
-import ActionService from "../services/actionService.tsx";
-import EventService from "../services/eventService.tsx";
-import ContextService from "../services/contextService.tsx";
-import GuardService from "../services/guardService.tsx";
-
+import {ReactFlowContext} from "../../utils.ts";
 
 
 const nodeTypes = {
@@ -48,10 +41,10 @@ const edgeTypes = {
 }
 
 const NODE_HISTORY_LENGTH = 10;
+/*
 const initialNodes: Node<CsmNodeProps>[] = [];
 const initialEdges: Edge<CsmEdgeProps>[] = [];
-
-export const ReactFlowContext = createContext<ReactFlowContextProps | null>(null);
+*/
 
 let nodeId = 0;
 let edgeId = 0;
@@ -59,45 +52,26 @@ const getNewNodeId = () => `node_${nodeId++}`;
 const getNewEdgeId = () => `edge_${edgeId++}`;
 
 export default function Flow() {
+    const context: ReactFlowContextProps = useContext(ReactFlowContext) as ReactFlowContextProps;
 
-    const stateOrStateMachineService: StateOrStateMachineService = useMemo(() => new StateOrStateMachineService(), []);
-    const transitionService: TransitionService = useMemo(() => new TransitionService(stateOrStateMachineService), [stateOrStateMachineService]);
-    const actionService: ActionService = useMemo(() => new ActionService(),[]);
-    const eventService: EventService = useMemo(() => new EventService(),[]);
-    const contextService: ContextService = useMemo(() => new ContextService(),[]);
-    const guardService: GuardService = useMemo(()=> new GuardService(),[])
-
-
-    const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
-    const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
-    const [selectedNode, setSelectedNode] = useState<Node<CsmNodeProps> | null>(null);
-    const [selectedEdge, setSelectedEdge] = useState<Edge<CsmEdgeProps> | null>(null)
-    const [showSidebar, setShowSidebar] = useState(false);
-    const [nameInput, setNameInput] = useState<string>("");
-    const [nodeHistory, setNodeHistory] = useState<Node<CsmNodeProps>[][]>([[]]);
-    const { getIntersectingNodes, screenToFlowPosition } = useReactFlow();
-
-    const contextValue: ReactFlowContextProps = {
+    const {
         nodes,
         setNodes,
-        nodeHistory,
+        onNodesChange,
         setNodeHistory,
         edges,
         setEdges,
+        onEdgesChange,
         selectedNode,
         setSelectedNode,
         selectedEdge,
         setSelectedEdge,
-        showSidebar,
         setShowSidebar,
-        nameInput,
-        setNameInput,
         stateOrStateMachineService,
-        actionService,
-        eventService,
-        contextService,
-        guardService
-    };
+        transitionService
+    } = context
+
+    const { getIntersectingNodes, screenToFlowPosition } = useReactFlow();
 
     const updateNodeHistory = useCallback((nodes: Node<CsmNodeProps>[]) => {
         setNodeHistory(prev => {
@@ -265,31 +239,30 @@ export default function Flow() {
     }, []);
 
     return (
-        <ReactFlowContext.Provider value={contextValue}>
-            <ReactFlow
-                nodes={nodes}
-                nodeTypes={nodeTypes}
-                onNodesChange={onNodesChange}
-                edges={edges}
-                onEdgesChange={onEdgesChange}
-                edgeTypes={edgeTypes}
-                onConnect={onConnect}
-                onPaneClick={onPaneClick}
-                onNodeClick={onNodeClick}
-                onEdgeClick={onEdgeClick}
-                onNodesDelete={onNodesDelete}
-                onDragOver={onDragOver}
-                onDrop={onDrop}
-                onNodeDragStop={onNodeDragStop}
-                fitView
-                connectionLineType={ConnectionLineType.Bezier}
-            >
-                <Background />
-                <MiniMap />
-                <Controls />
-            </ReactFlow>
-            <NodeInfoForm />
-            <TransitionInfoForm/>
-        </ReactFlowContext.Provider>
+        <div className={"flow-container"}>
+                <ReactFlow
+                    nodes={nodes}
+                    nodeTypes={nodeTypes}
+                    onNodesChange={onNodesChange}
+                    edges={edges}
+                    onEdgesChange={onEdgesChange}
+                    edgeTypes={edgeTypes}
+                    onConnect={onConnect}
+                    onPaneClick={onPaneClick}
+                    onNodeClick={onNodeClick}
+                    onEdgeClick={onEdgeClick}
+                    onNodesDelete={onNodesDelete}
+                    onDragOver={onDragOver}
+                    onDrop={onDrop}
+                    onNodeDragStop={onNodeDragStop}
+                    fitView
+                    connectionLineType={ConnectionLineType.Bezier}
+                >
+                    <Background />
+                    <MiniMap />
+                    <Controls />
+                </ReactFlow>
+
+        </div>
     );
 }

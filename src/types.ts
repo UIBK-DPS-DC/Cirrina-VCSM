@@ -1,14 +1,15 @@
-import {Edge, Node} from "@xyflow/react";
+import {Edge, Node, OnEdgesChange, OnNodesChange} from "@xyflow/react";
 import Transition from "./classes/transition.ts";
 import StateMachine from "./classes/stateMachine.ts";
 import State from "./classes/state.ts";
 import React from "react";
 import StateOrStateMachineService from "./services/stateOrStateMachineService.tsx";
-import Action from "./classes/action.tsx";
+import Action from "./classes/action.ts";
 import ActionService from "./services/actionService.tsx";
 import EventService from "./services/eventService.tsx";
 import ContextService from "./services/contextService.tsx";
 import GuardService from "./services/guardService.tsx";
+import TransitionService from "./services/transitionService.tsx";
 
 // One Type to avoid repeating ourselves. Can be expanded/unionized as needed.
 export type CsmNodeProps = {state: State} | {stateMachine: StateMachine} | {name: string};
@@ -49,12 +50,14 @@ export type TransitionEdge = Edge<{
 export type ReactFlowContextProps = {
     nodes: Node<CsmNodeProps>[];
     setNodes: React.Dispatch<React.SetStateAction<Node<CsmNodeProps>[]>>;
+    onNodesChange: OnNodesChange<Node<CsmNodeProps>>
     nodeHistory: Node<CsmNodeProps>[][];
     setNodeHistory: React.Dispatch<React.SetStateAction<Node<CsmNodeProps>[][]>>;
     selectedEdge: Edge<CsmEdgeProps> | null
     setSelectedEdge: React.Dispatch<React.SetStateAction<Edge<CsmEdgeProps> | null>>
     edges: Edge<CsmEdgeProps>[];
     setEdges: React.Dispatch<React.SetStateAction<Edge<CsmEdgeProps>[]>>
+    onEdgesChange: OnEdgesChange<Edge<CsmEdgeProps>>
     selectedNode: Node<CsmNodeProps> | null;
     setSelectedNode: React.Dispatch<React.SetStateAction<Node<CsmNodeProps> | null>>;
     showSidebar: boolean;
@@ -66,6 +69,7 @@ export type ReactFlowContextProps = {
     eventService: EventService;
     contextService: ContextService;
     guardService: GuardService;
+    transitionService: TransitionService;
 }
 
 

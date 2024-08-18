@@ -1,4 +1,4 @@
-import FlowSideBar from "../src/components/flowSideBar";
+import FlowSideBar from "../src/components/visualEditor/flowSideBar";
 import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom'
 

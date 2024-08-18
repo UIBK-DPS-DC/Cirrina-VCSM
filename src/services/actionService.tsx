@@ -1,4 +1,4 @@
-import Action from "../classes/action.tsx";
+import Action from "../classes/action.ts";
 
 export default class ActionService {
     private nameToActionMap: Map<string,Action>;
