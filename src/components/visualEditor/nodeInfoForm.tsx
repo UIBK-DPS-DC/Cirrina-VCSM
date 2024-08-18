@@ -1,8 +1,8 @@
 import React, {useCallback, useContext, useEffect, useState} from "react";
-import { ReactFlowContext } from "./flow.tsx";
-import {CsmNodeProps, isState, isStateMachine, ReactFlowContextProps} from "../types.ts";
-import {ActionCategory, ActionType, MemoryUnit, ServiceLevel, ServiceType, TimeUnit} from "../enums.tsx";
-import Action from "../classes/action.tsx";
+import { CsmNodeProps, isState, isStateMachine, ReactFlowContextProps} from "../../types.ts";
+import {ActionCategory, ActionType, MemoryUnit, ServiceLevel, ServiceType, TimeUnit} from "../../enums.ts";
+import Action from "../../classes/action.ts";
+import {ReactFlowContext} from "../../utils.ts";
 
 
 /**

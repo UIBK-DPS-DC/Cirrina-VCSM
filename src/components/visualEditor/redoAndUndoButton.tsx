@@ -1,11 +1,10 @@
 //import React from 'react';
 import '@fortawesome/fontawesome-free/css/all.min.css'; // Import Font Awesome CSS
-import "../css/redoUndoButton.css"
+import "../../css/redoUndoButton.css"
 import {useCallback, useContext, useRef,} from "react";
-import {ReactFlowContext} from "./flow.tsx";
-import {ReactFlowContextProps} from "../types.ts";
+import { ReactFlowContextProps} from "../../types.ts";
 import {differenceWith} from "lodash"
-import {nodeIsEqual} from "../utils.tsx"
+import {nodeIsEqual, ReactFlowContext} from "../../utils.ts"
 
 
 export default function RedoAndUndoButton() {

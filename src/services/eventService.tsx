@@ -1,6 +1,6 @@
 import {CsmNodeProps, isState, isStateMachine} from "../types.ts";
-import Action from "../classes/action.tsx";
-import {ActionType} from "../enums.tsx";
+import Action from "../classes/action.ts";
+import {ActionType} from "../enums.ts";
 
 export default class EventService {
     private eventNames: Set<string>;

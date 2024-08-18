@@ -1,5 +1,5 @@
 import React from "react";
-import {NodeType} from "../types.ts";
+import {NodeType} from "../../types.ts";
 
 
 export default function FlowSideBar () {

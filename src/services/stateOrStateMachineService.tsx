@@ -5,8 +5,8 @@ import State from "../classes/state.ts";
 import StateMachine from "../classes/stateMachine.ts";
 import {CsmNodeProps, isState, isStateMachine} from "../types.ts";
 import StateOrStateMachine from "../classes/stateOrStateMachine.ts";
-import Action from "../classes/action.tsx";
-import {ActionCategory} from "../enums.tsx";
+import Action from "../classes/action.ts";
+import {ActionCategory} from "../enums.ts";
 
 
 export default class StateOrStateMachineService {

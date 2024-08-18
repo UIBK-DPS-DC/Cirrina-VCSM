@@ -1,6 +1,6 @@
 import StateOrStateMachine from "./stateOrStateMachine.ts"
 import {Context} from "../types.ts";
-import Action from "./action.tsx";
+import Action from "./action.ts";
 
 export default class StateMachine implements StateOrStateMachine {
 

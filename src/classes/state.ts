@@ -1,5 +1,5 @@
 import StateOrStateMachine from "./stateOrStateMachine.ts"
-import Action from "./action.tsx";
+import Action from "./action.ts";
 import {Context} from "../types.ts";
 import Transition from "./transition.ts";
 

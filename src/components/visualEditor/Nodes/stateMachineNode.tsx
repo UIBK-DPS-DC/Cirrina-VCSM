@@ -1,5 +1,5 @@
 import {NodeProps, NodeResizer} from "@xyflow/react";
-import {type StateMachineNode} from "../../types.ts";
+import {type StateMachineNode} from "../../../types.ts";
 
 export function StateMachineNode ({data, selected}: NodeProps<StateMachineNode>) {
     return (

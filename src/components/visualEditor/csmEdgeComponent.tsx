@@ -1,9 +1,9 @@
 import {BaseEdge, EdgeLabelRenderer, type EdgeProps, getSmoothStepPath} from '@xyflow/react';
 
-import {ReactFlowContextProps, TransitionEdge} from '../types';
+import { ReactFlowContextProps, TransitionEdge} from '../../types.ts';
 import {useContext, useEffect, useState} from "react";
-import {ReactFlowContext} from "./flow.tsx";
-import Transition from "../classes/transition.ts";
+import Transition from "../../classes/transition.ts";
+import {ReactFlowContext} from "../../utils.ts";
 
 export default function CsmEdge({
     id,
