@@ -1,6 +1,7 @@
 import StateOrStateMachine from "./stateOrStateMachine.ts"
 import {Context} from "../types.ts";
-import Action from "./action.ts";
+import Action from "./action.tsx";
+import State from "./state.ts";
 
 export default class StateMachine implements StateOrStateMachine {
 
@@ -70,6 +71,39 @@ export default class StateMachine implements StateOrStateMachine {
 
     set abstract(value: boolean) {
         this._abstract = value;
+    }
+
+    public toDICT(): object {
+        let dict = {
+            states: {} as { [key: string]: object },
+            stateMachines: {} as { [key: string]: object }
+        };
+
+        dict = {states: {}, stateMachines: {}}
+        this.states.forEach((stateOrStateMachine) => {
+            if(stateOrStateMachine instanceof State) {
+                dict = {
+                    ...dict,
+                    states: {
+                        ...dict.states,
+                        [stateOrStateMachine.name]: stateOrStateMachine.toDICT()
+
+                    }
+                }
+            }
+            if(stateOrStateMachine instanceof StateMachine) {
+                dict = {
+                    ...dict,
+                    stateMachines: {
+                        ...dict.stateMachines,
+                        [stateOrStateMachine.name]: stateOrStateMachine.toDICT()
+
+                    }
+                }
+            }
+
+        })
+        return dict;
     }
 
 
