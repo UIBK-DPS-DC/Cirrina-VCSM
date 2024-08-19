@@ -1,4 +1,5 @@
-import Action from "./action.ts";
+import Action from "./action.tsx";
+import Guard from "./guard.tsx";
 
 export default class Transition {
     private static _TRANSITION_ID_COUNT = 0;
@@ -6,7 +7,7 @@ export default class Transition {
     private readonly ID: number
     private source : string
     private target : string
-    private _guards : string[]
+    private _guards : Guard[]
     private _actions : Action[]
     private _else : string []
     private _event : string
@@ -39,11 +40,11 @@ export default class Transition {
     }
 
 
-    public getGuards(): string[] {
+    public getGuards(): Guard[] {
         return this._guards;
     }
 
-    public setGuards(value: string[]) {
+    public setGuards(value: Guard[]) {
         this._guards = value;
     }
 
@@ -59,7 +60,7 @@ export default class Transition {
         return this._else;
     }
 
-     public setElse(value: string[]) {
+    public setElse(value: string[]) {
         this._else = value;
     }
 
@@ -86,7 +87,8 @@ export default class Transition {
      *
      * @param {string} guard - The guard to be added to the transition.
      */
-    public addGuard(guard: string): void {
+    //TODO UPDATE THE CHECK FOR THE NEW GUARD CLASS
+    public addGuard(guard: Guard): void {
         if(this._guards.includes(guard)){
             console.warn(`Guard ${guard} already exists on Transition ${this.source} => ${this.target}!`)
             return;
@@ -94,8 +96,25 @@ export default class Transition {
         this._guards.push(guard);
     }
 
+
     private getNewId(){
         return Transition._TRANSITION_ID_COUNT++;
+    }
+
+    // TODO: Expand for internal transitions.
+    public toDICT() {
+        let dict = {}
+        dict = {[this._event] : this.target}
+        if(this._guards.length >= 1) {
+            dict = {...dict, guard: this.guardsToString(this._guards)}
+        }
+        return dict
+    }
+
+    private guardsToString(guards: Guard[]) {
+        return guards.map(guard => {
+            return guard.name? guard.name : guard.expression;
+        })
     }
 
 }
