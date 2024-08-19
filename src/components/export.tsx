@@ -1,5 +1,5 @@
 import {useCallback, useContext} from "react";
-import {isState, isStateMachine, ReactFlowContextProps} from "../types.ts";
+import {ReactFlowContextProps} from "../types.ts";
 import {ReactFlowContext} from "../utils.ts";
 import StateMachine from "../classes/stateMachine.ts";
 
@@ -29,6 +29,8 @@ export default function Export () {
     const onButtonClick = useCallback(() => {
         addStatesToStatemachines();
         const topLevelSM = createTopLevelStatemachine();
+
+        console.log(topLevelSM);
         
         console.log("Edges")
         edges.forEach((edge) => {
