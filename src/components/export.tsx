@@ -20,7 +20,7 @@ export default function Export () {
     },[nodes,edges])
 
     return(
-        <button onClick={onButtonClick}>Export test</button>
+        <button className="button" onClick={onButtonClick}>Export</button>
     )
 
 
