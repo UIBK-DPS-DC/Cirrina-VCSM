@@ -83,7 +83,6 @@ export default class StateMachine implements StateOrStateMachine {
             stateMachines: {} as { [key: string]: object }
         };
 
-        dict = {states: {}, stateMachines: {}}
         this.states.forEach((stateOrStateMachine) => {
             if(stateOrStateMachine instanceof State) {
                 dict = {
