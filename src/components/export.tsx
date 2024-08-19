@@ -12,6 +12,7 @@ export default function Export () {
             if(isState(node.data)) {
                 console.log(node.data.state.toDICT())
             }
+            console.log(node.extent)
         })
         console.log("Edges")
         edges.forEach((edge) => {
