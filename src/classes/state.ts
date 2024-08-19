@@ -1,5 +1,5 @@
 import StateOrStateMachine from "./stateOrStateMachine.ts"
-import Action from "./action.ts";
+import Action from "./action.tsx";
 import {Context} from "../types.ts";
 import Transition from "./transition.ts";
 
@@ -204,7 +204,7 @@ export default class State implements StateOrStateMachine {
         }
 
         if(this.on.length >= 1) {
-            // TODO: Transition to dict
+            dict = {...dict, on: this.on.map((transition) => { return transition.toDICT()})};
         }
 
         return dict;
