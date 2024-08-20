@@ -153,6 +153,13 @@ export default class State implements StateOrStateMachine {
             .concat(this._while || [], this._after || [], this._exit || []);
     }
 
+
+    public getAllNamedActions(): Action[] {
+        return this.getAllActions().filter((action) => {
+            action.name
+        })
+    }
+
     /**
      * Adds a new transition to the state's "on" transitions if it doesn't already exist.
      *
