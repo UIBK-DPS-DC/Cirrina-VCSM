@@ -209,6 +209,14 @@ export default class State implements StateOrStateMachine {
         return actions.map((action: Action) => {return action.toDICT()})
     }
 
+    private contextAsDict (context: Context[]) {
+        let dict = {}
+        context.forEach((context) => {
+            dict = {...dict, [context.name] : {value: context.value}}
+        })
+        return dict;
+    }
+
     public toDICT() {
         let dict = {}
 
@@ -230,6 +238,18 @@ export default class State implements StateOrStateMachine {
 
         if(this.on.length >= 1) {
             dict = {...dict, on: this.on.map((transition) => { return transition.toDICT()})};
+        }
+
+        if(this.localContext.length >= 1) {
+            dict = {...dict, localContext: this.contextAsDict(this.localContext)}
+        }
+
+        if(this.persistentContext.length >= 1) {
+            dict = {...dict, persistentContext: this.contextAsDict(this.persistentContext)}
+        }
+
+        if(this.staticContext.length >= 1) {
+            dict = {...dict, staticContext: this.contextAsDict(this.staticContext)}
         }
 
         return dict;
