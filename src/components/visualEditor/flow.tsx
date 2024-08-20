@@ -222,7 +222,7 @@ export default function Flow() {
         }
         setSelectedNode(node);
         setShowSidebar(true);
-    }, [selectedNode, selectedEdge]);
+    }, [selectedEdge, setSelectedNode, setShowSidebar, setSelectedEdge]);
 
     const onEdgeClick = useCallback(
         (_: React.MouseEvent, edge: Edge<CsmEdgeProps>) => {
@@ -231,12 +231,12 @@ export default function Flow() {
             }
             setSelectedEdge(edge)
             setShowSidebar(true);
-        }, [selectedNode, selectedEdge]
+        }, [selectedNode, setSelectedEdge, setShowSidebar, setSelectedNode]
     )
 
     const onPaneClick = useCallback(() => {
         setShowSidebar(false);
-    }, []);
+    }, [setShowSidebar]);
 
     return (
         <div className={"flow-container"}>
