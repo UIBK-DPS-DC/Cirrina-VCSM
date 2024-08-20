@@ -117,4 +117,10 @@ export default class Transition {
         })
     }
 
+    public getAllNamedGuards() {
+        return this._guards.filter((guard) => {
+            return guard.name
+        })
+    }
+
 }

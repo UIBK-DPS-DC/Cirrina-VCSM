@@ -160,6 +160,11 @@ export default class State implements StateOrStateMachine {
         })
     }
 
+    public getAllTransitions(): Transition[] {
+        return (this.always || []).concat(this._on || [])
+    }
+
+
     /**
      * Adds a new transition to the state's "on" transitions if it doesn't already exist.
      *
