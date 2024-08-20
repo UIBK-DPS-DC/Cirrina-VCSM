@@ -81,7 +81,7 @@ export default function Flow() {
                 return [...prev.slice(1), nodes];
             }
         });
-    }, []);
+    }, [setNodeHistory]);
 
 
     const onConnect: OnConnect = useCallback(
