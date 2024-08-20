@@ -2,6 +2,7 @@ import State from "../src/classes/state";
 import Action from "../src/classes/action";
 import {ActionType} from "../src/enums";
 import Transition from "../src/classes/transition";
+import Guard from "../src/classes/guard";
 
 describe('State Class', () => {
     let state: State;
@@ -160,5 +161,69 @@ describe('State Class', () => {
             while: [action2.toDICT()],
             on: [transition1.toDICT(), transition2.toDICT()],
         });
+    });
+
+    test('should return an empty array when there are no transitions', () => {
+        const namedGuards = state.getAllNamedGuards();
+        expect(namedGuards).toEqual([]);
+    });
+
+    test('should return an empty array when transitions have no named guards', () => {
+        const transition = new Transition('source', 'target');
+        transition.setGuards([new Guard('expression1'), new Guard('expression2')]); // Guards without names
+        state.on = [transition];
+
+        const namedGuards = state.getAllNamedGuards();
+        expect(namedGuards).toEqual([]);
+    });
+
+    test('should return all named guards from multiple transitions', () => {
+        const guard1 = new Guard('expression1', 'guard1');
+        const guard2 = new Guard('expression2', 'guard2');
+        const guard3 = new Guard('expression3', 'guard3');
+
+        const transition1 = new Transition('source1', 'target1');
+        transition1.setGuards([guard1, guard2]);
+
+        const transition2 = new Transition('source2', 'target2');
+        transition2.setGuards([guard2, guard3]); // guard2 appears in both transitions
+
+        state.on = [transition1, transition2];
+
+        const namedGuards = state.getAllNamedGuards();
+        expect(namedGuards).toEqual([guard1, guard2, guard3]);
+    });
+
+    test('should remove duplicate guards across transitions', () => {
+        const guard1 = new Guard('expression1', 'guard1');
+        const duplicateGuard1 = new Guard('expression1', 'guard1'); // Duplicate
+
+        const transition1 = new Transition('source1', 'target1');
+        transition1.setGuards([guard1]);
+
+        const transition2 = new Transition('source2', 'target2');
+        transition2.setGuards([duplicateGuard1]); // Same as guard1
+
+        state.on = [transition1, transition2];
+
+        const namedGuards = state.getAllNamedGuards();
+        expect(namedGuards).toEqual([guard1]); // Should only return the unique guard
+    });
+
+    test('should handle a mix of named and unnamed guards across transitions', () => {
+        const guard1 = new Guard('expression1', 'guard1');
+        const guard2 = new Guard('expression2'); // Unnamed guard
+        const guard3 = new Guard('expression3', 'guard3');
+
+        const transition1 = new Transition('source1', 'target1');
+        transition1.setGuards([guard1, guard2]);
+
+        const transition2 = new Transition('source2', 'target2');
+        transition2.setGuards([guard3]);
+
+        state.on = [transition1, transition2];
+
+        const namedGuards = state.getAllNamedGuards();
+        expect(namedGuards).toEqual([guard1, guard3]); // Only guard1 and guard3 should be returned
     });
 });

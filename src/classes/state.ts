@@ -2,6 +2,7 @@ import StateOrStateMachine from "./stateOrStateMachine.ts"
 import Action from "./action.tsx";
 import {Context} from "../types.ts";
 import Transition from "./transition.ts";
+import Guard from "./guard.tsx";
 
 export default class State implements StateOrStateMachine {
 
@@ -162,6 +163,16 @@ export default class State implements StateOrStateMachine {
 
     public getAllTransitions(): Transition[] {
         return (this.always || []).concat(this._on || [])
+    }
+
+    public getAllNamedGuards() :Guard[] {
+        let guards: Guard[] = [];
+        this.getAllTransitions().forEach((transition) => {
+            guards = guards.concat(transition.getAllNamedGuards())
+        })
+        return guards.filter((guard, index, self) => {
+            return index === self.findIndex((g) => g.equals(guard))
+        });
     }
 
 
