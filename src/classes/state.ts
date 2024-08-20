@@ -3,7 +3,7 @@ import Action from "./action.tsx";
 import {Context} from "../types.ts";
 import Transition from "./transition.ts";
 import Guard from "./guard.tsx";
-import {findIndex} from "lodash";
+
 
 export default class State implements StateOrStateMachine {
 

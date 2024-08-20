@@ -226,4 +226,56 @@ describe('State Class', () => {
         const namedGuards = state.getAllNamedGuards();
         expect(namedGuards).toEqual([guard1, guard3]); // Only guard1 and guard3 should be returned
     });
+
+    test('should return an empty array when there are no actions', () => {
+        const namedActions = state.getAllNamedActions();
+        expect(namedActions).toEqual([]);
+    });
+
+    test('should return an empty array when actions have no names', () => {
+        const action1 = new Action('', ActionType.RAISE_EVENT); // No name
+        const action2 = new Action('', ActionType.RAISE_EVENT); // No name
+        state.entry = [action1];
+        state.exit = [action2];
+
+        const namedActions = state.getAllNamedActions();
+        expect(namedActions).toEqual([]);
+    });
+
+    test('should return all named actions from various action lists', () => {
+        const action1 = new Action('action1', ActionType.RAISE_EVENT);
+        const action2 = new Action('action2', ActionType.RAISE_EVENT);
+        const action3 = new Action('action3', ActionType.RAISE_EVENT);
+
+        state.entry = [action1];
+        state.while = [action2];
+        state.exit = [action3];
+
+        const namedActions = state.getAllNamedActions();
+        expect(namedActions).toEqual([action1, action2, action3]);
+    });
+
+    test('should remove duplicate actions across different lists', () => {
+        const action1 = new Action('action1', ActionType.RAISE_EVENT);
+        const duplicateAction1 = new Action('action1', ActionType.RAISE_EVENT); // Same as action1
+
+        state.entry = [action1];
+        state.exit = [duplicateAction1]; // Duplicate in a different list
+
+        const namedActions = state.getAllNamedActions();
+        expect(namedActions).toEqual([action1]); // Should only return the unique action
+    });
+
+    test('should handle a mix of named and unnamed actions across different lists', () => {
+        const action1 = new Action('action1', ActionType.RAISE_EVENT);
+        const action2 = new Action('', ActionType.RAISE_EVENT); // Unnamed action
+        const action3 = new Action('action3', ActionType.RAISE_EVENT);
+
+        state.entry = [action1];
+        state.while = [action2];
+        state.exit = [action3];
+
+        const namedActions = state.getAllNamedActions();
+        expect(namedActions).toEqual([action1, action3]); // Only named actions should be returned
+    });
 });
