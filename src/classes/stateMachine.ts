@@ -2,6 +2,7 @@ import StateOrStateMachine from "./stateOrStateMachine.ts"
 import {Context} from "../types.ts";
 import Action from "./action.tsx";
 import State from "./state.ts";
+import Guard from "./guard.tsx";
 
 export default class StateMachine implements StateOrStateMachine {
 
@@ -80,6 +81,31 @@ export default class StateMachine implements StateOrStateMachine {
     public clearStates() {
         this._states = [];
     }
+
+    public getAllNamedActions() {
+        let actions: Action[] = [];
+        this.states.forEach(stateOrStatemachine => {
+            actions = actions.concat(stateOrStatemachine.getAllNamedActions())
+        })
+        return actions.filter((action, index, self) => {
+            return index === self.findIndex((a) => {
+               return a.equals(action);
+            })
+        })
+    }
+
+    public getAllNamedGuards(): Guard[] {
+        let guards: Guard[] = [];
+        this.states.forEach(stateOrStatemachine => {
+            guards = guards.concat(stateOrStatemachine.getAllNamedGuards())
+        })
+        return guards.filter((guard, index, self) => {
+            return index === self.findIndex((g) => {
+                return g.equals(guard);
+            })
+        })
+    }
+
 
     public toDICT(): object {
         let dict = {
