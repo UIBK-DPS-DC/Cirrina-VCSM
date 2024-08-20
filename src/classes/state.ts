@@ -156,7 +156,7 @@ export default class State implements StateOrStateMachine {
 
     public getAllNamedActions(): Action[] {
         return this.getAllActions().filter((action) => {
-            action.name
+           return action.name
         })
     }
 
