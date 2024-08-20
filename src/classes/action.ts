@@ -76,6 +76,7 @@ export default class Action {
         }
     }
 
+    // Webstorm marks this method as unused. However, it is used in state class
     public toDICT() {
         this._properties = {...this.properties, type: this.type};
         let dict = {}
