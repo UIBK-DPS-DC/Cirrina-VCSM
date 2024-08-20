@@ -3,6 +3,7 @@ import Action from "./action.tsx";
 import {Context} from "../types.ts";
 import Transition from "./transition.ts";
 import Guard from "./guard.tsx";
+import {findIndex} from "lodash";
 
 export default class State implements StateOrStateMachine {
 
@@ -156,10 +157,11 @@ export default class State implements StateOrStateMachine {
 
 
     public getAllNamedActions(): Action[] {
-        return this.getAllActions().filter((action) => {
-           return action.name
-        })
+        return this.getAllActions().filter((action, index, self) => {
+            return action.name && index === self.findIndex((a) => a.equals(action));
+        });
     }
+
 
     public getAllTransitions(): Transition[] {
         return (this.always || []).concat(this._on || [])

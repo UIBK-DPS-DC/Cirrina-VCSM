@@ -88,6 +88,14 @@ export default class Action {
         return dict;
     }
 
+    // Could be extended to compare fields for non named actions.
+    public equals(other: Action) {
+        if(this.name){
+            return this.name === other.name;
+        }
+        return this === other;
+    }
+
 
 
 
