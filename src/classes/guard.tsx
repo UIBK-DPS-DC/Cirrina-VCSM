@@ -24,6 +24,13 @@ export default class Guard {
         this._expression = value;
     }
 
+    public equals(other: Guard): boolean {
+        if(this.name){
+            return this.name === other.name;
+        }
+        return this._expression === other._expression
+    }
+
 
 
 

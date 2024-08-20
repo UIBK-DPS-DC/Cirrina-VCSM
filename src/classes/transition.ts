@@ -89,12 +89,13 @@ export default class Transition {
      */
     //TODO UPDATE THE CHECK FOR THE NEW GUARD CLASS
     public addGuard(guard: Guard): void {
-        if(this._guards.includes(guard)){
-            console.warn(`Guard ${guard} already exists on Transition ${this.source} => ${this.target}!`)
+        if (this._guards.some(existingGuard => existingGuard.equals(guard))) {
+            console.warn(`Guard ${guard.name} already exists on Transition ${this.source} => ${this.target}!`);
             return;
         }
         this._guards.push(guard);
     }
+
 
 
     private getNewId(){
