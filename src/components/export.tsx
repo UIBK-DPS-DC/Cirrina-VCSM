@@ -1,5 +1,5 @@
 import {useCallback, useContext} from "react";
-import {ReactFlowContextProps} from "../types.ts";
+import {isStateMachine, ReactFlowContextProps} from "../types.ts";
 import {ReactFlowContext} from "../utils.ts";
 import StateMachine from "../classes/stateMachine.ts";
 
@@ -24,19 +24,40 @@ export default function Export () {
         })
         return topLevelSM;
     },[nodes, stateOrStateMachineService])
+    
+    const clearAllStatemachines = useCallback(() => {
+        nodes.forEach((node) => {
+            if(isStateMachine(node.data)){
+                node.data.stateMachine.clearStates()
+            }
+        })
+    },[nodes])
 
 
     const onButtonClick = useCallback(() => {
+        clearAllStatemachines()
         addStatesToStatemachines();
         const topLevelSM = createTopLevelStatemachine();
 
-        console.log(topLevelSM);
+        const dict = {
+            version: "0.0.0.1",
+            name: topLevelSM.name,
+            description: "This is a test",
+            memoryMode: "distributed",
+            stateMachines : {
+                [topLevelSM.name]: topLevelSM.toDICT()
+            }
+
+        }
+
+        console.log(dict);
         
         console.log("Edges")
         edges.forEach((edge) => {
             console.log(edge.id)
         })
-    },[addStatesToStatemachines, createTopLevelStatemachine, edges])
+
+    },[addStatesToStatemachines, clearAllStatemachines, createTopLevelStatemachine, edges])
 
 
 

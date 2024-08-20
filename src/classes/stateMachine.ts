@@ -77,6 +77,10 @@ export default class StateMachine implements StateOrStateMachine {
         this._states.push(stateOrStatemachine);
     }
 
+    public clearStates() {
+        this._states = [];
+    }
+
     public toDICT(): object {
         let dict = {
             states: {} as { [key: string]: object },
