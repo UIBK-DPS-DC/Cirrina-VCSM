@@ -3,6 +3,7 @@ import {isStateMachine, ReactFlowContextProps} from "../types.ts";
 import {ReactFlowContext} from "../utils.ts";
 import StateMachine from "../classes/stateMachine.ts";
 
+
 export default function Export () {
     const context = useContext(ReactFlowContext) as ReactFlowContextProps;
     const {nodes, edges, stateOrStateMachineService} = context;
@@ -50,12 +51,26 @@ export default function Export () {
 
         }
 
-        console.log(dict);
-        
         console.log("Edges")
         edges.forEach((edge) => {
             console.log(edge.id)
         })
+
+        const content = JSON.stringify(dict, null, 2);
+
+
+        const blob = new Blob([content], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'content.json';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+
+
+
+
 
     },[addStatesToStatemachines, clearAllStatemachines, createTopLevelStatemachine, edges])
 
