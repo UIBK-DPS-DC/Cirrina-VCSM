@@ -21,7 +21,9 @@ export default function Export () {
     const createTopLevelStatemachine = useCallback(() => {
         const topLevelSM = new StateMachine("Example");
         nodes.forEach((node) => {
-            stateOrStateMachineService.addStateToStatemachine(topLevelSM, node.data);
+            if(node.extent !== "parent"){
+                stateOrStateMachineService.addStateToStatemachine(topLevelSM, node.data);
+            }
         })
         return topLevelSM;
     },[nodes, stateOrStateMachineService])

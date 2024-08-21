@@ -85,7 +85,9 @@ export default class StateMachine implements StateOrStateMachine {
     public getAllNamedActions() {
         let actions: Action[] = [];
         this.states.forEach(stateOrStatemachine => {
-            actions = actions.concat(stateOrStatemachine.getAllNamedActions())
+            if(!(stateOrStatemachine instanceof StateMachine)) {
+                actions = actions.concat(stateOrStatemachine.getAllNamedActions())
+            }
         })
         return actions.filter((action, index, self) => {
             return index === self.findIndex((a) => {
@@ -97,7 +99,10 @@ export default class StateMachine implements StateOrStateMachine {
     public getAllNamedGuards(): Guard[] {
         let guards: Guard[] = [];
         this.states.forEach(stateOrStatemachine => {
-            guards = guards.concat(stateOrStatemachine.getAllNamedGuards())
+            if( !(stateOrStatemachine instanceof StateMachine)){
+                guards = guards.concat(stateOrStatemachine.getAllNamedGuards())
+
+            }
         })
         return guards.filter((guard, index, self) => {
             return index === self.findIndex((g) => {
@@ -110,7 +115,7 @@ export default class StateMachine implements StateOrStateMachine {
     public toDICT(): object {
         let dict: {
             states: { [key: string]: object };
-            stateMachines: { [key: string]: object };
+            stateMachines?: { [key: string]: object };
             guards?: {[key: string] : string};  // Optional guards field
             actions?: {[key: string] : object};  // Optional actions field
         } = {
