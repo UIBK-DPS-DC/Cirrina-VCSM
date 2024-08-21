@@ -89,7 +89,7 @@ export default function Flow() {
             // TODO: Add this new transition to the relevant states and statemachines.
             const newTransition = transitionService.connectionToTransition(connection)
             if(newTransition) {
-                const edge: Edge<CsmEdgeProps> = { id: getNewEdgeId(), ...connection, type: 'csm-edge', data: {transition: newTransition} };
+                const edge: Edge<CsmEdgeProps> = { id: getNewEdgeId(), ...connection, type: 'csm-edge', data: {transition: newTransition}, zIndex: 1 };
                 setEdges(eds => addEdge(edge, eds));
             }
 
