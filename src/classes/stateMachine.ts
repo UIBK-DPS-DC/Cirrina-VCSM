@@ -108,7 +108,12 @@ export default class StateMachine implements StateOrStateMachine {
 
 
     public toDICT(): object {
-        let dict = {
+        let dict: {
+            states: { [key: string]: object };
+            stateMachines: { [key: string]: object };
+            guards?: {[key: string] : string};  // Optional guards field
+            actions?: {[key: string] : object};  // Optional actions field
+        } = {
             states: {} as { [key: string]: object },
             stateMachines: {} as { [key: string]: object }
         };
@@ -136,6 +141,74 @@ export default class StateMachine implements StateOrStateMachine {
             }
 
         })
+
+
+        if(this.getAllNamedActions().length > 0) {
+            dict = {...dict, actions:{}}
+            this.getAllNamedActions().forEach((action) => {
+                dict = {...dict,
+                actions: {
+                    ...dict.actions,
+                    [action.name] : action.properties
+                }}
+            })
+        }
+
+        if(this.getAllNamedGuards().length > 0) {
+            dict = {...dict, guards:{}}
+            this.getAllNamedGuards().forEach((guard) => {
+                dict = {...dict,
+                guards: {
+                ...dict.guards,
+                [guard.name] : guard.expression}
+                }
+            })
+        }
+
+
+        /**
+         * In JavaScript and TypeScript, object properties do not have a guaranteed order.
+         * The order in which properties appear when you print or iterate over an object
+         * is generally determined by the JavaScript engine and can vary.
+         * When you add new properties to an object using the spread operator,
+         * the new properties are added at the end of the object literal
+         * but may appear earlier when the object is printed,
+         * depending on the engine's internal handling.
+         * If you need the properties to appear in a specific order
+         * when printed or accessed, you can explicitly create a new object with the desired order.
+         * This is why the following code exists.
+         */
+
+        if(dict.guards && dict.actions){
+            dict = {
+                states: dict.states,
+                stateMachines: dict.stateMachines,
+                actions: dict.actions,
+                guards: dict.guards,
+
+            }
+            return dict
+        }
+
+        if(dict.guards){
+            dict = {
+                states: dict.states,
+                stateMachines: dict.stateMachines,
+                guards: dict.guards,
+            }
+            return dict
+        }
+
+        if(dict.actions){
+            dict = {
+                states: dict.states,
+                stateMachines: dict.stateMachines,
+                actions: dict.actions
+            }
+            return dict
+        }
+
+
         return dict;
     }
 
