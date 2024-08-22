@@ -1,5 +1,6 @@
 import {ActionType} from "../enums.ts";
 import {Context} from "../types.ts";
+import {ActionDescription} from "../pkl/bindings/collaborative_state_machine_description.pkl.ts";
 
 
 /**
@@ -94,6 +95,12 @@ export default class Action {
             return this.name === other.name;
         }
         return this === other;
+    }
+
+    public toDescription():ActionDescription {
+        switch(this.type){
+
+        }
     }
 
 

@@ -1,13 +1,13 @@
 export enum ActionType {
-    "INVOKE" = "Invoke",
-    "CREATE" = "Create",
-    "ASSIGN" = "Assign",
-    "LOCK" = "Lock",
-    "UNLOCK" = "Unlock",
-    "RAISE_EVENT" ="Raise Event Action"
+    "INVOKE" = "invoke",
+    "CREATE" = "create",
+    "ASSIGN" = "assign",
+    "LOCK" = "lock",
+    "UNLOCK" = "unlock",
+    "RAISE_EVENT" ="raise"
 
 }
-
+// TODO: Restructure types. Maybe just use pkl bindings
 export enum ActionCategory {
     "TIMEOUT" = "Timeout Action",
     "ENTRY_ACTION" = "Entry Action",
