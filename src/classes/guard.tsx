@@ -1,3 +1,5 @@
+import {GuardDescription} from "../pkl/bindings/collaborative_state_machine_description.pkl.ts";
+
 export default class Guard {
     private _name: string;
     private _expression: string;
@@ -31,7 +33,10 @@ export default class Guard {
         return this._expression === other._expression
     }
 
-
-
+    public toDescription(): GuardDescription {
+        return {
+            expression: this.expression
+        };
+    }
 
 }
