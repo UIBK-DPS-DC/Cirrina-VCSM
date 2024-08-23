@@ -41,6 +41,7 @@ export default function Export () {
         clearAllStatemachines()
         addStatesToStatemachines();
         const topLevelSM = createTopLevelStatemachine();
+        console.log(topLevelSM.toDescription())
 
         const dict = {
             version: "0.0.0.1",
@@ -67,7 +68,7 @@ export default function Export () {
         a.href = url;
         a.download = 'content.json';
         document.body.appendChild(a);
-        a.click();
+        //a.click();
         document.body.removeChild(a);
 
 
