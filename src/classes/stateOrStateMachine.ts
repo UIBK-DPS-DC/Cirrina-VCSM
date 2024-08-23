@@ -5,4 +5,5 @@ export default interface StateOrStateMachine {
     get name(): string
     getAllNamedActions(): Action[]
     getAllNamedGuards(): Guard[]
+
 }
