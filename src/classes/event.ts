@@ -1,6 +1,8 @@
 /**
  * Placeholder event class. Add fields once we can import the schema.
  */
+
+//TODO: Actually use this class. Expand with pkl binds
 export default class Event {
     private _name;
 
