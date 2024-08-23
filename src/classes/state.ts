@@ -3,6 +3,7 @@ import Action from "./action.tsx";
 import {Context} from "../types.ts";
 import Transition from "./transition.ts";
 import Guard from "./guard.tsx";
+import {StateDescription} from "../pkl/bindings/collaborative_state_machine_description.pkl.ts";
 
 
 export default class State implements StateOrStateMachine {
@@ -253,6 +254,48 @@ export default class State implements StateOrStateMachine {
         }
 
         return dict;
+
+    }
+
+    public toDescription(): StateDescription {
+        let description: StateDescription = {
+            after: [],
+            always: [],
+            entry: [],
+            exit: [],
+            initial: this.initial,
+            localContext: {variables: []},
+            name: this.name,
+            on: [],
+            persistentContext: {variables: []},
+            staticContext: {variables: []},
+            terminal: this.terminal,
+            while: []
+        }
+
+        if(this.entry.length >= 1) {
+            description.entry = this.entry.map((action) => {
+                return action.toDescription()
+            })
+        }
+
+        if(this.on.length >= 1) {
+            description.on = this.on.map((transition) =>{
+                return transition.toDescription()
+            })
+        }
+
+
+
+
+
+
+
+
+
+
+        return description;
+
 
     }
 
