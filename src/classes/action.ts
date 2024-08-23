@@ -1,6 +1,11 @@
 import {ActionType} from "../enums.ts";
 import {Context} from "../types.ts";
-import {ActionDescription} from "../pkl/bindings/collaborative_state_machine_description.pkl.ts";
+import {
+    ActionDescription, AssignActionDescription, CreateActionDescription,
+    EventDescription,
+    InvokeActionDescription,
+    RaiseActionDescription, TimeoutActionDescription
+} from "../pkl/bindings/collaborative_state_machine_description.pkl.ts";
 
 
 /**
@@ -99,8 +104,66 @@ export default class Action {
 
     public toDescription():ActionDescription {
         switch(this.type){
+            case ActionType.RAISE_EVENT: {
+                const props = this.properties as {event: string}
+                const eventDescription: EventDescription = {
+                    channel: "global", data: [], name: props.event
+
+                }
+                const description: RaiseActionDescription = {
+                    event: eventDescription, type: "raise"
+                }
+                return description;
+            }
+
+            case ActionType.INVOKE: {
+
+                const props = this.properties as {
+                        description: string,
+                        serviceType: string,
+                        serviceLevel: string
+                    }
+                const description: InvokeActionDescription = {
+                    done: [],
+                    input: [],
+                    isLocal: false,
+                    output: [],
+                    serviceType: props.serviceType,
+                    type: "invoke"
+
+                }
+                return description;
+            }
+            case ActionType.CREATE: {
+                const props = this.properties as {
+                    description: string,
+                    variable: string,
+                    value: string,
+                    isPersistent: boolean
+                }
+
+                const description: CreateActionDescription = {
+                    isPersistent: props.isPersistent , type: "create", variable: {name: props.variable, value: props.value}
+
+                }
+                return description;
+            }
+
+            case ActionType.ASSIGN: {
+                const props = this.properties as {variable: string, value: string}
+                const description: AssignActionDescription = {
+                    type: "assign", variable: {name: props.variable, value: props.value}
+
+                }
+                return description;
+            }
+            default: {
+                // TODO: HANDLE OTHER TYPES.
+                return {type: "lock"}
+            }
 
         }
+
     }
 
 
