@@ -285,6 +285,15 @@ export default class State implements StateOrStateMachine {
             })
         }
 
+        if(this.always.length >= 1) {
+            description.always = this.always.map((action)=>{
+                return action.toDescription()
+            })
+        }
+
+
+
+
 
 
 
