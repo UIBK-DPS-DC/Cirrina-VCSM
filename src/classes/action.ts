@@ -4,7 +4,7 @@ import {
     ActionDescription, AssignActionDescription, CreateActionDescription,
     EventDescription,
     InvokeActionDescription,
-    RaiseActionDescription, TimeoutActionDescription
+    RaiseActionDescription
 } from "../pkl/bindings/collaborative_state_machine_description.pkl.ts";
 
 
