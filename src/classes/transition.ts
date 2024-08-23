@@ -1,5 +1,6 @@
 import Action from "./action.tsx";
 import Guard from "./guard.tsx";
+import {OnTransitionDescription} from "../pkl/bindings/collaborative_state_machine_description.pkl.ts";
 
 export default class Transition {
     private static _TRANSITION_ID_COUNT = 0;
@@ -123,6 +124,17 @@ export default class Transition {
             return guard.name
         })
     }
+
+    // TODO: Expand for internal transitions.
+    public toDescription(): OnTransitionDescription {
+        const description: OnTransitionDescription = {
+            actions: [], else: null, event: this.getEvent(),
+            guards: this.getGuards().map((guard)=> {return guard.toDescription()}),
+            target: this.target
+
+        }
+        return description;
+}
 
 
 
