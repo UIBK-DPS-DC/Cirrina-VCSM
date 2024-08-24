@@ -9,20 +9,28 @@ import {
 import {ActionType} from "../enums.ts";
 
 export default class PklService {
-    public static guardToPKL(description: GuardDescription){
-        let pkl ="{\n"
-        pkl+= `\texpression: "${description.expression}"\n`
-        pkl+= "}"
+    public static guardToPKL(description: GuardDescription, indentLevel = 0){
+        let pkl =`${this.getIndent(indentLevel)}{\n`;
+        pkl+= `${this.getIndent(indentLevel + 1)}expression: "${description.expression}"\n`
+        pkl+= `${this.getIndent(indentLevel)}}`
         return pkl
     }
 
-    public static transitionToPKL(description: OnTransitionDescription): string {
+    public static transitionToPKL(description: OnTransitionDescription, indentLevel = 0): string {
         let pkl = `{\n`
-        pkl+= `\ttarget: ${description.target}\n`
-        pkl += `\tguards: [\n`
+        pkl+= `${this.getIndent(indentLevel + 1)}target: ${description.target}\n`
+        pkl += `${this.getIndent(indentLevel + 1)}guards: [\n`
         description.guards.forEach(guard => {
-            pkl += `\t\t${this.guardToPKL(guard)}\n`
+            pkl += `${this.guardToPKL(guard,indentLevel + 2)}\n`
         })
+        pkl += `${this.getIndent(indentLevel + 1)}]\n`
+        pkl += `${this.getIndent(indentLevel + 1)}actions: [\n`
+        description.actions.forEach(action => {
+            pkl += `${this.actionToPKL(action, indentLevel +2)}\n`
+        })
+        pkl += `${this.getIndent(indentLevel + 1)}]\n`
+        pkl += `${this.getIndent(indentLevel + 1)}event: "${description.event}"\n`
+        pkl += `}`
 
 
         return pkl;
@@ -30,32 +38,32 @@ export default class PklService {
     }
 
 
-    public static actionToPKL(description: ActionDescription): string {
-        let pkl = "{\n"
+    public static actionToPKL(description: ActionDescription, indentLevel = 0): string {
+        let pkl = `${this.getIndent(indentLevel)}{\n`
         switch(description.type){
             case ActionType.RAISE_EVENT: {
                 const raiseEventDescription = description as RaiseActionDescription
-                pkl+= `\ttype: "${raiseEventDescription.type}"\n`
-                pkl+= `\tevent: {\n`
+                pkl+= `${this.getIndent(indentLevel + 1)}type: "${raiseEventDescription.type}"\n`
+                pkl+= `${this.getIndent(indentLevel + 1)}event: {\n`
                 //TODO: Replace with Event to pkl once its done.
-                pkl+= `\t\tchannel: "${raiseEventDescription.event.channel}"\n`
-                pkl+= `\t\tdata: []\n`
-                pkl+= `\t\tname: "${raiseEventDescription.event.name}"\n`
-                pkl+= '\t}\n'
-                pkl+= `}`
+                pkl+= `${this.getIndent(indentLevel + 2)}channel: "${raiseEventDescription.event.channel}"\n`
+                pkl+= `${this.getIndent(indentLevel + 2)}data: []\n`
+                pkl+= `${this.getIndent(indentLevel + 2)}name: "${raiseEventDescription.event.name}"\n`
+                pkl+= `${this.getIndent(indentLevel + 1)}}\n`
+                pkl+= `${this.getIndent(indentLevel)}}`
 
                 return pkl;
 
             }
             case ActionType.INVOKE: {
                 const invokeDescription = description as InvokeActionDescription
-                pkl += `\ttype: "${invokeDescription.type}"\n`
-                pkl += `\tdone: []\n`
-                pkl += `\tinput: []\n`
-                pkl += `\tisLocal: ${invokeDescription.isLocal}`
-                pkl += `\toutput: []\n`
-                pkl += `\tserviceType: "${invokeDescription.serviceType}"\n`
-                pkl += `}`
+                pkl += `${this.getIndent(indentLevel + 1)}type: "${invokeDescription.type}"\n`
+                pkl += `${this.getIndent(indentLevel + 1)}done: []\n`
+                pkl += `${this.getIndent(indentLevel + 1)}input: []\n`
+                pkl += `${this.getIndent(indentLevel + 1)}isLocal: ${invokeDescription.isLocal}`
+                pkl += `${this.getIndent(indentLevel + 1)}output: []\n`
+                pkl += `${this.getIndent(indentLevel + 1)}serviceType: "${invokeDescription.serviceType}"\n`
+                pkl+= `${this.getIndent(indentLevel)}}`
                 return pkl;
 
 
@@ -63,34 +71,36 @@ export default class PklService {
             //TODO replace stuff with context to pkl once implemented
             case ActionType.CREATE: {
                 const createDescription = description as CreateActionDescription as CreateActionDescription
-                pkl += `\ttype: "create"\n`
-                pkl += `\tisPersistent: ${createDescription.isPersistent}\n`
-                pkl += `\tvariable: {\n`
-                pkl += `\t\tname: "${createDescription.variable.name}"\n`
-                pkl += `\t\tvalue: "${createDescription.variable.value}"\n`
-                pkl += `\t}\n`
-                pkl += `}`
+                pkl += `${this.getIndent(indentLevel + 1)}type: "create"\n`
+                pkl += `${this.getIndent(indentLevel + 1)}isPersistent: ${createDescription.isPersistent}\n`
+                pkl += `${this.getIndent(indentLevel + 1)}variable: {\n`
+                pkl += `${this.getIndent(indentLevel + 2)}name: "${createDescription.variable.name}"\n`
+                pkl += `${this.getIndent(indentLevel + 2)}value: "${createDescription.variable.value}"\n`
+                pkl += `${this.getIndent(indentLevel + 1)}}\n`
+                pkl+= `${this.getIndent(indentLevel)}}`
                 return pkl;
             }
             case ActionType.ASSIGN: {
                 const assignDescription = description as AssignActionDescription
-                pkl += `\ttype: ${assignDescription.type}\n`
-                pkl += `\tvariable: {\n`
-                pkl += `\t\tname: "${assignDescription.variable.name}"\n`
-                pkl += `\t\tvalue: "${assignDescription.variable.value}"\n`
-                pkl += `\t}\n`
-                pkl += `}`
+                pkl += `${this.getIndent(indentLevel + 1)}type: ${assignDescription.type}\n`
+                pkl += `${this.getIndent(indentLevel + 1)}variable: {\n`
+                pkl += `${this.getIndent(indentLevel + 2)}name: "${assignDescription.variable.name}"\n`
+                pkl += `${this.getIndent(indentLevel + 2)}value: "${assignDescription.variable.value}"\n`
+                pkl += `${this.getIndent(indentLevel + 1)}}\n`
+                pkl+= `${this.getIndent(indentLevel)}}`
                 return pkl
             }
-
-
-
 
             default: {
                 console.error(`Unknown type ${description.type}`)
                 return "";
             }
         }
+    }
+
+
+    private static getIndent(level: number): string {
+        return '\t'.repeat(level);
     }
 
 }

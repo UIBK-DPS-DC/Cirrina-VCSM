@@ -2,6 +2,7 @@ import Guard from "../src/classes/guard";
 import Action from "../src/classes/action";
 import PklService from "../src/services/pklService";
 import {ActionType} from "../src/enums";
+import {OnTransitionDescription} from "../src/pkl/bindings/collaborative_state_machine_description.pkl";
 
 describe('Guard.toPKL', () => {
 
@@ -62,6 +63,29 @@ describe('Guard.toPKL', () => {
             value: "1"
         }
         console.log(PklService.actionToPKL(action.toDescription()))
+    })
+
+    it("Transition", ()=> {
+        const action1 = new Action("Test", ActionType.ASSIGN);
+        action1.properties = {
+            variable:"Variable a",
+            value: "1"
+        }
+        const action2 = new Action("Test", ActionType.CREATE);
+        action2.properties = {
+            description: "description",
+            variable: "variable a",
+            value: "1",
+            isPersistent: true
+        }
+        const guard1 = new Guard('x > 10 && y < 20')
+        const guard2 = new Guard('a == 5', 'checkEquality');
+
+        const description: OnTransitionDescription = {
+            actions: [action1.toDescription(),action2.toDescription()], else: "", event: "Event a", guards: [guard1.toDescription(),guard2.toDescription()], target: "Target State"
+
+        }
+        console.log(PklService.transitionToPKL(description));
     })
 
 
