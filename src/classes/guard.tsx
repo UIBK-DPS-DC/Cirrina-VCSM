@@ -39,12 +39,4 @@ export default class Guard {
         };
     }
 
-    public toPKL():string {
-        const description = this.toDescription()
-        let pkl ="{\n"
-        pkl+= `\texpression: "${description.expression}"\n`
-        pkl+= "}"
-        return pkl
-    }
-
 }
