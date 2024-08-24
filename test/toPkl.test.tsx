@@ -1,4 +1,6 @@
 import Guard from "../src/classes/guard";
+import Action from "../src/classes/action";
+import {ActionType} from "../src/enums";
 
 describe('Guard.toPKL', () => {
 
@@ -29,5 +31,41 @@ describe('Guard.toPKL', () => {
         expect(guard.toPKL()).toBe(expectedPKL);
         console.log(guard.toPKL());
     });
+
+    it("Raise event", () => {
+        const action = new Action("Test",ActionType.RAISE_EVENT);
+        action.properties = {event: "Event name"}
+        console.log(action.toPKL());
+    })
+
+    it("Invoke event",()=>{
+        const action = new Action("Test", ActionType.INVOKE)
+        action.properties = {
+            description: "description",
+            serviceType: "Type",
+            serviceLevel: "Service Level"
+        }
+        console.log(action.toPKL());
+    })
+
+    it("Create Action", ()=> {
+        const action = new Action("Test", ActionType.CREATE);
+        action.properties = {
+            description: "description",
+            variable: "variable a",
+            value: "1",
+            isPersistent: true
+        }
+        console.log(action.toPKL());
+    })
+    it("Assign Action", ()=> {
+        const action = new Action("Test", ActionType.ASSIGN);
+        action.properties = {
+            variable:"Variable a",
+            value: "1"
+        }
+        console.log(action.toPKL())
+    })
+
 
 });

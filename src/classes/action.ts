@@ -165,12 +165,68 @@ export default class Action {
         }
 
     }
-
+    //TODO: expand for other types etc
     public toPKL(): string {
         let pkl = "{\n"
-        
+        switch(this.type){
+            case ActionType.RAISE_EVENT: {
+                const description = this.toDescription() as RaiseActionDescription
+                pkl+= `\ttype: "${description.type}"\n`
+                pkl+= `\tevent: {\n`
+                //TODO: Replace with Event to pkl once its done.
+                pkl+= `\t\tchannel: "${description.event.channel}"\n`
+                pkl+= `\t\tdata: []\n`
+                pkl+= `\t\tname: "${description.event.name}"\n`
+                pkl+= '\t}\n'
+                pkl+= `}`
 
-        return "Hello"
+                return pkl;
+
+            }
+            case ActionType.INVOKE: {
+                const description = this.toDescription() as InvokeActionDescription
+                pkl += `\ttype: "${description.type}"\n`
+                pkl += `\tdone: []\n`
+                pkl += `\tinput: []\n`
+                pkl += `\tisLocal: ${description.isLocal}`
+                pkl += `\toutput: []\n`
+                pkl += `\tserviceType: "${description.serviceType}"\n`
+                pkl += `}`
+                return pkl;
+
+
+            }
+            //TODO replace stuff with context to pkl once implemented
+            case ActionType.CREATE: {
+                const description = this.toDescription() as CreateActionDescription as CreateActionDescription
+                pkl += `\ttype: "create"\n`
+                pkl += `\tisPersistent: ${description.isPersistent}\n`
+                pkl += `\tvariable: {\n`
+                pkl += `\t\tname: "${description.variable.name}"\n`
+                pkl += `\t\tvalue: "${description.variable.value}"\n`
+                pkl += `\t}\n`
+                pkl += `}`
+                return pkl;
+            }
+            case ActionType.ASSIGN: {
+                const description = this.toDescription() as AssignActionDescription
+                pkl += `\ttype: ${description.type}\n`
+                pkl += `\tvariable: {\n`
+                pkl += `\t\tname: "${description.variable.name}"\n`
+                pkl += `\t\tvalue: "${description.variable.value}"\n`
+                pkl += `\t}\n`
+                pkl += `}`
+                return pkl
+            }
+
+
+
+
+            default: {
+                console.error(`Unknown type ${this._type}`)
+                return "";
+            }
+        }
     }
 
 
