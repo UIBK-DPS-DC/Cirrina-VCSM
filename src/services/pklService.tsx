@@ -1,6 +1,6 @@
 import {
     ActionDescription,
-    AssignActionDescription,
+    AssignActionDescription, CollaborativeStateMachineDescription,
     CreateActionDescription,
     GuardDescription,
     InvokeActionDescription, OnTransitionDescription,
@@ -162,12 +162,32 @@ export default class PklService {
             pkl += `${this.stateMachineToPKL(stateMachine, indentLevel + 2)}\n`
         })
         pkl += `${this.getIndent(indentLevel + 1)}]\n`
-        pkl += `${this.getIndent(indentLevel + 1)}:localContext: []\n`
-        pkl += `${this.getIndent(indentLevel + 1)}:persistentContext: []\n`
+        pkl += `${this.getIndent(indentLevel + 1)}localContext: []\n`
+        pkl += `${this.getIndent(indentLevel + 1)}persistentContext: []\n`
         pkl += `${this.getIndent(indentLevel)}}\n`
 
 
 
+
+
+
+        return pkl;
+
+    }
+
+    public static collaborativeStateMachineToPKL(description: CollaborativeStateMachineDescription, indentLevel = 0) {
+        let pkl = `${this.getIndent(indentLevel)}{\n`
+        pkl += `${this.getIndent(indentLevel + 1)}name: "${description.name}"\n`
+        pkl += `${this.getIndent(indentLevel + 1)}version: "${description.version}"\n`
+
+        pkl += `${this.getIndent(indentLevel + 1)}stateMachines: [\n`
+        description.stateMachines.forEach((stateMachine) =>{
+            pkl += `${this.stateMachineToPKL(stateMachine, indentLevel +2)}\n`
+        })
+        pkl += `${this.getIndent(indentLevel + 1)}]\n`
+        pkl += `${this.getIndent(indentLevel + 1)}localContext: []\n`
+        pkl += `${this.getIndent(indentLevel + 1)}persistentContext: []\n`
+        pkl += `${this.getIndent(indentLevel)}}\n`
 
 
 
