@@ -81,7 +81,7 @@ export default function Flow() {
                 return [...prev.slice(1), nodes];
             }
         });
-    }, []);
+    }, [setNodeHistory]);
 
 
     const onConnect: OnConnect = useCallback(
@@ -89,12 +89,12 @@ export default function Flow() {
             // TODO: Add this new transition to the relevant states and statemachines.
             const newTransition = transitionService.connectionToTransition(connection)
             if(newTransition) {
-                const edge: Edge<CsmEdgeProps> = { id: getNewEdgeId(), ...connection, type: 'csm-edge', data: {transition: newTransition} };
+                const edge: Edge<CsmEdgeProps> = { id: getNewEdgeId(), ...connection, type: 'csm-edge', data: {transition: newTransition}, zIndex: 1 };
                 setEdges(eds => addEdge(edge, eds));
             }
 
         },
-        [setEdges]
+        [setEdges, transitionService]
     );
 
     const onDragOver = useCallback((event: React.DragEvent<HTMLDivElement>) => {
@@ -222,7 +222,7 @@ export default function Flow() {
         }
         setSelectedNode(node);
         setShowSidebar(true);
-    }, [selectedNode, selectedEdge]);
+    }, [selectedEdge, setSelectedNode, setShowSidebar, setSelectedEdge]);
 
     const onEdgeClick = useCallback(
         (_: React.MouseEvent, edge: Edge<CsmEdgeProps>) => {
@@ -231,12 +231,12 @@ export default function Flow() {
             }
             setSelectedEdge(edge)
             setShowSidebar(true);
-        }, [selectedNode, selectedEdge]
+        }, [selectedNode, setSelectedEdge, setShowSidebar, setSelectedNode]
     )
 
     const onPaneClick = useCallback(() => {
         setShowSidebar(false);
-    }, []);
+    }, [setShowSidebar]);
 
     return (
         <div className={"flow-container"}>

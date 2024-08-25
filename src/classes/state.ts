@@ -1,7 +1,10 @@
 import StateOrStateMachine from "./stateOrStateMachine.ts"
-import Action from "./action.ts";
+import Action from "./action.tsx";
 import {Context} from "../types.ts";
 import Transition from "./transition.ts";
+import Guard from "./guard.tsx";
+import {StateDescription} from "../pkl/bindings/collaborative_state_machine_description.pkl.ts";
+
 
 export default class State implements StateOrStateMachine {
 
@@ -153,6 +156,29 @@ export default class State implements StateOrStateMachine {
             .concat(this._while || [], this._after || [], this._exit || []);
     }
 
+
+    public getAllNamedActions(): Action[] {
+        return this.getAllActions().filter((action, index, self) => {
+            return action.name && index === self.findIndex((a) => a.equals(action));
+        });
+    }
+
+
+    public getAllTransitions(): Transition[] {
+        return (this.always || []).concat(this._on || [])
+    }
+
+    public getAllNamedGuards() :Guard[] {
+        let guards: Guard[] = [];
+        this.getAllTransitions().forEach((transition) => {
+            guards = guards.concat(transition.getAllNamedGuards())
+        })
+        return guards.filter((guard, index, self) => {
+            return index === self.findIndex((g) => g.equals(guard))
+        });
+    }
+
+
     /**
      * Adds a new transition to the state's "on" transitions if it doesn't already exist.
      *
@@ -180,34 +206,24 @@ export default class State implements StateOrStateMachine {
     }
 
 
-    private actionsAsDictArray (actions: Action[]) {
-        return actions.map((action: Action) => {return action.toDICT()})
-    }
+    public toDescription(): StateDescription {
+        const description: StateDescription = {
+            after: [],
+            always: [],
+            entry: this.entry.map((action) => action.toDescription()),
+            exit: this.exit.map((action) => action.toDescription()),
+            initial: this.initial,
+            localContext: { variables: [] },
+            name: this.name,
+            on: this.on.map((transition) => transition.toDescription()),
+            persistentContext: { variables: [] },
+            staticContext: { variables: [] },
+            terminal: this.terminal,
+            while: []
+        };
 
-    public toDICT() {
-        let dict = {}
+        return description;
 
-        if(this.entry.length >= 1) {
-            dict = {...dict, entry: this.actionsAsDictArray(this.entry)};
-        }
-
-        if(this.while.length >= 1) {
-            dict = {...dict, while: this.actionsAsDictArray(this.while)};
-        }
-
-        if(this.exit .length >= 1) {
-            dict = {...dict, exit: this.actionsAsDictArray(this.exit)};
-        }
-
-        if(this.after.length >= 1) {
-            dict = {...dict, after: this.actionsAsDictArray(this.after)};
-        }
-
-        if(this.on.length >= 1) {
-            // TODO: Transition to dict
-        }
-
-        return dict;
 
     }
 

@@ -13,6 +13,7 @@ import GuardService from "./services/guardService.tsx";
 import {Edge, Node, useEdgesState, useNodesState} from "@xyflow/react";
 import {ReactFlowContext} from './utils.ts';
 import CsmlEditor from "./components/csmlEditor/csmlEditor.tsx";
+import Export from "./components/export.tsx";
 
 const initialNodes: Node<CsmNodeProps>[] = [];
 const initialEdges: Edge<CsmEdgeProps>[] = [];
@@ -69,7 +70,7 @@ export default function App() {
                 <div className={"topBar"}>
                     <h2> Project Name </h2>
                     <div className={"buttons"}>
-                        <button className={"button"}> Export</button>
+                        <Export></Export>
                         <button className={"button"}> Invoke</button>
                     </div>
                 </div>

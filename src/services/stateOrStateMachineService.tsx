@@ -302,6 +302,21 @@ export default class StateOrStateMachineService {
         return undefined;
     }
 
+    public addStateToStatemachine(stateMachine :StateMachine, data: CsmNodeProps ) {
+        if(isState(data)){
+            stateMachine.addState(data.state);
+            console.log(`Added ${data.state.name} to ${stateMachine.name} as state!`);
+            return;
+        }
+        if(isStateMachine(data)){
+            console.log(`Added ${data.stateMachine.name} to ${stateMachine.name} as state!`);
+            stateMachine.addState(data.stateMachine)
+            return;
+        }
+        console.error("Unknown data type")
+        return;
+    }
+
 
     public getDefaultState(name: string): State {
         // add default config here

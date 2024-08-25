@@ -1,19 +1,19 @@
 import {BaseEdge, EdgeLabelRenderer, type EdgeProps, getSmoothStepPath} from '@xyflow/react';
 
-import { ReactFlowContextProps, TransitionEdge} from '../../types.ts';
+import {ReactFlowContextProps, TransitionEdge} from "../../types.ts";
 import {useContext, useEffect, useState} from "react";
-import Transition from "../../classes/transition.ts";
 import {ReactFlowContext} from "../../utils.ts";
+import Transition from "../../classes/transition.ts";
 
 export default function CsmEdge({
-    id,
-    sourceX,
-    sourceY,
-    targetX,
-    targetY,
-    data,
+                                    id,
+                                    sourceX,
+                                    sourceY,
+                                    targetX,
+                                    targetY,
+                                    data,
 
-  }: EdgeProps<TransitionEdge>) {
+                                }: EdgeProps<TransitionEdge>) {
     const [edgePath] = getSmoothStepPath({ sourceX, sourceY, targetX, targetY });
     const [infoString,setInfoString] = useState<string>("");
 
@@ -23,7 +23,9 @@ export default function CsmEdge({
     const generateInfoString = (transition: Transition | undefined) => {
         if(transition && transition.getEvent()){
             if(transition.getGuards().length >= 1) {
-                return transition.getEvent() + " / " + transition.getGuards().toString();
+                return transition.getEvent() + " / " + transition.getGuards().map((guard => {
+                    return guard.name ? guard.name : guard.expression
+                })).toString();
             }
             else {
                 return transition.getEvent();

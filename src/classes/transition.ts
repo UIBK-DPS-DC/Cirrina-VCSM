@@ -1,4 +1,6 @@
-import Action from "./action.ts";
+import Action from "./action.tsx";
+import Guard from "./guard.tsx";
+import {OnTransitionDescription} from "../pkl/bindings/collaborative_state_machine_description.pkl.ts";
 
 export default class Transition {
     private static _TRANSITION_ID_COUNT = 0;
@@ -6,7 +8,7 @@ export default class Transition {
     private readonly ID: number
     private source : string
     private target : string
-    private _guards : string[]
+    private _guards : Guard[]
     private _actions : Action[]
     private _else : string []
     private _event : string
@@ -39,11 +41,11 @@ export default class Transition {
     }
 
 
-    public getGuards(): string[] {
+    public getGuards(): Guard[] {
         return this._guards;
     }
 
-    public setGuards(value: string[]) {
+    public setGuards(value: Guard[]) {
         this._guards = value;
     }
 
@@ -59,7 +61,7 @@ export default class Transition {
         return this._else;
     }
 
-     public setElse(value: string[]) {
+    public setElse(value: string[]) {
         this._else = value;
     }
 
@@ -86,16 +88,41 @@ export default class Transition {
      *
      * @param {string} guard - The guard to be added to the transition.
      */
-    public addGuard(guard: string): void {
-        if(this._guards.includes(guard)){
-            console.warn(`Guard ${guard} already exists on Transition ${this.source} => ${this.target}!`)
+    //TODO UPDATE THE CHECK FOR THE NEW GUARD CLASS
+    public addGuard(guard: Guard): void {
+        if (this._guards.some(existingGuard => existingGuard.equals(guard))) {
+            console.warn(`Guard ${guard.name} already exists on Transition ${this.source} => ${this.target}!`);
             return;
         }
         this._guards.push(guard);
     }
 
+
+
     private getNewId(){
         return Transition._TRANSITION_ID_COUNT++;
     }
+
+
+    public getAllNamedGuards() {
+        return this._guards.filter((guard) => {
+            return guard.name
+        })
+    }
+
+    // TODO: Expand for internal transitions.
+    public toDescription(): OnTransitionDescription {
+        const description: OnTransitionDescription = {
+            actions: [], else: null, event: this.getEvent(),
+            guards: this.getGuards().map((guard)=> {return guard.toDescription()}),
+            target: this.target
+
+        }
+        return description;
+    }
+
+
+
+
 
 }
