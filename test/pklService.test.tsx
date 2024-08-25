@@ -5,7 +5,7 @@ import {ActionType} from "../src/enums";
 import {
     CreateActionDescription, GuardDescription, InvokeActionDescription,
     OnTransitionDescription,
-    StateDescription, TransitionDescription
+    StateDescription, StateMachineDescription, TransitionDescription
 } from "../src/pkl/bindings/collaborative_state_machine_description.pkl";
 
 describe('Guard.toPKL', () => {
@@ -139,6 +139,92 @@ describe('Guard.toPKL', () => {
         }
 
         console.log(PklService.stateToPKL(stateDescription))
+    })
+
+    it("StateMachine", () => {
+        const actionDescription1: InvokeActionDescription = {
+            done: [], input: [], isLocal: false, output: [], serviceType: "Service type",
+            type: "invoke"
+
+        }
+
+        const actionDescription2: CreateActionDescription = {
+            isPersistent: false, type: "create", variable: {name: "Variable name", value: "2 + 2"}
+
+
+        }
+
+        const actions = [actionDescription1,actionDescription2];
+
+        const transitionDescription: TransitionDescription = {
+            actions: [], else: "", guards: [], target: ""
+
+        }
+
+        const guardDescription: GuardDescription = {
+            expression: "a > 5"
+
+        }
+
+        const onTransitionDescription: OnTransitionDescription = {
+            actions: actions, else: "", event: "Transition Event", guards: [guardDescription], target: "targetState"
+
+        }
+
+        const stateDescription1: StateDescription = {
+            after: actions,
+            always: [transitionDescription],
+            entry: actions,
+            exit: actions,
+            initial: false,
+            localContext: {variables: []},
+            name: "StateName",
+            on: [onTransitionDescription],
+            persistentContext: {variables: []},
+            staticContext: {variables: []},
+            terminal: false,
+            while: actions
+
+        }
+
+        const stateDescription2: StateDescription = {
+            after: actions,
+            always: [transitionDescription],
+            entry: actions,
+            exit: actions,
+            initial: false,
+            localContext: {variables: []},
+            name: "StateName",
+            on: [onTransitionDescription],
+            persistentContext: {variables: []},
+            staticContext: {variables: []},
+            terminal: false,
+            while: actions
+
+        }
+
+        const states = [stateDescription1,stateDescription2]
+
+        const stateMachineDescription1: StateMachineDescription = {
+            localContext: {variables: []},
+            name: "StateMachine",
+            persistentContext: {variables: []},
+            stateMachines: [],
+            states: states
+
+        }
+
+        const stateMachineDescription2: StateMachineDescription = {
+            localContext: {variables: []},
+            name: "StateMachine",
+            persistentContext: {variables: []},
+            stateMachines: [stateMachineDescription1],
+            states: states
+
+        }
+
+        console.log(PklService.stateMachineToPKL(stateMachineDescription2))
+
     })
 
 

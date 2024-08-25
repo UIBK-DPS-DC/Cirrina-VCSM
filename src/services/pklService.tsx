@@ -30,7 +30,7 @@ export default class PklService {
         })
         pkl += `${this.getIndent(indentLevel + 1)}]\n`
         pkl += `${this.getIndent(indentLevel + 1)}event: "${description.event}"\n`
-        pkl += `}`
+        pkl += `${this.getIndent(indentLevel)}}`
 
 
         return pkl;
@@ -147,8 +147,32 @@ export default class PklService {
         return pkl
     }
 
-    public stateMachineToPKL(description: StateMachineDescription, indentLevel = 0) {
-        return "";
+    public static stateMachineToPKL(description: StateMachineDescription, indentLevel = 0) {
+        let pkl = `${this.getIndent(indentLevel)}{\n`
+        pkl += `${this.getIndent(indentLevel + 1)}name: "${description.name}"\n`
+        pkl += `${this.getIndent(indentLevel + 1)}states: [\n`
+
+        description.states.forEach((state) =>{
+            pkl += `${this.stateToPKL(state, indentLevel + 2)}\n`
+        })
+        pkl += `${this.getIndent(indentLevel + 1)}]\n`
+
+        pkl += `${this.getIndent(indentLevel + 1)}stateMachines: [\n`
+        description.stateMachines.forEach((stateMachine) =>{
+            pkl += `${this.stateMachineToPKL(stateMachine, indentLevel + 2)}\n`
+        })
+        pkl += `${this.getIndent(indentLevel + 1)}]\n`
+        pkl += `${this.getIndent(indentLevel + 1)}:localContext: []\n`
+        pkl += `${this.getIndent(indentLevel + 1)}:persistentContext: []\n`
+        pkl += `${this.getIndent(indentLevel)}}\n`
+
+
+
+
+
+
+        return pkl;
+
     }
 
 
