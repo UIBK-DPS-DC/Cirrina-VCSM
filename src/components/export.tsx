@@ -2,11 +2,13 @@ import {useCallback, useContext} from "react";
 import {isStateMachine, ReactFlowContextProps} from "../types.ts";
 import {ReactFlowContext} from "../utils.ts";
 import StateMachine from "../classes/stateMachine.ts";
+import {CollaborativeStateMachineDescription} from "../pkl/bindings/collaborative_state_machine_description.pkl.ts";
+import PklService from "../services/pklService.tsx";
 
 
 export default function Export () {
     const context = useContext(ReactFlowContext) as ReactFlowContextProps;
-    const {nodes, edges, stateOrStateMachineService} = context;
+    const {nodes, stateOrStateMachineService} = context;
 
     const addStatesToStatemachines = useCallback(() => {
         nodes.forEach((node) => {
@@ -54,28 +56,32 @@ export default function Export () {
 
         }
 
-        console.log("Edges")
-        edges.forEach((edge) => {
-            console.log(edge.id)
-        })
+        const collaborativeStateMachineDescription: CollaborativeStateMachineDescription = {
+            localContext: {variables: []},
+            name: "Collaborative StateMachine",
+            persistentContext: {variables: []},
+            stateMachines: [topLevelSM.toDescription()],
+            version: "2.0"
 
-        const content = JSON.stringify(dict, null, 2);
+        }
 
+        const pkl: string = PklService.collaborativeStateMachineToPKL(collaborativeStateMachineDescription);
 
-        const blob = new Blob([content], { type: 'application/json' });
+        const blob = new Blob([pkl], { type: 'text/plain' });
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = 'content.json';
+        a.download = 'content.pkl';
         document.body.appendChild(a);
-        //a.click();
+        a.click();
         document.body.removeChild(a);
 
 
 
 
 
-    },[addStatesToStatemachines, clearAllStatemachines, createTopLevelStatemachine, edges])
+
+    },[addStatesToStatemachines, clearAllStatemachines, createTopLevelStatemachine])
 
 
 
