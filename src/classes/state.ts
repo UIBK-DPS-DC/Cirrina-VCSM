@@ -206,58 +206,6 @@ export default class State implements StateOrStateMachine {
     }
 
 
-    private actionsAsDictArray (actions: Action[]) {
-        return actions.map((action: Action) => {return action.toDICT()})
-    }
-
-    private contextAsDict (context: Context[]) {
-        let dict = {}
-        context.forEach((context) => {
-            dict = {...dict, [context.name] : {value: context.value}}
-        })
-        return dict;
-    }
-
-    public toDICT() {
-        let dict = {}
-
-        if(this.entry.length >= 1) {
-            dict = {...dict, entry: this.actionsAsDictArray(this.entry)};
-        }
-
-        if(this.while.length >= 1) {
-            dict = {...dict, while: this.actionsAsDictArray(this.while)};
-        }
-
-        if(this.exit .length >= 1) {
-            dict = {...dict, exit: this.actionsAsDictArray(this.exit)};
-        }
-
-        if(this.after.length >= 1) {
-            dict = {...dict, after: this.actionsAsDictArray(this.after)};
-        }
-
-        if(this.on.length >= 1) {
-            dict = {...dict, on: this.on.map((transition) => { return transition.toDICT()})};
-        }
-
-        if(this.localContext.length >= 1) {
-            dict = {...dict, localContext: this.contextAsDict(this.localContext)}
-        }
-
-        if(this.persistentContext.length >= 1) {
-            dict = {...dict, persistentContext: this.contextAsDict(this.persistentContext)}
-        }
-
-        if(this.staticContext.length >= 1) {
-            dict = {...dict, staticContext: this.contextAsDict(this.staticContext)}
-        }
-
-        return dict;
-
-    }
-
-
     public toDescription(): StateDescription {
         const description: StateDescription = {
             after: [],

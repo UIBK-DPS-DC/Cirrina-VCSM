@@ -45,16 +45,6 @@ export default function Export () {
         const topLevelSM = createTopLevelStatemachine();
         console.log(topLevelSM.toDescription())
 
-        const dict = {
-            version: "0.0.0.1",
-            name: topLevelSM.name,
-            description: "This is a test",
-            memoryMode: "distributed",
-            stateMachines : {
-                [topLevelSM.name]: topLevelSM.toDICT()
-            }
-
-        }
 
         const collaborativeStateMachineDescription: CollaborativeStateMachineDescription = {
             localContext: {variables: []},

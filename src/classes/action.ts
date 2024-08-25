@@ -82,17 +82,6 @@ export default class Action {
         }
     }
 
-    // Webstorm marks this method as unused. However, it is used in state class
-    public toDICT() {
-        this._properties = {...this.properties, type: this.type};
-        let dict = {}
-        if(this.delay > 0){
-            dict = {...dict, delay: this.delay};
-        }
-        dict = {...dict, action: this.name ? this.name : this.properties};
-
-        return dict;
-    }
 
     // Could be extended to compare fields for non named actions.
     public equals(other: Action) {

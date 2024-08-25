@@ -50,17 +50,6 @@ describe('Transition', () => {
         expect(transition.getAllNamedGuards()).toEqual([guard1, guard3]);
     });
 
-    test('should return correct string representation of guards', () => {
-        const guard1 = new Guard('expression1', 'guard1');
-        const guard2 = new Guard('expression2'); // No name, should return expression
-
-        transition.setGuards([guard1, guard2]);
-
-        expect(transition.toDICT()).toEqual({
-            [transition.getEvent()]: transition.getTarget(),
-            guard: ['guard1', 'expression2']
-        });
-    });
 
     test('should add and retrieve actions correctly', () => {
         const action1 = new Action('action1', ActionType.RAISE_EVENT);
@@ -71,37 +60,4 @@ describe('Transition', () => {
         expect(transition.getActions()).toEqual([action1, action2]);
     });
 
-    test('should return a correct dictionary representation with actions and guards', () => {
-        const action1 = new Action('action1', ActionType.RAISE_EVENT);
-        const guard1 = new Guard('expression1', 'guard1');
-
-        transition.setActions([action1]);
-        transition.addGuard(guard1);
-
-        const dict = transition.toDICT();
-        expect(dict).toEqual({
-            [transition.getEvent()]: transition.getTarget(),
-            guard: ['guard1']
-        });
-    });
-
-    test('should return an empty dictionary if no event and guards are set', () => {
-        const dict = transition.toDICT();
-        expect(dict).toEqual({ [transition.getEvent()]: transition.getTarget() });
-    });
-
-    test('should handle complex toDICT cases with multiple guards and actions', () => {
-        const action1 = new Action('action1', ActionType.RAISE_EVENT);
-        const guard1 = new Guard('expression1', 'guard1');
-        const guard2 = new Guard('expression2');
-
-        transition.setActions([action1]);
-        transition.setGuards([guard1, guard2]);
-
-        const dict = transition.toDICT();
-        expect(dict).toEqual({
-            [transition.getEvent()]: transition.getTarget(),
-            guard: ['guard1', 'expression2']
-        });
-    });
 });

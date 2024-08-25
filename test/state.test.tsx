@@ -114,27 +114,7 @@ describe('State Class', () => {
         expect(state.on).toContain(transition2);
     });
 
-    test('should return an empty object from toDICT if no actions or transitions are set', () => {
-        const dict = state.toDICT();
-        expect(dict).toEqual({});
-    });
 
-    test('should return a correct dictionary representation from toDICT', () => {
-        const action1 = new Action('action1', ActionType.RAISE_EVENT);
-        const action2 = new Action('action2', ActionType.RAISE_EVENT);
-        state.entry = [action1];
-        state.exit = [action2];
-
-        const transition1 = new Transition('source1', 'target1');
-        state.addOnTransition(transition1);
-
-        const dict = state.toDICT();
-        expect(dict).toEqual({
-            entry: [action1.toDICT()],
-            exit: [action2.toDICT()],
-            on: [transition1.toDICT()],
-        });
-    });
 
     test('should not add duplicate transitions to the "on" array', () => {
         const transition1 = new Transition('source1', 'target1');
@@ -144,24 +124,6 @@ describe('State Class', () => {
         expect(state.on.length).toBe(1);
     });
 
-    test('should handle complex toDICT cases with multiple actions and transitions', () => {
-        const action1 = new Action('action1', ActionType.RAISE_EVENT);
-        const action2 = new Action('action2', ActionType.RAISE_EVENT);
-        state.entry = [action1];
-        state.while = [action2];
-
-        const transition1 = new Transition('source1', 'target1');
-        const transition2 = new Transition('source2', 'target2');
-        state.addOnTransition(transition1);
-        state.addOnTransition(transition2);
-
-        const dict = state.toDICT();
-        expect(dict).toEqual({
-            entry: [action1.toDICT()],
-            while: [action2.toDICT()],
-            on: [transition1.toDICT(), transition2.toDICT()],
-        });
-    });
 
     test('should return an empty array when there are no transitions', () => {
         const namedGuards = state.getAllNamedGuards();

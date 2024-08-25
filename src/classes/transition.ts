@@ -103,21 +103,6 @@ export default class Transition {
         return Transition._TRANSITION_ID_COUNT++;
     }
 
-    // TODO: Expand for internal transitions.
-    public toDICT() {
-        let dict = {}
-        dict = {[this._event] : this.target}
-        if(this._guards.length >= 1) {
-            dict = {...dict, guard: this.guardsToString(this._guards)}
-        }
-        return dict
-    }
-
-    private guardsToString(guards: Guard[]) {
-        return guards.map(guard => {
-            return guard.name? guard.name : guard.expression;
-        })
-    }
 
     public getAllNamedGuards() {
         return this._guards.filter((guard) => {

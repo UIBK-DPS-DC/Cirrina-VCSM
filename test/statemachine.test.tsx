@@ -74,36 +74,4 @@ describe('StateMachine', () => {
         expect(namedGuards).toEqual([guard1, guard2]); // No duplicates
     });
 
-    test('should return correct dictionary representation with nested states and state machines', () => {
-        const state1 = new State('State1');
-        const state2 = new State('State2');
-
-        const nestedStateMachine = new StateMachine('NestedStateMachine');
-        const nestedState1 = new State('NestedState1');
-
-        nestedStateMachine.addState(nestedState1);
-
-        stateMachine.addState(state1);
-        stateMachine.addState(state2);
-        stateMachine.addState(nestedStateMachine);
-
-        const dict = stateMachine.toDICT();
-        expect(dict).toEqual({
-            states: {
-                State1: state1.toDICT(),
-                State2: state2.toDICT()
-            },
-            stateMachines: {
-                NestedStateMachine: nestedStateMachine.toDICT()
-            }
-        });
-    });
-
-    test('should return an empty dictionary if no states or state machines are present', () => {
-        const dict = stateMachine.toDICT();
-        expect(dict).toEqual({
-            states: {},
-            stateMachines: {}
-        });
-    });
 });
