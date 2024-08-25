@@ -4,7 +4,7 @@ import {
     CreateActionDescription,
     GuardDescription,
     InvokeActionDescription, OnTransitionDescription,
-    RaiseActionDescription
+    RaiseActionDescription, StateDescription, StateMachineDescription
 } from "../pkl/bindings/collaborative_state_machine_description.pkl.ts";
 import {ActionType} from "../enums.ts";
 
@@ -17,7 +17,7 @@ export default class PklService {
     }
 
     public static transitionToPKL(description: OnTransitionDescription, indentLevel = 0): string {
-        let pkl = `{\n`
+        let pkl = `${this.getIndent(indentLevel)}{\n`
         pkl+= `${this.getIndent(indentLevel + 1)}target: ${description.target}\n`
         pkl += `${this.getIndent(indentLevel + 1)}guards: [\n`
         description.guards.forEach(guard => {
@@ -60,7 +60,7 @@ export default class PklService {
                 pkl += `${this.getIndent(indentLevel + 1)}type: "${invokeDescription.type}"\n`
                 pkl += `${this.getIndent(indentLevel + 1)}done: []\n`
                 pkl += `${this.getIndent(indentLevel + 1)}input: []\n`
-                pkl += `${this.getIndent(indentLevel + 1)}isLocal: ${invokeDescription.isLocal}`
+                pkl += `${this.getIndent(indentLevel + 1)}isLocal: ${invokeDescription.isLocal}\n`
                 pkl += `${this.getIndent(indentLevel + 1)}output: []\n`
                 pkl += `${this.getIndent(indentLevel + 1)}serviceType: "${invokeDescription.serviceType}"\n`
                 pkl+= `${this.getIndent(indentLevel)}}`
@@ -96,6 +96,59 @@ export default class PklService {
                 return "";
             }
         }
+    }
+
+    public static stateToPKL(description: StateDescription, indentLevel = 0) {
+
+        let pkl = `${this.getIndent(indentLevel)}{\n`
+        pkl += `${this.getIndent(indentLevel + 1)}name: "${description.name}"\n`
+        pkl += `${this.getIndent(indentLevel + 1)}initial: ${description.initial}\n`
+        pkl += `${this.getIndent(indentLevel + 1)}terminal: ${description.terminal}\n`
+
+        pkl += `${this.getIndent(indentLevel + 1)}entry: [\n`
+        description.entry.forEach((action) =>{
+            pkl += `${this.actionToPKL(action,indentLevel + 2)}\n`
+        })
+        pkl += `${this.getIndent(indentLevel + 1)}]\n`
+
+        pkl += `${this.getIndent(indentLevel + 1)}exit: [\n`
+        description.exit.forEach((action) =>{
+            pkl += `${this.actionToPKL(action,indentLevel + 2)}\n`
+        })
+        pkl += `${this.getIndent(indentLevel + 1)}]\n`
+
+        pkl += `${this.getIndent(indentLevel + 1)}while: [\n`
+        description.while.forEach((action) =>{
+            pkl += `${this.actionToPKL(action,indentLevel + 2)}\n`
+        })
+        pkl += `${this.getIndent(indentLevel + 1)}]\n`
+
+        pkl += `${this.getIndent(indentLevel + 1)}after: [\n`
+        description.after.forEach((action) =>{
+            pkl += `${this.actionToPKL(action,indentLevel + 2)}\n`
+        })
+        pkl += `${this.getIndent(indentLevel + 1)}]\n`
+
+        pkl += `${this.getIndent(indentLevel + 1)}on: [\n`
+        description.on.forEach((action) =>{
+            pkl += `${this.transitionToPKL(action,indentLevel + 2)}\n`
+        })
+        pkl += `${this.getIndent(indentLevel + 1)}]\n`
+
+        pkl += `${this.getIndent(indentLevel + 1)}always: []\n`
+
+        pkl += `${this.getIndent(indentLevel + 1)}localContext: []\n`
+        pkl += `${this.getIndent(indentLevel + 1)}staticContext: []\n`
+        pkl += `${this.getIndent(indentLevel)}}\n`
+
+
+
+
+        return pkl
+    }
+
+    public stateMachineToPKL(description: StateMachineDescription, indentLevel = 0) {
+        return "";
     }
 
 
