@@ -3,7 +3,7 @@ import { CsmNodeProps, isState, isStateMachine, ReactFlowContextProps} from "../
 import {ActionCategory, ActionType, MemoryUnit, ServiceLevel, ServiceType, TimeUnit} from "../../enums.ts";
 import Action from "../../classes/action.ts";
 import {ReactFlowContext} from "../../utils.ts";
-
+import RenameNodeComponent from "./renameNodeComponent.tsx";
 
 /**
  * NodeInfoForm Component
@@ -746,6 +746,7 @@ export default function NodeInfoForm() {
     return (
         showSidebar && selectedNode && (
             <div className="node-form">
+                <RenameNodeComponent></RenameNodeComponent>
                 <form onSubmit={onFormSubmit}>
                     <h3>Hi mom! It's me {stateOrStateMachineService.getName(selectedNode.data)}!</h3>
                     <label htmlFor="name">Name: </label>
