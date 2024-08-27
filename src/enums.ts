@@ -1,12 +1,25 @@
+
 export enum ActionType {
     "INVOKE" = "invoke",
     "CREATE" = "create",
     "ASSIGN" = "assign",
     "LOCK" = "lock",
     "UNLOCK" = "unlock",
-    "RAISE_EVENT" ="raise"
-
+    "RAISE_EVENT" = "raise",
+    "TIMEOUT" = "timeout",
+    "TIMEOUT_RESET" = "timeoutReset"
 }
+
+
+
+export enum EventChannel {
+        "INTERNAL" = "internal",
+        "EXTERNAL" = "external",
+        "GLOBAL" = "global",
+        "PERSONAL" = "peripheral",
+}
+
+
 // TODO: Restructure types. Maybe just use pkl bindings
 export enum ActionCategory {
     "TIMEOUT" = "Timeout Action",
