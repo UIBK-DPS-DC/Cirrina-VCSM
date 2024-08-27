@@ -8,6 +8,8 @@ export default function RenameNodeComponent() {
     const [nodeNameInput, setNodeNameInput] = useState<string>("");
     const {
         selectedNode,
+        nodes,
+        setNodes,
         setEdges,
         stateOrStateMachineService
     } = context;
@@ -56,13 +58,39 @@ export default function RenameNodeComponent() {
 
     const onFormSubmit = useCallback((event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
+        if(!selectedNode){
+            return;
+        }
+
         const formElements = event.currentTarget.elements as typeof event.currentTarget.elements & {
             [INPUT_FIELD_NAME]: HTMLInputElement
         };
         const newName = formElements[INPUT_FIELD_NAME]?.value;
         console.log(`Logging NEW NAME FROM COMPONENT ${newName}`);
 
-    },[])
+        const oldName = stateOrStateMachineService.getName(selectedNode.data);
+
+        if (!stateOrStateMachineService.isNameUnique(newName) && newName !== oldName) {
+            console.error(`StateOrStateMachine name ${newName} already exists!`);
+            return;
+        }
+
+        if (newName && newName !== oldName) {
+            const newNodes = nodes.map(node => {
+                if (node.id === selectedNode.id) {
+                    const newData = stateOrStateMachineService.setName(newName, node.data);
+                    return { ...node, data: newData };
+                }
+                return node;
+            });
+
+            stateOrStateMachineService.unregisterName(oldName);
+            stateOrStateMachineService.registerName(newName);
+            setNodes(newNodes);
+            updateTransitionsOnRename(oldName, newName);
+        }
+
+    },[nodes, selectedNode, setNodes, stateOrStateMachineService, updateTransitionsOnRename])
 
 
 
