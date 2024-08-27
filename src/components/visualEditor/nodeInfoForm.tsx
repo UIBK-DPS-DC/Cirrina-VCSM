@@ -28,7 +28,6 @@ export default function NodeInfoForm() {
         selectedNode,
         stateOrStateMachineService,
         showSidebar,
-        nameInput,
         setNameInput,
         setEdges,
         actionService,
@@ -163,8 +162,6 @@ export default function NodeInfoForm() {
         if (!selectedNode) return;
 
         const formElements = event.currentTarget.elements as typeof event.currentTarget.elements & {
-            // GENERIC
-            name: HTMLInputElement,
             "delay-input-value": HTMLInputElement,
             "save-as-named-action-checkbox": HTMLInputElement,
 
@@ -247,33 +244,12 @@ export default function NodeInfoForm() {
 
 
 
-        const newName = formElements.name.value;
+
         const delay = formElements["delay-input-value"]?.value
         const saveAsNamedAction = formElements["save-as-named-action-checkbox"]?.checked;
 
         console.log("EXISTING ACTION ",existingActionName)
 
-        const oldName = stateOrStateMachineService.getName(selectedNode.data);
-
-        if (!stateOrStateMachineService.isNameUnique(newName) && newName !== oldName) {
-            console.error(`StateOrStateMachine name ${newName} already exists!`);
-            return;
-        }
-
-        if (newName && newName !== oldName) {
-            const newNodes = nodes.map(node => {
-                if (node.id === selectedNode.id) {
-                    const newData = stateOrStateMachineService.setName(newName, node.data);
-                    return { ...node, data: newData };
-                }
-                return node;
-            });
-
-            stateOrStateMachineService.unregisterName(oldName);
-            stateOrStateMachineService.registerName(newName);
-            setNodes(newNodes);
-            updateTransitionsOnRename(oldName, newName);
-        }
 
         let newAction = undefined;
 
@@ -417,11 +393,8 @@ export default function NodeInfoForm() {
         setNewActionName("")
 
 
-    }, [nodes, setNodes, selectedNode, stateOrStateMachineService, updateTransitionsOnRename]);
-
-    const onNameInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setNameInput(event.target.value);
-    };
+    }, [selectedNode, stateOrStateMachineService, nodes, setNodes, updateTransitionsOnRename, actionService, newEventName, eventService, contextService, selectedActionType]);
+    
 
     // TODO: Style to make it more readable
     // Show Category etc.
@@ -749,9 +722,6 @@ export default function NodeInfoForm() {
                 <RenameNodeComponent></RenameNodeComponent>
                 <form onSubmit={onFormSubmit}>
                     <h3>Hi mom! It's me {stateOrStateMachineService.getName(selectedNode.data)}!</h3>
-                    <label htmlFor="name">Name: </label>
-                    <input type="text" id="name" name="name" value={nameInput} onChange={onNameInputChange} />
-
                     <div className="from-action-section">
                         <label htmlFor="select-action-type">Add action: </label>
                         <select id="select-action-type" name="select-action-type" onChange={onActionTypeSelect}
