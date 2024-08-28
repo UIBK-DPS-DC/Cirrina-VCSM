@@ -28,7 +28,7 @@ import {
 import StateMachine from "../../classes/stateMachine.ts";
 import State from "../../classes/state.ts";
 import CsmEdge from "./csmEdgeComponent.tsx";
-import {ReactFlowContext} from "../../utils.ts";
+import {ReactFlowContext} from "../../utils.tsx";
 
 
 const nodeTypes = {

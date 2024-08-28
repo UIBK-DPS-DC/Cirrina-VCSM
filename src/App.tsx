@@ -11,7 +11,7 @@ import EventService from "./services/eventService.tsx";
 import ContextService from "./services/contextService.tsx";
 import GuardService from "./services/guardService.tsx";
 import {Edge, Node, useEdgesState, useNodesState} from "@xyflow/react";
-import {ReactFlowContext} from './utils.ts';
+import {ReactFlowContext} from './utils.tsx';
 import CsmlEditor from "./components/csmlEditor/csmlEditor.tsx";
 import Export from "./components/export.tsx";
 

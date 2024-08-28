@@ -2,7 +2,7 @@ import {BaseEdge, EdgeLabelRenderer, type EdgeProps, getSmoothStepPath} from '@x
 
 import {ReactFlowContextProps, TransitionEdge} from "../../types.ts";
 import {useContext, useEffect, useState} from "react";
-import {ReactFlowContext} from "../../utils.ts";
+import {ReactFlowContext} from "../../utils.tsx";
 import Transition from "../../classes/transition.ts";
 
 export default function CsmEdge({

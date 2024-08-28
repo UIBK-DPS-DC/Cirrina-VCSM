@@ -1,5 +1,5 @@
 import React, {useCallback, useContext, useEffect, useState} from "react";
-import {ReactFlowContext} from "../../utils.ts";
+import {ReactFlowContext} from "../../utils.tsx";
 import {ReactFlowContextProps} from "../../types.ts";
 import State from "../../classes/state.ts";
 import Guard from "../../classes/guard.tsx";

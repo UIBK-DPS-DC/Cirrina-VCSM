@@ -1,7 +1,7 @@
 import {Handle, NodeProps, Position} from "@xyflow/react";
 import {ReactFlowContextProps, type StateNode} from "../../../types.ts";
 import {useContext} from "react";
-import {ReactFlowContext} from "../../../utils.ts";
+import {ReactFlowContext} from "../../../utils.tsx";
 
 export function StateNode ({data}: NodeProps<StateNode>) {
 

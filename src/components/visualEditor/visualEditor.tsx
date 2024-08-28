@@ -4,7 +4,7 @@ import {ReactFlowProvider} from "@xyflow/react";
 
 import "../../css/visualEditor.css"
 import {useContext} from "react";
-import {getNodeInfoForm, ReactFlowContext} from "../../utils.ts";
+import {getNodeInfoForm, ReactFlowContext} from "../../utils.tsx";
 import {ReactFlowContextProps} from "../../types.ts";
 import TransitionInfoForm from "./transitionInfoForm.tsx";
 

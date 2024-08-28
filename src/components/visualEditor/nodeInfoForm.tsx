@@ -2,7 +2,7 @@ import React, {useCallback, useContext, useEffect, useState} from "react";
 import { CsmNodeProps, isState, isStateMachine, ReactFlowContextProps} from "../../types.ts";
 import {ActionCategory, ActionType, MemoryUnit, ServiceLevel, ServiceType, TimeUnit} from "../../enums.ts";
 import Action from "../../classes/action.ts";
-import {ReactFlowContext} from "../../utils.ts";
+import {ReactFlowContext} from "../../utils.tsx";
 import RenameNodeComponent from "./renameNodeComponent.tsx";
 import {renderEnumAsOptions} from "../../utils.tsx";
 import ActionTypeSelect from "./ActionForms/actionTypeSelect.tsx";

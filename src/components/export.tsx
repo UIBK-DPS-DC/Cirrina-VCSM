@@ -1,6 +1,6 @@
 import {useCallback, useContext} from "react";
 import {isStateMachine, ReactFlowContextProps} from "../types.ts";
-import {ReactFlowContext} from "../utils.ts";
+import {ReactFlowContext} from "../utils.tsx";
 import StateMachine from "../classes/stateMachine.ts";
 import {CollaborativeStateMachineDescription} from "../pkl/bindings/collaborative_state_machine_description.pkl.ts";
 import PklService from "../services/pklService.tsx";

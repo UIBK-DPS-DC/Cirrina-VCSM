@@ -1,12 +1,13 @@
 import React, {useCallback, useContext} from "react";
-import {ReactFlowContext} from "../../../utils.ts";
-import {ReactFlowContextProps} from "../../../types.ts";
+
 import {ActionType} from "../../../enums.ts";
-import {renderEnumAsOptions} from "../../../utils.tsx";
+import {ReactFlowContext, renderEnumAsOptions} from "../../../utils.tsx";
+import {ReactFlowContextProps} from "../../../types.ts";
 
 const ACTION_TYPE_SELECT_NAME = "action-type-select"
 
 export default function ActionTypeSelect() {
+    const context = useContext(ReactFlowContext) as ReactFlowContextProps;
     const [selectedActionType, setSelectedActionType] = React.useState<string>(ActionType.RAISE_EVENT);
 
     const onSelectedActionTypeChange = useCallback((event: React.ChangeEvent<HTMLSelectElement>)=> {

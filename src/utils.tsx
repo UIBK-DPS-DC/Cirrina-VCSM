@@ -1,6 +1,6 @@
 import {Node} from "@xyflow/react";
 import {CsmNodeProps, OptionEnums, ReactFlowContextProps} from "./types.ts";
-import React, {createContext} from "react";
+import {createContext} from "react";
 import StateInfoForm from "./components/visualEditor/stateInfoForm.tsx";
 import StateMachineInfoForm from "./components/visualEditor/stateMachineInfoForm.tsx";
 
