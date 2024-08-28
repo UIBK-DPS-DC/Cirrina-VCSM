@@ -4,6 +4,8 @@ import {ActionCategory, ActionType, MemoryUnit, ServiceLevel, ServiceType, TimeU
 import Action from "../../classes/action.ts";
 import {ReactFlowContext} from "../../utils.ts";
 import RenameNodeComponent from "./renameNodeComponent.tsx";
+import {renderEnumAsOptions} from "../../utils.tsx";
+import ActionTypeSelect from "./ActionForms/actionTypeSelect.tsx";
 
 /**
  * NodeInfoForm Component
@@ -59,8 +61,7 @@ export default function NodeInfoForm() {
     const [selectedExistingAction, setSelectedExistingAction] = useState<string>("")
     const [saveAsNamedActionCheckbox, setSaveAsNamedActionCheckbox] = useState<boolean>(false);
 
-    type OptionEnums = typeof ActionType | typeof ServiceType | typeof ServiceLevel | typeof ActionCategory
-        | typeof TimeUnit | typeof MemoryUnit
+
 
 
     /**
@@ -425,6 +426,7 @@ export default function NodeInfoForm() {
         setSelectedActionType(event.target.value);
     }
 
+
     const onCategorySelect = (event: React.ChangeEvent<HTMLSelectElement>) => {
         setSelectedActionCategory(event.target.value);
     }
@@ -564,13 +566,7 @@ export default function NodeInfoForm() {
         )
     }
 
-    const renderEnumAsOptions = (enumObject: OptionEnums) => {
-        return (
-            Object.values(enumObject).map((value) => {
-                return <option key={value} value={value}>{value}</option>
-            })
-        );
-    }
+
 
     // TODO: Refactor ids/values to be more self explanatory
     const renderActionProperties = () => {
@@ -720,6 +716,7 @@ export default function NodeInfoForm() {
         showSidebar && selectedNode && (
             <div className="node-form">
                 <RenameNodeComponent></RenameNodeComponent>
+                <ActionTypeSelect></ActionTypeSelect>
                 <form onSubmit={onFormSubmit}>
                     <h3>Hi mom! It's me {stateOrStateMachineService.getName(selectedNode.data)}!</h3>
                     <div className="from-action-section">

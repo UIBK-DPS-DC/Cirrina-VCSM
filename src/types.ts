@@ -10,6 +10,7 @@ import EventService from "./services/eventService.tsx";
 import ContextService from "./services/contextService.tsx";
 import GuardService from "./services/guardService.tsx";
 import TransitionService from "./services/transitionService.tsx";
+import {ActionCategory, ActionType, MemoryUnit, ServiceLevel, ServiceType, TimeUnit} from "./enums.ts";
 
 // One Type to avoid repeating ourselves. Can be expanded/unionized as needed.
 export type CsmNodeProps = {state: State} | {stateMachine: StateMachine} | {name: string};
@@ -18,6 +19,10 @@ export type CsmEdgeProps = {transition: Transition}
 export type NodeType =
     | 'state-node'
     | 'state-machine-node'
+
+
+export type OptionEnums = typeof ActionType | typeof ServiceType | typeof ServiceLevel | typeof ActionCategory
+    | typeof TimeUnit | typeof MemoryUnit
 
 
 export type Transitionn = {
