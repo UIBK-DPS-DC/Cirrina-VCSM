@@ -1,5 +1,5 @@
 import {ActionType} from "../enums.ts";
-import {Context} from "../types.ts";
+import ContextVariable from "./contextVariable.tsx";
 import {
     ActionDescription, AssignActionDescription, CreateActionDescription,
     EventDescription,
@@ -16,7 +16,7 @@ export default class Action {
     private _type: ActionType
     private _delay: number
     private _properties: {}
-    private _context: Context | undefined
+    private _context: ContextVariable[] | undefined
 
     constructor(name: string, type: ActionType, delay = 0) {
         this._name = name;
@@ -60,11 +60,11 @@ export default class Action {
     }
 
 
-    get context(): Context | undefined {
+    get context(): ContextVariable[] | undefined {
         return this._context;
     }
 
-    set context(value: Context | undefined) {
+    set context(value: ContextVariable[] | undefined) {
         this._context = value;
     }
 

@@ -1,6 +1,6 @@
 import StateOrStateMachine from "./stateOrStateMachine.ts"
 import Action from "./action.tsx";
-import {Context} from "../types.ts";
+import ContextVariable from "./contextVariable.tsx";
 import Transition from "./transition.ts";
 import Guard from "./guard.tsx";
 import {StateDescription} from "../pkl/bindings/collaborative_state_machine_description.pkl.ts";
@@ -19,9 +19,9 @@ export default class State implements StateOrStateMachine {
     private _after: Action[] = [];
     private _on: Transition[] = [];
     private _always: Transition[] = [];
-    private _localContext: Context[] = [];
-    private _persistentContext: Context[] = [];
-    private _staticContext: Context[] = [];
+    private _localContext: ContextVariable[] = [];
+    private _persistentContext: ContextVariable[] = [];
+    private _staticContext: ContextVariable[] = [];
 
     public constructor(name: string) {
         this._name = name
@@ -115,27 +115,27 @@ export default class State implements StateOrStateMachine {
         this._always = value;
     }
 
-    get localContext(): Context[] {
+    get localContext(): ContextVariable[] {
         return this._localContext;
     }
 
-    set localContext(value: Context[]) {
+    set localContext(value: ContextVariable[]) {
         this._localContext = value;
     }
 
-    get persistentContext(): Context[] {
+    get persistentContext(): ContextVariable[] {
         return this._persistentContext;
     }
 
-    set persistentContext(value: Context[]) {
+    set persistentContext(value: ContextVariable[]) {
         this._persistentContext = value;
     }
 
-    get staticContext(): Context[] {
+    get staticContext(): ContextVariable[] {
         return this._staticContext;
     }
 
-    set staticContext(value: Context[]) {
+    set staticContext(value: ContextVariable[]) {
         this._staticContext = value;
     }
 

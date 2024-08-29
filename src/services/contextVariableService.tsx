@@ -1,4 +1,4 @@
-import {Context} from "../types.ts";
+import ContextVariable from "../classes/contextVariable.tsx";
 
 /**
  * ContextService Class
@@ -6,8 +6,8 @@ import {Context} from "../types.ts";
  * This class is responsible for managing contexts using a Map. It provides methods
  * to register, update, and create contexts. Each context is identified by a unique name.
  */
-export default class ContextService {
-    private _contextMap: Map<string, Context>;
+export default class ContextVariableService {
+    private _contextMap: Map<string, ContextVariable>;
 
     public constructor() {
         this._contextMap = new Map();
@@ -21,7 +21,7 @@ export default class ContextService {
      *
      * @param {Context} context - The context to be registered.
      */
-    public registerContext(context: Context): void {
+    public registerContext(context: ContextVariable): void {
         if(! this.isContextNameUnique(context)){
             console.error("Context name already exists!");
             return;
@@ -37,7 +37,7 @@ export default class ContextService {
      * @param {Context} context - The context to check.
      * @returns {boolean} - Returns true if the context name is unique, false otherwise.
      */
-    public isContextNameUnique(context: Context): boolean {
+    public isContextNameUnique(context: ContextVariable): boolean {
         return ! this._contextMap.has(context.name);
     }
 
@@ -49,7 +49,7 @@ export default class ContextService {
      *
      * @param {Context} context - The context to be updated.
      */
-    public updateContext(context: Context): void {
+    public updateContext(context: ContextVariable): void {
         if(this.isContextNameUnique(context)){
             console.log(context.name);
             console.error(`Context does not exist`);
@@ -68,11 +68,9 @@ export default class ContextService {
      * @param {string} value - The value of the context.
      * @returns {Context} - Returns the created context object.
      */
-    public createContext(name: string, value: string): Context {
-        return {
-            name: name,
-            value: value
-        }
+    // TODO: Expression validation could be added here
+    public createContext(name: string, value: string): ContextVariable {
+        return new ContextVariable(name, value);
     }
 
     /**

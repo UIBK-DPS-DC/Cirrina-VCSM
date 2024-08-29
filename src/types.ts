@@ -7,7 +7,7 @@ import StateOrStateMachineService from "./services/stateOrStateMachineService.ts
 import Action from "./classes/action.ts";
 import ActionService from "./services/actionService.tsx";
 import EventService from "./services/eventService.tsx";
-import ContextService from "./services/contextService.tsx";
+import ContextVariableService from "./services/contextVariableService.tsx";
 import GuardService from "./services/guardService.tsx";
 import TransitionService from "./services/transitionService.tsx";
 import {ActionCategory, ActionType, MemoryUnit, ServiceLevel, ServiceType, TimeUnit} from "./enums.ts";
@@ -31,11 +31,6 @@ export type Transitionn = {
     actions: Action[];
     else?: string[];
     event?: string;
-}
-
-export type Context = {
-    name: string;
-    value: string;
 }
 
 
@@ -72,7 +67,7 @@ export type ReactFlowContextProps = {
     stateOrStateMachineService: StateOrStateMachineService;
     actionService: ActionService;
     eventService: EventService;
-    contextService: ContextService;
+    contextService: ContextVariableService;
     guardService: GuardService;
     transitionService: TransitionService;
 }
