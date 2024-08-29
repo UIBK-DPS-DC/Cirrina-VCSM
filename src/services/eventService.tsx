@@ -1,12 +1,13 @@
 import {CsmNodeProps, isState, isStateMachine} from "../types.ts";
 import Action from "../classes/action.ts";
+import Event from "../classes/event.ts";
 import {ActionType} from "../enums.ts";
 
 export default class EventService {
-    private eventNames: Set<string>;
+    private nameToEventMap: Map<string,Event>;
 
     public constructor() {
-        this.eventNames = new Set<string>();
+        this.nameToEventMap = new Map<string,Event>();
     }
 
     /**
@@ -21,14 +22,14 @@ export default class EventService {
      * @returns {boolean} - Returns `true` if the name is unique and successfully registered,
      *                      otherwise returns `false`.
      */
-    public registerName(eventName: string): boolean {
-        if(!this.isNameUnique(eventName)){
+    public registerEvent(event: Event): boolean {
+        if(!this.isNameUnique(event.name)){
             console.error("Event name already exists!");
             return false;
         }
 
-        this.eventNames.add(eventName);
-        console.log(eventName + " has been registered!");
+        this.nameToEventMap.set(event.name,event);
+        console.log(event.name + " has been registered!");
         return true;
     }
 
@@ -40,9 +41,9 @@ export default class EventService {
      *
      * @param {string | unknown} eventName - The name of the event to unregister.
      */
-    public unregisterName(eventName: string | unknown): void {
+    public unregisterEvent(eventName: string | unknown): void {
         if(typeof eventName === "string" ){
-            this.eventNames.delete(eventName);
+            this.nameToEventMap.delete(eventName);
             console.log(eventName + " has been unregistered!");
         }
         else {
@@ -63,11 +64,11 @@ export default class EventService {
      *                      otherwise returns `false`.
      */
     public isNameUnique(eventName: string): boolean {
-        return ! this.eventNames.has(eventName);
+        return ! this.nameToEventMap.has(eventName);
     }
 
     public getAllEvents() {
-        return Array.from(this.eventNames.values());
+        return Array.from(this.nameToEventMap.values());
     }
 
 
@@ -91,7 +92,7 @@ export default class EventService {
 
         }
         if(isStateMachine(data)){
-            const actions = data.stateMachine.actions.filter((action: Action) => {action.type = ActionType.RAISE_EVENT;})
+            const actions = data.stateMachine.actions.filter((action: Action) => action.type = ActionType.RAISE_EVENT);
             return actions.map((action: Action) => {
                 const props = action.properties as { event: string } // TODO: This probably needs to be dynamic once we have the schema
                 return props.event

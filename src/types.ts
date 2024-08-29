@@ -3,6 +3,7 @@ import Transition from "./classes/transition.ts";
 import StateMachine from "./classes/stateMachine.ts";
 import State from "./classes/state.ts";
 import React from "react";
+import Event from "./classes/event.ts";
 import StateOrStateMachineService from "./services/stateOrStateMachineService.tsx";
 import Action from "./classes/action.ts";
 import ActionService from "./services/actionService.tsx";
@@ -11,6 +12,7 @@ import ContextVariableService from "./services/contextVariableService.tsx";
 import GuardService from "./services/guardService.tsx";
 import TransitionService from "./services/transitionService.tsx";
 import {ActionCategory, ActionType, MemoryUnit, ServiceLevel, ServiceType, TimeUnit} from "./enums.ts";
+import ContextVariable from "./classes/contextVariable.tsx";
 
 // One Type to avoid repeating ourselves. Can be expanded/unionized as needed.
 export type CsmNodeProps = {state: State} | {stateMachine: StateMachine} | {name: string};
@@ -32,6 +34,22 @@ export type Transitionn = {
     else?: string[];
     event?: string;
 }
+
+export type InvokeActionProps = {
+    type: ActionType,
+    serviceType: ServiceType,
+    isLocal: Boolean,
+    input: ContextVariable[],
+    done: Event[],
+    output: string[] // Maybe make it Context Variable array
+}
+
+export type ActionProps = InvokeActionProps | {}
+
+
+
+
+
 
 
 export type StateNode = Node<{

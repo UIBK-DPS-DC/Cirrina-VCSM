@@ -383,7 +383,7 @@ export default function NodeInfoForm() {
             }
 
             if(newRaiseEventName){
-                eventService.registerName(newRaiseEventName);
+                eventService.registerEvent(newRaiseEventName);
             }
             setNodes(newNodes)
 
