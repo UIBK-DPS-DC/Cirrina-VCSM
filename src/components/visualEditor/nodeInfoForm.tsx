@@ -5,7 +5,7 @@ import Action from "../../classes/action.ts";
 import {ReactFlowContext} from "../../utils.tsx";
 import RenameNodeComponent from "./renameNodeComponent.tsx";
 import {renderEnumAsOptions} from "../../utils.tsx";
-import ActionTypeSelect from "./ActionForms/actionTypeSelect.tsx";
+import ActionDisplay from "./ActionForms/actionDisplay.tsx";
 
 /**
  * NodeInfoForm Component
@@ -60,6 +60,9 @@ export default function NodeInfoForm() {
     const [delayValueInput, setDelayValueInput] = useState<string | number>("")
     const [selectedExistingAction, setSelectedExistingAction] = useState<string>("")
     const [saveAsNamedActionCheckbox, setSaveAsNamedActionCheckbox] = useState<boolean>(false);
+
+
+    const[showNewActionForm, setShowNewActionForm] = useState(false);
 
 
 
@@ -537,6 +540,12 @@ export default function NodeInfoForm() {
         }
     }
 
+    const onNewActionFormButtonClick = useCallback((_: React.MouseEvent<HTMLButtonElement>) => {
+        setShowNewActionForm(true)
+        console.log("new action button clicked at", new Date().toISOString());
+    },[])
+
+
 
      const renderEventsAsOptions = () => {
         return (
@@ -711,12 +720,28 @@ export default function NodeInfoForm() {
             }
         }
     }
+
+
+    return (
+        showSidebar && selectedNode && (
+            <div className={"node-form"}>
+                <RenameNodeComponent/>
+                <button className={"new-action-button"} onClick={onNewActionFormButtonClick}>New Action</button>
+                {showNewActionForm && (
+                    <div className={"action-form-container"}>
+                        <ActionDisplay action={undefined}></ActionDisplay>
+                    </div>
+                )}
+            </div>
+        )
+    )
     //TODO: Make this look good
+    /**
     return (
         showSidebar && selectedNode && (
             <div className="node-form">
                 <RenameNodeComponent></RenameNodeComponent>
-                <ActionTypeSelect></ActionTypeSelect>
+                <ActionDisplay></ActionDisplay>
                 <form onSubmit={onFormSubmit}>
                     <h3>Hi mom! It's me {stateOrStateMachineService.getName(selectedNode.data)}!</h3>
                     <div className="from-action-section">
@@ -784,4 +809,5 @@ export default function NodeInfoForm() {
             </div>
         )
     );
+        */
 }
