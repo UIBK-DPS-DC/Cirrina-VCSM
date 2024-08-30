@@ -11,6 +11,7 @@ import LockActionForm from "./lockActionForm.tsx";
 import UnlockActionForm from "./unlockActionForm.tsx";
 import TimeoutActionForm from "./timeoutActionForm.tsx";
 import TimeoutResetActionForm from "./timeoutResetActionForm.tsx";
+import {Form} from "react-bootstrap";
 
 const ACTION_TYPE_SELECT_NAME = "action-type-select"
 
@@ -34,11 +35,15 @@ export default function ActionDisplay(props: {action: Action | undefined}) {
 
     return (
         <div>
-            <h2>Action select wip</h2>
-            <label htmlFor={ACTION_TYPE_SELECT_NAME}>Action type: </label>
-            <select id={ACTION_TYPE_SELECT_NAME} name={ACTION_TYPE_SELECT_NAME} value={selectedActionType} onChange={onSelectedActionTypeChange} disabled={isDisabled}>
-                {renderEnumAsOptions(ActionType)}
-            </select>
+            <Form.Group className={"mb-3"}>
+                <Form.Label>Action Type</Form.Label>
+            </Form.Group>
+            <Form.Group className={"mb-3"}>
+                <Form.Select disabled={isDisabled} onChange={onSelectedActionTypeChange}>
+                    {renderEnumAsOptions(ActionType)}
+                </Form.Select>
+            </Form.Group>
+
 
             {selectedActionType && selectedActionType === ActionType.INVOKE && (
                 <InvokeActionForm action={props.action}></InvokeActionForm>
