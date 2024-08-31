@@ -326,7 +326,7 @@ export default function NodeInfoForm() {
                 }
                 case ActionType.CREATE: {
                     const newContext = contextService.createContext(createVariableName,createVariableValue)
-                    if(!contextService.isContextNameUnique(newContext)){
+                    if(!contextService.isContextUnique(newContext)){
                         console.error(`Context with name ${newContext.name} already exists!`)
                         return;
                     }
@@ -579,6 +579,19 @@ export default function NodeInfoForm() {
         )
     }
 
+    const renderContexts = useCallback(() => {
+        if(selectedNode && isState(selectedNode.data)){
+            console.log("Entering RC")
+            return (
+                selectedNode.data.state.localContext.map((context) => {
+                    return (
+                        <h2 key={context.name}>{context.name}</h2>
+                    )
+                })
+            )
+        }
+    },[selectedNode])
+
 
 
     // TODO: Refactor ids/values to be more self explanatory
@@ -728,7 +741,7 @@ export default function NodeInfoForm() {
 
     return (
         selectedNode && (
-            <Container>
+            <div>
                 <Offcanvas show={showSidebar} scroll={true} backdrop={false} placement={"end"}>
                     <OffcanvasHeader closeButton={true} onClick={() => {setShowSidebar(false)}}>
                         <Offcanvas.Title>{stateOrStateMachineService.getName(selectedNode.data)}</Offcanvas.Title>
@@ -751,9 +764,13 @@ export default function NodeInfoForm() {
                                 <ActionDisplay action={undefined}></ActionDisplay>
                             </div>
                         )}
+                        <div>
+                            <h2>Context Test</h2>
+                            {renderContexts()}
+                        </div>
                     </OffcanvasBody>
                 </Offcanvas>
-            </Container>
+            </div>
         )
     )
 //TODO: Make this look good

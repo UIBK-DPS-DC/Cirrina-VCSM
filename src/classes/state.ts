@@ -27,6 +27,8 @@ export default class State implements StateOrStateMachine {
         this._name = name
     }
 
+
+
     public get name(): string {
         return this._name
     }
@@ -176,6 +178,16 @@ export default class State implements StateOrStateMachine {
         return guards.filter((guard, index, self) => {
             return index === self.findIndex((g) => g.equals(guard))
         });
+    }
+
+    removeContext(context: ContextVariable): void {
+        // Remove the context from the localContext array by reference comparison
+        this._localContext = this._localContext.filter(existingContext => existingContext !== context);
+
+        // Remove the context from the persistentContext array by reference comparison
+        this._persistentContext = this._persistentContext.filter(existingContext => existingContext !== context);
+
+        this._staticContext = this._staticContext.filter(existingContext => existingContext !== context);
     }
 
 

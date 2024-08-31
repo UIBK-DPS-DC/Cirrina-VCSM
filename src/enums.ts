@@ -1,4 +1,3 @@
-
 export enum ActionType {
     "INVOKE" = "invoke",
     "CREATE" = "create",
@@ -10,8 +9,11 @@ export enum ActionType {
     "TIMEOUT_RESET" = "timeoutReset"
 }
 
-
-
+export enum ContextType {
+    "LOCAL" = "Local",
+    "PERSISTENT" = "Persistent",
+    "STATIC" = "Static"
+}
 
 
 export enum EventChannel {

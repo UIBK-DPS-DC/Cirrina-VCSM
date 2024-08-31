@@ -1,13 +1,16 @@
-import { useState } from 'react';
+import {useState} from 'react';
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
 import ContextVariable from "../../classes/contextVariable.tsx";
 import {Container} from "react-bootstrap";
 import ContextForm from "./contextForm.tsx";
 
+
 export default function ContextModal(props: {variable: ContextVariable | undefined}) {
 
     const [show,setShow]=useState(false);
+
+
 
     const handleShow = () => setShow(true)
     const handleClose= () => setShow(false)

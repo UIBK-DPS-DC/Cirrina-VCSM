@@ -1,48 +1,142 @@
 import ContextVariable from "../../classes/contextVariable.tsx";
-import React, {ChangeEvent, useContext, useState} from "react";
-import {ReactFlowContext} from "../../utils.tsx";
-import {ReactFlowContextProps} from "../../types.ts";
+import React, {ChangeEvent, useCallback, useContext, useEffect, useState} from "react";
+import {ReactFlowContext, renderEnumAsOptions} from "../../utils.tsx";
+import { ReactFlowContextProps} from "../../types.ts";
 import {Button, Form} from "react-bootstrap";
-
+import {ContextType} from "../../enums.ts";
 
 export default function ContextForm(props: {variable: ContextVariable | undefined, onClose: () => void}) {
 
-    const VARIABLE_NAME_FIELD_NAME = "variable-name"
-    const EXPRESSION_FIELD_NAME = "expression"
-    const CONTEXT_TYPE_FIELD_NAME = "contextType"
 
-    const buttonText = () => props.variable ? "Update Variable" : "Create Variable"
+
+    const VARIABLE_NAME_FIELD_NAME = "variable-name";
+    const EXPRESSION_FIELD_NAME = "expression";
+    const CONTEXT_TYPE_FIELD_NAME = "contextType";
+
+    const buttonText = () => props.variable ? "Update Variable" : "Create Variable";
+    const oldName = props.variable ? props.variable.name : null;
 
 
     const EXPRESSION_INFO_LINK = "https://en.wikipedia.org/wiki/Expression_(computer_science)";
-    const SPECIFICATIONS_LINK = "https://github.com/UIBK-DPS-DC/Cirrina-Specifications/blob/develop/SPECIFICATIONS.md#data-model-manipulation-and-scope"
+    const SPECIFICATIONS_LINK = "https://github.com/UIBK-DPS-DC/Cirrina-Specifications/blob/develop/SPECIFICATIONS.md#data-model-manipulation-and-scope";
 
     const context = useContext(ReactFlowContext) as ReactFlowContextProps;
-    const {selectedNode} = context
+    const {contextService,
+    selectedNode} = context;
+
+
+
+    const [formIsValid, setFormIsValid] = useState<boolean>(false);
+    const [variableNameIsValid, setVariableNameIsValid] = useState<boolean>(false);
+    const [expressionIsValid, setExpressionIsValid] = useState<boolean>(false);
+    const [contextTypeIsValid, setContextTypeIsValid] = useState<boolean>(true);
+
+
+    useEffect(() => {
+        setFormIsValid(variableNameIsValid && expressionIsValid && contextTypeIsValid);
+    }, [variableNameIsValid, expressionIsValid, contextTypeIsValid]);
+
+
+    const validateVariableName = useCallback((name: string) => {
+        if ((props.variable && props.variable.name !== name) || !props.variable) {
+            return contextService.isContextNameUnique(name);
+        }
+        return true;
+    }, [props.variable, contextService]);
+
+    const validateExpression = useCallback((_: string) => {
+        // TODO: Logic to validate expression.
+        return true;
+    }, []);
+
+    const validateContextType = useCallback((contextType: string) => {
+        return Object.values(ContextType).includes(contextType as ContextType);
+    }, []);
+
+    const validateForm = useCallback(() => {
+        return variableNameIsValid && expressionIsValid && contextTypeIsValid;
+    }, [variableNameIsValid, expressionIsValid, contextTypeIsValid]);
 
     const [variableNameInput, setVariableNameInput] = useState<string>("");
     const [variableValueInput, setVariableValueInput] = useState<string>("");
     const [contextTypeValue, setContextTypeValue] = useState<string>("");
 
-    const onVariableNameInputChange = (event: ChangeEvent<HTMLInputElement>) => setVariableNameInput(event.target.value);
-    const onVariableValueInputChange = (event: ChangeEvent<HTMLInputElement>) => setVariableValueInput(event.target.value);
-    const onContextTypeValueChange = (event: ChangeEvent<HTMLSelectElement>) => setContextTypeValue(event.target.value);
+    const onVariableNameInputChange = useCallback((event: ChangeEvent<HTMLInputElement>) => {
+        const value = event.target.value;
+        setVariableNameInput(value);
+        setVariableNameIsValid(validateVariableName(value));
+        setFormIsValid(validateForm());
+    }, [validateVariableName, validateForm]);
+
+    const onVariableValueInputChange = useCallback((event: ChangeEvent<HTMLInputElement>) => {
+        const value = event.target.value;
+        setVariableValueInput(value);
+        setExpressionIsValid(validateExpression(value));
+        setFormIsValid(validateForm());
+    }, [validateExpression, validateForm]);
+
+    const onContextTypeValueChange = useCallback((event: ChangeEvent<HTMLSelectElement>) => {
+        const value = event.target.value;
+        setContextTypeValue(value);
+        setContextTypeIsValid(validateContextType(value));
+        setFormIsValid(validateForm());
+    }, [validateContextType, validateForm]);
 
 
-    const handleSubmit =(event: React.FormEvent<HTMLFormElement>) => {
+
+    const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-        props.onClose()
+        if(!selectedNode?.data){
+            return;
+        }
 
-    }
+        const formElements = event.currentTarget.elements as typeof event.currentTarget.elements & {
+            [VARIABLE_NAME_FIELD_NAME]: HTMLInputElement;
+            [EXPRESSION_FIELD_NAME]: HTMLInputElement;
+            [CONTEXT_TYPE_FIELD_NAME]: HTMLSelectElement;
+        };
+
+        const variableName = formElements[VARIABLE_NAME_FIELD_NAME].value;
+        const expression = formElements[EXPRESSION_FIELD_NAME].value;
+        const contextType = formElements[CONTEXT_TYPE_FIELD_NAME].value;
+
+        console.log(`VariableName: ${variableName}`);
+        console.log(`Expression: ${expression}`);
+        console.log(`ContextType: ${contextType}`);
+
+        if(props.variable) {
+
+            contextService.removeContext(props.variable,selectedNode.data)
+            contextService.addContext(props.variable,selectedNode.data,contextType as ContextType);
+            props.variable.name = variableName;
+            props.variable.value = expression
+
+            if(oldName && oldName !== variableName) {
+                contextService.deregisterContextByName(oldName)
+                contextService.registerContext(props.variable)
+            }
+
+
+        }
+        else {
+            const newContext = new ContextVariable(variableName, expression);
+            contextService.registerContext(newContext)
+            contextService.addContext(newContext,selectedNode.data,contextType as ContextType);
+            console.log("New Context added!")
+        }
+
+
+        props.onClose();
+    };
 
 
 
 
-    return(
-        <Form onSubmit={handleSubmit}>
+    return (
+        <Form onSubmit={handleSubmit} className={"no"}>
             <Form.Group>
                 <Form.Label>Name</Form.Label>
-                <Form.Control type={"text"} name={VARIABLE_NAME_FIELD_NAME} placeholder={"Variable Name"} value={variableNameInput} onChange={onVariableNameInputChange} required on/>
+                <Form.Control type={"text"} name={VARIABLE_NAME_FIELD_NAME} placeholder={"Variable Name"} value={variableNameInput} onChange={onVariableNameInputChange} required isValid={variableNameIsValid}/>
                 <Form.Text className={"text-muted"}>
                     The new Variable's Name
                 </Form.Text>
@@ -50,26 +144,24 @@ export default function ContextForm(props: {variable: ContextVariable | undefine
 
             <Form.Group>
                 <Form.Label>Value</Form.Label>
-                <Form.Control type={"text"} name={EXPRESSION_FIELD_NAME} placeholder={"Value"} value={variableValueInput} onChange={onVariableValueInputChange} required/>
+                <Form.Control type={"text"} name={EXPRESSION_FIELD_NAME} placeholder={"Value"} value={variableValueInput} onChange={onVariableValueInputChange} required isValid={expressionIsValid}/>
                 <Form.Text className={"text-muted"}>
-                    The variables value. Must be an <a href={EXPRESSION_INFO_LINK} target={"_blank"}>Expression</a>
+                    The variable's value. Must be an <a href={EXPRESSION_INFO_LINK} target={"_blank"}>Expression</a>.
                 </Form.Text>
             </Form.Group>
 
             <Form.Group>
                 <Form.Label>Context Type</Form.Label>
-                <Form.Select name={CONTEXT_TYPE_FIELD_NAME} value={contextTypeValue} onChange={onContextTypeValueChange}>
-                    <option> Test</option>
+                <Form.Select name={CONTEXT_TYPE_FIELD_NAME} value={contextTypeValue} onChange={onContextTypeValueChange} isValid={contextTypeIsValid}>
+                    {renderEnumAsOptions(ContextType)}
                 </Form.Select>
                 <Form.Text className={"text-muted"}>
-                    The Context Type of the variable affects its visibility. See the <a href={SPECIFICATIONS_LINK} target={"_blank"}>Specification</a>
+                    The Context Type of the variable affects its visibility. See the <a href={SPECIFICATIONS_LINK} target={"_blank"}>Specification</a>.
                 </Form.Text>
             </Form.Group>
-            <Button variant="primary" type="submit">
+            <Button variant="primary" type="submit" disabled={!formIsValid}>
                 {buttonText()}
             </Button>
         </Form>
-    )
-
-
+    );
 }

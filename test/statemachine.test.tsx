@@ -1,7 +1,8 @@
-import StateMachine from '../src/classes/stateMachine'; // Adjust the import path as necessary
+import StateMachine from '../src/classes/stateMachine';
 import State from '../src/classes/state';
 import Action from '../src/classes/action';
 import Guard from '../src/classes/guard';
+import ContextVariable from '../src/classes/contextVariable';
 import { ActionType } from '../src/enums';
 
 describe('StateMachine', () => {
@@ -72,6 +73,54 @@ describe('StateMachine', () => {
 
         const namedGuards = stateMachine.getAllNamedGuards();
         expect(namedGuards).toEqual([guard1, guard2]); // No duplicates
+    });
+
+    // New tests for removeContext
+    test('should remove a context variable from localContext', () => {
+        const contextVar1 = new ContextVariable('var1', 'value1');
+        const contextVar2 = new ContextVariable('var2', 'value2');
+
+        stateMachine.localContext = [contextVar1, contextVar2];
+        stateMachine.removeContext(contextVar1);
+
+        expect(stateMachine.localContext).toEqual([contextVar2]);
+    });
+
+    test('should remove a context variable from persistentContext', () => {
+        const contextVar1 = new ContextVariable('var1', 'value1');
+        const contextVar2 = new ContextVariable('var2', 'value2');
+
+        stateMachine.persistentContext = [contextVar1, contextVar2];
+        stateMachine.removeContext(contextVar1);
+
+        expect(stateMachine.persistentContext).toEqual([contextVar2]);
+    });
+
+    test('should remove a context variable from both localContext and persistentContext', () => {
+        const contextVar1 = new ContextVariable('var1', 'value1');
+        const contextVar2 = new ContextVariable('var2', 'value2');
+
+        stateMachine.localContext = [contextVar1, contextVar2];
+        stateMachine.persistentContext = [contextVar1, contextVar2];
+
+        stateMachine.removeContext(contextVar1);
+
+        expect(stateMachine.localContext).toEqual([contextVar2]);
+        expect(stateMachine.persistentContext).toEqual([contextVar2]);
+    });
+
+    test('should not alter contexts if the context variable is not found', () => {
+        const contextVar1 = new ContextVariable('var1', 'value1');
+        const contextVar2 = new ContextVariable('var2', 'value2');
+        const contextVar3 = new ContextVariable('var3', 'value3'); // This one will not be in the context arrays
+
+        stateMachine.localContext = [contextVar1, contextVar2];
+        stateMachine.persistentContext = [contextVar1, contextVar2];
+
+        stateMachine.removeContext(contextVar3);
+
+        expect(stateMachine.localContext).toEqual([contextVar1, contextVar2]);
+        expect(stateMachine.persistentContext).toEqual([contextVar1, contextVar2]);
     });
 
 });

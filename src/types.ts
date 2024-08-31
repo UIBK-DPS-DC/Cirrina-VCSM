@@ -11,7 +11,7 @@ import EventService from "./services/eventService.tsx";
 import ContextVariableService from "./services/contextVariableService.tsx";
 import GuardService from "./services/guardService.tsx";
 import TransitionService from "./services/transitionService.tsx";
-import {ActionCategory, ActionType, MemoryUnit, ServiceLevel, ServiceType, TimeUnit} from "./enums.ts";
+import {ActionCategory, ActionType, ContextType, MemoryUnit, ServiceLevel, ServiceType, TimeUnit} from "./enums.ts";
 import ContextVariable from "./classes/contextVariable.tsx";
 
 // One Type to avoid repeating ourselves. Can be expanded/unionized as needed.
@@ -24,7 +24,7 @@ export type NodeType =
 
 
 export type OptionEnums = typeof ActionType | typeof ServiceType | typeof ServiceLevel | typeof ActionCategory
-    | typeof TimeUnit | typeof MemoryUnit
+    | typeof TimeUnit | typeof MemoryUnit | typeof ContextType
 
 
 export type Transitionn = {

@@ -34,11 +34,11 @@ describe('ContextService', () => {
     test('isContextNameUnique should return true for a unique context name', () => {
         const context = new ContextVariable("uniqueContext", "value1");
 
-        expect(contextService.isContextNameUnique(context)).toBe(true);
+        expect(contextService.isContextUnique(context)).toBe(true);
 
         contextService.registerContext(context);
 
-        expect(contextService.isContextNameUnique(context)).toBe(false);
+        expect(contextService.isContextUnique(context)).toBe(false);
     });
 
     test('updateContext should update an existing context', () => {
