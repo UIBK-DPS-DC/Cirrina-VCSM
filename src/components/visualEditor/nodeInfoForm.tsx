@@ -7,7 +7,8 @@ import RenameNodeComponent from "./renameNodeComponent.tsx";
 import {renderEnumAsOptions} from "../../utils.tsx";
 import ActionDisplay from "./ActionForms/actionDisplay.tsx";
 import Offcanvas from 'react-bootstrap/Offcanvas';
-import {Button, OffcanvasBody, OffcanvasHeader} from "react-bootstrap";
+import {Button, Container, OffcanvasBody, OffcanvasHeader} from "react-bootstrap";
+import ContextModal from "../Context/contextModal.tsx";
 
 /**
  * NodeInfoForm Component
@@ -727,7 +728,7 @@ export default function NodeInfoForm() {
 
     return (
         selectedNode && (
-            <>
+            <Container>
                 <Offcanvas show={showSidebar} scroll={true} backdrop={false} placement={"end"}>
                     <OffcanvasHeader closeButton={true} onClick={() => {setShowSidebar(false)}}>
                         <Offcanvas.Title>{stateOrStateMachineService.getName(selectedNode.data)}</Offcanvas.Title>
@@ -735,25 +736,30 @@ export default function NodeInfoForm() {
                     <OffcanvasBody>
                         <RenameNodeComponent/>
                         <br/>
+                        <Container>
+                            <ContextModal context={undefined}></ContextModal>
+                        </Container>
+
+                        <br/>
                         <div className="d-grid gap-2">
                             <Button variant="primary" size="lg" onClick={onNewActionFormButtonClick}>
                                 New Action
                             </Button>
                         </div>
-                            {showNewActionForm && (
-                                <div className={"action-form-container"}>
-                                    <ActionDisplay action={undefined}></ActionDisplay>
-                                </div>
-                            )}
+                        {showNewActionForm && (
+                            <div className={"action-form-container"}>
+                                <ActionDisplay action={undefined}></ActionDisplay>
+                            </div>
+                        )}
                     </OffcanvasBody>
                 </Offcanvas>
-            </>
-)
-)
+            </Container>
+        )
+    )
 //TODO: Make this look good
-/**
-return (
-showSidebar && selectedNode && (
+    /**
+     return (
+     showSidebar && selectedNode && (
             <div className="node-form">
                 <RenameNodeComponent></RenameNodeComponent>
                 <ActionDisplay></ActionDisplay>
