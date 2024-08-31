@@ -5,15 +5,15 @@ import ContextVariable from "../../classes/contextVariable.tsx";
 import {Container} from "react-bootstrap";
 import ContextForm from "./contextForm.tsx";
 
-export default function ContextModal(props: {context: ContextVariable | undefined}) {
+export default function ContextModal(props: {variable: ContextVariable | undefined}) {
 
     const [show,setShow]=useState(false);
 
     const handleShow = () => setShow(true)
     const handleClose= () => setShow(false)
 
-    const buttonName = () => props.context ? "Edit" : "Create new Context variable"
-    const modalTitle = () => props.context ? props.context.name : "New Context variable"
+    const buttonName = () => props.variable ? "Edit" : "Create new Context variable"
+    const modalTitle = () => props.variable ? props.variable.name : "New Context variable"
 
 
     return (
@@ -31,8 +31,7 @@ export default function ContextModal(props: {context: ContextVariable | undefine
                 </Modal.Header>
 
                 <Modal.Body>
-                    This is a Modal
-                    <ContextForm context={props.context} />
+                    <ContextForm variable={props.variable} />
                 </Modal.Body>
 
                 <Modal.Footer>

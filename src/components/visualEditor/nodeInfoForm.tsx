@@ -737,7 +737,7 @@ export default function NodeInfoForm() {
                         <RenameNodeComponent/>
                         <br/>
                         <Container>
-                            <ContextModal context={undefined}></ContextModal>
+                            <ContextModal variable={undefined}></ContextModal>
                         </Container>
 
                         <br/>
