@@ -1,5 +1,9 @@
 import ContextVariableService from "../src/services/contextVariableService";
 import ContextVariable from "../src/classes/contextVariable";
+import State from "../src/classes/state";
+import StateMachine from "../src/classes/stateMachine";
+import { ContextType } from "../src/enums";
+import { CsmNodeProps } from "../src/types";
 
 describe('ContextService', () => {
     let contextService: ContextVariableService;
@@ -81,5 +85,136 @@ describe('ContextService', () => {
 
         const allContextNames = contextService.getAllContextNames();
         expect(allContextNames).toEqual(expect.arrayContaining(["context1", "context2"]));
+    });
+
+    // New tests for addContext and removeContext
+    test('addContext should add a context variable to a state\'s persistent context', () => {
+        const state = new State('TestState');
+        const contextVariable = new ContextVariable('TestVariable', 'TestValue');
+        const data: CsmNodeProps = { state };
+
+        contextService.addContext(contextVariable, data, ContextType.PERSISTENT);
+
+        expect(state.persistentContext).toContain(contextVariable);
+    });
+
+    test('addContext should add a context variable to a state\'s local context', () => {
+        const state = new State('TestState');
+        const contextVariable = new ContextVariable('TestVariable', 'TestValue');
+        const data: CsmNodeProps = { state };
+
+        contextService.addContext(contextVariable, data, ContextType.LOCAL);
+
+        expect(state.localContext).toContain(contextVariable);
+    });
+
+    test('addContext should add a context variable to a state\'s static context', () => {
+        const state = new State('TestState');
+        const contextVariable = new ContextVariable('TestVariable', 'TestValue');
+        const data: CsmNodeProps = { state };
+
+        contextService.addContext(contextVariable, data, ContextType.STATIC);
+
+        expect(state.staticContext).toContain(contextVariable);
+    });
+
+    test('addContext should add a context variable to a state machine\'s persistent context', () => {
+        const stateMachine = new StateMachine('TestStateMachine');
+        const contextVariable = new ContextVariable('TestVariable', 'TestValue');
+        const data: CsmNodeProps = { stateMachine };
+
+        contextService.addContext(contextVariable, data, ContextType.PERSISTENT);
+
+        expect(stateMachine.persistentContext).toContain(contextVariable);
+    });
+
+    test('addContext should add a context variable to a state machine\'s local context', () => {
+        const stateMachine = new StateMachine('TestStateMachine');
+        const contextVariable = new ContextVariable('TestVariable', 'TestValue');
+        const data: CsmNodeProps = { stateMachine };
+
+        contextService.addContext(contextVariable, data, ContextType.LOCAL);
+
+        expect(stateMachine.localContext).toContain(contextVariable);
+    });
+
+    test('removeContext should remove a context variable from a state\'s persistent context', () => {
+        const state = new State('TestState');
+        const contextVariable = new ContextVariable('TestVariable', 'TestValue');
+        state.persistentContext.push(contextVariable);
+        const data: CsmNodeProps = { state };
+
+        contextService.removeContext(contextVariable, data);
+
+        expect(state.persistentContext).not.toContain(contextVariable);
+    });
+
+    test('removeContext should remove a context variable from a state\'s local context', () => {
+        const state = new State('TestState');
+        const contextVariable = new ContextVariable('TestVariable', 'TestValue');
+        state.localContext.push(contextVariable);
+        const data: CsmNodeProps = { state };
+
+        contextService.removeContext(contextVariable, data);
+
+        expect(state.localContext).not.toContain(contextVariable);
+    });
+
+    test('removeContext should remove a context variable from a state\'s static context', () => {
+        const state = new State('TestState');
+        const contextVariable = new ContextVariable('TestVariable', 'TestValue');
+        state.staticContext.push(contextVariable);
+        const data: CsmNodeProps = { state };
+
+        contextService.removeContext(contextVariable, data);
+
+        expect(state.staticContext).not.toContain(contextVariable);
+    });
+
+    test('removeContext should remove a context variable from a state machine\'s persistent context', () => {
+        const stateMachine = new StateMachine('TestStateMachine');
+        const contextVariable = new ContextVariable('TestVariable', 'TestValue');
+        stateMachine.persistentContext.push(contextVariable);
+        const data: CsmNodeProps = { stateMachine };
+
+        contextService.removeContext(contextVariable, data);
+
+        expect(stateMachine.persistentContext).not.toContain(contextVariable);
+    });
+
+    test('removeContext should remove a context variable from a state machine\'s local context', () => {
+        const stateMachine = new StateMachine('TestStateMachine');
+        const contextVariable = new ContextVariable('TestVariable', 'TestValue');
+        stateMachine.localContext.push(contextVariable);
+        const data: CsmNodeProps = { stateMachine };
+
+        contextService.removeContext(contextVariable, data);
+
+        expect(stateMachine.localContext).not.toContain(contextVariable);
+    });
+
+    test('addContext should log an error for an unknown context type', () => {
+        const state = new State('TestState');
+        const contextVariable = new ContextVariable('TestVariable', 'TestValue');
+        const data: CsmNodeProps = { state };
+        const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation();
+
+        contextService.addContext(contextVariable, data, "UNKNOWN_TYPE" as ContextType);
+
+        expect(consoleErrorSpy).toHaveBeenCalledWith("Unknown Context type. UNKNOWN_TYPE does not exist on State class");
+
+        consoleErrorSpy.mockRestore();
+    });
+
+    test('removeContext should log an error for an unknown data type', () => {
+        const contextVariable = new ContextVariable('TestVariable', 'TestValue');
+        const data: CsmNodeProps = {} as CsmNodeProps;
+        const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation();
+
+        contextService.removeContext(contextVariable, data);
+
+        expect(consoleErrorSpy).toHaveBeenCalledWith("Unknown data type");
+
+        consoleErrorSpy.mockRestore();
     });
 });
