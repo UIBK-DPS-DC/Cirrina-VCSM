@@ -31,7 +31,7 @@ export default function ContextModal(props: {variable: ContextVariable | undefin
                 </Modal.Header>
 
                 <Modal.Body>
-                    <ContextForm variable={props.variable} />
+                    <ContextForm variable={props.variable} onClose={handleClose} />
                 </Modal.Body>
 
                 <Modal.Footer>

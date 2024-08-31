@@ -1,11 +1,11 @@
 import ContextVariable from "../../classes/contextVariable.tsx";
-import {ChangeEvent, useContext, useState} from "react";
+import React, {ChangeEvent, useContext, useState} from "react";
 import {ReactFlowContext} from "../../utils.tsx";
 import {ReactFlowContextProps} from "../../types.ts";
 import {Button, Form} from "react-bootstrap";
 
 
-export default function ContextForm(props: {variable: ContextVariable | undefined}) {
+export default function ContextForm(props: {variable: ContextVariable | undefined, onClose: () => void}) {
 
     const VARIABLE_NAME_FIELD_NAME = "variable-name"
     const EXPRESSION_FIELD_NAME = "expression"
@@ -29,15 +29,20 @@ export default function ContextForm(props: {variable: ContextVariable | undefine
     const onContextTypeValueChange = (event: ChangeEvent<HTMLSelectElement>) => setContextTypeValue(event.target.value);
 
 
+    const handleSubmit =(event: React.FormEvent<HTMLFormElement>) => {
+        event.preventDefault();
+        props.onClose()
+
+    }
 
 
 
 
     return(
-        <Form>
+        <Form onSubmit={handleSubmit}>
             <Form.Group>
                 <Form.Label>Name</Form.Label>
-                <Form.Control type={"text"} name={VARIABLE_NAME_FIELD_NAME} placeholder={"Variable Name"} value={variableNameInput} onChange={onVariableNameInputChange} required />
+                <Form.Control type={"text"} name={VARIABLE_NAME_FIELD_NAME} placeholder={"Variable Name"} value={variableNameInput} onChange={onVariableNameInputChange} required on/>
                 <Form.Text className={"text-muted"}>
                     The new Variable's Name
                 </Form.Text>
