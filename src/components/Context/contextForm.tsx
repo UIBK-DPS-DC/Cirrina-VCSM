@@ -13,8 +13,6 @@ export default function ContextForm(props: {variable: ContextVariable | undefine
     const EXPRESSION_FIELD_NAME = "expression";
     const CONTEXT_TYPE_FIELD_NAME = "contextType";
 
-
-
     const oldName = props.variable ? props.variable.name : null;
 
 
