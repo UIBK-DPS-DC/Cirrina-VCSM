@@ -6,7 +6,7 @@ import {Container} from "react-bootstrap";
 import ContextForm from "./contextForm.tsx";
 
 
-export default function ContextModal(props: {variable: ContextVariable | undefined}) {
+export default function ContextFormModal(props: {variable: ContextVariable | undefined, buttonName: string | undefined}) {
 
     const [show,setShow]=useState(false);
 
@@ -15,7 +15,7 @@ export default function ContextModal(props: {variable: ContextVariable | undefin
     const handleShow = () => setShow(true)
     const handleClose= () => setShow(false)
 
-    const buttonName = () => props.variable ? "Edit" : "Create new Context variable"
+    const buttonName = () => props.variable ? "Edit" : props.buttonName ? props.buttonName :"Create new Context variable"
     const modalTitle = () => props.variable ? props.variable.name : "New Context variable"
 
 

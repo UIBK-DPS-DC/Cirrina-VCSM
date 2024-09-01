@@ -8,7 +8,7 @@ import {renderEnumAsOptions} from "../../utils.tsx";
 import ActionDisplay from "./ActionForms/actionDisplay.tsx";
 import Offcanvas from 'react-bootstrap/Offcanvas';
 import {Button, Container, OffcanvasBody, OffcanvasHeader} from "react-bootstrap";
-import ContextModal from "../Context/contextModal.tsx";
+import ContextFormModal from "../Context/contextFormModal.tsx";
 
 /**
  * NodeInfoForm Component
@@ -79,6 +79,7 @@ export default function NodeInfoForm() {
             setNameInput(stateOrStateMachineService.getName(selectedNode.data));
         }
     }, [selectedNode, setNameInput, stateOrStateMachineService]);
+
 
 
     //################################## For logging #####################################
@@ -742,7 +743,7 @@ export default function NodeInfoForm() {
     return (
         selectedNode && (
             <div>
-                <Offcanvas show={showSidebar} scroll={true} backdrop={false} placement={"end"}>
+                <Offcanvas show={showSidebar} scroll={true} backdrop={false} placement={"end"} style={{ width: '30vw' }}>
                     <OffcanvasHeader closeButton={true} onClick={() => {setShowSidebar(false)}}>
                         <Offcanvas.Title>{stateOrStateMachineService.getName(selectedNode.data)}</Offcanvas.Title>
                     </OffcanvasHeader>
@@ -750,7 +751,7 @@ export default function NodeInfoForm() {
                         <RenameNodeComponent/>
                         <br/>
                         <Container>
-                            <ContextModal variable={undefined}></ContextModal>
+                            <ContextFormModal variable={undefined}></ContextFormModal>
                         </Container>
 
                         <br/>

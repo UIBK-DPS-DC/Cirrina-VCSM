@@ -39,7 +39,7 @@ export default function ActionDisplay(props: {action: Action | undefined}) {
                 <Form.Label>Action Type</Form.Label>
             </Form.Group>
             <Form.Group className={"mb-3"}>
-                <Form.Select disabled={isDisabled} onChange={onSelectedActionTypeChange}>
+                <Form.Select disabled={isDisabled} onChange={onSelectedActionTypeChange} name={ACTION_TYPE_SELECT_NAME} value={selectedActionType}>
                     {renderEnumAsOptions(ActionType)}
                 </Form.Select>
             </Form.Group>

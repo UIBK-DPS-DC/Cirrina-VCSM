@@ -168,6 +168,7 @@ export default function Flow() {
 
             /** The parent always needs to before the child in the nodes array.
              * This bock moves the child node to the front of the parent node in the array to always ensure this*/
+            //TODO: Logic for moving statemachines into statemachines.
             if (intersectedBlock) {
                 setNodes((ns: Node<CsmNodeProps> []) => {
                     ns = ns.filter(i => i.id !== node.id)
