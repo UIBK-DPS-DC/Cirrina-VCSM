@@ -139,7 +139,7 @@ export default function ContextForm(props: {variable: ContextVariable | undefine
 
     return (
         <Form onSubmit={handleSubmit} className={"no"}>
-            <Form.Group>
+            <Form.Group controlId={"form-variable-name"}>
                 <Form.Label>Name</Form.Label>
                 <Form.Control
                     type={"text"}
@@ -159,7 +159,7 @@ export default function ContextForm(props: {variable: ContextVariable | undefine
                 </Form.Text>
             </Form.Group>
 
-            <Form.Group>
+            <Form.Group controlId={"form-variable-value"}>
                 <Form.Label>Value</Form.Label>
                 <Form.Control
                     type={"text"}
@@ -179,7 +179,7 @@ export default function ContextForm(props: {variable: ContextVariable | undefine
                 </Form.Text>
             </Form.Group>
 
-            <Form.Group>
+            <Form.Group controlId={"form-variable-context"}>
                 <Form.Label>Context Type</Form.Label>
                 <Form.Select
                     name={CONTEXT_TYPE_FIELD_NAME}
