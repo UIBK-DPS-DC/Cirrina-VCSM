@@ -4,16 +4,21 @@ import {ServiceType} from "../../../enums.ts";
 import {
     ReactFlowContext,
     renderEnumAsOptions,
-    renderStringsAsOptions
 } from "../../../utils.tsx";
-import {useContext} from "react";
+import {useContext, useState} from "react";
 import {ReactFlowContextProps} from "../../../types.ts";
 import ContextFormModal from "../../Context/contextFormModal.tsx";
+import SelectContextsModal from "../../Context/selectContextsModal.tsx";
 
 export default function InvokeActionForm(props: {action: Action | undefined}) {
     const context = useContext(ReactFlowContext) as ReactFlowContextProps
     const {contextService} = context
+
+    // PASS TO SELECT FORM
+    const [selectedInputContextVariables, setSelectedInputContextVariables] = useState<string[]>([])
+
     const cardHeaderText = () => props.action ? "Edit Invoke Action" : "Create new Invoke Action"
+
 
     return(
         <Card className={"text-center"}>
@@ -46,16 +51,7 @@ export default function InvokeActionForm(props: {action: Action | undefined}) {
                     <Form.Group as={Row} className={"mb-3"} controlId={"fromInputVariables"}>
                         <Form.Label column sm="3" className="mb-0">Input</Form.Label>
                         <Col sm="5">
-                            {contextService.getAllContextNames().length > 0 && (
-                                <Form.Select>
-                                    {renderStringsAsOptions(contextService.getAllContextNames())}
-                                </Form.Select>
-                            ) ||
-                                (
-                                    <Form.Select disabled>
-                                        <option>None found</option>
-                                    </Form.Select>
-                                )}
+                           <SelectContextsModal buttonName={"Select Variables"} vars={selectedInputContextVariables} setVars={setSelectedInputContextVariables}></SelectContextsModal>
                         </Col>
                         <Col sm={4}>
                             <ContextFormModal variable={undefined} buttonName={"Create New"}></ContextFormModal>

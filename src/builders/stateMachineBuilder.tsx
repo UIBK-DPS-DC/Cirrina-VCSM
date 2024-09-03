@@ -10,7 +10,7 @@ export default class StateMachineBuilder implements Builder<StateMachine> {
 
 
     public setStateMachineName(stateMachineName: string){
-        this.stateMachine._name = stateMachineName
+        this.stateMachine.name = stateMachineName
     }
 
     public build(): StateMachine {
