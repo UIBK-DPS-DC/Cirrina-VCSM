@@ -143,7 +143,7 @@ describe('ContextService', () => {
         expect(staticContext).toContain(contextVariable);
     });
 
-    test('getStaticContext should log an error when called with a state machine', () => {
+    test('getStaticContext should return an empty array if called on a  state machine', () => {
         const stateMachine = new StateMachine('TestStateMachine');
         const data: CsmNodeProps = { stateMachine };
         const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation();
@@ -151,7 +151,6 @@ describe('ContextService', () => {
         const staticContext = contextService.getStaticContext(data);
 
         expect(staticContext).toEqual([]);
-        expect(consoleErrorSpy).toHaveBeenCalledWith("Statemachine can not have static context");
 
         consoleErrorSpy.mockRestore();
     });

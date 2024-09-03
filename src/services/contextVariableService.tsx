@@ -244,7 +244,6 @@ export default class ContextVariableService {
             return data.state.staticContext;
         }
         if(isStateMachine(data)){
-            console.error("Statemachine can not have static context")
             return []
         }
         console.error("Unknown data type")

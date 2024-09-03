@@ -14,8 +14,49 @@ export default function SelectContextsModal(props: {buttonName: string | undefin
     contextService} = context
 
     const getKnownContextVariables = useCallback((node: Node<CsmNodeProps>) => {
-        console.log(`Test ${node}`)
-    },[selectedNode, nodes]);
+        let localContext: ContextVariable[] = []
+        let staticContext: ContextVariable[] = []
+
+        localContext = localContext.concat(contextService.getLocalContext(node.data))
+        staticContext = staticContext.concat(contextService.getStaticContext(node.data))
+
+        if(node.extent === "parent"){
+            nodes.forEach((n) => {
+                if(n.parentId === node.parentId){
+                    localContext = localContext.concat(contextService.getLocalContext(n.data));
+                    staticContext = staticContext.concat(contextService.getStaticContext(n.data));
+                }
+                if(n.id === node.parentId){
+                    const parentRes = getKnownContextVariables(n)
+                    localContext = localContext.concat(parentRes[0])
+                    staticContext = staticContext.concat(parentRes[1])
+                }
+            })
+        }
+
+        return [localContext, staticContext]
+
+    },[contextService, nodes]);
+
+    const knownLocalContext = useCallback(() => {
+        if(!selectedNode){
+            return []
+        }
+        return getKnownContextVariables(selectedNode)[0].filter((value, index, vars) => {
+            return vars.indexOf(value) === index;
+        })
+    },[getKnownContextVariables])
+
+    const knownStaticContext = useCallback(() => {
+        if(!selectedNode){
+            return
+        }
+        return getKnownContextVariables(selectedNode)[1].filter((value, index, vars) => {
+            return vars.indexOf(value) === index;
+        })
+    })
+
+
 
     const getPersistentContextVariables = useCallback(() => {
         let persistentContext: ContextVariable[] = []
@@ -26,9 +67,6 @@ export default function SelectContextsModal(props: {buttonName: string | undefin
 
     },[nodes])
 
-    useEffect(() => {
-        getPersistentContextVariables()
-    }, []);
 
 
     const[show,setShow]=useState(false);
@@ -56,9 +94,9 @@ export default function SelectContextsModal(props: {buttonName: string | undefin
                     <Form>
                         <Form.Label>Select Context Variables</Form.Label>
                         <Form.Select multiple={true}>
-                            { getPersistentContextVariables().map((v) => {
-                                return(
-                                    <option>{v.name} : {v.value}</option>
+                            {selectedNode && knownLocalContext().map((n) => {
+                                return (
+                                    <option key={`o-${n.name}`}>{n.name} : {n.value}</option>
                                 )
                             })}
 q                        </Form.Select>
