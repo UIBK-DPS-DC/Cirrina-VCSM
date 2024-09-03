@@ -178,6 +178,46 @@ export default class ContextVariableService {
         return;
     }
 
+    public getPersistentContext(data: CsmNodeProps) {
+        if(isState(data)){
+            return data.state.persistentContext;
+        }
+
+        if(isStateMachine(data)){
+            return data.stateMachine.persistentContext
+        }
+
+        console.error("Unknown data type")
+        return []
+    }
+
+    public getLocalContext(data: CsmNodeProps) {
+        if(isState(data)){
+            return data.state.localContext;
+        }
+
+        if(isStateMachine(data)){
+            return data.stateMachine.localContext
+        }
+
+        console.error("Unknown data type")
+        return [];
+
+
+    }
+
+    public getStaticContext(data: CsmNodeProps) {
+        if(isState(data)){
+            return data.state.staticContext;
+        }
+        if(isStateMachine(data)){
+            console.error("Statemachine can not have static context")
+            return []
+        }
+        console.error("Unknown data type")
+        return [];
+    }
+
 
 
 }

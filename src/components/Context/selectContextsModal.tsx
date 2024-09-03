@@ -1,8 +1,30 @@
 import {Button, Container, Form, ModalBody} from "react-bootstrap";
-import {Dispatch, SetStateAction, useState} from "react";
+import {Dispatch, SetStateAction, useCallback, useContext, useEffect, useState} from "react";
 import Modal from "react-bootstrap/Modal";
+import {ReactFlowContext} from "../../utils.tsx";
+import {CsmNodeProps, ReactFlowContextProps} from "../../types.ts";
+import {Node} from "@xyflow/react";
+import ContextVariable from "../../classes/contextVariable.tsx";
 
 export default function SelectContextsModal(props: {buttonName: string | undefined, vars: string[], setVars: Dispatch<SetStateAction<string[]>>}){
+
+    const context = useContext(ReactFlowContext) as ReactFlowContextProps;
+    const {nodes,
+    selectedNode} = context
+
+    const getKnownContextVariables = useCallback((node: Node<CsmNodeProps>) => {
+        console.log(`Test ${node}`)
+    },[selectedNode, nodes]);
+
+    const getPersistentContextVariables = useCallback(() => {
+        const persistentContext: ContextVariable[] = []
+
+    },[nodes])
+
+    useEffect(() => {
+        getPersistentContextVariables()
+    }, []);
+
 
     const[show,setShow]=useState(false);
 
