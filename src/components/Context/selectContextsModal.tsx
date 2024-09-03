@@ -10,14 +10,19 @@ export default function SelectContextsModal(props: {buttonName: string | undefin
 
     const context = useContext(ReactFlowContext) as ReactFlowContextProps;
     const {nodes,
-    selectedNode} = context
+    selectedNode,
+    contextService} = context
 
     const getKnownContextVariables = useCallback((node: Node<CsmNodeProps>) => {
         console.log(`Test ${node}`)
     },[selectedNode, nodes]);
 
     const getPersistentContextVariables = useCallback(() => {
-        const persistentContext: ContextVariable[] = []
+        let persistentContext: ContextVariable[] = []
+        nodes.forEach((node: Node<CsmNodeProps>) => {
+             persistentContext = persistentContext.concat(contextService.getPersistentContext(node.data))
+        })
+        return persistentContext;
 
     },[nodes])
 
@@ -51,8 +56,11 @@ export default function SelectContextsModal(props: {buttonName: string | undefin
                     <Form>
                         <Form.Label>Select Context Variables</Form.Label>
                         <Form.Select multiple={true}>
-                            <option>Test 1</option>
-                            <option>Test 2</option>
+                            { getPersistentContextVariables().map((v) => {
+                                return(
+                                    <option>{v.name} : {v.value}</option>
+                                )
+                            })}
 q                        </Form.Select>
                     </Form>
                 </ModalBody>
