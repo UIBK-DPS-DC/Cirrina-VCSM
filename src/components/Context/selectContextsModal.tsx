@@ -13,6 +13,19 @@ export default function SelectContextsModal(props: {buttonName: string | undefin
     selectedNode,
     contextService} = context
 
+    /**
+     * Retrieves the local and static context variables for a given node and its parent nodes.
+     *
+     * This function starts by gathering the local and static context variables from the current node.
+     * If the node has a parent extent, it recursively gathers context variables from sibling nodes with
+     * the same parentId and from the parent node itself. This approach allows for the accumulation of
+     * context variables up the node hierarchy.
+     *
+     * @param {Node<CsmNodeProps>} node - The node for which to retrieve context variables.
+     * @returns {[ContextVariable[], ContextVariable[]]} - A tuple containing two arrays:
+     *   1. The local context variables.
+     *   2. The static context variables.
+     */
     const getKnownContextVariables = useCallback((node: Node<CsmNodeProps>) => {
         let localContext: ContextVariable[] = []
         let staticContext: ContextVariable[] = []
@@ -38,6 +51,14 @@ export default function SelectContextsModal(props: {buttonName: string | undefin
 
     },[contextService, nodes]);
 
+    /**
+     * Retrieves the local context variables that are known for the currently selected node.
+     *
+     * This function checks if a node is selected, then uses `getKnownContextVariables` to gather
+     * all local context variables, ensuring that duplicates are removed.
+     *
+     * @returns {ContextVariable[]} - An array of unique local context variables.
+     */
     const knownLocalContext = useCallback(() => {
         if(!selectedNode){
             return []
@@ -47,6 +68,15 @@ export default function SelectContextsModal(props: {buttonName: string | undefin
         })
     },[getKnownContextVariables])
 
+    /**
+     * Retrieves the static context variables that are known for the currently selected node.
+     *
+     * This function checks if a node is selected, then uses `getKnownContextVariables` to gather
+     * all static context variables, ensuring that duplicates are removed.
+     *
+     * @returns {ContextVariable[] | undefined} - An array of unique static context variables,
+     *                                            or undefined if no node is selected.
+     */
     const knownStaticContext = useCallback(() => {
         if(!selectedNode){
             return
@@ -54,7 +84,7 @@ export default function SelectContextsModal(props: {buttonName: string | undefin
         return getKnownContextVariables(selectedNode)[1].filter((value, index, vars) => {
             return vars.indexOf(value) === index;
         })
-    })
+    },[getKnownContextVariables])
 
 
 
