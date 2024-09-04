@@ -93,7 +93,9 @@ export default function SelectContextsModal(props: {buttonName: string | undefin
         nodes.forEach((node: Node<CsmNodeProps>) => {
              persistentContext = persistentContext.concat(contextService.getPersistentContext(node.data))
         })
-        return persistentContext;
+        return persistentContext.filter((value, index, vars) => {
+            return vars.indexOf(value) === index;
+        });
 
     },[nodes])
 
