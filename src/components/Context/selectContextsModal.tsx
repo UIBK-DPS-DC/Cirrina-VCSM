@@ -87,7 +87,16 @@ export default function SelectContextsModal(props: {buttonName: string | undefin
     },[getKnownContextVariables])
 
 
-
+    /**
+     * Retrieves all unique persistent context variables from the nodes in the current graph.
+     *
+     * This function iterates through all the nodes in the `nodes` array and accumulates their
+     * persistent context variables using the `contextService.getPersistentContext` method.
+     * After gathering all the persistent context variables, it filters out any duplicates to
+     * ensure that the returned array only contains unique values.
+     *
+     * @returns {ContextVariable[]} - An array of unique persistent context variables.
+     */
     const getPersistentContextVariables = useCallback(() => {
         let persistentContext: ContextVariable[] = []
         nodes.forEach((node: Node<CsmNodeProps>) => {
