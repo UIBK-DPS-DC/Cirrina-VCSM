@@ -131,15 +131,32 @@ export default function SelectContextsModal(props: {buttonName: string | undefin
     const buttonName = () => props.buttonName ? props.buttonName : "Select Context"
 
 
-    const onSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault()
         if(!selectedNode){
             return;
         }
 
-        const formElements = event.currentTarget.elements as typeof event.currentTarget.elements && {
-
+        const formElements = event.currentTarget.elements as typeof event.currentTarget.elements & {
+            [PERSISTENT_CONTEXT_MULTISELECT_NAME]: HTMLSelectElement| null;
+            [LOCAL_CONTEXT_MULTISELECT_NAME]: HTMLSelectElement | null;
+            [STATIC_CONTEXT_MULTISELECT_NAME]: HTMLSelectElement | null;
         }
+
+        const persistentSelect = formElements[PERSISTENT_CONTEXT_MULTISELECT_NAME];
+        const localSelect = formElements[LOCAL_CONTEXT_MULTISELECT_NAME];
+        const staticSelect = formElements[STATIC_CONTEXT_MULTISELECT_NAME];
+
+        const selectedPersistentContext = persistentSelect ? Array.from(persistentSelect.selectedOptions).map(option => option.value) : [];
+        const selectedLocalContext = localSelect ? Array.from(localSelect.selectedOptions).map(option => option.value) : [];
+        const selectedStaticContext = staticSelect ? Array.from(staticSelect.selectedOptions).map(option => option.value) : [];
+
+        console.log(selectedLocalContext);
+        console.log(selectedStaticContext);
+        console.log(selectedPersistentContext);
+
+
+
 
     }
 
@@ -160,12 +177,12 @@ export default function SelectContextsModal(props: {buttonName: string | undefin
                 <ModalBody>
 
                     <div className={"mb-3"}>
-                        <small className="text-decoration-underline">
+                        <small className="text-decoration-underline text-muted">
                             You can select multiple variables by holding CTRL
                         </small>
                     </div>
 
-                    <Form>
+                    <Form onSubmit={handleSubmit}>
 
                         <Form.Group controlId={"fromPersistentContext"}>
                         <Row>
@@ -207,6 +224,8 @@ export default function SelectContextsModal(props: {buttonName: string | undefin
                                 </Row>
                             </Form.Group>
                         )}
+
+                        <Button type={"submit"}>Save Selection</Button>
 
                     </Form>
                 </ModalBody>
