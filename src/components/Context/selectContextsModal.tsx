@@ -1,17 +1,30 @@
-import {Button, Container, Form, ModalBody} from "react-bootstrap";
-import {Dispatch, SetStateAction, useCallback, useContext, useState} from "react";
+import {Button, Container, Form, ModalBody, Row} from "react-bootstrap";
+import React, {Dispatch, SetStateAction, useCallback, useContext, useState} from "react";
 import Modal from "react-bootstrap/Modal";
 import {ReactFlowContext} from "../../utils.tsx";
-import {CsmNodeProps, ReactFlowContextProps} from "../../types.ts";
+import {CsmNodeProps, isState, ReactFlowContextProps} from "../../types.ts";
 import {Node} from "@xyflow/react";
 import ContextVariable from "../../classes/contextVariable.tsx";
 
 export default function SelectContextsModal(props: {buttonName: string | undefined, vars: string[], setVars: Dispatch<SetStateAction<string[]>>}){
 
+
     const context = useContext(ReactFlowContext) as ReactFlowContextProps;
     const {nodes,
     selectedNode,
     contextService} = context
+
+    const PERSISTENT_CONTEXT_MULTISELECT_NAME = "selected-persistent-context"
+    const LOCAL_CONTEXT_MULTISELECT_NAME = "selected-local-context"
+    const STATIC_CONTEXT_MULTISELECT_NAME = "selected-static-context"
+
+    const renderContextVariablesAsOptions = (vars: ContextVariable[]) => {
+        return (
+            vars.map((v) => {
+                return <option key={v.name} value={v.name}>{v.name} : {v.value}</option>
+            })
+        )
+    }
 
     /**
      * Retrieves the local and static context variables for a given node and its parent nodes.
@@ -79,7 +92,7 @@ export default function SelectContextsModal(props: {buttonName: string | undefin
      */
     const knownStaticContext = useCallback(() => {
         if(!selectedNode){
-            return
+            return []
         }
         return getKnownContextVariables(selectedNode)[1].filter((value, index, vars) => {
             return vars.indexOf(value) === index;
@@ -118,6 +131,19 @@ export default function SelectContextsModal(props: {buttonName: string | undefin
     const buttonName = () => props.buttonName ? props.buttonName : "Select Context"
 
 
+    const onSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+        event.preventDefault()
+        if(!selectedNode){
+            return;
+        }
+
+        const formElements = event.currentTarget.elements as typeof event.currentTarget.elements && {
+
+        }
+
+    }
+
+
     return (
         <Container>
             <Button variant={"primary"} onClick={()=>{handleShow()}}>
@@ -132,21 +158,63 @@ export default function SelectContextsModal(props: {buttonName: string | undefin
                 </Modal.Header>
 
                 <ModalBody>
+
+                    <div className={"mb-3"}>
+                        <small className="text-decoration-underline">
+                            You can select multiple variables by holding CTRL
+                        </small>
+                    </div>
+
                     <Form>
-                        <Form.Label>Select Context Variables</Form.Label>
-                        <Form.Select multiple={true}>
-                            {selectedNode && knownLocalContext().map((n) => {
-                                return (
-                                    <option key={`o-${n.name}`}>{n.name} : {n.value}</option>
-                                )
-                            })}
-q                        </Form.Select>
+
+                        <Form.Group controlId={"fromPersistentContext"}>
+                        <Row>
+                                <Form.Label>Persistent Context</Form.Label>
+                            </Row>
+                            <Row className={"mb-3"}>
+                                {getPersistentContextVariables().length > 0 && (
+                                    <Form.Select multiple={true} name={PERSISTENT_CONTEXT_MULTISELECT_NAME}>
+                                        {renderContextVariablesAsOptions(getPersistentContextVariables())}
+                                    </Form.Select>
+                                ) || (<Form.Text muted> No Persistent Context found</Form.Text>)}
+                            </Row>
+                        </Form.Group>
+
+                        <Form.Group controlId={"fromLocalContext"}>
+                            <Row>
+                                <Form.Label>Local Context</Form.Label>
+                            </Row>
+                            <Row className={"mb-3"}>
+                                {knownLocalContext().length > 0 && (
+                                    <Form.Select multiple={true} name={LOCAL_CONTEXT_MULTISELECT_NAME}>
+                                        {renderContextVariablesAsOptions(knownLocalContext())}
+                                    </Form.Select>
+                                ) || (<Form.Text muted> No Local Context found</Form.Text>)}
+                            </Row>
+                        </Form.Group>
+
+                        {selectedNode && isState(selectedNode.data) && (
+                            <Form.Group controlId={"fromStaticContext"}>
+                                <Row>
+                                    <Form.Label>Static Context</Form.Label>
+                                </Row>
+                                <Row className={"mb-3"}>
+                                    {knownStaticContext().length > 0 && (
+                                        <Form.Select multiple={true} name={STATIC_CONTEXT_MULTISELECT_NAME}>
+                                            {renderContextVariablesAsOptions(knownStaticContext())}
+                                        </Form.Select>
+                                    ) || (<Form.Text muted> No Static Context found</Form.Text>)}
+                                </Row>
+                            </Form.Group>
+                        )}
+
                     </Form>
                 </ModalBody>
 
                 <Modal.Footer>
+
                     <Button variant="secondary" onClick={handleClose}>
-                        Close
+                    Close
                     </Button>
                 </Modal.Footer>
 
