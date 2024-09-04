@@ -3,10 +3,10 @@ import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
 import ContextVariable from "../../classes/contextVariable.tsx";
 import {Container} from "react-bootstrap";
-import ContextForm from "./contextForm.tsx";
+import CreateContextForm from "./createContextForm.tsx";
 
 
-export default function ContextFormModal(props: {variable: ContextVariable | undefined, buttonName: string | undefined}) {
+export default function CreateContextFormModal(props: {variable: ContextVariable | undefined, buttonName: string | undefined}) {
 
     const [show,setShow]=useState(false);
 
@@ -34,7 +34,7 @@ export default function ContextFormModal(props: {variable: ContextVariable | und
                 </Modal.Header>
 
                 <Modal.Body>
-                    <ContextForm variable={props.variable} onClose={handleClose} />
+                    <CreateContextForm variable={props.variable} onClose={handleClose} />
                 </Modal.Body>
 
                 <Modal.Footer>

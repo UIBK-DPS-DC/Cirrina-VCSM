@@ -8,7 +8,7 @@ import {renderEnumAsOptions} from "../../utils.tsx";
 import ActionDisplay from "./ActionForms/actionDisplay.tsx";
 import Offcanvas from 'react-bootstrap/Offcanvas';
 import {Button, Container, OffcanvasBody, OffcanvasHeader} from "react-bootstrap";
-import ContextFormModal from "../Context/contextFormModal.tsx";
+import CreateContextFormModal from "../Context/createContextFormModal.tsx";
 
 /**
  * NodeInfoForm Component
@@ -584,7 +584,7 @@ export default function NodeInfoForm() {
         if(selectedNode && isState(selectedNode.data)){
             console.log("Entering RC")
             return (
-                selectedNode.data.state.localContext.map((context) => {
+                selectedNode.data.state.persistentContext.map((context) => {
                     return (
                         <h2 key={context.name}>{context.name}</h2>
                     )
@@ -751,7 +751,7 @@ export default function NodeInfoForm() {
                         <RenameNodeComponent/>
                         <br/>
                         <Container>
-                            <ContextFormModal variable={undefined} buttonName={undefined}></ContextFormModal>
+                            <CreateContextFormModal variable={undefined} buttonName={undefined}></CreateContextFormModal>
                         </Container>
 
                         <br/>

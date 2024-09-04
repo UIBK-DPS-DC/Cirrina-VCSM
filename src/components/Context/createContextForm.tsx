@@ -5,7 +5,7 @@ import { ReactFlowContextProps} from "../../types.ts";
 import {Button, Form} from "react-bootstrap";
 import {ContextType} from "../../enums.ts";
 
-export default function ContextForm(props: {variable: ContextVariable | undefined, onClose: () => void}) {
+export default function CreateContextForm(props: {variable: ContextVariable | undefined, onClose: () => void}) {
 
 
 

@@ -5,6 +5,7 @@ import {ReactFlowContext} from "../../utils.tsx";
 import {CsmNodeProps, isState, ReactFlowContextProps} from "../../types.ts";
 import {Node} from "@xyflow/react";
 import ContextVariable from "../../classes/contextVariable.tsx";
+import Select, { ActionMeta, OnChangeValue } from 'react-select'
 
 export default function SelectContextsModal(props: {buttonName: string | undefined, vars: string[], setVars: Dispatch<SetStateAction<string[]>>}){
 
@@ -18,10 +19,22 @@ export default function SelectContextsModal(props: {buttonName: string | undefin
     const LOCAL_CONTEXT_MULTISELECT_NAME = "selected-local-context"
     const STATIC_CONTEXT_MULTISELECT_NAME = "selected-static-context"
 
+    const getSelectedOptions = (selectedVars: string[], allVars: ContextVariable[]) => {
+        const options = renderContextVariablesAsOptions(allVars);
+        return options.filter(option => selectedVars.includes(option.value));
+    };
+
+
+
+
+
+
+
+
     const renderContextVariablesAsOptions = (vars: ContextVariable[]) => {
         return (
             vars.map((v) => {
-                return <option key={v.name} value={v.name}>{v.name} : {v.value}</option>
+                return {value: v.name, label: v.name + ": " + v.value}
             })
         )
     }
@@ -72,7 +85,7 @@ export default function SelectContextsModal(props: {buttonName: string | undefin
      *
      * @returns {ContextVariable[]} - An array of unique local context variables.
      */
-    const knownLocalContext = useCallback(() => {
+    const getKnownLocalContext = useCallback(() => {
         if(!selectedNode){
             return []
         }
@@ -90,7 +103,7 @@ export default function SelectContextsModal(props: {buttonName: string | undefin
      * @returns {ContextVariable[] | undefined} - An array of unique static context variables,
      *                                            or undefined if no node is selected.
      */
-    const knownStaticContext = useCallback(() => {
+    const getKnownStaticContext = useCallback(() => {
         if(!selectedNode){
             return []
         }
@@ -125,6 +138,74 @@ export default function SelectContextsModal(props: {buttonName: string | undefin
 
     const[show,setShow]=useState(false);
 
+    const [selectedPersistentVariables, setSelectedPersistentVariables] = useState<readonly {value:string, label:string}[]>(
+        getSelectedOptions(props.vars, getPersistentContextVariables())
+    )
+
+    const onSelectedPersistentVariablesChange = (
+        newValue: OnChangeValue<{value: string, label: string}, true>,
+        actionMeta: ActionMeta<{value: string, label: string}>
+    ) => {
+        switch (actionMeta.action) {
+            case 'remove-value':
+            case 'pop-value':
+                break;
+            case 'clear':
+                newValue = []
+                break;
+        }
+
+        setSelectedPersistentVariables(newValue);
+    };
+
+
+
+    const [selectedLocalVariables, setSelectedLocalVariables] = useState<readonly {value:string, label:string}[]>(
+        getSelectedOptions(props.vars, getKnownLocalContext())
+
+    )
+
+    const onSelectedLocalVariablesChange = (
+        newValue: OnChangeValue<{value: string, label: string}, true>,
+        actionMeta: ActionMeta<{value: string, label: string}>
+    ) => {
+        switch (actionMeta.action) {
+            case 'remove-value':
+            case 'pop-value':
+                break;
+            case 'clear':
+                newValue = []
+                break;
+        }
+
+        setSelectedLocalVariables(newValue);
+    };
+
+    const [selectedStaticVariables, setSelectedStaticVariables] = useState<readonly {value:string, label:string}[]>(
+        getSelectedOptions(props.vars, getKnownStaticContext())
+    )
+
+    const onSelectedStaticVariablesChange = (
+        newValue: OnChangeValue<{value: string, label: string}, true>,
+        actionMeta: ActionMeta<{value: string, label: string}>
+    ) => {
+        switch (actionMeta.action) {
+            case 'remove-value':
+            case 'pop-value':
+                break;
+            case 'clear':
+                newValue = []
+                break;
+        }
+
+        setSelectedStaticVariables(newValue);
+    };
+
+
+
+
+
+
     const handleShow = () => setShow(true);
     const handleClose = () => setShow(false);
 
@@ -137,23 +218,21 @@ export default function SelectContextsModal(props: {buttonName: string | undefin
             return;
         }
 
-        const formElements = event.currentTarget.elements as typeof event.currentTarget.elements & {
-            [PERSISTENT_CONTEXT_MULTISELECT_NAME]: HTMLSelectElement| null;
-            [LOCAL_CONTEXT_MULTISELECT_NAME]: HTMLSelectElement | null;
-            [STATIC_CONTEXT_MULTISELECT_NAME]: HTMLSelectElement | null;
-        }
 
-        const persistentSelect = formElements[PERSISTENT_CONTEXT_MULTISELECT_NAME];
-        const localSelect = formElements[LOCAL_CONTEXT_MULTISELECT_NAME];
-        const staticSelect = formElements[STATIC_CONTEXT_MULTISELECT_NAME];
+        const persistentVars = selectedPersistentVariables.map((v) => {
+            return v.value;
+        })
 
-        const selectedPersistentContext = persistentSelect ? Array.from(persistentSelect.selectedOptions).map(option => option.value) : [];
-        const selectedLocalContext = localSelect ? Array.from(localSelect.selectedOptions).map(option => option.value) : [];
-        const selectedStaticContext = staticSelect ? Array.from(staticSelect.selectedOptions).map(option => option.value) : [];
+        const localVars = selectedLocalVariables.map((v) => {
+            return v.value;
+        })
 
-        console.log(selectedLocalContext);
-        console.log(selectedStaticContext);
-        console.log(selectedPersistentContext);
+        const staticVars = selectedStaticVariables.map((v) => {
+            return v.value;
+        })
+
+        props.setVars(persistentVars.concat(localVars.concat(staticVars)));
+        handleClose()
 
 
 
@@ -190,9 +269,9 @@ export default function SelectContextsModal(props: {buttonName: string | undefin
                             </Row>
                             <Row className={"mb-3"}>
                                 {getPersistentContextVariables().length > 0 && (
-                                    <Form.Select multiple={true} name={PERSISTENT_CONTEXT_MULTISELECT_NAME}>
-                                        {renderContextVariablesAsOptions(getPersistentContextVariables())}
-                                    </Form.Select>
+                                    <Select closeMenuOnSelect={false} isMulti={true} name={PERSISTENT_CONTEXT_MULTISELECT_NAME}
+                                            options={renderContextVariablesAsOptions(getPersistentContextVariables())} value={selectedPersistentVariables} onChange={onSelectedPersistentVariablesChange}>
+                                    </Select>
                                 ) || (<Form.Text muted> No Persistent Context found</Form.Text>)}
                             </Row>
                         </Form.Group>
@@ -202,10 +281,10 @@ export default function SelectContextsModal(props: {buttonName: string | undefin
                                 <Form.Label>Local Context</Form.Label>
                             </Row>
                             <Row className={"mb-3"}>
-                                {knownLocalContext().length > 0 && (
-                                    <Form.Select multiple={true} name={LOCAL_CONTEXT_MULTISELECT_NAME}>
-                                        {renderContextVariablesAsOptions(knownLocalContext())}
-                                    </Form.Select>
+                                {getKnownLocalContext().length > 0 && (
+                                    <Select closeMenuOnSelect={false} isMulti={true} name={LOCAL_CONTEXT_MULTISELECT_NAME}
+                                            options={renderContextVariablesAsOptions(getKnownLocalContext())} value={selectedLocalVariables} onChange={onSelectedLocalVariablesChange}>
+                                    </Select>
                                 ) || (<Form.Text muted> No Local Context found</Form.Text>)}
                             </Row>
                         </Form.Group>
@@ -216,10 +295,10 @@ export default function SelectContextsModal(props: {buttonName: string | undefin
                                     <Form.Label>Static Context</Form.Label>
                                 </Row>
                                 <Row className={"mb-3"}>
-                                    {knownStaticContext().length > 0 && (
-                                        <Form.Select multiple={true} name={STATIC_CONTEXT_MULTISELECT_NAME}>
-                                            {renderContextVariablesAsOptions(knownStaticContext())}
-                                        </Form.Select>
+                                    {getKnownStaticContext().length > 0 && (
+                                        <Select closeMenuOnSelect={false} isMulti={true} name={STATIC_CONTEXT_MULTISELECT_NAME}
+                                                options={renderContextVariablesAsOptions(getKnownStaticContext())} value={selectedStaticVariables} onChange={onSelectedStaticVariablesChange}>
+                                        </Select>
                                     ) || (<Form.Text muted> No Static Context found</Form.Text>)}
                                 </Row>
                             </Form.Group>

@@ -36,6 +36,10 @@ export default class ContextVariableService {
         this._contextMap.delete(name);
     }
 
+    public getContextByName(name: string): ContextVariable | undefined {
+        return this._contextMap.get(name);
+    }
+
     /**
      * Checks if the context name is unique.
      *

@@ -7,7 +7,7 @@ import {
 } from "../../../utils.tsx";
 import {useContext, useState} from "react";
 import {ReactFlowContextProps} from "../../../types.ts";
-import ContextFormModal from "../../Context/contextFormModal.tsx";
+import CreateContextFormModal from "../../Context/createContextFormModal.tsx";
 import SelectContextsModal from "../../Context/selectContextsModal.tsx";
 
 export default function InvokeActionForm(props: {action: Action | undefined}) {
@@ -54,8 +54,16 @@ export default function InvokeActionForm(props: {action: Action | undefined}) {
                            <SelectContextsModal buttonName={"Select Variables"} vars={selectedInputContextVariables} setVars={setSelectedInputContextVariables}></SelectContextsModal>
                         </Col>
                         <Col sm={4}>
-                            <ContextFormModal variable={undefined} buttonName={"Create New"}></ContextFormModal>
+                            <CreateContextFormModal variable={undefined} buttonName={"Create New"}></CreateContextFormModal>
                         </Col>
+                    </Form.Group>
+                    <Form.Group>
+                        <h2>Action context test</h2>
+                        {selectedInputContextVariables && (
+                            selectedInputContextVariables.map((v) => {
+                               return <h3 key={`h3-${v}`}>{contextService.getContextByName(v)?.name} : {contextService.getContextByName(v)?.value}</h3>
+                            })
+                        )}
                     </Form.Group>
                 </Form>
             </Card.Body>
