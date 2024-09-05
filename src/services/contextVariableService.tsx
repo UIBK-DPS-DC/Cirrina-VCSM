@@ -2,7 +2,8 @@ import ContextVariable from "../classes/contextVariable.tsx";
 import {CsmNodeProps, isState, isStateMachine} from "../types.ts";
 import {ContextType} from "../enums.ts";
 import StateOrStateMachine from "../classes/stateOrStateMachine.ts";
-
+import State from "../classes/state.ts";
+import StateMachine from "../classes/stateMachine.ts";
 
 
 /**
@@ -76,6 +77,50 @@ export default class ContextVariableService {
      */
     public getLinkedStateByContextName(contextName: string): StateOrStateMachine | undefined {
         return this._contextToSateOrStateMachineMap.get(contextName);
+    }
+
+
+    public getContextType(context: ContextVariable): ContextType | undefined {
+        const linkedStateOrStateMachine = this.getLinkedStateByContextName(context.name);
+        if(!linkedStateOrStateMachine) {
+            return undefined;
+        }
+
+        if(linkedStateOrStateMachine instanceof State){
+
+            if(linkedStateOrStateMachine.persistentContext.includes(context)){
+                return ContextType.PERSISTENT;
+            }
+
+            if(linkedStateOrStateMachine.localContext.includes(context)){
+                return ContextType.LOCAL;
+            }
+
+            return ContextType.STATIC;
+
+        }
+
+        if(linkedStateOrStateMachine instanceof StateMachine){
+
+            if(linkedStateOrStateMachine.persistentContext.includes(context)){
+                return ContextType.PERSISTENT;
+            }
+
+            return ContextType.LOCAL
+
+
+        }
+
+    }
+
+    public getContextTypeByContextName(contextName: string): ContextType | undefined {
+        const context = this.getContextByName(contextName);
+        if(!context) {
+            return undefined;
+        }
+
+        return this.getContextType(context);
+
     }
 
     /**
