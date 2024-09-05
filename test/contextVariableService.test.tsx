@@ -352,6 +352,80 @@ describe('ContextVariableService - Linking and Renaming Contexts', () => {
         expect(context.name).toBe('UpdatedContext');
     });
 
+    test('linkContextToStateByData should link context to a state if data contains a state', () => {
+        const state = new State('TestState');
+        const contextVariable = new ContextVariable('TestContext', 'TestValue');
+        const data: CsmNodeProps = { state };
+
+        contextService.linkContextToStateByData(contextVariable, data);
+
+        const linkedState = contextService.getLinkedState(contextVariable);
+        expect(linkedState).toBe(state);
+    });
+
+    test('linkContextToStateByData should link context to a state machine if data contains a state machine', () => {
+        const stateMachine = new StateMachine('TestStateMachine');
+        const contextVariable = new ContextVariable('TestContext', 'TestValue');
+        const data: CsmNodeProps = { stateMachine };
+
+        contextService.linkContextToStateByData(contextVariable, data);
+
+        const linkedStateMachine = contextService.getLinkedState(contextVariable);
+        expect(linkedStateMachine).toBe(stateMachine);
+    });
+
+    test('linkContextToStateByData should log error for invalid data type', () => {
+        const contextVariable = new ContextVariable('TestContext', 'TestValue');
+        const data: CsmNodeProps = {} as CsmNodeProps;  // Invalid data (not a state or state machine)
+
+        const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation();
+
+        contextService.linkContextToStateByData(contextVariable, data);
+
+        expect(consoleErrorSpy).toHaveBeenCalledWith("Invalid Data");
+        expect(contextService.getLinkedState(contextVariable)).toBeUndefined();
+
+        consoleErrorSpy.mockRestore();
+    });
+
+    test('linkContextToStateByData should not link context if data is null', () => {
+        const contextVariable = new ContextVariable('TestContext', 'TestValue');
+        const data = null as unknown as CsmNodeProps;  // Null data
+
+        const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation();
+
+        contextService.linkContextToStateByData(contextVariable, data);
+
+        expect(consoleErrorSpy).toHaveBeenCalledWith("Invalid Data");
+        expect(contextService.getLinkedState(contextVariable)).toBeUndefined();
+
+        consoleErrorSpy.mockRestore();
+    });
+
+    test('linkContextToStateByData should not overwrite an existing linked state unless valid new data is provided', () => {
+        const state1 = new State('State1');
+        const state2 = new State('State2');
+        const contextVariable = new ContextVariable('TestContext', 'TestValue');
+
+        // Link context to the first state
+        const data1: CsmNodeProps = { state: state1 };
+        contextService.linkContextToStateByData(contextVariable, data1);
+
+        expect(contextService.getLinkedState(contextVariable)).toBe(state1);
+
+        // Try to link context to invalid data (shouldn't change the linked state)
+        const invalidData: CsmNodeProps = {} as CsmNodeProps;
+        contextService.linkContextToStateByData(contextVariable, invalidData);
+
+        expect(contextService.getLinkedState(contextVariable)).toBe(state1);  // Still linked to state1
+
+        // Now link to a valid new state
+        const data2: CsmNodeProps = { state: state2 };
+        contextService.linkContextToStateByData(contextVariable, data2);
+
+        expect(contextService.getLinkedState(contextVariable)).toBe(state2);  // Linked to state2 now
+    });
+
 });
 
 describe('ContextService - getContextType and getContextTypeByContextName', () => {

@@ -106,6 +106,9 @@ export type ReactFlowContextProps = {
  * @returns {data is { state: State }} - Returns `true` if the data is of type `{ state: State }`.
  */
 export function isState(data: CsmNodeProps): data is { state: State } {
+    if(!data){
+        return false;
+    }
     return (data as { state: State }).state !== undefined;
 }
 
@@ -119,5 +122,8 @@ export function isState(data: CsmNodeProps): data is { state: State } {
  * @returns {data is { stateMachine: StateMachine }} - Returns `true` if the data is of type `{ stateMachine: StateMachine }`.
  */
 export function isStateMachine(data: CsmNodeProps): data is { stateMachine: StateMachine } {
+    if(!data){
+        return false;
+    }
     return (data as { stateMachine: StateMachine }).stateMachine !== undefined;
 }

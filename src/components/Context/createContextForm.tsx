@@ -125,8 +125,8 @@ export default function CreateContextForm(props: {variable: ContextVariable | un
         else {
             const newContext = new ContextVariable(variableName, expression);
             contextService.registerContext(newContext)
-            contextService.linkContextToState(newContext, )
             contextService.addContext(newContext,selectedNode.data,contextType as ContextType);
+            contextService.linkContextToStateByData(newContext, selectedNode.data)
             console.log("New Context added!")
         }
 
