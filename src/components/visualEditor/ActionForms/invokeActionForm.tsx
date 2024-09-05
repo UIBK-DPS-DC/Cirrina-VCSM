@@ -10,6 +10,7 @@ import {ReactFlowContextProps} from "../../../types.ts";
 import CreateContextFormModal from "../../Context/createContextFormModal.tsx";
 import SelectContextsModal from "../../Context/selectContextsModal.tsx";
 import ContextCardDisplay from "../../Context/contextCardDisplay.tsx";
+import ContextVariable from "../../../classes/contextVariable.tsx";
 
 export default function InvokeActionForm(props: {action: Action | undefined}) {
     const context = useContext(ReactFlowContext) as ReactFlowContextProps
@@ -61,6 +62,8 @@ export default function InvokeActionForm(props: {action: Action | undefined}) {
                     <Form.Group>
                         <ContextCardDisplay vars={selectedInputContextVariables} headerText={"Selected Input Vars"} setVars={setSelectedInputContextVariables}/>
                     </Form.Group>
+
+
                 </Form>
             </Card.Body>
         </Card>

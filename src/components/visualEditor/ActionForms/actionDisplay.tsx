@@ -39,43 +39,42 @@ export default function ActionDisplay(props: {action: Action | undefined}) {
                 <Form.Label>Action Type</Form.Label>
             </Form.Group>
             <Form.Group className={"mb-3"}>
-                <Form.Select disabled={isDisabled} onChange={onSelectedActionTypeChange} name={ACTION_TYPE_SELECT_NAME} value={selectedActionType}>
+                <Form.Select disabled={isDisabled} onChange={onSelectedActionTypeChange} name={ACTION_TYPE_SELECT_NAME} value={selectedActionType} className={"mb-3"}>
                     {renderEnumAsOptions(ActionType)}
                 </Form.Select>
+
+                {selectedActionType && selectedActionType === ActionType.INVOKE && (
+                    <InvokeActionForm action={props.action}></InvokeActionForm>
+                )}
+
+                {selectedActionType && selectedActionType === ActionType.CREATE && (
+                    <CreateActionForm action={props.action}></CreateActionForm>
+                )}
+
+                {selectedActionType && selectedActionType === ActionType.ASSIGN && (
+                    <AssignActionForm action={props.action}></AssignActionForm>
+                )}
+
+                {selectedActionType && selectedActionType === ActionType.LOCK && (
+                    <LockActionForm action={props.action}></LockActionForm>
+                )}
+
+                {selectedActionType && selectedActionType === ActionType.UNLOCK && (
+                    <UnlockActionForm action={props.action}></UnlockActionForm>
+                )}
+
+                {selectedActionType && selectedActionType === ActionType.RAISE_EVENT && (
+                    <RaiseEventActionForm action={props.action}></RaiseEventActionForm>
+                )}
+
+                {selectedActionType && selectedActionType === ActionType.TIMEOUT && (
+                    <TimeoutActionForm action={props.action}></TimeoutActionForm>
+                )}
+
+                {selectedActionType && selectedActionType === ActionType.TIMEOUT_RESET && (
+                    <TimeoutResetActionForm action={props.action}></TimeoutResetActionForm>
+                )}
             </Form.Group>
-
-
-            {selectedActionType && selectedActionType === ActionType.INVOKE && (
-                <InvokeActionForm action={props.action}></InvokeActionForm>
-            )}
-
-            {selectedActionType && selectedActionType === ActionType.CREATE && (
-                <CreateActionForm action={props.action}></CreateActionForm>
-            )}
-
-            {selectedActionType && selectedActionType === ActionType.ASSIGN && (
-                <AssignActionForm action={props.action}></AssignActionForm>
-            )}
-
-            {selectedActionType && selectedActionType === ActionType.LOCK && (
-                <LockActionForm action={props.action}></LockActionForm>
-            )}
-
-            {selectedActionType && selectedActionType === ActionType.UNLOCK && (
-                <UnlockActionForm action={props.action}></UnlockActionForm>
-            )}
-
-            {selectedActionType && selectedActionType === ActionType.RAISE_EVENT && (
-                <RaiseEventActionForm action={props.action}></RaiseEventActionForm>
-            )}
-
-            {selectedActionType && selectedActionType === ActionType.TIMEOUT && (
-                <TimeoutActionForm action={props.action}></TimeoutActionForm>
-            )}
-
-            {selectedActionType && selectedActionType === ActionType.TIMEOUT_RESET && (
-                <TimeoutResetActionForm action={props.action}></TimeoutResetActionForm>
-            )}
 
 
 

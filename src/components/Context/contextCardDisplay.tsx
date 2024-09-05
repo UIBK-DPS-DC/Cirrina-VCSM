@@ -2,6 +2,7 @@ import {Accordion, CardGroup} from "react-bootstrap";
 import ContextCard from "./contextCard.tsx";
 import {Dispatch, SetStateAction} from "react";
 
+
 export default function ContextCardDisplay(props: {vars: string[], headerText: string | undefined, setVars: Dispatch<SetStateAction<string[]>>}) {
 
     const headerText = () => props.headerText || "Display Context Variables"
@@ -14,7 +15,7 @@ export default function ContextCardDisplay(props: {vars: string[], headerText: s
                     <CardGroup>
                         {props.vars.map((v) => {
                             return (
-                                <ContextCard contextName={v} setVars={props.setVars}/>
+                                <ContextCard key={`${v}-card`} contextVariable={v} setVars={props.setVars}/>
                             )
                         })}
                     </CardGroup>

@@ -8,29 +8,31 @@ import {ContextType} from "../../enums.ts";
 export default function CreateContextForm(props: {variable: ContextVariable | undefined, onClose: () => void}) {
 
 
+    const context = useContext(ReactFlowContext) as ReactFlowContextProps;
+    const {contextService,
+        selectedNode} = context;
 
     const VARIABLE_NAME_FIELD_NAME = "variable-name";
     const EXPRESSION_FIELD_NAME = "expression";
     const CONTEXT_TYPE_FIELD_NAME = "contextType";
 
     const oldName = props.variable ? props.variable.name : null;
+    const initialContextType = props.variable ? contextService.getContextType(props.variable) : undefined;
 
 
     const EXPRESSION_INFO_LINK = "https://en.wikipedia.org/wiki/Expression_(computer_science)";
     const SPECIFICATIONS_LINK = "https://github.com/UIBK-DPS-DC/Cirrina-Specifications/blob/develop/SPECIFICATIONS.md#data-model-manipulation-and-scope";
 
-    const context = useContext(ReactFlowContext) as ReactFlowContextProps;
-    const {contextService,
-    selectedNode} = context;
 
 
-    const [variableNameInput, setVariableNameInput] = useState<string>("");
-    const [variableValueInput, setVariableValueInput] = useState<string>("");
-    const [contextTypeValue, setContextTypeValue] = useState<string>("");
+
+    const [variableNameInput, setVariableNameInput] = useState<string>(props.variable ? props.variable.name : "");
+    const [variableValueInput, setVariableValueInput] = useState<string>(props.variable ? props.variable.value : "");
+    const [contextTypeValue, setContextTypeValue] = useState<string>(props.variable && initialContextType ? initialContextType : "");
 
     const [formIsValid, setFormIsValid] = useState<boolean>(false);
-    const [variableNameIsValid, setVariableNameIsValid] = useState<boolean>(false);
-    const [expressionIsValid, setExpressionIsValid] = useState<boolean>(false);
+    const [variableNameIsValid, setVariableNameIsValid] = useState<boolean>(props.variable && props.variable.name === oldName || false);
+    const [expressionIsValid, setExpressionIsValid] = useState<boolean>(props.variable && !!props.variable.value || false);
     const [contextTypeIsValid, setContextTypeIsValid] = useState<boolean>(true);
 
     const buttonText = () => props.variable ? "Update Variable" : "Create Variable";
@@ -46,7 +48,12 @@ export default function CreateContextForm(props: {variable: ContextVariable | un
         if(!name){
             return false;
         }
-        if ((props.variable && props.variable.name !== name) || !props.variable) {
+
+        if(props.variable && name === oldName){
+            return true
+        }
+
+        if ((props.variable && props.variable.name !== name)) {
             return contextService.isContextNameUnique(name);
         }
         return true;
@@ -110,7 +117,6 @@ export default function CreateContextForm(props: {variable: ContextVariable | un
         console.log(`ContextType: ${contextType}`);
 
         if(props.variable) {
-
             contextService.removeContext(props.variable,selectedNode.data)
             contextService.addContext(props.variable,selectedNode.data,contextType as ContextType);
             props.variable.name = variableName;
