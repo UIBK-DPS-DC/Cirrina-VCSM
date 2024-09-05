@@ -32,10 +32,29 @@ export default class ContextVariableService {
         this._contextMap.set(context.name, context);
     }
 
+    /**
+     * Deregisters (removes) a context by its name.
+     *
+     * This method removes a context variable from the `_contextMap` by its name.
+     * If the provided name exists in the map, the corresponding context is removed.
+     * If the name does not exist, no action is taken.
+     *
+     * @param {string} name - The name of the context variable to remove.
+     */
     public deregisterContextByName(name: string): void {
         this._contextMap.delete(name);
     }
 
+    /**
+     * Retrieves a context variable by its name.
+     *
+     * This method looks up and returns a `ContextVariable` from the `_contextMap`
+     * based on the provided name. If a context with the given name is found, it
+     * is returned. If not, `undefined` is returned.
+     *
+     * @param {string} name - The name of the context variable to retrieve.
+     * @returns {ContextVariable | undefined} - The `ContextVariable` if found, or `undefined` if not found.
+     */
     public getContextByName(name: string): ContextVariable | undefined {
         return this._contextMap.get(name);
     }
