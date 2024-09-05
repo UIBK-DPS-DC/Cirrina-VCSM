@@ -36,18 +36,60 @@ export default class ContextVariableService {
         this._nameToContextMap.set(context.name, context);
     }
 
+    /**
+     * Links a context variable to a state or state machine.
+     *
+     * This method associates a `ContextVariable` with a `StateOrStateMachine` by storing the relationship
+     * in a map. The context variable's name is used as the key to store the corresponding state.
+     * This allows easy lookup of the state linked to a specific context.
+     *
+     * @param {ContextVariable} context - The context variable to link.
+     * @param {StateOrStateMachine} state - The state or state machine to be linked to the context variable.
+     */
     public linkContextToState(context: ContextVariable, state: StateOrStateMachine): void {
         this._contextToSateOrStateMachineMap.set(context.name, state);
     }
 
+    /**
+     * Retrieves the state or state machine linked to a given context variable.
+     *
+     * This method looks up the state or state machine associated with the provided `ContextVariable`
+     * by calling `getLinkedStateByContextName` using the context variable's name as the key.
+     *
+     * @param {ContextVariable} context - The context variable whose linked state is to be retrieved.
+     * @returns {StateOrStateMachine | undefined} - The state or state machine linked to the context variable,
+     *                                              or undefined if no such link exists.
+     */
     public getLinkedState(context: ContextVariable): StateOrStateMachine | undefined {
         return this.getLinkedStateByContextName(context.name)
     }
 
+    /**
+     * Retrieves the state or state machine linked to a context variable by its name.
+     *
+     * This method retrieves the `StateOrStateMachine` that has been linked to a specific context name.
+     * It uses the context name as the key to search the internal map that tracks these relationships.
+     *
+     * @param {string} contextName - The name of the context variable whose linked state is to be retrieved.
+     * @returns {StateOrStateMachine | undefined} - The linked state or state machine, or undefined if none is found.
+     */
     public getLinkedStateByContextName(contextName: string): StateOrStateMachine | undefined {
         return this._contextToSateOrStateMachineMap.get(contextName);
     }
 
+    /**
+     * Renames a context variable and updates all associated mappings.
+     *
+     * This method renames the provided `ContextVariable` to a new name if the current context exists
+     * and the new name is unique. It updates the internal mappings that track context variables and
+     * their linked states. If the context has a linked state, the mapping between the old context name
+     * and the state is updated to reflect the new context name.
+     *
+     * Only ever use this function to rename existing Context Variables!
+     *
+     * @param {ContextVariable} context - The context variable to rename.
+     * @param {string} newName - The new name to assign to the context variable.
+     */
     public renameContext(context: ContextVariable, newName: string){
         if(!this._nameToContextMap.has(context.name)){
             console.error("Context does not exist!");
