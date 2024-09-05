@@ -191,3 +191,165 @@ describe('ContextService', () => {
         consoleErrorSpy.mockRestore();
     });
 });
+
+
+describe('ContextVariableService - Linking and Renaming Contexts', () => {
+    let contextService: ContextVariableService;
+
+    beforeEach(() => {
+        contextService = new ContextVariableService();
+    });
+
+    test('linkContextToState should link a context to a state', () => {
+        const context = new ContextVariable('TestContext', 'value1');
+        const state = new State('TestState');
+
+        contextService.linkContextToState(context, state);
+
+        const linkedState = contextService.getLinkedState(context);
+        expect(linkedState).toBe(state);
+    });
+
+    test('getLinkedState should return undefined if the context is not linked', () => {
+        const context = new ContextVariable('TestContext', 'value1');
+
+        const linkedState = contextService.getLinkedState(context);
+        expect(linkedState).toBeUndefined();
+    });
+
+    test('getLinkedStateByContextName should return the correct state for a given context name', () => {
+        const context = new ContextVariable('TestContext', 'value1');
+        const state = new State('TestState');
+
+        contextService.linkContextToState(context, state);
+
+        const linkedState = contextService.getLinkedStateByContextName('TestContext');
+        expect(linkedState).toBe(state);
+    });
+
+    test('getLinkedStateByContextName should return undefined for a non-existent context name', () => {
+        const linkedState = contextService.getLinkedStateByContextName('NonExistentContext');
+        expect(linkedState).toBeUndefined();
+    });
+
+    test('renameContext should rename a context and update all mappings', () => {
+        const context = new ContextVariable('OldName', 'value1');
+        const state = new State('TestState');
+
+        contextService.registerContext(context);
+        contextService.linkContextToState(context, state);
+
+        contextService.renameContext(context, 'NewName');
+
+        // Check the context was renamed in the name-to-context map
+        const updatedContext = contextService.getContextByName('NewName');
+        expect(updatedContext).toBe(context);
+
+        // Ensure the old name is no longer in the map
+        const oldContext = contextService.getContextByName('OldName');
+        expect(oldContext).toBeUndefined();
+
+        // Check the linked state has been updated
+        const linkedState = contextService.getLinkedStateByContextName('NewName');
+        expect(linkedState).toBe(state);
+
+        // Ensure the old link is gone
+        const oldLinkedState = contextService.getLinkedStateByContextName('OldName');
+        expect(oldLinkedState).toBeUndefined();
+
+        // Verify the context itself was updated
+        expect(context.name).toBe('NewName');
+    });
+
+    test('renameContext should not rename a context if the original context does not exist', () => {
+        const context = new ContextVariable('NonExistentContext', 'value1');
+        const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation();
+
+        contextService.renameContext(context, 'NewName');
+
+        expect(consoleErrorSpy).toHaveBeenCalledWith('Context does not exist!');
+        consoleErrorSpy.mockRestore();
+    });
+
+    test('renameContext should not rename if the new name already exists', () => {
+        const context1 = new ContextVariable('ExistingContext', 'value1');
+        const context2 = new ContextVariable('AnotherContext', 'value2');
+
+        contextService.registerContext(context1);
+        contextService.registerContext(context2);
+
+        const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation();
+
+        contextService.renameContext(context2, 'ExistingContext');
+
+        expect(consoleErrorSpy).toHaveBeenCalledWith('Context with name ExistingContext already exists!');
+        consoleErrorSpy.mockRestore();
+
+        // Ensure the original name remains unchanged
+        expect(context2.name).toBe('AnotherContext');
+    });
+
+    test('renameContext should update linked state when renaming a context', () => {
+        const context = new ContextVariable('ContextToRename', 'value1');
+        const stateMachine = new StateMachine('TestStateMachine');
+
+        contextService.registerContext(context);
+        contextService.linkContextToState(context, stateMachine);
+
+        contextService.renameContext(context, 'RenamedContext');
+
+        // Ensure the new name links to the same state machine
+        const linkedStateMachine = contextService.getLinkedStateByContextName('RenamedContext');
+        expect(linkedStateMachine).toBe(stateMachine);
+
+        // Ensure the old name does not link to any state
+        const oldLinkedStateMachine = contextService.getLinkedStateByContextName('ContextToRename');
+        expect(oldLinkedStateMachine).toBeUndefined();
+    });
+
+    test('linkContextToState should update the linked state for the same context', () => {
+        const context = new ContextVariable('TestContext', 'value1');
+        const state1 = new State('TestState1');
+        const state2 = new State('TestState2');
+
+        // Link to state1 first
+        contextService.linkContextToState(context, state1);
+        let linkedState = contextService.getLinkedState(context);
+        expect(linkedState).toBe(state1);
+
+        // Link to state2, overwriting the first link
+        contextService.linkContextToState(context, state2);
+        linkedState = contextService.getLinkedState(context);
+        expect(linkedState).toBe(state2);
+    });
+
+    test('renameContext should retain link to state even after renaming the context', () => {
+        const context = new ContextVariable('ContextToRename', 'value1');
+        const state = new State('TestState');
+
+        contextService.registerContext(context);
+        contextService.linkContextToState(context, state);
+
+        contextService.renameContext(context, 'RenamedContext');
+
+        // Verify the link to the state still exists after renaming
+        const linkedState = contextService.getLinkedStateByContextName('RenamedContext');
+        expect(linkedState).toBe(state);
+    });
+
+    test('renameContext should update both maps and context variable when context is renamed', () => {
+        const context = new ContextVariable('InitialContext', 'value1');
+        const state = new State('LinkedState');
+
+        contextService.registerContext(context);
+        contextService.linkContextToState(context, state);
+
+        contextService.renameContext(context, 'UpdatedContext');
+
+        expect(contextService.getContextByName('UpdatedContext')).toBe(context);
+        expect(contextService.getLinkedStateByContextName('UpdatedContext')).toBe(state);
+        expect(context.name).toBe('UpdatedContext');
+    });
+
+});
+

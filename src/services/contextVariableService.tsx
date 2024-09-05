@@ -2,7 +2,7 @@ import ContextVariable from "../classes/contextVariable.tsx";
 import {CsmNodeProps, isState, isStateMachine} from "../types.ts";
 import {ContextType} from "../enums.ts";
 import StateOrStateMachine from "../classes/stateOrStateMachine.ts";
-import context from "react-bootstrap/NavbarContext";
+
 
 
 /**
@@ -18,6 +18,7 @@ export default class ContextVariableService {
 
     public constructor() {
         this._nameToContextMap = new Map();
+        this._contextToSateOrStateMachineMap = new Map();
     }
 
     /**
@@ -295,7 +296,7 @@ export default class ContextVariableService {
      * @param {CsmNodeProps} data - The data object, which can represent either a state or a state machine.
      * @returns {ContextVariable[]} An array of persistent context variables, or an empty array if the data type is unknown.
      */
-    public getPersistentContext(data: CsmNodeProps) {
+    public getPersistentContext(data: CsmNodeProps):ContextVariable[] {
         if(isState(data)){
             return data.state.persistentContext;
         }
@@ -319,7 +320,7 @@ export default class ContextVariableService {
      * @param {CsmNodeProps} data - The data object, which can represent either a state or a state machine.
      * @returns {ContextVariable[]} An array of local context variables, or an empty array if the data type is unknown.
      */
-    public getLocalContext(data: CsmNodeProps) {
+    public getLocalContext(data: CsmNodeProps):ContextVariable[] {
         if(isState(data)){
             return data.state.localContext;
         }
@@ -345,7 +346,7 @@ export default class ContextVariableService {
      * @param {CsmNodeProps} data - The data object, which can represent either a state or a state machine.
      * @returns {ContextVariable[]} An array of static context variables, or an empty array if the data type is unknown or invalid for static context.
      */
-    public getStaticContext(data: CsmNodeProps) {
+    public getStaticContext(data: CsmNodeProps): ContextVariable[] {
         if(isState(data)){
             return data.state.staticContext;
         }
