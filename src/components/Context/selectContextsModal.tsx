@@ -24,13 +24,6 @@ export default function SelectContextsModal(props: {buttonName: string | undefin
         return options.filter(option => selectedVars.includes(option.value));
     };
 
-
-
-
-
-
-
-
     const renderContextVariablesAsOptions = (vars: ContextVariable[]) => {
         return (
             vars.map((v) => {
