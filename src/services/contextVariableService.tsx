@@ -53,6 +53,37 @@ export default class ContextVariableService {
     }
 
     /**
+     * Links a given context variable to a state or state machine based on the provided data.
+     *
+     * This function attempts to link the specified `context` to either a `State` or `StateMachine`
+     * within the provided `data`. It first checks if the `data` represents a `State` or a `StateMachine`,
+     * and then invokes the `linkContextToState` method to establish the link between the context and the state or state machine.
+     *
+     * If the `data` is neither a `State` nor a `StateMachine`, an error is logged to the console.
+     *
+     * @param {ContextVariable} context - The context variable to be linked to the state or state machine.
+     * @param {CsmNodeProps} data - The data object which contains either a state or a state machine.
+     *
+     * Example usage:
+     *
+     * linkContextToStateByData(someContext, nodeData);
+     *
+     * - If the `data` contains a valid `State`, the context will be linked to it.
+     * - If the `data` contains a valid `StateMachine`, the context will be linked to the state machine.
+     * - If the `data` is invalid, an error will be logged.
+     */
+    public linkContextToStateByData(context: ContextVariable, data: CsmNodeProps){
+        const stateOrStatemachine = isState(data) ? data.state : isStateMachine(data) ? data.stateMachine : null;
+        if(stateOrStatemachine){
+            this.linkContextToState(context, stateOrStatemachine);
+        }
+        else{
+            console.error("Invalid Data");
+        }
+
+    }
+
+    /**
      * Retrieves the state or state machine linked to a given context variable.
      *
      * This method looks up the state or state machine associated with the provided `ContextVariable`
@@ -80,6 +111,20 @@ export default class ContextVariableService {
     }
 
 
+    /**
+     * Retrieves the type of the given `ContextVariable`.
+     *
+     * This function determines the type of the provided context variable by checking its association
+     * with a `State` or `StateMachine`. It first retrieves the linked state or state machine using
+     * the context's name, and based on the context's association with either the persistent, local,
+     * or static context arrays, it returns the corresponding `ContextType`.
+     *
+     * - For a `State`, it checks the `persistentContext`, `localContext`, and defaults to `ContextType.STATIC`.
+     * - For a `StateMachine`, it checks only the `persistentContext` and defaults to `ContextType.LOCAL`.
+     *
+     * @param {ContextVariable} context - The context variable whose type needs to be determined.
+     * @returns {ContextType | undefined} - The type of the context variable (`PERSISTENT`, `LOCAL`, `STATIC`), or `undefined` if the context is not linked to any state or state machine.
+     */
     public getContextType(context: ContextVariable): ContextType | undefined {
         const linkedStateOrStateMachine = this.getLinkedStateByContextName(context.name);
         if(!linkedStateOrStateMachine) {
@@ -113,6 +158,15 @@ export default class ContextVariableService {
 
     }
 
+    /**
+     * Retrieves the type of the context variable using its name.
+     *
+     * This function looks up the `ContextVariable` by its name and then determines its type
+     * by calling `getContextType`. If the context is not found, it returns `undefined`.
+     *
+     * @param {string} contextName - The name of the context variable whose type needs to be determined.
+     * @returns {ContextType | undefined} - The type of the context variable (`PERSISTENT`, `LOCAL`, `STATIC`), or `undefined` if the context is not found.
+     */
     public getContextTypeByContextName(contextName: string): ContextType | undefined {
         const context = this.getContextByName(contextName);
         if(!context) {

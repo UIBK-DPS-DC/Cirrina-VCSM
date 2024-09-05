@@ -18,6 +18,8 @@ export default function ContextCard(props: {contextName: string, setVars: Dispat
         })
     }
 
+    const footerText = () => contextVariable ? `${contextVariable.name} is a ${contextService.getContextType(contextVariable)} variable in ${contextService.getLinkedState(contextVariable)?.name}` : ""
+
     return(
         <Container>
             {contextVariable && (
@@ -28,7 +30,8 @@ export default function ContextCard(props: {contextName: string, setVars: Dispat
                         <Card.Text>Value: {contextVariable.value}</Card.Text>
                     </Card.Body>
                     <Card.Footer className="text-muted">
-                        <Button variant={"danger"} onClick={handleClick}>Remove</Button>
+                        <Card.Text>{footerText()}</Card.Text>
+                        <Button variant={"danger"} className={"right"} onClick={handleClick}>Remove</Button>
                     </Card.Footer>
                 </Card>
 

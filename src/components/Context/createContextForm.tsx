@@ -117,8 +117,7 @@ export default function CreateContextForm(props: {variable: ContextVariable | un
             props.variable.value = expression
 
             if(oldName && oldName !== variableName) {
-                contextService.deregisterContextByName(oldName)
-                contextService.registerContext(props.variable)
+                contextService.renameContext(props.variable, variableName);
             }
 
 
@@ -126,6 +125,7 @@ export default function CreateContextForm(props: {variable: ContextVariable | un
         else {
             const newContext = new ContextVariable(variableName, expression);
             contextService.registerContext(newContext)
+            contextService.linkContextToState(newContext, )
             contextService.addContext(newContext,selectedNode.data,contextType as ContextType);
             console.log("New Context added!")
         }

@@ -3,6 +3,7 @@ import ContextVariable from "../src/classes/contextVariable";
 import State from "../src/classes/state";
 import StateMachine from "../src/classes/stateMachine";
 import { CsmNodeProps } from "../src/types";
+import {ContextType} from "../src/enums";
 
 describe('ContextService', () => {
     let contextService: ContextVariableService;
@@ -351,5 +352,115 @@ describe('ContextVariableService - Linking and Renaming Contexts', () => {
         expect(context.name).toBe('UpdatedContext');
     });
 
+});
+
+describe('ContextService - getContextType and getContextTypeByContextName', () => {
+    let contextService: ContextVariableService;
+
+    beforeEach(() => {
+        contextService = new ContextVariableService();
+    });
+
+    // Test for getContextType function
+    test('getContextType should return PERSISTENT for context linked to persistentContext in a State', () => {
+        const state = new State('TestState');
+        const contextVariable = new ContextVariable('PersistentVariable', 'value1');
+        state.persistentContext.push(contextVariable);
+
+        contextService.linkContextToState(contextVariable, state);
+
+        const contextType = contextService.getContextType(contextVariable);
+        expect(contextType).toBe(ContextType.PERSISTENT);
+    });
+
+    test('getContextType should return LOCAL for context linked to localContext in a State', () => {
+        const state = new State('TestState');
+        const contextVariable = new ContextVariable('LocalVariable', 'value2');
+        state.localContext.push(contextVariable);
+
+        contextService.linkContextToState(contextVariable, state);
+
+        const contextType = contextService.getContextType(contextVariable);
+        expect(contextType).toBe(ContextType.LOCAL);
+    });
+
+    test('getContextType should return STATIC for context not linked to persistent or local in a State', () => {
+        const state = new State('TestState');
+        const contextVariable = new ContextVariable('StaticVariable', 'value3');
+        state.staticContext.push(contextVariable); // For clarity, but not checked directly
+
+        contextService.linkContextToState(contextVariable, state);
+
+        const contextType = contextService.getContextType(contextVariable);
+        expect(contextType).toBe(ContextType.STATIC);
+    });
+
+    test('getContextType should return PERSISTENT for context linked to persistentContext in a StateMachine', () => {
+        const stateMachine = new StateMachine('TestStateMachine');
+        const contextVariable = new ContextVariable('PersistentVariableInSM', 'value4');
+        stateMachine.persistentContext.push(contextVariable);
+
+        contextService.linkContextToState(contextVariable, stateMachine);
+
+        const contextType = contextService.getContextType(contextVariable);
+        expect(contextType).toBe(ContextType.PERSISTENT);
+    });
+
+    test('getContextType should return LOCAL for context linked to localContext in a StateMachine', () => {
+        const stateMachine = new StateMachine('TestStateMachine');
+        const contextVariable = new ContextVariable('LocalVariableInSM', 'value5');
+        stateMachine.localContext.push(contextVariable);
+
+        contextService.linkContextToState(contextVariable, stateMachine);
+
+        const contextType = contextService.getContextType(contextVariable);
+        expect(contextType).toBe(ContextType.LOCAL);
+    });
+
+    test('getContextType should return undefined if the context is not linked to any State or StateMachine', () => {
+        const contextVariable = new ContextVariable('OrphanVariable', 'value6');
+
+        const contextType = contextService.getContextType(contextVariable);
+        expect(contextType).toBeUndefined();
+    });
+
+    // Tests for getContextTypeByContextName function
+    test('getContextTypeByContextName should return PERSISTENT for context name linked to persistentContext in a State', () => {
+        const state = new State('TestState');
+        const contextVariable = new ContextVariable('PersistentContextName', 'value7');
+        state.persistentContext.push(contextVariable);
+
+        contextService.registerContext(contextVariable);
+        contextService.linkContextToState(contextVariable, state);
+
+        const contextType = contextService.getContextTypeByContextName('PersistentContextName');
+        expect(contextType).toBe(ContextType.PERSISTENT);
+    });
+
+    test('getContextTypeByContextName should return LOCAL for context name linked to localContext in a StateMachine', () => {
+        const stateMachine = new StateMachine('TestStateMachine');
+        const contextVariable = new ContextVariable('LocalContextName', 'value8');
+        stateMachine.localContext.push(contextVariable);
+
+        contextService.registerContext(contextVariable);
+        contextService.linkContextToState(contextVariable, stateMachine);
+
+        const contextType = contextService.getContextTypeByContextName('LocalContextName');
+        expect(contextType).toBe(ContextType.LOCAL);
+    });
+
+    test('getContextTypeByContextName should return undefined if the context does not exist', () => {
+        const contextType = contextService.getContextTypeByContextName('NonExistentContext');
+        expect(contextType).toBeUndefined();
+    });
+
+    test('getContextTypeByContextName should return undefined if the context exists but is not linked to any state or state machine', () => {
+        const contextVariable = new ContextVariable('UnlinkedContext', 'value9');
+
+        contextService.registerContext(contextVariable);
+
+        const contextType = contextService.getContextTypeByContextName('UnlinkedContext');
+        expect(contextType).toBeUndefined();
+    });
 });
 
