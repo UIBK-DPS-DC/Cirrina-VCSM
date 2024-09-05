@@ -1,5 +1,5 @@
 import {Button, Container, Form, ModalBody, Row} from "react-bootstrap";
-import React, {Dispatch, SetStateAction, useCallback, useContext, useState} from "react";
+import React, {Dispatch, SetStateAction, useCallback, useContext, useEffect, useState} from "react";
 import Modal from "react-bootstrap/Modal";
 import {ReactFlowContext} from "../../utils.tsx";
 import {CsmNodeProps, isState, ReactFlowContextProps} from "../../types.ts";
@@ -193,6 +193,12 @@ export default function SelectContextsModal(props: {buttonName: string | undefin
 
         setSelectedStaticVariables(newValue);
     };
+
+    useEffect(() => {
+        setSelectedPersistentVariables(getSelectedOptions(props.vars, getPersistentContextVariables()));
+        setSelectedLocalVariables(getSelectedOptions(props.vars, getKnownLocalContext()));
+        setSelectedStaticVariables(getSelectedOptions(props.vars, getKnownStaticContext()));
+    }, [props.vars, getPersistentContextVariables, getKnownLocalContext, getKnownStaticContext]);
 
 
 

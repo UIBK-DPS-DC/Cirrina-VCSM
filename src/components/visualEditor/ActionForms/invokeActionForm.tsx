@@ -59,7 +59,7 @@ export default function InvokeActionForm(props: {action: Action | undefined}) {
                         </Col>
                     </Form.Group>
                     <Form.Group>
-                        <ContextCardDisplay vars={selectedInputContextVariables} headerText={"Selected Input Vars"}/>
+                        <ContextCardDisplay vars={selectedInputContextVariables} headerText={"Selected Input Vars"} setVars={setSelectedInputContextVariables}/>
                     </Form.Group>
                 </Form>
             </Card.Body>
