@@ -7,7 +7,7 @@ import {Node} from "@xyflow/react";
 import ContextVariable from "../../classes/contextVariable.tsx";
 import Select, { ActionMeta, OnChangeValue } from 'react-select'
 
-export default function SelectContextsModal(props: {buttonName: string | undefined, vars: string[], setVars: Dispatch<SetStateAction<string[]>>}){
+export default function SelectContextsModal(props: {buttonName: string | undefined, vars: ContextVariable[], setVars: Dispatch<SetStateAction<ContextVariable[]>>}){
 
 
     const context = useContext(ReactFlowContext) as ReactFlowContextProps;
@@ -132,7 +132,7 @@ export default function SelectContextsModal(props: {buttonName: string | undefin
     const[show,setShow]=useState(false);
 
     const [selectedPersistentVariables, setSelectedPersistentVariables] = useState<readonly {value:string, label:string}[]>(
-        getSelectedOptions(props.vars, getPersistentContextVariables())
+        getSelectedOptions(props.vars.map((v) => v.name), getPersistentContextVariables())
     )
 
     const onSelectedPersistentVariablesChange = (
@@ -154,8 +154,7 @@ export default function SelectContextsModal(props: {buttonName: string | undefin
 
 
     const [selectedLocalVariables, setSelectedLocalVariables] = useState<readonly {value:string, label:string}[]>(
-        getSelectedOptions(props.vars, getKnownLocalContext())
-
+        getSelectedOptions(props.vars.map((v) => v.name), getKnownLocalContext())
     )
 
     const onSelectedLocalVariablesChange = (
@@ -175,7 +174,7 @@ export default function SelectContextsModal(props: {buttonName: string | undefin
     };
 
     const [selectedStaticVariables, setSelectedStaticVariables] = useState<readonly {value:string, label:string}[]>(
-        getSelectedOptions(props.vars, getKnownStaticContext())
+        getSelectedOptions(props.vars.map((v) => v.name), getKnownStaticContext())
     )
 
     const onSelectedStaticVariablesChange = (
@@ -195,9 +194,9 @@ export default function SelectContextsModal(props: {buttonName: string | undefin
     };
 
     useEffect(() => {
-        setSelectedPersistentVariables(getSelectedOptions(props.vars, getPersistentContextVariables()));
-        setSelectedLocalVariables(getSelectedOptions(props.vars, getKnownLocalContext()));
-        setSelectedStaticVariables(getSelectedOptions(props.vars, getKnownStaticContext()));
+        setSelectedPersistentVariables(getSelectedOptions(props.vars.map((v) => v.name), getPersistentContextVariables()));
+        setSelectedLocalVariables(getSelectedOptions(props.vars.map((v) => v.name), getKnownLocalContext()));
+        setSelectedStaticVariables(getSelectedOptions(props.vars.map((v) => v.name), getKnownStaticContext()));
     }, [props.vars, getPersistentContextVariables, getKnownLocalContext, getKnownStaticContext]);
 
 
@@ -218,19 +217,31 @@ export default function SelectContextsModal(props: {buttonName: string | undefin
         }
 
 
-        const persistentVars = selectedPersistentVariables.map((v) => {
-            return v.value;
+        const persistentVars: ContextVariable[] = []
+        selectedPersistentVariables.forEach(variable => {
+            const context = contextService.getContextByName(variable.value)
+            if(context){
+                persistentVars.push(context)
+            }
         })
 
-        const localVars = selectedLocalVariables.map((v) => {
-            return v.value;
+        const localVars: ContextVariable[] = []
+        selectedLocalVariables.forEach(variable => {
+            const context = contextService.getContextByName(variable.value)
+            if(context){
+                localVars.push(context)
+            }
         })
 
-        const staticVars = selectedStaticVariables.map((v) => {
-            return v.value;
+        const staticVars: ContextVariable[] = []
+        selectedStaticVariables.forEach(variable => {
+            const context = contextService.getContextByName(variable.value)
+            if(context){
+                staticVars.push(context)
+            }
         })
 
-        props.setVars(persistentVars.concat(localVars.concat(staticVars)));
+        props.setVars([...persistentVars,...localVars,...staticVars]);
         handleClose()
 
 

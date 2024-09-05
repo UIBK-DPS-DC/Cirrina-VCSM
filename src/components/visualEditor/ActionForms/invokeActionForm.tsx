@@ -17,7 +17,7 @@ export default function InvokeActionForm(props: {action: Action | undefined}) {
     const {contextService} = context
 
     // PASS TO SELECT FORM
-    const [selectedInputContextVariables, setSelectedInputContextVariables] = useState<string[]>([])
+    const [selectedInputContextVariables, setSelectedInputContextVariables] = useState<ContextVariable[]>([])
 
     const cardHeaderText = () => props.action ? "Edit Invoke Action" : "Create new Invoke Action"
 

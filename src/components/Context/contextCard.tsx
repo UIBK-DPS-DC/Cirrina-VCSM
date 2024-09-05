@@ -3,19 +3,20 @@ import {Button, Card, Container} from "react-bootstrap";
 import {ReactFlowContext} from "../../utils.tsx";
 import {ReactFlowContextProps} from "../../types.ts";
 import CreateContextFormModal from "./createContextFormModal.tsx";
+import ContextVariable from "../../classes/contextVariable.tsx";
 
-export default function ContextCard(props: {contextVariable: string, setVars: Dispatch<SetStateAction<string[]>>}) {
+export default function ContextCard(props: {contextVariable: ContextVariable, setVars: Dispatch<SetStateAction<ContextVariable[]>>}) {
     const context = useContext(ReactFlowContext) as ReactFlowContextProps
     const {contextService} = context
 
-    const contextVariable = contextService.getContextByName(props.contextVariable);
+    const contextVariable = props.contextVariable;
 
     const handleClick = () => {
         if(!contextVariable) {
             return
         }
         props.setVars((prevState) => {
-            return prevState.filter((v) => v !== contextVariable?.name)
+            return prevState.filter((v) => v !== contextVariable)
         })
     }
 

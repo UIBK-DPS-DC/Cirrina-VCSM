@@ -119,7 +119,6 @@ export default function CreateContextForm(props: {variable: ContextVariable | un
         if(props.variable) {
             contextService.removeContext(props.variable,selectedNode.data)
             contextService.addContext(props.variable,selectedNode.data,contextType as ContextType);
-            props.variable.name = variableName;
             props.variable.value = expression
 
             if(oldName && oldName !== variableName) {
