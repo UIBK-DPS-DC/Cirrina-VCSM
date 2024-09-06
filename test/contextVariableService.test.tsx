@@ -538,3 +538,77 @@ describe('ContextService - getContextType and getContextTypeByContextName', () =
     });
 });
 
+describe('ContextVariableService - deregisterContextByName', () => {
+    let contextService: ContextVariableService;
+    let context: ContextVariable;
+    let state: State;
+
+    beforeEach(() => {
+        contextService = new ContextVariableService();
+        context = new ContextVariable("testContext", "testValue");
+        state = new State("testState");
+    });
+
+    test('deregisterContextByName should remove context from _nameToContextMap', () => {
+        // Register the context and link it to a state
+        contextService.registerContext(context);
+        contextService.linkContextToState(context, state);
+
+        // Ensure the context is registered
+        expect(contextService.getContextByName("testContext")).toBe(context);
+
+        // Deregister the context
+        contextService.deregisterContextByName("testContext");
+
+        // Verify the context is removed from _nameToContextMap
+        expect(contextService.getContextByName("testContext")).toBeUndefined();
+    });
+
+    test('deregisterContextByName should remove linked state from _contextToSateOrStateMachineMap', () => {
+        // Register the context and link it to a state
+        contextService.registerContext(context);
+        contextService.linkContextToState(context, state);
+
+        // Ensure the context is linked to the state
+        expect(contextService.getLinkedState(context)).toBe(state);
+
+        // Deregister the context
+        contextService.deregisterContextByName("testContext");
+
+        // Verify the context is removed from _contextToSateOrStateMachineMap
+        expect(contextService.getLinkedState(context)).toBeUndefined();
+    });
+
+    test('deregisterContextByName should log to console after removal', () => {
+        // Mock the console.log function
+        console.log = jest.fn();
+
+        // Register the context
+        contextService.registerContext(context);
+
+        // Deregister the context
+        contextService.deregisterContextByName("testContext");
+
+        // Verify that the correct log message was printed
+        expect(console.log).toHaveBeenCalledWith("Context Variable testContext has been deregistered!");
+    });
+
+    test('deregisterContextByName should handle non-existent context gracefully', () => {
+        // Mock the console.log function
+        console.log = jest.fn();
+
+        // Attempt to deregister a non-existent context
+        contextService.deregisterContextByName("nonExistentContext");
+
+        // Verify no error is thrown, and no log message is printed (since it doesn't exist)
+        expect(console.log).not.toHaveBeenCalled();
+    });
+
+    test('deregisterContextByName should not throw an error when no such context exists', () => {
+        // Attempt to deregister a context that has not been registered
+        expect(() => {
+            contextService.deregisterContextByName("nonExistentContext");
+        }).not.toThrow();
+    });
+});
+

@@ -216,15 +216,21 @@ export default class ContextVariableService {
     }
 
     /**
-     * Deregisters (removes) a context by its name.
+     * Deregisters (removes) a context variable by its name.
      *
-     * This method removes a context variable from the `_nameToContextMap` by its name.
-     * If the provided name exists in the map, the corresponding context is removed.
-     * If the name does not exist, no action is taken.
+     * This method removes a context variable from the `_nameToContextMap` and
+     * also removes any association it has in the `_contextToSateOrStateMachineMap`.
+     * It ensures that both the context variable and its links to any state or state machine
+     * are completely removed from the system.
+     *
+     * Logs a message to the console once the context is successfully deregistered.
      *
      * @param {string} name - The name of the context variable to remove.
      */
     public deregisterContextByName(name: string): void {
+        if(this.isContextNameUnique(name)){
+            return;
+        }
         this._nameToContextMap.delete(name);
         this._contextToSateOrStateMachineMap.delete(name)
         console.log(`Context Variable ${name} has been deregistered!`)
