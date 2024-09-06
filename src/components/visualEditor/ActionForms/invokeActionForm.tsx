@@ -26,7 +26,6 @@ export default function InvokeActionForm(props: {action: Action | undefined}) {
                 // Update the properties of the existing variable (maintain reference)
                 existingVar.name = newVar.name;
                 existingVar.value = newVar.value;
-                // (add more fields if needed)
                 return [...prevVars];
             } else {
                 // Add the new variable if it doesn't exist
