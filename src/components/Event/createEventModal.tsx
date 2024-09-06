@@ -2,6 +2,7 @@ import Modal from "react-bootstrap/Modal";
 import Event from "../../classes/event.ts";
 import {Button, Container, ModalBody} from "react-bootstrap";
 import React from "react";
+import CreateEventForm from "./createEventForm.tsx";
 
 export default function CreateEventModal(props: {event: Event | undefined, onSubmit: (updatedEvent: Event) => void}) {
 
@@ -13,6 +14,12 @@ export default function CreateEventModal(props: {event: Event | undefined, onSub
     const buttonText = () => props.event ? "Edit Event" : "Create Event";
     const modalTitle = () => props.event && props.event.name ? props.event.name : "New Event";
 
+    const onSubmit = (event: Event) => {
+        if(props.onSubmit){
+            props.onSubmit(event);
+        }
+        handleClose();
+    }
     return(
         <Container>
             <Button onClick={handleShow}>{buttonText()}</Button>
@@ -22,7 +29,7 @@ export default function CreateEventModal(props: {event: Event | undefined, onSub
                 </Modal.Header
                 >
                 <ModalBody>
-                    <h2>This is the Modals body</h2>
+                   <CreateEventForm event={props.event} onSubmit={onSubmit}></CreateEventForm>
                 </ModalBody>
 
                 <Modal.Footer>

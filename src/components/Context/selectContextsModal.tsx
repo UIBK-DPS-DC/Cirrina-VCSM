@@ -274,9 +274,10 @@ export default function SelectContextsModal(props: {buttonName: string | undefin
                     <Form onSubmit={handleSubmit}>
 
                         <Form.Group controlId={"fromPersistentContext"}>
-                        <Row>
+                            <Row>
                                 <Form.Label>Persistent Context</Form.Label>
                             </Row>
+
                             <Row className={"mb-3"}>
                                 {getPersistentContextVariables().length > 0 && (
                                     <Select closeMenuOnSelect={false} isMulti={true} name={PERSISTENT_CONTEXT_MULTISELECT_NAME}

@@ -15,7 +15,7 @@ function nodeIsEqual(node1: Node<CsmNodeProps>, node2: Node<CsmNodeProps>): bool
 export const renderEnumAsOptions = (enumObject: OptionEnums) => {
     return (
         Object.values(enumObject).map((value) => {
-            return <option key={value} value={value}>{value}</option>
+            return <option key={value} value={value}>{value.toUpperCase()}</option>
         })
     );
     

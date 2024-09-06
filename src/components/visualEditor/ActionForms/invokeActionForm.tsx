@@ -10,6 +10,7 @@ import SelectContextsModal from "../../Context/selectContextsModal.tsx";
 import ContextCardDisplay from "../../Context/contextCardDisplay.tsx";
 import ContextVariable from "../../../classes/contextVariable.tsx";
 import CreateEventModal from "../../Event/createEventModal.tsx";
+import SelectEventsModal from "../../Event/selectEventsModal.tsx";
 
 export default function InvokeActionForm(props: {action: Action | undefined}) {
     const context = useContext(ReactFlowContext) as ReactFlowContextProps;
@@ -99,7 +100,10 @@ export default function InvokeActionForm(props: {action: Action | undefined}) {
 
                     <Form.Group as={Row} className={"mb-3"} controlId={"formDoneEvents"} >
                         <Form.Label column sm={3} className={"mb-0"}>Done Events</Form.Label>
-                        <Col sm={9}>
+                        <Col sm={5}>
+                            <SelectEventsModal buttonName={"Select Events"} modalTitle={"Select Events to be raised when done"} events={selectedEventsWhenDone} setEvents={setSelectedEventsWhenDone}/>
+                        </Col>
+                        <Col sm={4}>
                             <CreateEventModal event={undefined} onSubmit={onEventSubmit}/>
                         </Col>
                     </Form.Group>
