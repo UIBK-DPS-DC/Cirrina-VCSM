@@ -1,10 +1,7 @@
 import Action from "../../../classes/action.ts";
-import {Card, Col,Form, Row} from "react-bootstrap";
+import {Card, Col, Form, Row} from "react-bootstrap";
 import {ServiceType} from "../../../enums.ts";
-import {
-    ReactFlowContext,
-    renderEnumAsOptions,
-} from "../../../utils.tsx";
+import {ReactFlowContext, renderEnumAsOptions} from "../../../utils.tsx";
 import {useContext, useState} from "react";
 import {ReactFlowContextProps} from "../../../types.ts";
 import CreateContextFormModal from "../../Context/createContextFormModal.tsx";
@@ -13,16 +10,34 @@ import ContextCardDisplay from "../../Context/contextCardDisplay.tsx";
 import ContextVariable from "../../../classes/contextVariable.tsx";
 
 export default function InvokeActionForm(props: {action: Action | undefined}) {
-    const context = useContext(ReactFlowContext) as ReactFlowContextProps
-    const {contextService} = context
-
-    // PASS TO SELECT FORM
-    const [selectedInputContextVariables, setSelectedInputContextVariables] = useState<ContextVariable[]>([])
-
-    const cardHeaderText = () => props.action ? "Edit Invoke Action" : "Create new Invoke Action"
+    const context = useContext(ReactFlowContext) as ReactFlowContextProps;
+    const {contextService} = context;
 
 
-    return(
+
+    // Selected variables
+    const [selectedInputContextVariables, setSelectedInputContextVariables] = useState<ContextVariable[]>([]);
+
+    const onSubmit = (newVar: ContextVariable) => {
+        setSelectedInputContextVariables((prevVars) => {
+            const existingVar = prevVars.find((v) => v.name === newVar.name);
+
+            if (existingVar) {
+                // Update the properties of the existing variable (maintain reference)
+                existingVar.name = newVar.name;
+                existingVar.value = newVar.value;
+                // (add more fields if needed)
+                return [...prevVars];
+            } else {
+                // Add the new variable if it doesn't exist
+                return [...prevVars, newVar];
+            }
+        });
+    }
+
+    const cardHeaderText = () => props.action ? "Edit Invoke Action" : "Create new Invoke Action";
+
+    return (
         <Card className={"text-center"}>
             <Card.Header>
                 {cardHeaderText()}
@@ -30,7 +45,6 @@ export default function InvokeActionForm(props: {action: Action | undefined}) {
             <Card.Body>
                 <Card.Title>Action Properties</Card.Title>
                 <Form>
-
                     <Form.Group as={Row} className="mb-3" controlId="formServiceType">
                         <Form.Label column sm="3" className="text-sm-end">
                             ServiceType
@@ -53,21 +67,18 @@ export default function InvokeActionForm(props: {action: Action | undefined}) {
                     <Form.Group as={Row} className={"mb-3"} controlId={"fromInputVariables"}>
                         <Form.Label column sm="3" className="mb-0">Input</Form.Label>
                         <Col sm="5">
-                           <SelectContextsModal buttonName={"Select Variables"} vars={selectedInputContextVariables} setVars={setSelectedInputContextVariables}></SelectContextsModal>
+                            <SelectContextsModal buttonName={"Select Variables"} vars={selectedInputContextVariables} setVars={setSelectedInputContextVariables} />
                         </Col>
                         <Col sm={4}>
-                            <CreateContextFormModal variable={undefined} buttonName={"Create New"}></CreateContextFormModal>
+                            <CreateContextFormModal variable={undefined} buttonName={"Create New"} onSubmit={onSubmit} />
                         </Col>
                     </Form.Group>
+
                     <Form.Group>
-                        <ContextCardDisplay vars={selectedInputContextVariables} headerText={"Selected Input Vars"} setVars={setSelectedInputContextVariables}/>
+                        <ContextCardDisplay vars={selectedInputContextVariables} headerText={"Selected Input Vars"} setVars={setSelectedInputContextVariables} />
                     </Form.Group>
-
-
                 </Form>
             </Card.Body>
         </Card>
-
-    )
-
+    );
 }

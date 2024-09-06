@@ -1,149 +1,131 @@
 import ContextVariable from "../../classes/contextVariable.tsx";
 import React, {ChangeEvent, useCallback, useContext, useEffect, useState} from "react";
 import {ReactFlowContext, renderEnumAsOptions} from "../../utils.tsx";
-import { ReactFlowContextProps} from "../../types.ts";
+import {ReactFlowContextProps} from "../../types.ts";
 import {Button, Form} from "react-bootstrap";
 import {ContextType} from "../../enums.ts";
 
-export default function CreateContextForm(props: {variable: ContextVariable | undefined, onClose: () => void}) {
-
+export default function CreateContextForm(props: {variable: ContextVariable | undefined, onClose: () => void, onSubmit: (updatedVariable: ContextVariable) => void}) {
 
     const context = useContext(ReactFlowContext) as ReactFlowContextProps;
-    const {contextService,
-        selectedNode} = context;
+    const {contextService, selectedNode} = context;
 
     const VARIABLE_NAME_FIELD_NAME = "variable-name";
     const EXPRESSION_FIELD_NAME = "expression";
     const CONTEXT_TYPE_FIELD_NAME = "contextType";
 
     const oldName = props.variable ? props.variable.name : null;
-    const initialContextType = props.variable ? contextService.getContextType(props.variable) : undefined;
+    const initialContextType = props.variable && contextService.getContextType(props.variable) ? contextService.getContextType(props.variable) : undefined;
 
-
-    const EXPRESSION_INFO_LINK = "https://en.wikipedia.org/wiki/Expression_(computer_science)";
-    const SPECIFICATIONS_LINK = "https://github.com/UIBK-DPS-DC/Cirrina-Specifications/blob/develop/SPECIFICATIONS.md#data-model-manipulation-and-scope";
-
-
-
-
+    // States for managing input fields
     const [variableNameInput, setVariableNameInput] = useState<string>(props.variable ? props.variable.name : "");
     const [variableValueInput, setVariableValueInput] = useState<string>(props.variable ? props.variable.value : "");
-    const [contextTypeValue, setContextTypeValue] = useState<string>(props.variable && initialContextType ? initialContextType : "");
+    const [contextTypeValue, setContextTypeValue] = useState<string>(initialContextType ? initialContextType : ContextType.PERSISTENT);
 
-    const [formIsValid, setFormIsValid] = useState<boolean>(false);
-    const [variableNameIsValid, setVariableNameIsValid] = useState<boolean>(props.variable && props.variable.name === oldName || false);
-    const [expressionIsValid, setExpressionIsValid] = useState<boolean>(props.variable && !!props.variable.value || false);
+
+    const [variableNameIsValid, setVariableNameIsValid] = useState<boolean>(!!props.variable?.name);
+    const [expressionIsValid, setExpressionIsValid] = useState<boolean>(!!props.variable?.value);
     const [contextTypeIsValid, setContextTypeIsValid] = useState<boolean>(true);
+    const [formIsValid, setFormIsValid] = useState<boolean>(variableNameIsValid && expressionIsValid && contextTypeIsValid);
 
     const buttonText = () => props.variable ? "Update Variable" : "Create Variable";
-    const invalidNameText = () => variableNameInput? `A variable with name "${variableNameInput}" already exists` : "Name cannot be empty";
+    const invalidNameText = () => variableNameInput ? `A variable with name "${variableNameInput}" already exists` : "Name cannot be empty";
 
 
-        useEffect(() => {
+    // Effect to sync form values with the props.variable when the modal is opened with a new variable
+    useEffect(() => {
+        if (props.variable) {
+            setVariableNameInput(props.variable.name);
+            setVariableValueInput(props.variable.value);
+            setContextTypeValue(contextService.getContextType(props.variable) || "");
+        }
+    }, [props.variable, contextService]);
+
+    useEffect(() => {
         setFormIsValid(variableNameIsValid && expressionIsValid && contextTypeIsValid);
     }, [variableNameIsValid, expressionIsValid, contextTypeIsValid]);
 
-
     const validateVariableName = useCallback((name: string) => {
-        if(!name){
+        if (!name) {
             return false;
         }
 
-        if(props.variable && name === oldName){
-            return true
+        if (props.variable && name === oldName) {
+            return true;
         }
 
-        if ((props.variable && props.variable.name !== name)) {
-            return contextService.isContextNameUnique(name);
-        }
-        return true;
-    }, [props.variable, contextService]);
+        return contextService.isContextNameUnique(name);
+    }, [props.variable, oldName, contextService]);
 
     const validateExpression = useCallback((e: string) => {
         // TODO: Logic to validate expression.
-        return !!e
+        return !!e;
     }, []);
 
     const validateContextType = useCallback((contextType: string) => {
         return Object.values(ContextType).includes(contextType as ContextType);
     }, []);
 
-    const validateForm = useCallback(() => {
-        return variableNameIsValid && expressionIsValid && contextTypeIsValid;
-    }, [variableNameIsValid, expressionIsValid, contextTypeIsValid]);
-
-
     const onVariableNameInputChange = useCallback((event: ChangeEvent<HTMLInputElement>) => {
         const value = event.target.value;
         setVariableNameInput(value);
         setVariableNameIsValid(validateVariableName(value));
-        setFormIsValid(validateForm());
-    }, [validateVariableName, validateForm]);
+        setFormIsValid(variableNameIsValid && expressionIsValid && contextTypeIsValid);
+    }, [validateVariableName, variableNameIsValid, expressionIsValid, contextTypeIsValid]);
 
     const onVariableValueInputChange = useCallback((event: ChangeEvent<HTMLInputElement>) => {
         const value = event.target.value;
         setVariableValueInput(value);
         setExpressionIsValid(validateExpression(value));
-        setFormIsValid(validateForm());
-    }, [validateExpression, validateForm]);
+        setFormIsValid(variableNameIsValid && expressionIsValid && contextTypeIsValid);
+    }, [validateExpression, variableNameIsValid, expressionIsValid, contextTypeIsValid]);
 
     const onContextTypeValueChange = useCallback((event: ChangeEvent<HTMLSelectElement>) => {
         const value = event.target.value;
         setContextTypeValue(value);
         setContextTypeIsValid(validateContextType(value));
-        setFormIsValid(validateForm());
-    }, [validateContextType, validateForm]);
-
-
+        setFormIsValid(variableNameIsValid && expressionIsValid && contextTypeIsValid);
+    }, [validateContextType, variableNameIsValid, expressionIsValid, contextTypeIsValid]);
 
     const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-        if(!selectedNode?.data){
+        if (!selectedNode?.data) {
             return;
         }
 
-        const formElements = event.currentTarget.elements as typeof event.currentTarget.elements & {
-            [VARIABLE_NAME_FIELD_NAME]: HTMLInputElement;
-            [EXPRESSION_FIELD_NAME]: HTMLInputElement;
-            [CONTEXT_TYPE_FIELD_NAME]: HTMLSelectElement;
-        };
+        const variableName = variableNameInput;
+        const expression = variableValueInput;
+        const contextType = contextTypeValue;
+        let updatedVariable: ContextVariable;
 
-        const variableName = formElements[VARIABLE_NAME_FIELD_NAME].value;
-        const expression = formElements[EXPRESSION_FIELD_NAME].value;
-        const contextType = formElements[CONTEXT_TYPE_FIELD_NAME].value;
+        if (props.variable) {
+            contextService.removeContext(props.variable, selectedNode.data);
+            contextService.addContext(props.variable, selectedNode.data, contextType as ContextType);
+            props.variable.value = expression;
 
-        console.log(`VariableName: ${variableName}`);
-        console.log(`Expression: ${expression}`);
-        console.log(`ContextType: ${contextType}`);
-
-        if(props.variable) {
-            contextService.removeContext(props.variable,selectedNode.data)
-            contextService.addContext(props.variable,selectedNode.data,contextType as ContextType);
-            props.variable.value = expression
-
-            if(oldName && oldName !== variableName) {
+            if (oldName && oldName !== variableName) {
                 contextService.renameContext(props.variable, variableName);
             }
 
-
-        }
-        else {
+            updatedVariable = props.variable;
+        } else {
             const newContext = new ContextVariable(variableName, expression);
-            contextService.registerContext(newContext)
-            contextService.addContext(newContext,selectedNode.data,contextType as ContextType);
-            contextService.linkContextToStateByData(newContext, selectedNode.data)
-            console.log("New Context added!")
+            contextService.registerContext(newContext);
+            contextService.addContext(newContext, selectedNode.data, contextType as ContextType);
+            contextService.linkContextToStateByData(newContext, selectedNode.data);
+            updatedVariable = newContext;
+            console.log("New Context added!");
         }
 
+        // Notify parent about the updated context variable
+        props.onSubmit(updatedVariable);
 
+        // Close form
         props.onClose();
     };
 
-
-
-
     return (
-        <Form onSubmit={handleSubmit} className={"no"}>
+        <Form onSubmit={handleSubmit}>
             <Form.Group controlId={"form-variable-name"}>
                 <Form.Label>Name</Form.Label>
                 <Form.Control
@@ -180,7 +162,7 @@ export default function CreateContextForm(props: {variable: ContextVariable | un
                     Please provide a valid expression.
                 </Form.Control.Feedback>
                 <Form.Text className={"text-muted"}>
-                    The variable's value. Must be an <a href={EXPRESSION_INFO_LINK} target={"_blank"}>Expression</a>.
+                    The variable's value.
                 </Form.Text>
             </Form.Group>
 
@@ -199,14 +181,13 @@ export default function CreateContextForm(props: {variable: ContextVariable | un
                     Please select a valid context type.
                 </Form.Control.Feedback>
                 <Form.Text className={"text-muted"}>
-                    The Context Type of the variable affects its visibility. See the <a href={SPECIFICATIONS_LINK} target={"_blank"}>Specification</a>.
+                    The Context Type of the variable affects its visibility.
                 </Form.Text>
             </Form.Group>
 
-            <Button variant="primary" type="submit" disabled={!formIsValid} className={!formIsValid ? 'disabled' : ''}>
+            <Button variant="primary" type="submit" disabled={!formIsValid}>
                 {buttonText()}
             </Button>
         </Form>
-
     );
 }

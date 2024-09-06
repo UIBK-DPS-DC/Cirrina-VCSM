@@ -5,19 +5,23 @@ import ContextVariable from "../../classes/contextVariable.tsx";
 import {Container} from "react-bootstrap";
 import CreateContextForm from "./createContextForm.tsx";
 
+export default function CreateContextFormModal(props: {variable: ContextVariable | undefined, buttonName: string | undefined, onSubmit: ((updatedVariable: ContextVariable) => void) | undefined } ) {
 
-export default function CreateContextFormModal(props: {variable: ContextVariable | undefined, buttonName: string | undefined}) {
+    const [show, setShow] = useState(false);
 
-    const [show,setShow]=useState(false);
+    const handleShow = () => setShow(true);
+    const handleClose = () => setShow(false);
 
+    const buttonName = () => props.variable ? "Edit" : props.buttonName ? props.buttonName : "Create new Context variable";
+    const modalTitle = () => props.variable ? props.variable.name : "New Context variable";
 
-
-    const handleShow = () => setShow(true)
-    const handleClose= () => setShow(false)
-
-    const buttonName = () => props.variable ? "Edit" : props.buttonName ? props.buttonName :"Create new Context variable"
-    const modalTitle = () => props.variable ? props.variable.name : "New Context variable"
-
+    // Handle form submission and notify the parent component
+    const handleFormSubmit = (updatedVariable: ContextVariable) => {
+        if(props.onSubmit){
+            props.onSubmit(updatedVariable);
+        }
+        handleClose();  // Close modal after submit
+    };
 
     return (
         <Container>
@@ -25,16 +29,13 @@ export default function CreateContextFormModal(props: {variable: ContextVariable
                 {buttonName()}
             </Button>
 
-            <Modal show={show}
-            onHide={handleClose}
-            backdrop="static"
-            >
+            <Modal show={show} onHide={handleClose} backdrop="static">
                 <Modal.Header closeButton>
-                    <Modal.Title >{modalTitle()}</Modal.Title>
+                    <Modal.Title>{modalTitle()}</Modal.Title>
                 </Modal.Header>
 
                 <Modal.Body>
-                    <CreateContextForm variable={props.variable} onClose={handleClose} />
+                    <CreateContextForm variable={props.variable} onClose={handleClose} onSubmit={handleFormSubmit} />
                 </Modal.Body>
 
                 <Modal.Footer>
@@ -42,18 +43,7 @@ export default function CreateContextFormModal(props: {variable: ContextVariable
                         Close
                     </Button>
                 </Modal.Footer>
-
             </Modal>
         </Container>
-
-
-    )
-
-
-
-
-
-
-
-
+    );
 }

@@ -1,4 +1,4 @@
-import {Dispatch, SetStateAction, useContext, useEffect} from "react";
+import {Dispatch, SetStateAction, useContext} from "react";
 import {Button, Card, Container} from "react-bootstrap";
 import {ReactFlowContext} from "../../utils.tsx";
 import {ReactFlowContextProps} from "../../types.ts";
@@ -6,40 +6,37 @@ import CreateContextFormModal from "./createContextFormModal.tsx";
 import ContextVariable from "../../classes/contextVariable.tsx";
 
 export default function ContextCard(props: {contextVariable: ContextVariable, setVars: Dispatch<SetStateAction<ContextVariable[]>>}) {
-    const context = useContext(ReactFlowContext) as ReactFlowContextProps
-    const {contextService} = context
-
-    const contextVariable = props.contextVariable;
+    const context = useContext(ReactFlowContext) as ReactFlowContextProps;
+    const {contextService} = context;
 
     const handleClick = () => {
-        if(!contextVariable) {
-            return
-        }
-        props.setVars((prevState) => {
-            return prevState.filter((v) => v !== contextVariable)
-        })
-    }
+        props.setVars(prevState => prevState.filter(v => v !== props.contextVariable));
+    };
 
-    const footerText = () => contextVariable ? `${contextVariable.name} is a ${contextService.getContextType(contextVariable)?.toLowerCase()} variable in ${contextService.getLinkedState(contextVariable)?.name}` : ""
+    // Callback for handling when the context variable is edited
+    const handleContextEdit = (updatedVariable: ContextVariable) => {
+        props.setVars(prevState =>
+            prevState.map(v => v.name === updatedVariable.name ? updatedVariable : v)
+        );
+    };
 
-    return(
-        <Container key={`c-${contextVariable?.name}`}>
-            {contextVariable && (
+    const footerText = () => `${props.contextVariable.name} is a ${contextService.getContextType(props.contextVariable)?.toLowerCase()} variable in ${contextService.getLinkedState(props.contextVariable)?.name}`;
+
+    return (
+        <Container key={`c-${props.contextVariable?.name}`}>
+            {props.contextVariable && (
                 <Card border={"info"} className={"mb-3"}>
                     <Card.Body>
-                        <Card.Title>{contextVariable.name}</Card.Title>
-                        <Card.Text>Value: {contextVariable.value}</Card.Text>
-
+                        <Card.Title>{props.contextVariable.name}</Card.Title>
+                        <Card.Text>Value: {props.contextVariable.value}</Card.Text>
                     </Card.Body>
                     <Card.Footer className="text-muted">
                         <Card.Text>{footerText()}</Card.Text>
-                        <CreateContextFormModal variable={contextVariable} buttonName={"Edit"}></CreateContextFormModal>
+                        <CreateContextFormModal variable={props.contextVariable} buttonName={"Edit"} onSubmit={handleContextEdit} />
                         <Button variant={"danger"} className={"right"} onClick={handleClick}>Remove</Button>
                     </Card.Footer>
                 </Card>
-
             )}
         </Container>
-    )
-
+    );
 }
