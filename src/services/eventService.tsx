@@ -11,16 +11,15 @@ export default class EventService {
     }
 
     /**
-     * Registers an event name.
+     * Registers a new event in the system.
      *
-     * This method checks if the provided `eventName` is unique by comparing it against
-     * a collection of already registered names. If the name is not unique, it logs an
-     * error message to the console and returns `false`. If the name is unique, it adds
-     * the name to the collection and returns `true`.
+     * This method attempts to add a new event to the `nameToEventMap` if the event name is unique.
+     * It first checks whether an event with the same name already exists using the `isNameUnique` method.
+     * If the name is not unique, it logs an error to the console and returns `false`.
+     * If the name is unique, it stores the event in the `nameToEventMap` and logs a confirmation message.
      *
-     * @param {string} eventName - The name of the event to register.
-     * @returns {boolean} - Returns `true` if the name is unique and successfully registered,
-     *                      otherwise returns `false`.
+     * @param {Event} event - The event object to be registered.
+     * @returns {boolean} - Returns `true` if the event is successfully registered, or `false` if an event with the same name already exists.
      */
     public registerEvent(event: Event): boolean {
         if(!this.isNameUnique(event.name)){

@@ -114,3 +114,101 @@ describe('EventService', () => {
         expect(raisedEvents).toContain("event2");
     });
 });
+
+describe('Get Event Tests', () => {
+    let eventService: EventService;
+
+    beforeEach(() => {
+        eventService = new EventService();
+    });
+
+    test('getAllEvents should return all registered events', () => {
+        const event1 = new Event('event1', EventChannel.INTERNAL);
+        const event2 = new Event('event2', EventChannel.EXTERNAL);
+
+        eventService.registerEvent(event1);
+        eventService.registerEvent(event2);
+
+        const allEvents = eventService.getAllEvents();
+
+        expect(allEvents.length).toBe(2);
+        expect(allEvents).toEqual(expect.arrayContaining([event1, event2]));
+    });
+
+    test('getAllInternalEvents should return only internal events', () => {
+        const internalEvent = new Event('internalEvent', EventChannel.INTERNAL);
+        const externalEvent = new Event('externalEvent', EventChannel.EXTERNAL);
+
+        eventService.registerEvent(internalEvent);
+        eventService.registerEvent(externalEvent);
+
+        const internalEvents = eventService.getAllInternalEvents();
+
+        expect(internalEvents.length).toBe(1);
+        expect(internalEvents[0]).toEqual(internalEvent);
+    });
+
+    test('getAllExternalEvents should return only external events', () => {
+        const externalEvent = new Event('externalEvent', EventChannel.EXTERNAL);
+        const internalEvent = new Event('internalEvent', EventChannel.INTERNAL);
+
+        eventService.registerEvent(externalEvent);
+        eventService.registerEvent(internalEvent);
+
+        const externalEvents = eventService.getAllExternalEvents();
+
+        expect(externalEvents.length).toBe(1);
+        expect(externalEvents[0]).toEqual(externalEvent);
+    });
+
+    test('getAllGlobalEvents should return only global events', () => {
+        const globalEvent = new Event('globalEvent', EventChannel.GLOBAL);
+        const peripheralEvent = new Event('peripheralEvent', EventChannel.PERIPHERAL);
+
+        eventService.registerEvent(globalEvent);
+        eventService.registerEvent(peripheralEvent);
+
+        const globalEvents = eventService.getAllGlobalEvents();
+
+        expect(globalEvents.length).toBe(1);
+        expect(globalEvents[0]).toEqual(globalEvent);
+    });
+
+    test('getAllPeripheralEvents should return only peripheral events', () => {
+        const peripheralEvent = new Event('peripheralEvent', EventChannel.PERIPHERAL);
+        const globalEvent = new Event('globalEvent', EventChannel.GLOBAL);
+
+        eventService.registerEvent(peripheralEvent);
+        eventService.registerEvent(globalEvent);
+
+        const peripheralEvents = eventService.getAllPeripheralEvents();
+
+        expect(peripheralEvents.length).toBe(1);
+        expect(peripheralEvents[0]).toEqual(peripheralEvent);
+    });
+
+    test('getAllEvents should return an empty array when no events are registered', () => {
+        const allEvents = eventService.getAllEvents();
+        expect(allEvents).toEqual([]);
+    });
+
+    test('getAllInternalEvents should return an empty array when no internal events are registered', () => {
+        const internalEvents = eventService.getAllInternalEvents();
+        expect(internalEvents).toEqual([]);
+    });
+
+    test('getAllExternalEvents should return an empty array when no external events are registered', () => {
+        const externalEvents = eventService.getAllExternalEvents();
+        expect(externalEvents).toEqual([]);
+    });
+
+    test('getAllGlobalEvents should return an empty array when no global events are registered', () => {
+        const globalEvents = eventService.getAllGlobalEvents();
+        expect(globalEvents).toEqual([]);
+    });
+
+    test('getAllPeripheralEvents should return an empty array when no peripheral events are registered', () => {
+        const peripheralEvents = eventService.getAllPeripheralEvents();
+        expect(peripheralEvents).toEqual([]);
+    });
+});
