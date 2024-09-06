@@ -16,7 +16,7 @@ export default function CreateEventForm(props:{event: Event | undefined, onSubmi
     const oldEventName = props.event?.name;
     const buttonText = () => props.event ? "Save Changes" : "Create Event"
 
-    const [eventName, setEventName] = useState("");
+    const [eventNameInput, setEventNameInput] = useState("");
     const [selectedEventChannel, setSelectedEventChannel] = useState<string>(EventChannel.GLOBAL)
 
     const [eventNameIsValid, setEventNameIsValid] = useState(false);
@@ -40,7 +40,7 @@ export default function CreateEventForm(props:{event: Event | undefined, onSubmi
     }
 
     const invalidEventNameText = () => {
-        return eventName? `${eventName} already exists` : "Name cant be empty"
+        return eventNameInput? `${eventNameInput} already exists` : "Name cant be empty"
     }
 
 
@@ -66,7 +66,7 @@ export default function CreateEventForm(props:{event: Event | undefined, onSubmi
 
     const onEventNameChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
         const value = (event.target.value);
-        setEventName(value)
+        setEventNameInput(value)
         setEventNameIsValid(validateEventName(value))
     },[validateEventName])
 
@@ -80,7 +80,7 @@ export default function CreateEventForm(props:{event: Event | undefined, onSubmi
 
     useEffect(() => {
         if(props.event){
-            setEventName(props.event.name);
+            setEventNameInput(props.event.name);
         }
     }, [props.event]);
 
@@ -95,19 +95,38 @@ export default function CreateEventForm(props:{event: Event | undefined, onSubmi
             return;
         }
 
-        if(props.event){
+        let updatedEvent: Event
 
+        if(props.event){
+            if(oldEventName !== eventNameInput){
+                eventService.renameEvent(props.event, eventNameInput);
+                props.event.name = eventNameInput
+            }
+
+            props.event.data = selectedContextVariables
+            props.event.channel = selectedEventChannel as EventChannel;
+            updatedEvent = props.event
         }
+        else {
+            const newEvent = new Event(eventNameInput,selectedEventChannel as EventChannel)
+            newEvent.data = selectedContextVariables
+            eventService.registerEvent(newEvent)
+            updatedEvent = newEvent
+            console.log(`New Event ${updatedEvent.name} created!`)
+        }
+
+        props.onSubmit(updatedEvent)
+
 
     }
 
     return(
-        <Form>
+        <Form onSubmit={onSubmit}>
             <Form.Group className="mb-3">
                 <Form.Label>Name</Form.Label>
                 <Form.Control
                 type={"text"}
-                value={eventName}
+                value={eventNameInput}
                 onChange={onEventNameChange}
                 required={true}
                 isValid={eventNameIsValid}
