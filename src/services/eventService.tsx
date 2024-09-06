@@ -66,23 +66,63 @@ export default class EventService {
         return ! this.nameToEventMap.has(eventName);
     }
 
-    public getAllEvents() {
+    /**
+     * Retrieves all registered events.
+     *
+     * This method returns an array of all `Event` objects currently registered in the `nameToEventMap`.
+     * It converts the values of the map (which contains the registered events) into an array.
+     *
+     * @returns {Event[]} An array of all registered `Event` objects.
+     */
+    public getAllEvents(): Event[] {
         return Array.from(this.nameToEventMap.values());
     }
 
+    /**
+     * Retrieves all internal events.
+     *
+     * This method filters the array of all registered events to return only those that have
+     * an `EventChannel.INTERNAL` channel.
+     *
+     * @returns {Event[]} An array of `Event` objects that belong to the `INTERNAL` channel.
+     */
     public getAllInternalEvents(): Event[]{
         return this.getAllEvents().filter((event: Event) => event.channel === EventChannel.INTERNAL);
     }
 
+    /**
+     * Retrieves all external events.
+     *
+     * This method filters the array of all registered events to return only those that have
+     * an `EventChannel.EXTERNAL` channel.
+     *
+     * @returns {Event[]} An array of `Event` objects that belong to the `EXTERNAL` channel.
+     */
     public getAllExternalEvents(): Event[]{
         return this.getAllEvents().filter((event: Event) => event.channel === EventChannel.EXTERNAL);
     }
 
+    /**
+     * Retrieves all global events.
+     *
+     * This method filters the array of all registered events to return only those that have
+     * an `EventChannel.GLOBAL` channel.
+     *
+     * @returns {Event[]} An array of `Event` objects that belong to the `GLOBAL` channel.
+     */
     public getAllGlobalEvents(): Event[]{
         return this.getAllEvents().filter((event: Event) => event.channel === EventChannel.GLOBAL);
 
     }
 
+    /**
+     * Retrieves all peripheral events.
+     *
+     * This method filters the array of all registered events to return only those that have
+     * an `EventChannel.PERIPHERAL` channel.
+     *
+     * @returns {Event[]} An array of `Event` objects that belong to the `PERIPHERAL` channel.
+     */
     public getAllPeripheralEvents(): Event[]{
         return this.getAllEvents().filter((event: Event) => event.channel === EventChannel.PERIPHERAL);
     }
