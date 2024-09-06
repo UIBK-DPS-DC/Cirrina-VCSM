@@ -226,6 +226,8 @@ export default class ContextVariableService {
      */
     public deregisterContextByName(name: string): void {
         this._nameToContextMap.delete(name);
+        this._contextToSateOrStateMachineMap.delete(name)
+        console.log(`Context Variable ${name} has been deregistered!`)
     }
 
     /**

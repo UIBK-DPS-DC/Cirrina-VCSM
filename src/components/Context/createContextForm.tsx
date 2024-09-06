@@ -1,7 +1,7 @@
 import ContextVariable from "../../classes/contextVariable.tsx";
 import React, {ChangeEvent, useCallback, useContext, useEffect, useState} from "react";
-import {ReactFlowContext, renderEnumAsOptions} from "../../utils.tsx";
-import {ReactFlowContextProps} from "../../types.ts";
+import {ReactFlowContext, renderEnumAsOptions, renderStringsAsOptions} from "../../utils.tsx";
+import {isState, ReactFlowContextProps} from "../../types.ts";
 import {Button, Form} from "react-bootstrap";
 import {ContextType} from "../../enums.ts";
 
@@ -175,7 +175,8 @@ export default function CreateContextForm(props: {variable: ContextVariable | un
                     isValid={contextTypeIsValid}
                     isInvalid={!contextTypeIsValid}
                 >
-                    {renderEnumAsOptions(ContextType)}
+                    {selectedNode && isState(selectedNode.data) ? renderEnumAsOptions(ContextType)
+                        : renderStringsAsOptions([ContextType.PERSISTENT,ContextType.LOCAL])}
                 </Form.Select>
                 <Form.Control.Feedback type="invalid">
                     Please select a valid context type.

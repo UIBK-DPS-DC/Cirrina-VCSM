@@ -180,6 +180,10 @@ export default class State implements StateOrStateMachine {
         });
     }
 
+    public getAllContextVariables(): ContextVariable[] {
+        return this.persistentContext.concat(this.localContext.concat(this._staticContext))
+    }
+
     removeContext(context: ContextVariable): void {
         // Remove the context from the localContext array by reference comparison
         this._localContext = this._localContext.filter(existingContext => existingContext !== context);

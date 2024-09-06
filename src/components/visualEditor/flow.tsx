@@ -68,6 +68,7 @@ export default function Flow() {
         setSelectedEdge,
         setShowSidebar,
         stateOrStateMachineService,
+        contextService,
         transitionService
     } = context
 
@@ -205,10 +206,19 @@ export default function Flow() {
                 stateOrStateMachineService.unlinkNode(node.id)
                 switch (node.type) {
                     case "state-machine-node":
-                        stateOrStateMachineService.unregisterName((node.data.stateMachine as StateMachine).name);
+                        const stateMachine = node.data.stateMachine as StateMachine
+                        stateOrStateMachineService.unregisterName(stateMachine.name);
+                        stateMachine.getAllContextVariables().forEach(variable => {
+                            contextService.deregisterContextByName(variable.name);
+                        })
+
                         break;
                     case "state-node":
-                        stateOrStateMachineService.unregisterName((node.data.state as State).name);
+                        const state = node.data.state as State
+                        stateOrStateMachineService.unregisterName(state.name);
+                        state.getAllContextVariables().forEach(variable => {
+                            contextService.deregisterContextByName(variable.name);
+                        })
                         break;
                     default:
                         stateOrStateMachineService.unregisterName(node.data.name);
