@@ -3,7 +3,7 @@ import Event from "../../../classes/event.ts";
 import {Card, Col, Form, Row} from "react-bootstrap";
 import {ServiceType} from "../../../enums.ts";
 import {ReactFlowContext, renderEnumAsOptions} from "../../../utils.tsx";
-import {useContext, useState} from "react";
+import React, {useContext, useEffect, useState} from "react";
 import {ReactFlowContextProps} from "../../../types.ts";
 import CreateContextFormModal from "../../Context/createContextFormModal.tsx";
 import SelectContextsModal from "../../Context/selectContextsModal.tsx";
@@ -20,10 +20,45 @@ export default function InvokeActionForm(props: {action: Action | undefined}) {
 
     // Selected variables
     const [selectedInputContextVariables, setSelectedInputContextVariables] = useState<ContextVariable[]>([]);
+    const [serviceIsLocalCheckbox, setServiceIsLocalCheckbox] = useState<boolean>(false);
+    const [selectedOutputContextVariables, setSelectedOutputContextVariables] = useState<ContextVariable[]>([]);
     const [selectedEventsWhenDone, setSelectedEventsWhenDone] = useState<Event[]>([]);
+    const [selectedServiceType, setSelectedServiceType] = useState<string>(ServiceType.LOCAL)
 
-    const onContextSubmit = (newVar: ContextVariable) => {
+    useEffect(() => {
+        console.log(selectedServiceType)
+    }, [selectedServiceType]);
+
+    useEffect(() => {
+        console.log(serviceIsLocalCheckbox)
+    }, [serviceIsLocalCheckbox]);
+
+    const onServiceIsLocalCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>): void => {
+        setServiceIsLocalCheckbox(event.currentTarget.checked);
+    }
+
+    const onSelectedServiceTypeChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+        setSelectedServiceType(event.target.value);
+    }
+
+    const onInputContextSubmit = (newVar: ContextVariable) => {
         setSelectedInputContextVariables((prevVars) => {
+            const existingVar = prevVars.find((v) => v.name === newVar.name);
+
+            if (existingVar) {
+                // Update the properties of the existing variable (maintain reference)
+                existingVar.name = newVar.name;
+                existingVar.value = newVar.value;
+                return [...prevVars];
+            } else {
+                // Add the new variable if it doesn't exist
+                return [...prevVars, newVar];
+            }
+        });
+    }
+
+    const onOutputContextSubmit = (newVar: ContextVariable) => {
+        setSelectedOutputContextVariables((prevVars) => {
             const existingVar = prevVars.find((v) => v.name === newVar.name);
 
             if (existingVar) {
@@ -70,7 +105,7 @@ export default function InvokeActionForm(props: {action: Action | undefined}) {
                             ServiceType
                         </Form.Label>
                         <Col sm="9">
-                            <Form.Select>
+                            <Form.Select value={selectedServiceType} onChange={onSelectedServiceTypeChange}>
                                 {renderEnumAsOptions(ServiceType)}
                             </Form.Select>
                             <Form.Text className={"text-muted"}>
@@ -81,7 +116,7 @@ export default function InvokeActionForm(props: {action: Action | undefined}) {
 
                     <Form.Group className={"mb-3 d-flex align-items-center"} controlId={"formIsLocal"}>
                         <Form.Label className={"me-3 mb-0 ms-3"}>Service is local</Form.Label>
-                        <Form.Check type="checkbox" />
+                        <Form.Check type="checkbox" checked={serviceIsLocalCheckbox} onChange={onServiceIsLocalCheckboxChange} />
                     </Form.Group>
 
                     <Form.Group as={Row} className={"mb-3"} controlId={"fromInputVariables"}>
@@ -90,7 +125,7 @@ export default function InvokeActionForm(props: {action: Action | undefined}) {
                             <SelectContextsModal buttonName={"Select Variables"} vars={selectedInputContextVariables} setVars={setSelectedInputContextVariables} />
                         </Col>
                         <Col sm={4}>
-                            <CreateContextFormModal variable={undefined} buttonName={"Create New"} onSubmit={onContextSubmit} />
+                            <CreateContextFormModal variable={undefined} buttonName={"Create New"} onSubmit={onInputContextSubmit} />
                         </Col>
                     </Form.Group>
 
@@ -106,6 +141,20 @@ export default function InvokeActionForm(props: {action: Action | undefined}) {
                         <Col sm={4}>
                             <CreateEventModal event={undefined} onSubmit={onEventSubmit}/>
                         </Col>
+                    </Form.Group>
+
+                    <Form.Group as={Row} className={"mb-3"} controlId={"fromOutputVariables"}>
+                        <Form.Label column sm={3} className={"mb-0"}>Input</Form.Label>
+                        <Col sm={5}>
+                            <SelectContextsModal buttonName={"Select Variables"} vars={selectedOutputContextVariables} setVars={setSelectedOutputContextVariables} />
+                        </Col>
+                        <Col sm={4}>
+                            <CreateContextFormModal variable={undefined} buttonName={"Create New"} onSubmit={onOutputContextSubmit} />
+                        </Col>
+                    </Form.Group>
+
+                    <Form.Group className={"mb-3"}>
+                        <ContextCardDisplay vars={selectedOutputContextVariables} headerText={"Selected Output Vars"} setVars={setSelectedOutputContextVariables} />
                     </Form.Group>
 
 
