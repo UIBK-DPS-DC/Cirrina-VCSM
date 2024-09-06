@@ -67,6 +67,44 @@ export default class EventService {
     }
 
     /**
+     * Renames an existing event.
+     *
+     * This method renames the provided `Event` to a new name, ensuring that the new name is unique.
+     * It first checks whether the new name is already in use by another event. If the new name is not unique,
+     * an error is logged, and the renaming process is aborted.
+     *
+     * If the new name is unique, the event is first unregistered using its old name, then its `name` property
+     * is updated, and the event is re-registered with the new name.
+     *
+     * @param {Event} event - The event to be renamed.
+     * @param {string} newName - The new name to assign to the event.
+     */
+    public renameEvent(event: Event, newName: string): void {
+
+        if(!this.getEventByName(event.name)){
+            console.error(`Event ${event.name} does not exist!`);
+            return;
+        }
+
+        if(!this.isNameUnique(newName)){
+            console.error(`Event name ${newName} already exists!`);
+            return;
+        }
+        if(!newName.trim()){
+            console.error(`New name cant be empty!`);
+            return;
+        }
+        const oldName = event.name
+        this.unregisterEvent(oldName)
+
+        event.name = newName
+        this.registerEvent(event)
+
+        console.log(`Event ${oldName} has been renamed to ${newName}!`);
+
+    }
+
+    /**
      * Retrieves all registered events.
      *
      * This method returns an array of all `Event` objects currently registered in the `nameToEventMap`.

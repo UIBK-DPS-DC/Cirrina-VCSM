@@ -95,6 +95,10 @@ export default function CreateEventForm(props:{event: Event | undefined, onSubmi
             return;
         }
 
+        if(props.event){
+
+        }
+
     }
 
     return(

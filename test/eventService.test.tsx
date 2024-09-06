@@ -251,3 +251,129 @@ describe('Get Event Tests', () => {
         expect(peripheralEvents).toEqual([]);
     });
 });
+
+describe("EventService - renameEvent", () => {
+    let eventService: EventService;
+
+    beforeEach(() => {
+        eventService = new EventService();
+    });
+
+    test("should successfully rename an event when the new name is unique", () => {
+        const event = new Event("TestEvent", EventChannel.INTERNAL);
+        eventService.registerEvent(event);
+
+        eventService.renameEvent(event, "NewTestEvent");
+
+        // Check that the old name is no longer registered
+        expect(eventService.getEventByName("TestEvent")).toBeUndefined();
+
+        // Check that the event is now registered under the new name
+        const renamedEvent = eventService.getEventByName("NewTestEvent");
+        expect(renamedEvent).toBeDefined();
+        expect(renamedEvent?.name).toBe("NewTestEvent");
+    });
+
+    test("should log an error and not rename if the new event name already exists", () => {
+        const event1 = new Event("Event1", EventChannel.INTERNAL);
+        const event2 = new Event("Event2", EventChannel.EXTERNAL);
+
+        eventService.registerEvent(event1);
+        eventService.registerEvent(event2);
+
+        console.error = jest.fn(); // Mock console.error to track error logs
+
+        // Try to rename Event1 to Event2's name, which should fail
+        eventService.renameEvent(event1, "Event2");
+
+        // Check that the renaming process was aborted
+        expect(eventService.getEventByName("Event1")).toBeDefined();
+        expect(eventService.getEventByName("Event2")).toBeDefined();
+
+        // Ensure that the error was logged
+        expect(console.error).toHaveBeenCalledWith("Event name Event2 already exists!");
+    });
+
+    test("should unregister the old event and register it with the new name", () => {
+        const event = new Event("OldEventName", EventChannel.INTERNAL);
+        eventService.registerEvent(event);
+
+        // Mock the unregister and register methods
+        const unregisterSpy = jest.spyOn(eventService, "unregisterEvent");
+        const registerSpy = jest.spyOn(eventService, "registerEvent");
+
+        eventService.renameEvent(event, "NewEventName");
+
+        // Ensure the old event was unregistered
+        expect(unregisterSpy).toHaveBeenCalledWith("OldEventName");
+
+        // Ensure the event was registered with the new name
+        expect(registerSpy).toHaveBeenCalledWith(event);
+
+        // Ensure the event is now registered under the new name
+        expect(eventService.getEventByName("NewEventName")).toBeDefined();
+        expect(eventService.getEventByName("OldEventName")).toBeUndefined();
+    });
+
+    test("should not rename an event if the new name is not unique", () => {
+        const event1 = new Event("EventA", EventChannel.INTERNAL);
+        const event2 = new Event("EventB", EventChannel.EXTERNAL);
+        eventService.registerEvent(event1);
+        eventService.registerEvent(event2);
+
+        console.error = jest.fn(); // Mock console.error
+
+        eventService.renameEvent(event1, "EventB");
+
+        // Check that event1's name is unchanged
+        expect(eventService.getEventByName("EventA")).toBeDefined();
+        expect(eventService.getEventByName("EventB")).toBeDefined();
+
+        // Ensure an error was logged
+        expect(console.error).toHaveBeenCalledWith("Event name EventB already exists!");
+    });
+
+    test("should log the renaming action", () => {
+        const event = new Event("LogEventTest", EventChannel.GLOBAL);
+        eventService.registerEvent(event);
+
+        console.log = jest.fn(); // Mock console.log
+
+        eventService.renameEvent(event, "RenamedEvent");
+
+        // Ensure the renaming action is logged
+        expect(console.log).toHaveBeenCalledWith("Event LogEventTest has been renamed to RenamedEvent!");
+    });
+
+    test("should handle renaming to an empty string or invalid name", () => {
+        const event = new Event("ValidEventName", EventChannel.INTERNAL);
+        eventService.registerEvent(event);
+
+        console.error = jest.fn(); // Mock console.error
+
+        // Attempt to rename to an invalid empty string
+        eventService.renameEvent(event, "");
+
+        // Ensure the event wasn't renamed
+        expect(eventService.getEventByName("ValidEventName")).toBeDefined();
+        expect(eventService.getEventByName("")).toBeUndefined();
+
+        // Ensure the error was logged
+        expect(console.error).toHaveBeenCalled();
+    });
+
+    test("should not rename if event is not registered", () => {
+        const unregisteredEvent = new Event("UnregisteredEvent", EventChannel.GLOBAL);
+
+        console.error = jest.fn(); // Mock console.error
+
+        eventService.renameEvent(unregisteredEvent, "NewName");
+
+        // Check that the event wasn't registered after renaming attempt
+        expect(eventService.getEventByName("UnregisteredEvent")).toBeUndefined();
+        expect(eventService.getEventByName("NewName")).toBeUndefined();
+
+        // Ensure the error was logged
+        expect(console.error).toHaveBeenCalledWith("Event UnregisteredEvent does not exist!");
+    });
+});
