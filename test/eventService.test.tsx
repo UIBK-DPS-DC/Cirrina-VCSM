@@ -113,6 +113,45 @@ describe('EventService', () => {
         expect(raisedEvents).toContain("event1");
         expect(raisedEvents).toContain("event2");
     });
+
+    test('should return an event if it exists', () => {
+        // Create and register an event
+        const event = new Event('testEvent', EventChannel.INTERNAL);
+        eventService.registerEvent(event);
+
+        // Retrieve the event by name
+        const retrievedEvent = eventService.getEventByName('testEvent');
+        expect(retrievedEvent).toBeDefined();
+        expect(retrievedEvent?.name).toBe('testEvent');
+        expect(retrievedEvent?.channel).toBe(EventChannel.INTERNAL);
+    });
+
+    test('should return undefined if event does not exist', () => {
+        // Attempt to retrieve an event that doesn't exist
+        const retrievedEvent = eventService.getEventByName('nonExistentEvent');
+        expect(retrievedEvent).toBeUndefined();
+    });
+
+    test('should return undefined if name is an empty string', () => {
+        // Attempt to retrieve an event with an empty name
+        const retrievedEvent = eventService.getEventByName('');
+        expect(retrievedEvent).toBeUndefined();
+    });
+
+    test('should retrieve the correct event when multiple events exist', () => {
+        // Register multiple events
+        const event1 = new Event('event1', EventChannel.INTERNAL);
+        const event2 = new Event('event2', EventChannel.EXTERNAL);
+        eventService.registerEvent(event1);
+        eventService.registerEvent(event2);
+
+        // Retrieve specific event by name
+        const retrievedEvent = eventService.getEventByName('event2');
+        expect(retrievedEvent).toBeDefined();
+        expect(retrievedEvent?.name).toBe('event2');
+        expect(retrievedEvent?.channel).toBe(EventChannel.EXTERNAL);
+    });
+
 });
 
 describe('Get Event Tests', () => {
