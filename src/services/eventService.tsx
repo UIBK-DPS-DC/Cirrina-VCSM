@@ -1,7 +1,7 @@
 import {CsmNodeProps, isState, isStateMachine} from "../types.ts";
 import Action from "../classes/action.ts";
 import Event from "../classes/event.ts";
-import {ActionType} from "../enums.ts";
+import {ActionType, EventChannel} from "../enums.ts";
 
 export default class EventService {
     private nameToEventMap: Map<string,Event>;
@@ -70,6 +70,24 @@ export default class EventService {
     public getAllEvents() {
         return Array.from(this.nameToEventMap.values());
     }
+
+    public getAllInternalEvents(): Event[]{
+        return this.getAllEvents().filter((event: Event) => event.channel === EventChannel.INTERNAL);
+    }
+
+    public getAllExternalEvents(): Event[]{
+        return this.getAllEvents().filter((event: Event) => event.channel === EventChannel.EXTERNAL);
+    }
+
+    public getAllGlobalEvents(): Event[]{
+        return this.getAllEvents().filter((event: Event) => event.channel === EventChannel.GLOBAL);
+
+    }
+
+    public getAllPeripheralEvents(): Event[]{
+        return this.getAllEvents().filter((event: Event) => event.channel === EventChannel.PERIPHERAL);
+    }
+
 
 
     /**
