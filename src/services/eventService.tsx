@@ -127,6 +127,20 @@ export default class EventService {
         return this.getAllEvents().filter((event: Event) => event.channel === EventChannel.PERIPHERAL);
     }
 
+    /**
+     * Retrieves an event by its name.
+     *
+     * This method searches for an event in the `nameToEventMap` using the provided event name as the key.
+     * If an event with the specified name exists in the map, it returns the event.
+     * Otherwise, it returns `undefined`.
+     *
+     * @param {string} name - The name of the event to retrieve.
+     * @returns {Event | undefined} - The event object if found, or `undefined` if no event with the specified name exists.
+     */
+    public getEventByName(name: string): Event | undefined {
+        return this.nameToEventMap.get(name);
+    }
+
 
 
     /**
