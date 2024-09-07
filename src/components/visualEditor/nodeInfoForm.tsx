@@ -1,10 +1,8 @@
-import React, {useCallback, useContext, useEffect, useState} from "react";
-import { CsmNodeProps, isState, isStateMachine, ReactFlowContextProps} from "../../types.ts";
-import {ActionCategory, ActionType, MemoryUnit, ServiceLevel, ServiceType, TimeUnit} from "../../enums.ts";
+import React, {useCallback, useContext, useState} from "react";
+import { isState, ReactFlowContextProps} from "../../types.ts";
 import Action from "../../classes/action.ts";
 import {ReactFlowContext} from "../../utils.tsx";
 import RenameNodeComponent from "./renameNodeComponent.tsx";
-import {renderEnumAsOptions} from "../../utils.tsx";
 import ActionDisplay from "./ActionForms/actionDisplay.tsx";
 import Offcanvas from 'react-bootstrap/Offcanvas';
 import {Button, Container, OffcanvasBody, OffcanvasHeader} from "react-bootstrap";
