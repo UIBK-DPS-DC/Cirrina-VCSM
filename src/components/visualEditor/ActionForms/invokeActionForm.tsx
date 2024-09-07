@@ -146,7 +146,7 @@ export default function InvokeActionForm(props: {action: Action | undefined}) {
                     </Form.Group>
 
                     <Form.Group as={Row} className={"mb-3"} controlId={"fromOutputVariables"}>
-                        <Form.Label column sm={3} className={"mb-0"}>Input</Form.Label>
+                        <Form.Label column sm={3} className={"mb-0"}>Output</Form.Label>
                         <Col sm={5}>
                             <SelectContextsModal buttonName={"Select Variables"} vars={selectedOutputContextVariables} setVars={setSelectedOutputContextVariables} />
                         </Col>

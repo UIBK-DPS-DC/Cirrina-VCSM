@@ -1,6 +1,6 @@
 import Event from "../../classes/event.ts";
 import { Button, Col, Form, Row } from "react-bootstrap";
-import React, {Dispatch, SetStateAction, useCallback, useContext, useState} from "react";
+import React, {Dispatch, SetStateAction, useCallback, useContext, useEffect, useState} from "react";
 import { ReactFlowContext, renderEnumAsOptions } from "../../utils.tsx";
 import { ReactFlowContextProps } from "../../types.ts";
 import { EventChannel } from "../../enums.ts";
@@ -17,12 +17,39 @@ export default function CreateEventForm(props: { event: Event | undefined, onSub
     const oldEventName = props.event?.name;
     const buttonText = () => props.event ? "Save Changes" : "Create Event";
 
+    const validateEventName = (name: string) => {
+        if (!name) {
+            return false;
+        }
+
+        if (props.event && name === oldEventName) {
+            return true;
+        }
+
+        return eventService.isNameUnique(name);
+    };
+
+    const validateEventChannel = (channel: string) => {
+        return Object.values(EventChannel).includes(channel as EventChannel);
+    };
+
+
     const [eventNameInput, setEventNameInput] = useState("");
     const [selectedEventChannel, setSelectedEventChannel] = useState<string>(EventChannel.GLOBAL);
 
-    const [eventNameIsValid, setEventNameIsValid] = useState(false);
+    const [eventNameIsValid, setEventNameIsValid] = useState(props.event ? validateEventName(props.event.name) : false);
     const [eventChannelIsValid, setEventChannelIsValid] = useState(true);
     const [selectedContextVariables, setSelectedContextVariables] = useState<ContextVariable[]>([]);
+
+    useEffect(() => {
+        if(props.event){
+            setEventNameInput(props.event.name);
+            setSelectedEventChannel(props.event.channel)
+            setSelectedContextVariables(props.event.data)
+            validateEventName(props.event.name);
+            validateEventChannel(props.event.channel);
+        }
+    }, []);
 
     // Handle context variable form submission
     const onContextSubmit = (newVar: ContextVariable) => {
@@ -51,21 +78,7 @@ export default function CreateEventForm(props: { event: Event | undefined, onSub
         setEventChannelIsValid(validateEventChannel(value));
     }, []);
 
-    const validateEventName = (name: string) => {
-        if (!name) {
-            return false;
-        }
 
-        if (props.event && name === oldEventName) {
-            return true;
-        }
-
-        return eventService.isNameUnique(name);
-    };
-
-    const validateEventChannel = (channel: string) => {
-        return Object.values(EventChannel).includes(channel as EventChannel);
-    };
 
     const onSubmit = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
@@ -122,7 +135,7 @@ export default function CreateEventForm(props: { event: Event | undefined, onSub
                 </Form.Select>
             </Form.Group>
 
-            <Form.Group>
+            <Form.Group className={"mb-3"}>
                 <Form.Label>Context Variables</Form.Label>
                 <Row className={"mb-3"}>
                     <Col sm={6}>

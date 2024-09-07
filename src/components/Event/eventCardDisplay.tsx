@@ -24,7 +24,7 @@ export default function EventCardDisplay(props: {headerText: string,
                                 <EventCard key={`e-${e.name}`} event={e} setEvents={props.setEvents} setVars={props.setVars} vars={props.vars}></EventCard>
                             ))}
                         </CardGroup>
-                    ) || (<h3 className={"text-muted"}>No Variables Selected</h3>)}
+                    ) || (<h3 className={"text-muted"}>No Events Selected</h3>)}
                 </Accordion.Body>
             </Accordion.Item>
         </Accordion>
