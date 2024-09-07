@@ -22,6 +22,8 @@ export default function ContextCard(props: {contextVariable: ContextVariable, se
 
     const footerText = () => `${props.contextVariable.name} is a ${contextService.getContextType(props.contextVariable)?.toLowerCase()} variable in ${contextService.getLinkedState(props.contextVariable)?.name}`;
 
+
+
     return (
         <Container key={`c-${props.contextVariable?.name}`}>
             {props.contextVariable && (
