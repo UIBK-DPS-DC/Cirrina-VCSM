@@ -7,6 +7,7 @@ import ActionDisplay from "./ActionForms/actionDisplay.tsx";
 import Offcanvas from 'react-bootstrap/Offcanvas';
 import {Button, Container, OffcanvasBody, OffcanvasHeader} from "react-bootstrap";
 import CreateContextFormModal from "../Context/createContextFormModal.tsx";
+import ActionAccordion from "./ActionForms/actionAccordion.tsx";
 
 /**
  * NodeInfoForm Component
@@ -38,6 +39,20 @@ export default function NodeInfoForm() {
 
     const[showNewActionForm, setShowNewActionForm] = useState(false);
     const [invokeActions,setInvokeActions] = useState<Action[]>([]);
+    const [createActions, setCreateActions] = useState<Action[]>([]);
+    const [assignActions, setAssignActions] = useState<Action[]>([]);
+    const [lockActions, setLockActions] = useState<Action[]>([]);
+    const [unlockActions, setUnlockActions] = useState<Action[]>([]);
+    const [raseEventActions, setRaseEventActions] = useState<Action[]>([]);
+    const [timeoutActions, setTimeoutActions] = useState<Action[]>([]);
+    const [timeoutResetActions, setTimeoutResetActions] = useState<Action[]>([]);
+    const [allAction,setAllActions] = useState<Action[]>([]);
+
+
+
+
+
+
 
 
 
@@ -101,12 +116,26 @@ export default function NodeInfoForm() {
                         </div>
 
                         <div>
-                            <h1>ENTRY TEST</h1>
-                            {isState(selectedNode.data) && selectedNode.data.state.entry.map((a) => {
-                                return (
-                                    <ActionDisplay action={a} setInvokeActions={setInvokeActions}></ActionDisplay>
-                                )
-                            })}
+                            {isState(selectedNode.data) && selectedNode.data.state.entry && (
+                                <ActionAccordion headerText={"Entry Actions"} actions={selectedNode.data.state.entry} setInvokeActions={setInvokeActions}/>
+                            )
+                            }
+
+                            {isState(selectedNode.data) && selectedNode.data.state.exit && (
+                                <ActionAccordion headerText={"Exit Actions"} actions={selectedNode.data.state.exit} setInvokeActions={setInvokeActions}/>
+                            )
+                            }
+
+                            {isState(selectedNode.data) && selectedNode.data.state.while && (
+                                <ActionAccordion headerText={"While Actions"} actions={selectedNode.data.state.while} setInvokeActions={setInvokeActions}/>
+                            )
+                            }
+
+                            {isState(selectedNode.data) && selectedNode.data.state.after && (
+                                <ActionAccordion headerText={"Timeout Actions"} actions={selectedNode.data.state.after} setInvokeActions={setInvokeActions}/>
+                            )
+                            }
+
                         </div>
                     </OffcanvasBody>
                 </Offcanvas>

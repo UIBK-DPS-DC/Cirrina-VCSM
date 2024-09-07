@@ -4,13 +4,22 @@ import {ReactFlowContext} from "../../utils.tsx";
 import {ReactFlowContextProps} from "../../types.ts";
 import CreateContextFormModal from "./createContextFormModal.tsx";
 import ContextVariable from "../../classes/contextVariable.tsx";
+import Event from "../../classes/event.ts";
 
-export default function ContextCard(props: {contextVariable: ContextVariable, setVars: Dispatch<SetStateAction<ContextVariable[]>>}) {
+export default function ContextCard(props: {contextVariable: ContextVariable,
+    setVars: Dispatch<SetStateAction<ContextVariable[]>>, event?: Event, onEventEdit?: (event: Event) => void}) {
     const context = useContext(ReactFlowContext) as ReactFlowContextProps;
     const {contextService} = context;
 
     const handleClick = () => {
         props.setVars(prevState => prevState.filter(v => v !== props.contextVariable));
+        if(props.event) {
+            props.event.data =  props.event.data.filter(v => v !== props.contextVariable)
+
+            if(props.onEventEdit){
+                props.onEventEdit(props.event)
+            }
+        }
     };
 
     // Callback for handling when the context variable is edited

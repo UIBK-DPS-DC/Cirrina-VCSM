@@ -5,7 +5,11 @@ import {Dispatch, SetStateAction} from "react";
 import ContextVariable from "../../classes/contextVariable.tsx";
 import { useEffect } from "react";
 
-export default function ContextCardDisplay(props: {vars: ContextVariable[], headerText: string | undefined, setVars: Dispatch<SetStateAction<ContextVariable[]>>, event?: Event}) {
+export default function ContextCardDisplay(props: {vars: ContextVariable[],
+    headerText: string | undefined,
+    setVars: Dispatch<SetStateAction<ContextVariable[]>>,
+    event?: Event,
+    onEventEdit?: (event: Event) => void}) {
 
     const headerText = () => props.headerText || "Display Context Variables";
 
@@ -34,7 +38,7 @@ export default function ContextCardDisplay(props: {vars: ContextVariable[], head
                     {props.vars.length > 0 && props.event && (
                         <CardGroup>
                             {filterVars(props.event).map((v) => (
-                                <ContextCard key={`${v.name}-card`} contextVariable={v} setVars={props.setVars} />
+                                <ContextCard key={`${v.name}-card`} contextVariable={v} setVars={props.setVars} event={props.event} onEventEdit={props.onEventEdit} />
                             ))}
                         </CardGroup>
                     ) || props.vars.length > 0 && (

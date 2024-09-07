@@ -8,11 +8,24 @@ export default function EventCard(props: {event: Event, setEvents: Dispatch<SetS
 
 
 
-    const handleEventEdit = (updatedEvent: Event) => {
-        props.setEvents(prevState =>
-            prevState.map(e => e.name === updatedEvent.name ? updatedEvent : e)
-        );
-    };
+    const handleEventEdit = (newEvent: Event) => {
+        props.setEvents((prevEvents) => {
+            const existingVar = prevEvents.find((e) => e.name === newEvent.name);
+
+            if (existingVar) {
+                // Update the properties of the existing variable (maintain reference)
+                existingVar.name = newEvent.name;
+                existingVar.data = newEvent.data
+                existingVar.channel = newEvent.channel
+                return [...prevEvents];
+            } else {
+                // Add the new variable if it doesn't exist
+                return [...prevEvents, newEvent];
+            }
+        });
+
+        props.setVars(newEvent.data)
+    }
 
 
     return (
@@ -23,7 +36,7 @@ export default function EventCard(props: {event: Event, setEvents: Dispatch<SetS
                     <Card.Text>
                         Event Channel: {props.event.channel}
                     </Card.Text>
-                    <ContextCardDisplay vars={props.vars} headerText={"Show Vars"} setVars={props.setVars} event={props.event} ></ContextCardDisplay>
+                    <ContextCardDisplay vars={props.vars} headerText={"Show Vars"} setVars={props.setVars} event={props.event} onEventEdit={handleEventEdit}></ContextCardDisplay>
                 </Card.Body>
                 <Card.Footer>
                     <CreateEventModal event={props.event} onSubmit={handleEventEdit}></CreateEventModal>
