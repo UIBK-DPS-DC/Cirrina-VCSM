@@ -36,6 +36,7 @@ export default class ContextVariableService {
             return;
         }
         this._nameToContextMap.set(context.name, context);
+        console.log("CONTEXT_SERVICE: Context has been registered");
     }
 
     /**
@@ -76,6 +77,7 @@ export default class ContextVariableService {
         const stateOrStatemachine = isState(data) ? data.state : isStateMachine(data) ? data.stateMachine : null;
         if(stateOrStatemachine){
             this.linkContextToState(context, stateOrStatemachine);
+            console.log("CONTEXT_SERVICE: Linked context to data")
         }
         else{
             console.error("Invalid Data");
@@ -349,6 +351,7 @@ export default class ContextVariableService {
     }
 
     public addContext(context: ContextVariable, data: CsmNodeProps, type: ContextType): void {
+        console.log("CONTEXT_SERVICE: ADDING CONTEXT TO DATA")
         if(isState(data)){
             switch (type) {
                 case ContextType.PERSISTENT: {

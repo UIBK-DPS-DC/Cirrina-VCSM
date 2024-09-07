@@ -3,7 +3,7 @@ import {Accordion, CardGroup} from "react-bootstrap";
 import EventCard from "./eventCard.tsx";
 import {Dispatch, SetStateAction} from "react";
 import ContextVariable from "../../classes/contextVariable.tsx";
-import * as events from "node:events";
+
 
 export default function EventCardDisplay(props: {headerText: string,
     events: Event[],

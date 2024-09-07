@@ -5,7 +5,7 @@ import {isState, ReactFlowContextProps} from "../../types.ts";
 import {Button, Form} from "react-bootstrap";
 import {ContextType} from "../../enums.ts";
 
-export default function CreateContextForm(props: {variable: ContextVariable | undefined, onClose: () => void, onSubmit: (updatedVariable: ContextVariable) => void}) {
+export default function CreateContextForm(props: {variable: ContextVariable | undefined, onClose: () => void, onSubmit: (updatedVariable: ContextVariable) => void, noRegister?:boolean}) {
 
     const context = useContext(ReactFlowContext) as ReactFlowContextProps;
     const {contextService, selectedNode} = context;
@@ -100,20 +100,33 @@ export default function CreateContextForm(props: {variable: ContextVariable | un
         let updatedVariable: ContextVariable;
 
         if (props.variable) {
-            contextService.removeContext(props.variable, selectedNode.data);
-            contextService.addContext(props.variable, selectedNode.data, contextType as ContextType);
+
+
+            if(!props.noRegister){
+                contextService.removeContext(props.variable, selectedNode.data);
+                contextService.addContext(props.variable, selectedNode.data, contextType as ContextType);
+            }
+
             props.variable.value = expression;
 
-            if (oldName && oldName !== variableName) {
+            if (oldName && oldName !== variableName && ! props.noRegister) {
                 contextService.renameContext(props.variable, variableName);
             }
 
-            updatedVariable = props.variable;
+            if(props.noRegister){
+                props.variable.name = variableName;
+            }
+
+            updatedVariable = props.variable
+
+
         } else {
             const newContext = new ContextVariable(variableName, expression);
-            contextService.registerContext(newContext);
-            contextService.addContext(newContext, selectedNode.data, contextType as ContextType);
-            contextService.linkContextToStateByData(newContext, selectedNode.data);
+            if(!props.noRegister) {
+                contextService.registerContext(newContext);
+                contextService.addContext(newContext, selectedNode.data, contextType as ContextType);
+                contextService.linkContextToStateByData(newContext, selectedNode.data);
+            }
             updatedVariable = newContext;
             console.log("New Context added!");
         }

@@ -5,7 +5,7 @@ import ContextVariable from "../../classes/contextVariable.tsx";
 import { Container } from "react-bootstrap";
 import CreateContextForm from "./createContextForm.tsx";
 
-export default function CreateContextFormModal(props: { variable: ContextVariable | undefined, buttonName: string | undefined, onSubmit: ((updatedVariable: ContextVariable) => void) | undefined, noCascadeClose?: boolean }) {
+export default function CreateContextFormModal(props: { variable: ContextVariable | undefined, buttonName: string | undefined, onSubmit: ((updatedVariable: ContextVariable) => void) | undefined, noCascadeClose?: boolean, noRegister?: boolean }) {
 
     const [show, setShow] = useState(false);
 
@@ -37,7 +37,7 @@ export default function CreateContextFormModal(props: { variable: ContextVariabl
                 </Modal.Header>
 
                 <Modal.Body>
-                    <CreateContextForm variable={props.variable} onClose={handleClose} onSubmit={handleFormSubmit} />
+                    <CreateContextForm variable={props.variable} onClose={handleClose} onSubmit={handleFormSubmit} noRegister={props.noRegister} />
                 </Modal.Body>
 
                 <Modal.Footer>

@@ -7,7 +7,10 @@ import ContextVariable from "../../classes/contextVariable.tsx";
 import Event from "../../classes/event.ts";
 
 export default function ContextCard(props: {contextVariable: ContextVariable,
-    setVars: Dispatch<SetStateAction<ContextVariable[]>>, event?: Event, onEventEdit?: (event: Event) => void}) {
+    setVars: Dispatch<SetStateAction<ContextVariable[]>>,
+    noRegister?: boolean,
+    event?: Event,
+    onEventEdit?: (event: Event) => void}) {
     const context = useContext(ReactFlowContext) as ReactFlowContextProps;
     const {contextService} = context;
 
@@ -29,7 +32,9 @@ export default function ContextCard(props: {contextVariable: ContextVariable,
         );
     };
 
-    const footerText = () => `${props.contextVariable.name} is a ${contextService.getContextType(props.contextVariable)?.toLowerCase()} variable in ${contextService.getLinkedState(props.contextVariable)?.name}`;
+    const footerText = () => contextService.getLinkedState(props.contextVariable)?
+        `${props.contextVariable.name} is a ${contextService.getContextType(props.contextVariable)?.toLowerCase()} variable in ${contextService.getLinkedState(props.contextVariable)?.name}`
+        : `${props.contextVariable.name} has not been created yet.`
 
 
 
@@ -43,7 +48,7 @@ export default function ContextCard(props: {contextVariable: ContextVariable,
                     </Card.Body>
                     <Card.Footer className="text-muted">
                         <Card.Text>{footerText()}</Card.Text>
-                        <CreateContextFormModal variable={props.contextVariable} buttonName={"Edit"} onSubmit={handleContextEdit} />
+                        <CreateContextFormModal variable={props.contextVariable} buttonName={"Edit"} onSubmit={handleContextEdit} noRegister={props.noRegister}/>
                         <Button variant={"danger"} className={"right"} onClick={handleClick}>Remove</Button>
                     </Card.Footer>
                 </Card>
