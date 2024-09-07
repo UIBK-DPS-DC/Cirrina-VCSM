@@ -65,9 +65,15 @@ export default function NodeInfoForm() {
     const [selectedExistingAction, setSelectedExistingAction] = useState<string>("")
     const [saveAsNamedActionCheckbox, setSaveAsNamedActionCheckbox] = useState<boolean>(false);
 
+    //######################################################################################################################################################################################################
 
     const[showNewActionForm, setShowNewActionForm] = useState(false);
+    const [invokeActions,setInvokeActions] = useState<Action[]>([]);
 
+
+    const onActionFormSubmit = () => {
+        setShowNewActionForm(false)
+    }
 
 
 
@@ -166,6 +172,7 @@ export default function NodeInfoForm() {
      *
      * @param {React.FormEvent<HTMLFormElement>} event - The form submission event.
      */
+    /**
     const onFormSubmit = useCallback((event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         if (!selectedNode) return;
@@ -403,8 +410,8 @@ export default function NodeInfoForm() {
 
 
     }, [selectedNode, stateOrStateMachineService, nodes, setNodes, updateTransitionsOnRename, actionService, newEventName, eventService, contextService, selectedActionType]);
-    
-
+    */
+    /**
     // TODO: Style to make it more readable
     // Show Category etc.
     const showActions = (data: CsmNodeProps) => {
@@ -427,18 +434,21 @@ export default function NodeInfoForm() {
         return (<p>Unknown type</p>)
     }
 
-
+    */
     // All these on change functions could be refactored into inline functions.
     // Well keep them for now should we ever want for complicated logic.
+
+    /**
     const onActionTypeSelect = (event: React.ChangeEvent<HTMLSelectElement>) => {
         setSelectedActionType(event.target.value);
     }
+    */
 
-
+    /**
     const onCategorySelect = (event: React.ChangeEvent<HTMLSelectElement>) => {
         setSelectedActionCategory(event.target.value);
     }
-
+    */
     const onRaiseEventSelectChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
         console.log(`RAISE EVENT SELECTION ${event.target.value}`);
         setRaiseEventSelectedType(event.target.value);
@@ -762,12 +772,21 @@ export default function NodeInfoForm() {
                         </div>
                         {showNewActionForm && (
                             <div className={"action-form-container"}>
-                                <ActionDisplay action={undefined}></ActionDisplay>
+                                <ActionDisplay action={undefined} setInvokeActions={setInvokeActions} onSubmit={onActionFormSubmit}></ActionDisplay>
                             </div>
                         )}
                         <div>
                             <h2>Context Test</h2>
                             {renderContexts()}
+                        </div>
+
+                        <div>
+                            <h1>ENTRY TEST</h1>
+                            {isState(selectedNode.data) && selectedNode.data.state.entry.map((a) => {
+                                return (
+                                    <ActionDisplay action={a} setInvokeActions={setInvokeActions}></ActionDisplay>
+                                )
+                            })}
                         </div>
                     </OffcanvasBody>
                 </Offcanvas>

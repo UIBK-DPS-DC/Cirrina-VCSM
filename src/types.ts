@@ -47,7 +47,7 @@ export type Transitionn = {
 export type InvokeActionProps = {
     type: ActionType,
     serviceType: ServiceType,
-    isLocal: Boolean,
+    isLocal: boolean,
     input: ContextVariable[],
     done: Event[],
     output: ContextVariable[] // Maybe make it Context Variable array

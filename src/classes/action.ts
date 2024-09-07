@@ -12,6 +12,7 @@ import {ActionProps} from "../types.ts";
 /**
  * Placeholder Action class. Expand once we have the Schema
  */
+//TODO: REFACTOR ACTION CLASS
 export default class Action {
     private _name: string;
     private _type: ActionType

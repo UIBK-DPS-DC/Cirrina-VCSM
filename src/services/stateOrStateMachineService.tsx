@@ -223,6 +223,35 @@ export default class StateOrStateMachineService {
     }
 
     /**
+     * Removes an action from all action arrays within a state.
+     *
+     * This method takes an `Action` and a `CsmNodeProps` data object,
+     * and if the `data` contains a valid state, it attempts to remove the action
+     * from the state's `entry`, `while`, `exit`, and `after` action arrays.
+     * The removal is performed by filtering out the specified action from each array.
+     *
+     * - The function checks if `data` contains a valid state using the `isState` helper.
+     * - It iterates through each of the state's action arrays (`entry`, `while`, `exit`, `after`)
+     *   and removes any occurrence of the given `action` by filtering the array.
+     *
+     * If the `data` is not a valid state, no action is taken, and the function returns immediately.
+     *
+     * @param {Action} action - The action to be removed from the state.
+     * @param {CsmNodeProps} data - The node properties, which could contain a state.
+     *                               The function will modify the state's action arrays if the state is valid.
+     */
+    public removeActionFromState(action: Action, data: CsmNodeProps) {
+        if(isState(data)){
+            data.state.entry = data.state.entry.filter((a) => a !== action)
+            data.state.while = data.state.while.filter((a) => a !== action)
+            data.state.exit = data.state.exit.filter((a) => a !== action)
+            data.state.after = data.state.after.filter((a) => a !== action)
+
+        }
+        return;
+    }
+
+    /**
      * Links a node to a state or state machine.
      *
      * This method associates a given node ID with a corresponding state or state machine based on the provided data.

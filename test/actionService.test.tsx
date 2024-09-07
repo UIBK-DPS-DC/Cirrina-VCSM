@@ -1,6 +1,8 @@
 import ActionService from "../src/services/actionService";
 import Action from "../src/classes/action";
-import {ActionType} from "../src/enums";
+import {ActionCategory, ActionType} from "../src/enums";
+import {CsmNodeProps} from "../src/types";
+import State from "../src/classes/state";
 
 let service: ActionService;
 
@@ -96,3 +98,84 @@ describe('ActionService', () => {
 
 
 });
+
+describe("ActionService - getActionCategory", () => {
+    let actionService: ActionService;
+    let mockAction: Action;
+    let mockState: State;
+    let data: CsmNodeProps;
+
+    beforeEach(() => {
+        actionService = new ActionService();
+        mockAction = new Action("TestAction", ActionType.RAISE_EVENT); // Create a test action with ActionType
+        mockState = new State("TestState");
+        data = {
+            state: mockState, // Set the state in CsmNodeProps data
+        };
+    });
+
+    test("should return ENTRY_ACTION when the action is in the entry array", () => {
+        mockState.entry.push(mockAction); // Add action to entry array
+
+        const result = actionService.getActionCategory(mockAction, data);
+
+        expect(result).toBe(ActionCategory.ENTRY_ACTION);
+    });
+
+    test("should return EXIT_ACTION when the action is in the exit array", () => {
+        mockState.exit.push(mockAction); // Add action to exit array
+
+        const result = actionService.getActionCategory(mockAction, data);
+
+        expect(result).toBe(ActionCategory.EXIT_ACTION);
+    });
+
+    test("should return WHILE_ACTION when the action is in the while array", () => {
+        mockState.while.push(mockAction); // Add action to while array
+
+        const result = actionService.getActionCategory(mockAction, data);
+
+        expect(result).toBe(ActionCategory.WHILE_ACTION);
+    });
+
+    test("should return TIMEOUT when the action is in the after array", () => {
+        mockState.after.push(mockAction); // Add action to after array
+
+        const result = actionService.getActionCategory(mockAction, data);
+
+        expect(result).toBe(ActionCategory.TIMEOUT);
+    });
+
+    test("should return undefined if the action is not in any of the action arrays", () => {
+        // Do not add action to any arrays
+
+        const result = actionService.getActionCategory(mockAction, data);
+
+        expect(result).toBeUndefined();
+    });
+
+    test("should return undefined if the data does not contain a valid state", () => {
+        const invalidData = {}; // Invalid data that does not contain a state
+
+        const result = actionService.getActionCategory(mockAction, invalidData as CsmNodeProps);
+
+        expect(result).toBeUndefined();
+    });
+
+    test("should return undefined if the action is not in the state but exists elsewhere", () => {
+        const differentAction = new Action("DifferentAction", ActionType.CREATE); // Different action not in mockState
+        const result = actionService.getActionCategory(differentAction, data);
+
+        expect(result).toBeUndefined();
+    });
+
+    test("should correctly classify multiple actions", () => {
+        const anotherAction = new Action("AnotherAction", ActionType.ASSIGN);
+        mockState.entry.push(mockAction); // Add mockAction to entry
+        mockState.exit.push(anotherAction); // Add anotherAction to exit
+
+        expect(actionService.getActionCategory(mockAction, data)).toBe(ActionCategory.ENTRY_ACTION);
+        expect(actionService.getActionCategory(anotherAction, data)).toBe(ActionCategory.EXIT_ACTION);
+    });
+});
+

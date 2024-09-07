@@ -1,4 +1,6 @@
 import Action from "../classes/action.ts";
+import {CsmNodeProps, isState} from "../types.ts";
+import {ActionCategory} from "../enums.ts";
 
 export default class ActionService {
     private nameToActionMap: Map<string,Action>;
@@ -78,6 +80,51 @@ export default class ActionService {
     public getAllActionNames(): string[] {
         return Array.from(this.nameToActionMap.keys());
     }
+
+    /**
+     * Determines the category of an action within a specific state.
+     *
+     * This method inspects the `CsmNodeProps` data, checking if it contains a state.
+     * If the `data` represents a state, it identifies the category of the given `action`
+     * based on the state's action arrays (`entry`, `exit`, `while`, and `after`).
+     *
+     * - If the action is found in the state's `entry` array, it is classified as an `ENTRY_ACTION`.
+     * - If the action is in the `exit` array, it is classified as an `EXIT_ACTION`.
+     * - If the action is in the `while` array, it is classified as a `WHILE_ACTION`.
+     * - If the action is in the `after` array, it is categorized as a `TIMEOUT`.
+     * - If none of these conditions are met, the function returns `undefined`.
+     *
+     * @param {Action} action - The action for which to determine the category.
+     * @param {CsmNodeProps} data - The node properties, which could contain a state.
+     * @returns {ActionCategory | undefined} - The category of the action (`ENTRY_ACTION`, `EXIT_ACTION`, `WHILE_ACTION`, `TIMEOUT`),
+     *                                         or `undefined` if the action is not found in the state's actions.
+     */
+    public getActionCategory(action: Action, data: CsmNodeProps): ActionCategory | undefined{
+        if(isState(data)){
+            const state = data.state;
+
+            if(state.entry.includes(action)){
+                return ActionCategory.ENTRY_ACTION
+            }
+
+            if(state.exit.includes(action)){
+                return ActionCategory.EXIT_ACTION
+            }
+
+            if(state.while.includes(action)){
+                return ActionCategory.WHILE_ACTION
+            }
+
+            if(state.after.includes(action)){
+                return ActionCategory.TIMEOUT
+            }
+
+        }
+
+        return undefined
+    }
+
+
 
     /**
      * Retrieves an action by its name.

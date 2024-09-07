@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect} from "react";
+import React, {Dispatch, SetStateAction, useCallback, useEffect} from "react";
 
 import {ActionType} from "../../../enums.ts";
 import {renderEnumAsOptions} from "../../../utils.tsx";
@@ -15,7 +15,7 @@ import {Form} from "react-bootstrap";
 
 const ACTION_TYPE_SELECT_NAME = "action-type-select"
 
-export default function ActionDisplay(props: {action: Action | undefined}) {
+export default function ActionDisplay(props: {action: Action | undefined, setInvokeActions: Dispatch<SetStateAction<Action[]>>, onSubmit? : () => void}) {
     const [selectedActionType, setSelectedActionType] = React.useState<string>(ActionType.INVOKE);
 
     const isDisabled = props.action !== undefined;
@@ -35,16 +35,14 @@ export default function ActionDisplay(props: {action: Action | undefined}) {
 
     return (
         <div>
-            <Form.Group className={"mb-3"}>
+            <Form.Group className={"mb-3 mt-3"}>
                 <Form.Label>Action Type</Form.Label>
-            </Form.Group>
-            <Form.Group className={"mb-3"}>
                 <Form.Select disabled={isDisabled} onChange={onSelectedActionTypeChange} name={ACTION_TYPE_SELECT_NAME} value={selectedActionType} className={"mb-3"}>
                     {renderEnumAsOptions(ActionType)}
                 </Form.Select>
 
                 {selectedActionType && selectedActionType === ActionType.INVOKE && (
-                    <InvokeActionForm action={props.action}></InvokeActionForm>
+                    <InvokeActionForm action={props.action} setActions={props.setInvokeActions} onSubmit={props.onSubmit}></InvokeActionForm>
                 )}
 
                 {selectedActionType && selectedActionType === ActionType.CREATE && (
