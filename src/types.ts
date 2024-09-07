@@ -50,7 +50,7 @@ export type InvokeActionProps = {
     isLocal: Boolean,
     input: ContextVariable[],
     done: Event[],
-    output: string[] // Maybe make it Context Variable array
+    output: ContextVariable[] // Maybe make it Context Variable array
 }
 
 export type ActionProps = InvokeActionProps | {}

@@ -1,151 +1,123 @@
 import Event from "../../classes/event.ts";
-import {Button, Col, Form, Row} from "react-bootstrap";
-import React, {useCallback, useContext, useEffect, useState} from "react";
-import {ReactFlowContext, renderEnumAsOptions} from "../../utils.tsx";
-import {ReactFlowContextProps} from "../../types.ts";
-import {EventChannel} from "../../enums.ts";
+import { Button, Col, Form, Row } from "react-bootstrap";
+import React, {Dispatch, SetStateAction, useCallback, useContext, useState} from "react";
+import { ReactFlowContext, renderEnumAsOptions } from "../../utils.tsx";
+import { ReactFlowContextProps } from "../../types.ts";
+import { EventChannel } from "../../enums.ts";
 import ContextVariable from "../../classes/contextVariable.tsx";
 import SelectContextsModal from "../Context/selectContextsModal.tsx";
 import CreateContextFormModal from "../Context/createContextFormModal.tsx";
 import ContextCardDisplay from "../Context/contextCardDisplay.tsx";
-export default function CreateEventForm(props:{event: Event | undefined, onSubmit: (event: Event) => void}) {
 
-    const context = useContext(ReactFlowContext) as ReactFlowContextProps
-    const {eventService, selectedNode} = context
+export default function CreateEventForm(props: { event: Event | undefined, onSubmit: (event: Event) => void, setVars?:  Dispatch<SetStateAction<ContextVariable[]>> }) {
+
+    const context = useContext(ReactFlowContext) as ReactFlowContextProps;
+    const { eventService, selectedNode } = context;
 
     const oldEventName = props.event?.name;
-    const buttonText = () => props.event ? "Save Changes" : "Create Event"
+    const buttonText = () => props.event ? "Save Changes" : "Create Event";
 
     const [eventNameInput, setEventNameInput] = useState("");
-    const [selectedEventChannel, setSelectedEventChannel] = useState<string>(EventChannel.GLOBAL)
+    const [selectedEventChannel, setSelectedEventChannel] = useState<string>(EventChannel.GLOBAL);
 
     const [eventNameIsValid, setEventNameIsValid] = useState(false);
     const [eventChannelIsValid, setEventChannelIsValid] = useState(true);
-    const [selectedContextVariables, setSelectedContextVariables] = useState<ContextVariable[]>([])
+    const [selectedContextVariables, setSelectedContextVariables] = useState<ContextVariable[]>([]);
 
+    // Handle context variable form submission
     const onContextSubmit = (newVar: ContextVariable) => {
         setSelectedContextVariables((prevVars) => {
             const existingVar = prevVars.find((v) => v.name === newVar.name);
-
             if (existingVar) {
-                // Update the properties of the existing variable (maintain reference)
                 existingVar.name = newVar.name;
                 existingVar.value = newVar.value;
                 return [...prevVars];
             } else {
-                // Add the new variable if it doesn't exist
                 return [...prevVars, newVar];
             }
-        });
-    }
+        })
 
-    const invalidEventNameText = () => {
-        return eventNameInput? `${eventNameInput} already exists` : "Name cant be empty"
-    }
-
-
-    const validateEventName = (name: string) => {
-        if(!name){
-            return false;
-        }
-
-        if(props.event && name === oldEventName){
-            return true;
-        }
-
-        return eventService.isNameUnique(name)
-    }
-
-    const validateEventChannel = (channel: string) => {
-        return Object.values(EventChannel).includes(channel as EventChannel);
-    }
-
-
-
-
+    };
 
     const onEventNameChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
-        const value = (event.target.value);
-        setEventNameInput(value)
-        setEventNameIsValid(validateEventName(value))
-    },[validateEventName])
+        const value = event.target.value;
+        setEventNameInput(value);
+        setEventNameIsValid(validateEventName(value));
+    }, []);
 
     const onSelectedEventChannelChange = useCallback((event: React.ChangeEvent<HTMLSelectElement>) => {
         const value = event.target.value;
         setSelectedEventChannel(value);
-        setEventChannelIsValid(validateEventChannel(value))
-    },[setSelectedEventChannel,validateEventChannel])
+        setEventChannelIsValid(validateEventChannel(value));
+    }, []);
 
-
-
-    useEffect(() => {
-        if(props.event){
-            setEventNameInput(props.event.name);
+    const validateEventName = (name: string) => {
+        if (!name) {
+            return false;
         }
-    }, [props.event]);
 
-    useEffect(() => {
-        console.log(selectedEventChannel)
-    }, [selectedEventChannel]);
+        if (props.event && name === oldEventName) {
+            return true;
+        }
 
+        return eventService.isNameUnique(name);
+    };
+
+    const validateEventChannel = (channel: string) => {
+        return Object.values(EventChannel).includes(channel as EventChannel);
+    };
 
     const onSubmit = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-        if(!selectedNode) {
+        event.stopPropagation()
+
+        if (!selectedNode) {
             return;
         }
 
-        let updatedEvent: Event
-
-        if(props.event){
-            if(oldEventName !== eventNameInput){
+        let updatedEvent: Event;
+        if (props.event) {
+            if (oldEventName !== eventNameInput) {
                 eventService.renameEvent(props.event, eventNameInput);
-                props.event.name = eventNameInput
             }
-
-            props.event.data = selectedContextVariables
+            props.event.data = selectedContextVariables;
             props.event.channel = selectedEventChannel as EventChannel;
-            updatedEvent = props.event
-        }
-        else {
-            const newEvent = new Event(eventNameInput,selectedEventChannel as EventChannel)
-            newEvent.data = selectedContextVariables
-            eventService.registerEvent(newEvent)
-            updatedEvent = newEvent
-            console.log(`New Event ${updatedEvent.name} created!`)
+            updatedEvent = props.event;
+        } else {
+            const newEvent = new Event(eventNameInput, selectedEventChannel as EventChannel);
+            newEvent.data = selectedContextVariables;
+            eventService.registerEvent(newEvent);
+            updatedEvent = newEvent;
         }
 
-        props.onSubmit(updatedEvent)
+        if(props.setVars){
+            props.setVars((prevState) => {
+                return [...prevState, ...selectedContextVariables].filter((item, index, vars) => {
+                    return vars.findIndex(v => v.name === item.name) === index
+                });
+            })
+        }
+        props.onSubmit(updatedEvent);
+    };
 
-
-    }
-
-    return(
+    return (
         <Form onSubmit={onSubmit}>
+
             <Form.Group className="mb-3">
                 <Form.Label>Name</Form.Label>
                 <Form.Control
-                type={"text"}
-                value={eventNameInput}
-                onChange={onEventNameChange}
-                required={true}
-                isValid={eventNameIsValid}
-                isInvalid={!eventNameIsValid}>
+                    type={"text"}
+                    value={eventNameInput}
+                    onChange={onEventNameChange}
+                    required={true}
+                    isValid={eventNameIsValid}
+                    isInvalid={!eventNameIsValid}>
                 </Form.Control>
-
-                <Form.Control.Feedback type="invalid">
-                    {invalidEventNameText()}
-                </Form.Control.Feedback>
-
-                <Form.Text className={"text-muted"}>
-                    The Events Name
-                </Form.Text>
-
             </Form.Group>
 
             <Form.Group className="mb-3">
                 <Form.Label>EventChannel</Form.Label>
-                <Form.Select value={selectedEventChannel} onChange={onSelectedEventChannelChange} isValid={eventChannelIsValid} isInvalid={!eventChannelIsValid}>
+                <Form.Select value={selectedEventChannel} onChange={onSelectedEventChannelChange} isValid={eventChannelIsValid}>
                     {renderEnumAsOptions(EventChannel)}
                 </Form.Select>
             </Form.Group>
@@ -154,18 +126,16 @@ export default function CreateEventForm(props:{event: Event | undefined, onSubmi
                 <Form.Label>Context Variables</Form.Label>
                 <Row className={"mb-3"}>
                     <Col sm={6}>
-                        <SelectContextsModal buttonName={"Select Context"} vars={selectedContextVariables} setVars={setSelectedContextVariables}/>
+                        <SelectContextsModal buttonName={"Select Context"} vars={selectedContextVariables} setVars={setSelectedContextVariables} />
                     </Col>
                     <Col sm={6}>
-                        <CreateContextFormModal variable={undefined} buttonName={"Create new"} onSubmit={onContextSubmit}></CreateContextFormModal>
+                        <CreateContextFormModal variable={undefined} buttonName={"Create new"} onSubmit={onContextSubmit} noCascadeClose={true} />
                     </Col>
                 </Row>
-                <ContextCardDisplay vars={selectedContextVariables} headerText={"Selected Variables"} setVars={setSelectedContextVariables}/>
+                <ContextCardDisplay vars={selectedContextVariables} headerText={"Selected Variables"} setVars={setSelectedContextVariables} />
             </Form.Group>
 
             <Button variant="primary" type="submit">{buttonText()}</Button>
-
         </Form>
-    )
-
+    );
 }

@@ -1,11 +1,11 @@
-import {useState} from 'react';
+import { useState } from 'react';
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
 import ContextVariable from "../../classes/contextVariable.tsx";
-import {Container} from "react-bootstrap";
+import { Container } from "react-bootstrap";
 import CreateContextForm from "./createContextForm.tsx";
 
-export default function CreateContextFormModal(props: {variable: ContextVariable | undefined, buttonName: string | undefined, onSubmit: ((updatedVariable: ContextVariable) => void) | undefined } ) {
+export default function CreateContextFormModal(props: { variable: ContextVariable | undefined, buttonName: string | undefined, onSubmit: ((updatedVariable: ContextVariable) => void) | undefined, noCascadeClose?: boolean }) {
 
     const [show, setShow] = useState(false);
 
@@ -17,10 +17,12 @@ export default function CreateContextFormModal(props: {variable: ContextVariable
 
     // Handle form submission and notify the parent component
     const handleFormSubmit = (updatedVariable: ContextVariable) => {
-        if(props.onSubmit){
+        if (props.onSubmit) {
             props.onSubmit(updatedVariable);
         }
-        handleClose();  // Close modal after submit
+        if (!props.noCascadeClose) {
+            handleClose();  // Close modal after submit
+        }
     };
 
     return (

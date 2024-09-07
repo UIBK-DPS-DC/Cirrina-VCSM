@@ -2,20 +2,17 @@ import Action from "../../../classes/action.ts";
 import Event from "../../../classes/event.ts";
 import {Card, Col, Form, Row} from "react-bootstrap";
 import {ServiceType} from "../../../enums.ts";
-import {ReactFlowContext, renderEnumAsOptions} from "../../../utils.tsx";
-import React, {useContext, useEffect, useState} from "react";
-import {ReactFlowContextProps} from "../../../types.ts";
+import {renderEnumAsOptions} from "../../../utils.tsx";
+import React, {useEffect, useState} from "react";
 import CreateContextFormModal from "../../Context/createContextFormModal.tsx";
 import SelectContextsModal from "../../Context/selectContextsModal.tsx";
 import ContextCardDisplay from "../../Context/contextCardDisplay.tsx";
 import ContextVariable from "../../../classes/contextVariable.tsx";
 import CreateEventModal from "../../Event/createEventModal.tsx";
 import SelectEventsModal from "../../Event/selectEventsModal.tsx";
+import EventCardDisplay from "../../Event/eventCardDisplay.tsx";
 
 export default function InvokeActionForm(props: {action: Action | undefined}) {
-    const context = useContext(ReactFlowContext) as ReactFlowContextProps;
-    const {contextService} = context;
-
 
 
     // Selected variables
@@ -24,6 +21,7 @@ export default function InvokeActionForm(props: {action: Action | undefined}) {
     const [selectedOutputContextVariables, setSelectedOutputContextVariables] = useState<ContextVariable[]>([]);
     const [selectedEventsWhenDone, setSelectedEventsWhenDone] = useState<Event[]>([]);
     const [selectedServiceType, setSelectedServiceType] = useState<string>(ServiceType.LOCAL)
+    const [selectedEventVars, setSelectedEventVars] = useState<ContextVariable[]>([]);
 
     useEffect(() => {
         console.log(selectedServiceType)
@@ -139,8 +137,12 @@ export default function InvokeActionForm(props: {action: Action | undefined}) {
                             <SelectEventsModal buttonName={"Select Events"} modalTitle={"Select Events to be raised when done"} events={selectedEventsWhenDone} setEvents={setSelectedEventsWhenDone}/>
                         </Col>
                         <Col sm={4}>
-                            <CreateEventModal event={undefined} onSubmit={onEventSubmit}/>
+                            <CreateEventModal event={undefined} onSubmit={onEventSubmit} setVars={setSelectedEventVars}/>
                         </Col>
+                    </Form.Group>
+
+                    <Form.Group className={"mb-3"}>
+                        <EventCardDisplay headerText={"Selected Events"} events={selectedEventsWhenDone} setEvents={setSelectedEventsWhenDone} setVars={setSelectedEventVars} vars={selectedEventVars} />
                     </Form.Group>
 
                     <Form.Group as={Row} className={"mb-3"} controlId={"fromOutputVariables"}>

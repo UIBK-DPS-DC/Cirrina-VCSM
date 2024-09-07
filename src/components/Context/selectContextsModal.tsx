@@ -212,6 +212,8 @@ export default function SelectContextsModal(props: {buttonName: string | undefin
 
     const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault()
+        event.stopPropagation()
+
         if(!selectedNode){
             return;
         }

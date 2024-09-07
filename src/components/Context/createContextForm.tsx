@@ -89,6 +89,7 @@ export default function CreateContextForm(props: {variable: ContextVariable | un
 
     const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
+        event.stopPropagation()
         if (!selectedNode?.data) {
             return;
         }

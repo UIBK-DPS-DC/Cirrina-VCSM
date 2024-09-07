@@ -6,6 +6,7 @@ import {
     InvokeActionDescription,
     RaiseActionDescription
 } from "../pkl/bindings/collaborative_state_machine_description.pkl.ts";
+import {ActionProps} from "../types.ts";
 
 
 /**
@@ -15,13 +16,13 @@ export default class Action {
     private _name: string;
     private _type: ActionType
     private _delay: number
-    private _properties: {}
+    private _properties: ActionProps
     private _context: ContextVariable[] | undefined
 
     constructor(name: string, type: ActionType, delay = 0) {
         this._name = name;
         this._type = type;
-        this._properties = this.createActionProperties(type)
+        this._properties = {}
         this._delay = delay
         this._context = undefined
 
@@ -68,19 +69,6 @@ export default class Action {
         this._context = value;
     }
 
-    private createActionProperties(type: ActionType) {
-        switch (type) {
-            case ActionType.RAISE_EVENT: {
-                return {
-                    event: ""
-                }
-            }
-            //TODO: OTHER TYPES
-            default: {
-                return {}
-            }
-        }
-    }
 
 
     // Could be extended to compare fields for non named actions.
