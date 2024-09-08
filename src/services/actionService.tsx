@@ -1,12 +1,19 @@
 import Action from "../classes/action.ts";
 import {CsmNodeProps, isState} from "../types.ts";
-import {ActionCategory} from "../enums.ts";
+import {ActionCategory, ActionType} from "../enums.ts";
 
 export default class ActionService {
     private nameToActionMap: Map<string,Action>;
+    private typeToActionsMap: Map<ActionType,Action[]>;
 
     public constructor() {
         this.nameToActionMap = new Map();
+        this.typeToActionsMap = new Map();
+
+        Object.values(ActionType).forEach(type => {
+            this.typeToActionsMap.set(type as ActionType, []); // Initialize each ActionType with an empty array.
+        });
+
     }
 
 
@@ -32,6 +39,78 @@ export default class ActionService {
         console.log(actionName + " has been registered!");
         return true;
     }
+
+    /**
+     * Registers an action into the type-to-actions map.
+     *
+     * This method takes an action object and checks whether it has a valid type. If the action has no type,
+     * it logs an error and exits. If the action has a valid type, it retrieves the corresponding array from
+     * the `typeToActionsMap` and pushes the action into that array. If the action type does not exist in the map,
+     * it logs an error message.
+     *
+     * @param {Action} action - The action object to register.
+     */
+    public registerAction(action: Action): void {
+        if(!action.type){
+            console.error("Action does not have a type");
+            return
+        }
+
+        const arr = this.typeToActionsMap.get(action.type);
+        if(!arr) {
+            console.error(`Action type ${action.type} does not exist.`);
+        }
+        else{
+            arr.push(action);
+        }
+
+
+    }
+
+    /**
+     * Deregisters (removes) an action from the type-to-actions map.
+     *
+     * This method takes an action object and checks whether it has a valid type. If the action has no type,
+     * it logs an error and exits. If the action has a valid type, it retrieves the corresponding array from
+     * the `typeToActionsMap` and removes the action from that array. If the action type or the action itself
+     * does not exist in the array, the function logs an error.
+     *
+     * @param {Action} action - The action object to deregister (remove).
+     */
+    public deregisterAction(action: Action): void {
+        if (!action.type) {
+            console.error("Action does not have a type");
+            return;
+        }
+
+        const arr = this.typeToActionsMap.get(action.type);
+        console.log(arr?.length)
+        if (!arr) {
+            console.error(`Action type ${action.type} does not exist.`);
+            return;
+        }
+
+        // Find the index of the action and remove it in place if it exists
+        const index = arr.indexOf(action);
+        if (index !== -1) {
+            arr.splice(index, 1); // Removes the action from the array
+        }
+    }
+
+    /**
+     * Retrieves all actions of a specific type.
+     *
+     * This method takes an `ActionType` and returns an array of actions that correspond to that type.
+     * It looks up the `typeToActionsMap` using the provided type and returns the array of actions.
+     * If no actions are found for the given type, it returns an empty array.
+     *
+     * @param {ActionType} type - The type of actions to retrieve.
+     * @returns {Action[]} - An array of actions matching the given type, or an empty array if no actions exist for the type.
+     */
+    public getActionsByType(type: ActionType): Action[] {
+        return this.typeToActionsMap.get(type) || [];
+    }
+
 
     /**
      * Unregisters an action name.

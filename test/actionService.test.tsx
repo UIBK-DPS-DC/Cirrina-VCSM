@@ -179,3 +179,217 @@ describe("ActionService - getActionCategory", () => {
     });
 });
 
+describe('ActionService - Register and Deregister Actions', () => {
+    let actionService: ActionService;
+
+    beforeEach(() => {
+        actionService = new ActionService();
+    });
+
+    test('registerAction should correctly register an action with a valid type', () => {
+        const action = new Action('TestAction', ActionType.INVOKE);
+
+        actionService.registerAction(action);
+
+        const actionsArray = actionService['typeToActionsMap'].get(ActionType.INVOKE);
+        expect(actionsArray).toContain(action); // The action should be in the map under the correct type
+    });
+
+    test('registerAction should log error when action has no type', () => {
+        const action = new Action('TestAction', undefined as unknown as ActionType); // Action with no type
+
+        const consoleSpy = jest.spyOn(console, 'error').mockImplementation();
+
+        actionService.registerAction(action);
+
+        expect(consoleSpy).toHaveBeenCalledWith('Action does not have a type');
+        consoleSpy.mockRestore();
+    });
+
+    test('deregisterAction should remove an action from the corresponding type array', () => {
+        const action = new Action('TestAction', ActionType.INVOKE);
+
+        // First register the action
+        actionService.registerAction(action);
+
+        // Then deregister the action
+        actionService.deregisterAction(action);
+
+        const actionsArray = actionService['typeToActionsMap'].get(ActionType.INVOKE);
+        expect(actionsArray).not.toContain(action); // The action should be removed
+    });
+
+    test('deregisterAction should log an error when the action type does not exist', () => {
+        const action = new Action('TestAction', undefined as unknown as ActionType); // Action with no type
+
+        const consoleSpy = jest.spyOn(console, 'error').mockImplementation();
+
+        actionService.deregisterAction(action);
+
+        expect(consoleSpy).toHaveBeenCalledWith('Action does not have a type');
+        consoleSpy.mockRestore();
+    });
+
+
+    test('registerAction should handle registering multiple actions of the same type', () => {
+        const action1 = new Action('TestAction1', ActionType.INVOKE);
+        const action2 = new Action('TestAction2', ActionType.INVOKE);
+
+        actionService.registerAction(action1);
+        actionService.registerAction(action2);
+
+        const actionsArray = actionService['typeToActionsMap'].get(ActionType.INVOKE);
+        expect(actionsArray).toContain(action1);
+        expect(actionsArray).toContain(action2);
+    });
+
+    test('deregisterAction should remove the correct action when multiple actions of the same type exist', () => {
+        const action1 = new Action('TestAction1', ActionType.INVOKE);
+        const action2 = new Action('TestAction2', ActionType.INVOKE);
+
+        actionService.registerAction(action1);
+        actionService.registerAction(action2);
+
+        // Deregister the first action
+        actionService.deregisterAction(action1);
+
+        const actionsArray = actionService['typeToActionsMap'].get(ActionType.INVOKE);
+        expect(actionsArray).not.toContain(action1);
+        expect(actionsArray).toContain(action2); // Only action2 should remain
+    });
+});
+
+describe("ActionService - getActionsByType", () => {
+    let actionService: ActionService;
+
+    beforeEach(() => {
+        actionService = new ActionService();
+    });
+
+    test("should return an empty array if no actions of the given type exist", () => {
+        const result = actionService.getActionsByType(ActionType.INVOKE);
+        expect(result).toEqual([]);
+    });
+
+    test("should return actions of a given type when they exist", () => {
+        const action1 = new Action("Action1", ActionType.INVOKE);
+        const action2 = new Action("Action2", ActionType.INVOKE);
+
+        actionService.registerAction(action1);
+        actionService.registerAction(action2);
+
+        const result = actionService.getActionsByType(ActionType.INVOKE);
+        expect(result).toContain(action1);
+        expect(result).toContain(action2);
+        expect(result.length).toBe(2);
+    });
+
+    test("should only return actions of the requested type", () => {
+        const action1 = new Action("Action1", ActionType.INVOKE);
+        const action2 = new Action("Action2", ActionType.CREATE);
+
+        actionService.registerAction(action1);
+        actionService.registerAction(action2);
+
+        const invokeActions = actionService.getActionsByType(ActionType.INVOKE);
+        expect(invokeActions).toContain(action1);
+        expect(invokeActions).not.toContain(action2);
+        expect(invokeActions.length).toBe(1);
+
+        const createActions = actionService.getActionsByType(ActionType.CREATE);
+        expect(createActions).toContain(action2);
+        expect(createActions).not.toContain(action1);
+        expect(createActions.length).toBe(1);
+    });
+
+    test("should return an empty array for an ActionType with no registered actions", () => {
+        const action1 = new Action("Action1", ActionType.RAISE_EVENT);
+        actionService.registerAction(action1);
+
+        const result = actionService.getActionsByType(ActionType.INVOKE);
+        expect(result).toEqual([]);
+    });
+
+    test("should handle multiple actions of different types", () => {
+        const action1 = new Action("Action1", ActionType.INVOKE);
+        const action2 = new Action("Action2", ActionType.CREATE);
+        const action3 = new Action("Action3", ActionType.ASSIGN);
+
+        actionService.registerAction(action1);
+        actionService.registerAction(action2);
+        actionService.registerAction(action3);
+
+        const invokeActions = actionService.getActionsByType(ActionType.INVOKE);
+        expect(invokeActions.length).toBe(1);
+        expect(invokeActions).toContain(action1);
+
+        const createActions = actionService.getActionsByType(ActionType.CREATE);
+        expect(createActions.length).toBe(1);
+        expect(createActions).toContain(action2);
+
+        const assignActions = actionService.getActionsByType(ActionType.ASSIGN);
+        expect(assignActions.length).toBe(1);
+        expect(assignActions).toContain(action3);
+    });
+
+    test("should not return actions of unrelated types", () => {
+        const action1 = new Action("Action1", ActionType.LOCK);
+        const action2 = new Action("Action2", ActionType.UNLOCK);
+
+        actionService.registerAction(action1);
+        actionService.registerAction(action2);
+
+        const result = actionService.getActionsByType(ActionType.TIMEOUT);
+        expect(result).toEqual([]);
+    });
+
+    test("should return actions correctly even after deregistering an action", () => {
+        const action1 = new Action("Action1", ActionType.INVOKE);
+        const action2 = new Action("Action2", ActionType.INVOKE);
+
+        actionService.registerAction(action1);
+        actionService.registerAction(action2);
+        actionService.deregisterAction(action1);
+
+        const result = actionService.getActionsByType(ActionType.INVOKE);
+        expect(result).toContain(action2);
+        expect(result).not.toContain(action1);
+        expect(result.length).toBe(1);
+    });
+
+    test("should return an empty array if all actions of a type have been deregistered", () => {
+        const action1 = new Action("Action1", ActionType.INVOKE);
+        const action2 = new Action("Action2", ActionType.INVOKE);
+
+        actionService.registerAction(action1);
+        actionService.registerAction(action2);
+        actionService.deregisterAction(action1);
+        actionService.deregisterAction(action2);
+
+        const result = actionService.getActionsByType(ActionType.INVOKE);
+        expect(result).toEqual([]);
+    });
+
+    test("should return empty array for an invalid action type", () => {
+        const result = actionService.getActionsByType("INVALID_TYPE" as ActionType);
+        expect(result).toEqual([]);
+    });
+
+    test("should correctly handle registering multiple actions of the same type", () => {
+        const action1 = new Action("Action1", ActionType.INVOKE);
+        const action2 = new Action("Action2", ActionType.INVOKE);
+        const action3 = new Action("Action3", ActionType.INVOKE);
+
+        actionService.registerAction(action1);
+        actionService.registerAction(action2);
+        actionService.registerAction(action3);
+
+        const invokeActions = actionService.getActionsByType(ActionType.INVOKE);
+        expect(invokeActions.length).toBe(3);
+        expect(invokeActions).toContain(action1);
+        expect(invokeActions).toContain(action2);
+        expect(invokeActions).toContain(action3);
+    });
+});
+
+
