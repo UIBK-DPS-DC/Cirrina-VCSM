@@ -209,7 +209,7 @@ export default function CreateActionForm(props: {action: Action | undefined,
                     {variableToBeCreated.length > 0 && (
                         <Form.Group className={"mb-3"} controlId={"formVariable"}>
                             <Form.Label className={"mb-3"}>Variable to be created</Form.Label>
-                            <ContextCard contextVariable={variableToBeCreated[0]} setVars={setVariableToBeCreated} noRegister={true} deregisterOnRemove={true}/>
+                            <ContextCard contextVariable={variableToBeCreated[0]} setVars={setVariableToBeCreated} noRegister={true} noRemove={true}/>
                         </Form.Group>
                     )}
 

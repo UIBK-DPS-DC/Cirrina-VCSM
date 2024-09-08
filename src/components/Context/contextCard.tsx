@@ -9,6 +9,7 @@ import Event from "../../classes/event.ts";
 export default function ContextCard(props: {contextVariable: ContextVariable,
     setVars: Dispatch<SetStateAction<ContextVariable[]>>,
     noRegister?: boolean,
+    noRemove?: boolean
     deregisterOnRemove?: boolean,
     event?: Event,
     onEventEdit?: (event: Event) => void}) {
@@ -55,7 +56,10 @@ export default function ContextCard(props: {contextVariable: ContextVariable,
                     <Card.Footer className="text-muted">
                         <Card.Text>{footerText()}</Card.Text>
                         <CreateContextFormModal variable={props.contextVariable} buttonName={"Edit"} onSubmit={handleContextEdit} noRegister={props.noRegister}/>
-                        <Button variant={"danger"} className={"right"} onClick={handleClick}>Remove</Button>
+                        {!props.noRemove &&(
+                            <Button variant={"danger"} className={"right"} onClick={handleClick}>Remove</Button>
+                        )}
+
                     </Card.Footer>
                 </Card>
             )}
