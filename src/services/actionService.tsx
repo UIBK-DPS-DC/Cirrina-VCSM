@@ -18,26 +18,39 @@ export default class ActionService {
 
 
     /**
-     * Registers an action name.
+     * Registers a timeout action in the system.
      *
-     * This method checks if the provided `actionName` is unique by comparing it against
-     * a collection of already registered names. If the name is not unique, it logs an
-     * error message to the console and returns `false`. If the name is unique, it adds
-     * the name to the collection and returns `true`.
+     * This method is responsible for registering an action that is specifically of type `TIMEOUT`.
+     * It first checks if the action type is `TIMEOUT`. If not, it logs an error and returns `false`.
+     * Next, it checks if the provided action name is unique using the `isNameUnique` method. If the name is not unique,
+     * it logs an error and returns `false`.
      *
-     * @param {string} actionName - The name of the action to register.
-     * @returns {boolean} - Returns `true` if the name is unique and successfully registered,
-     *                      otherwise returns `false`.
+     * If both checks pass, the action is added to the `nameToActionMap` and the `registerAction` method is called to
+     * add the action to the type-specific actions map.
+     * After successful registration, a message is logged, and the method returns `true`.
+     *
+     * @param {string} actionName - The unique name of the action to be registered.
+     * @param {Action} action - The `Action` object to be registered, which must be of type `TIMEOUT`.
+     * @returns {boolean} - Returns `true` if the action is successfully registered, or `false` if the action type
+     *                      is not `TIMEOUT` or if the action name is not unique.
      */
-    public registerName(actionName: string, action: Action): boolean {
+    private registerTimeoutAction(actionName: string, action: Action): boolean {
+        if(!actionName.trim()){
+            console.error("Timeout Action name cant be empty");
+            return false;
+        }
+        if(action.type !== ActionType.TIMEOUT) {
+            console.error("Actions needs to be a Timeout action");
+            return false
+        }
         if(!this.isNameUnique(actionName)){
             console.error("Action name already exists!");
-            return false;
+            return false
         }
 
         this.nameToActionMap.set(actionName,action);
         console.log(actionName + " has been registered!");
-        return true;
+        return true
     }
 
     /**
@@ -50,19 +63,27 @@ export default class ActionService {
      *
      * @param {Action} action - The action object to register.
      */
-    public registerAction(action: Action): void {
+    public registerAction(action: Action): boolean {
         if(!action.type){
             console.error("Action does not have a type");
-            return
+            return false
         }
 
+        let res = true
         const arr = this.typeToActionsMap.get(action.type);
         if(!arr) {
             console.error(`Action type ${action.type} does not exist.`);
+            return false
         }
         else{
             arr.push(action);
         }
+
+        if(action.type === ActionType.TIMEOUT) {
+             res = this.registerTimeoutAction(action.name, action);
+        }
+
+        return res
 
 
     }
@@ -94,6 +115,10 @@ export default class ActionService {
         const index = arr.indexOf(action);
         if (index !== -1) {
             arr.splice(index, 1); // Removes the action from the array
+        }
+
+        if(action.type === ActionType.TIMEOUT){
+            this.nameToActionMap.delete(action.name)
         }
     }
 

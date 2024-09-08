@@ -15,24 +15,24 @@ describe('ActionService', () => {
 
     test('registerName should register a unique action name', () => {
         const name = 'uniqueAction';
-        const newAction = new Action(name,ActionType.INVOKE)
-        const result = service.registerName(name, newAction);
+        const newAction = new Action(name,ActionType.TIMEOUT)
+        const result = service.registerAction(newAction);
         expect(result).toBe(true);
         expect(service.isNameUnique(name)).toBe(false); // Now the name is not unique
     });
 
     test('registerName should not register a duplicate action name', () => {
         const name = 'duplicateAction';
-        const newAction = new Action(name,ActionType.INVOKE)
-        service.registerName(name,newAction);
-        const result = service.registerName(name,newAction);
+        const newAction = new Action(name,ActionType.TIMEOUT)
+        service.registerAction(newAction);
+        const result = service.registerAction(newAction);
         expect(result).toBe(false);
     });
 
     test('unregisterName should remove a registered action name', () => {
         const name = 'actionToRemove';
-        const newAction = new Action(name,ActionType.INVOKE)
-        service.registerName(name,newAction);
+        const newAction = new Action(name,ActionType.TIMEOUT)
+        service.registerAction(newAction);
         service.unregisterName(name);
         expect(service.isNameUnique(name)).toBe(true); // Now the name is unique
     });
@@ -57,8 +57,8 @@ describe('ActionService', () => {
 
     test('isNameUnique should return false for a non-unique action name', () => {
         const name = 'nonUniqueAction';
-        const newAction = new Action(name,ActionType.INVOKE)
-        service.registerName(name,newAction);
+        const newAction = new Action(name,ActionType.TIMEOUT)
+        service.registerAction(newAction);
         const result = service.isNameUnique(name);
         expect(result).toBe(false);
     });
@@ -69,11 +69,11 @@ describe('ActionService', () => {
     });
 
     test('getAllActionNames should return an array of all registered action names', () => {
-        const action1 = new Action('action1', ActionType.INVOKE);
-        const action2 = new Action('action2', ActionType.INVOKE);
+        const action1 = new Action('action1', ActionType.TIMEOUT);
+        const action2 = new Action('action2', ActionType.TIMEOUT);
 
-        service.registerName('action1', action1);
-        service.registerName('action2', action2);
+        service.registerAction(action1);
+        service.registerAction(action2);
 
         const actionNames = service.getAllActionNames();
         expect(actionNames).toContain('action1');
@@ -82,8 +82,8 @@ describe('ActionService', () => {
     });
 
     test('getActionByName should return the correct action for a registered name', () => {
-        const action = new Action('action1', ActionType.INVOKE);
-        service.registerName('action1', action);
+        const action = new Action('action1', ActionType.TIMEOUT);
+        service.registerAction(action);
 
         const retrievedAction = service.getActionByName('action1');
         expect(retrievedAction).toBe(action);
@@ -391,5 +391,190 @@ describe("ActionService - getActionsByType", () => {
         expect(invokeActions).toContain(action3);
     });
 });
+
+
+describe("ActionService - registerAction and deregisterAction", () => {
+    let actionService: ActionService;
+
+    beforeEach(() => {
+        actionService = new ActionService();
+        jest.clearAllMocks();
+    });
+
+    test("should register a valid action with a valid type", () => {
+        const action = new Action("TestAction", ActionType.INVOKE);
+
+        const result = actionService.registerAction(action);
+
+        const actionsOfType = actionService.getActionsByType(ActionType.INVOKE);
+        expect(actionsOfType).toContain(action);
+        expect(result).toBe(true);
+    });
+
+    test("should not register an action without a type", () => {
+        const action = new Action("TestAction", null as unknown as ActionType);
+        const consoleErrorSpy = jest.spyOn(console, "error").mockImplementation();
+
+        const result = actionService.registerAction(action);
+
+        expect(result).toBe(false);
+        expect(consoleErrorSpy).toHaveBeenCalledWith("Action does not have a type");
+        consoleErrorSpy.mockRestore();
+    });
+
+    test("should handle non-existent action type gracefully", () => {
+        const action = new Action("TestAction", "NON_EXISTENT_TYPE" as ActionType);
+        const consoleErrorSpy = jest.spyOn(console, "error").mockImplementation();
+
+        const result = actionService.registerAction(action);
+
+        expect(result).toBe(false);
+        expect(consoleErrorSpy).toHaveBeenCalledWith(
+            "Action type NON_EXISTENT_TYPE does not exist."
+        );
+        consoleErrorSpy.mockRestore();
+    });
+
+    test("should register a TIMEOUT action and handle it in name map", () => {
+        const action = new Action("TimeoutAction", ActionType.TIMEOUT);
+
+        const result = actionService.registerAction(action);
+
+        const actionsOfType = actionService.getActionsByType(ActionType.TIMEOUT);
+        expect(actionsOfType).toContain(action);
+
+        const actionByName = actionService.getActionByName("TimeoutAction");
+        expect(actionByName).toBe(action);
+
+        expect(result).toBe(true);
+    });
+
+    test("should not register a TIMEOUT action with a duplicate name", () => {
+        const action1 = new Action("TimeoutAction", ActionType.TIMEOUT);
+        const action2 = new Action("TimeoutAction", ActionType.TIMEOUT);
+        actionService.registerAction(action1);
+
+        const consoleErrorSpy = jest.spyOn(console, "error").mockImplementation();
+
+        const result = actionService.registerAction(action2);
+
+        expect(result).toBe(false);
+        expect(consoleErrorSpy).toHaveBeenCalledWith(
+            "Action name already exists!"
+        );
+
+        consoleErrorSpy.mockRestore();
+    });
+
+    test("should deregister a valid action", () => {
+        const action = new Action("TestAction", ActionType.INVOKE);
+        actionService.registerAction(action);
+
+        actionService.deregisterAction(action);
+
+        const actionsOfType = actionService.getActionsByType(ActionType.INVOKE);
+        expect(actionsOfType).not.toContain(action);
+    });
+
+    test("should not deregister an action without a type", () => {
+        const action = new Action("TestAction", null as unknown as ActionType);
+        const consoleErrorSpy = jest.spyOn(console, "error").mockImplementation();
+
+        actionService.deregisterAction(action);
+
+        expect(consoleErrorSpy).toHaveBeenCalledWith("Action does not have a type");
+        consoleErrorSpy.mockRestore();
+    });
+
+    test("should handle deregistering an action of a non-existent type", () => {
+        const action = new Action("TestAction", "NON_EXISTENT_TYPE" as ActionType);
+        const consoleErrorSpy = jest.spyOn(console, "error").mockImplementation();
+
+        actionService.deregisterAction(action);
+
+        expect(consoleErrorSpy).toHaveBeenCalledWith(
+            "Action type NON_EXISTENT_TYPE does not exist."
+        );
+        consoleErrorSpy.mockRestore();
+    });
+
+    test("should deregister a TIMEOUT action and remove it from the name map", () => {
+        const action = new Action("TimeoutAction", ActionType.TIMEOUT);
+        actionService.registerAction(action);
+
+        actionService.deregisterAction(action);
+
+        const actionsOfType = actionService.getActionsByType(ActionType.TIMEOUT);
+        expect(actionsOfType).not.toContain(action);
+
+        const actionByName = actionService.getActionByName("TimeoutAction");
+        expect(actionByName).toBeUndefined();
+    });
+
+    test("should do nothing when deregistering an action not in the list", () => {
+        const action = new Action("TestAction", ActionType.INVOKE);
+
+        actionService.deregisterAction(action); // Action was never registered
+
+        const actionsOfType = actionService.getActionsByType(ActionType.INVOKE);
+        expect(actionsOfType).not.toContain(action);
+    });
+
+    test("should not register a TIMEOUT action without a name", () => {
+        const action = new Action("", ActionType.TIMEOUT);
+        const consoleErrorSpy = jest.spyOn(console, "error").mockImplementation();
+
+        const result = actionService.registerAction(action);
+
+        expect(result).toBe(false);
+        expect(consoleErrorSpy).toHaveBeenCalledWith("Timeout Action name cant be empty");
+        consoleErrorSpy.mockRestore();
+    });
+
+    test("should log an error when trying to deregister a TIMEOUT action not in the map", () => {
+        const action = new Action("MissingTimeout", ActionType.TIMEOUT);
+
+        actionService.deregisterAction(action);
+
+        const actionByName = actionService.getActionByName("MissingTimeout");
+        expect(actionByName).toBeUndefined();
+    });
+
+    test("should handle registering multiple actions of the same type", () => {
+        const action1 = new Action("Action1", ActionType.INVOKE);
+        const action2 = new Action("Action2", ActionType.INVOKE);
+
+        actionService.registerAction(action1);
+        actionService.registerAction(action2);
+
+        const actionsOfType = actionService.getActionsByType(ActionType.INVOKE);
+        expect(actionsOfType).toContain(action1);
+        expect(actionsOfType).toContain(action2);
+    });
+
+    test("should deregister an action correctly when multiple actions exist for the same type", () => {
+        const action1 = new Action("Action1", ActionType.INVOKE);
+        const action2 = new Action("Action2", ActionType.INVOKE);
+
+        actionService.registerAction(action1);
+        actionService.registerAction(action2);
+
+        actionService.deregisterAction(action1);
+
+        const actionsOfType = actionService.getActionsByType(ActionType.INVOKE);
+        expect(actionsOfType).toContain(action2);
+        expect(actionsOfType).not.toContain(action1);
+    });
+
+    test("should handle trying to deregister an action that was never registered", () => {
+        const action = new Action("NonExistentAction", ActionType.INVOKE);
+
+        actionService.deregisterAction(action); // Action was never registered
+
+        const actionsOfType = actionService.getActionsByType(ActionType.INVOKE);
+        expect(actionsOfType).not.toContain(action);
+    });
+});
+
 
 
