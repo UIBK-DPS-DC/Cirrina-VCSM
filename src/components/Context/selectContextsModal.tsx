@@ -7,7 +7,10 @@ import {Node} from "@xyflow/react";
 import ContextVariable from "../../classes/contextVariable.tsx";
 import Select, { ActionMeta, OnChangeValue } from 'react-select'
 
-export default function SelectContextsModal(props: {buttonName: string | undefined, vars: ContextVariable[], setVars: Dispatch<SetStateAction<ContextVariable[]>>}){
+export default function SelectContextsModal(props: {buttonName: string | undefined,
+    vars: ContextVariable[],
+    setVars: Dispatch<SetStateAction<ContextVariable[]>>,
+    multiple?: boolean}){
 
 
     const context = useContext(ReactFlowContext) as ReactFlowContextProps;
@@ -282,7 +285,7 @@ export default function SelectContextsModal(props: {buttonName: string | undefin
 
                             <Row className={"mb-3"}>
                                 {getPersistentContextVariables().length > 0 && (
-                                    <Select closeMenuOnSelect={false} isMulti={true} name={PERSISTENT_CONTEXT_MULTISELECT_NAME}
+                                    <Select closeMenuOnSelect={false} isMulti={!props.multiple} name={PERSISTENT_CONTEXT_MULTISELECT_NAME}
                                             options={renderContextVariablesAsOptions(getPersistentContextVariables())} value={selectedPersistentVariables} onChange={onSelectedPersistentVariablesChange}>
                                     </Select>
                                 ) || (<Form.Text muted> No Persistent Context found</Form.Text>)}
