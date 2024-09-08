@@ -14,7 +14,9 @@ import EventCardDisplay from "../../Event/eventCardDisplay.tsx";
 import {InvokeActionProps, isState, ReactFlowContextProps} from "../../../types.ts";
 
 
-export default function InvokeActionForm(props: {action: Action | undefined, setActions: Dispatch<SetStateAction<Action[]>>, onSubmit?: () => void}) {
+export default function InvokeActionForm(props: {action: Action | undefined,
+    setActions: Dispatch<SetStateAction<Action[]>>,
+    onSubmit?: () => void}) {
 
     const context = useContext(ReactFlowContext) as ReactFlowContextProps;
     const {selectedNode,

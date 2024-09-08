@@ -60,13 +60,18 @@ export type CreateActionProps = {
 }
 
 export type AssignActionProps = {
-    type: ActionType,
+    type: ActionType.ASSIGN,
     variable: ContextVariable,
     expression: string
 
 }
 
-export type ActionProps = InvokeActionProps | CreateActionProps | AssignActionProps | {}
+export type RaiseEventActionProps = {
+    type: ActionType.RAISE_EVENT,
+    event: Event
+}
+
+export type ActionProps = InvokeActionProps | CreateActionProps | AssignActionProps | RaiseEventActionProps | {}
 
 
 

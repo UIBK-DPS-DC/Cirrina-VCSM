@@ -4,7 +4,11 @@ import {Dispatch, SetStateAction} from "react";
 import ContextVariable from "../../classes/contextVariable.tsx";
 import ContextCardDisplay from "../Context/contextCardDisplay.tsx";
 import CreateEventModal from "./createEventModal.tsx";
-export default function EventCard(props: {event: Event, setEvents: Dispatch<SetStateAction<Event[]>>, vars: ContextVariable[],setVars: Dispatch<SetStateAction<ContextVariable[]>>}) {
+export default function EventCard(props: {event: Event,
+    setEvents: Dispatch<SetStateAction<Event[]>>,
+    vars: ContextVariable[],
+    setVars: Dispatch<SetStateAction<ContextVariable[]>>,
+    noEdit?: boolean}) {
 
 
 
@@ -39,7 +43,9 @@ export default function EventCard(props: {event: Event, setEvents: Dispatch<SetS
                     <ContextCardDisplay vars={props.vars} headerText={"Show Vars"} setVars={props.setVars} event={props.event} onEventEdit={handleEventEdit}></ContextCardDisplay>
                 </Card.Body>
                 <Card.Footer>
-                    <CreateEventModal event={props.event} onSubmit={handleEventEdit}></CreateEventModal>
+                    {!props.noEdit && (
+                        <CreateEventModal event={props.event} onSubmit={handleEventEdit}></CreateEventModal>
+                    )}
                 </Card.Footer>
             </Card>
         </Container>

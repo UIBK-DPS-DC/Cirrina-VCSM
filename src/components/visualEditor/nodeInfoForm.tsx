@@ -43,7 +43,7 @@ export default function NodeInfoForm() {
     const [assignActions, setAssignActions] = useState<Action[]>([]);
     const [lockActions, setLockActions] = useState<Action[]>([]);
     const [unlockActions, setUnlockActions] = useState<Action[]>([]);
-    const [raseEventActions, setRaseEventActions] = useState<Action[]>([]);
+    const [raseEventActions, setRaiseEventActions] = useState<Action[]>([]);
     const [timeoutActions, setTimeoutActions] = useState<Action[]>([]);
     const [timeoutResetActions, setTimeoutResetActions] = useState<Action[]>([]);
     const [allAction,setAllActions] = useState<Action[]>([]);
@@ -107,7 +107,13 @@ export default function NodeInfoForm() {
                         </div>
                         {showNewActionForm && (
                             <div className={"action-form-container"}>
-                                <ActionDisplay action={undefined} setInvokeActions={setInvokeActions} onSubmit={onActionFormSubmit} setCreateActions={setCreateActions} setAssignActions={setAssignActions}></ActionDisplay>
+                                <ActionDisplay action={undefined}
+                                               setInvokeActions={setInvokeActions}
+                                               onSubmit={onActionFormSubmit}
+                                               setCreateActions={setCreateActions}
+                                               setAssignActions={setAssignActions}
+                                               setRaiseEventActions={setRaiseEventActions}
+                                ></ActionDisplay>
                             </div>
                         )}
                         <div>
@@ -117,22 +123,46 @@ export default function NodeInfoForm() {
 
                         <div>
                             {isState(selectedNode.data) && selectedNode.data.state.entry && (
-                                <ActionAccordion headerText={"Entry Actions"} actions={selectedNode.data.state.entry} setInvokeActions={setInvokeActions} setCreateActions={setCreateActions} setAssignActions={setAssignActions}/>
+                                <ActionAccordion headerText={"Entry Actions"}
+                                                 actions={selectedNode.data.state.entry}
+                                                 setInvokeActions={setInvokeActions}
+                                                 setCreateActions={setCreateActions}
+                                                 setAssignActions={setAssignActions}
+                                                 setRaiseEventActions={setRaiseEventActions}
+                                />
                             )
                             }
 
                             {isState(selectedNode.data) && selectedNode.data.state.exit && (
-                                <ActionAccordion headerText={"Exit Actions"} actions={selectedNode.data.state.exit} setInvokeActions={setInvokeActions} setCreateActions={setCreateActions} setAssignActions={setAssignActions}/>
+                                <ActionAccordion headerText={"Exit Actions"}
+                                                 actions={selectedNode.data.state.exit}
+                                                 setInvokeActions={setInvokeActions}
+                                                 setCreateActions={setCreateActions}
+                                                 setAssignActions={setAssignActions}
+                                                 setRaiseEventActions={setRaiseEventActions}
+                                />
                             )
                             }
 
                             {isState(selectedNode.data) && selectedNode.data.state.while && (
-                                <ActionAccordion headerText={"While Actions"} actions={selectedNode.data.state.while} setInvokeActions={setInvokeActions} setCreateActions={setCreateActions} setAssignActions={setAssignActions}/>
+                                <ActionAccordion headerText={"While Actions"}
+                                                 actions={selectedNode.data.state.while}
+                                                 setInvokeActions={setInvokeActions}
+                                                 setCreateActions={setCreateActions}
+                                                 setAssignActions={setAssignActions}
+                                                 setRaiseEventActions={setRaiseEventActions}
+                                />
                             )
                             }
 
                             {isState(selectedNode.data) && selectedNode.data.state.after && (
-                                <ActionAccordion headerText={"Timeout Actions"} actions={selectedNode.data.state.after} setInvokeActions={setInvokeActions} setCreateActions={setCreateActions} setAssignActions={setAssignActions}/>
+                                <ActionAccordion headerText={"Timeout Actions"}
+                                                 actions={selectedNode.data.state.after}
+                                                 setInvokeActions={setInvokeActions}
+                                                 setCreateActions={setCreateActions}
+                                                 setAssignActions={setAssignActions}
+                                                 setRaiseEventActions={setRaiseEventActions}
+                                />
                             )
                             }
 

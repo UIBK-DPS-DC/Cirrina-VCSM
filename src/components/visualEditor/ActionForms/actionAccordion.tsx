@@ -7,7 +7,8 @@ export default function ActionAccordion(props: {headerText: string,
     actions: Action[],
     setInvokeActions: Dispatch<SetStateAction<Action[]>>,
     setCreateActions: Dispatch<SetStateAction<Action[]>>,
-    setAssignActions: Dispatch<SetStateAction<Action[]>>}) {
+    setAssignActions: Dispatch<SetStateAction<Action[]>>,
+    setRaiseEventActions: Dispatch<SetStateAction<Action[]>>}) {
 
     let keyCount = 0
 
@@ -22,7 +23,8 @@ export default function ActionAccordion(props: {headerText: string,
                         return <ActionDisplay key={`AD-${keyCount++}`}
                                               action={a}
                                               setInvokeActions={props.setInvokeActions}
-                                              setCreateActions={props.setCreateActions} setAssignActions={props.setAssignActions}/>
+                                              setCreateActions={props.setCreateActions}
+                                              setAssignActions={props.setAssignActions} setRaiseEventActions={props.setRaiseEventActions}/>
                     })}
                 </AccordionBody>
             </AccordionItem>
