@@ -6,7 +6,7 @@ import ContextVariable from "../../../classes/contextVariable.tsx";
 import CreateContextFormModal from "../../Context/createContextFormModal.tsx";
 import ContextCard from "../../Context/contextCard.tsx";
 import {ReactFlowContext, renderEnumAsOptions} from "../../../utils.tsx";
-import {AssignActionProps, CreateActionProps, isState, ReactFlowContextProps} from "../../../types.ts";
+import {AssignActionProps, isState, ReactFlowContextProps} from "../../../types.ts";
 import {ActionCategory, ActionType} from "../../../enums.ts";
 
 export default function AssignActionForm(props: {action: Action | undefined,
