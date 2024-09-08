@@ -6,9 +6,11 @@ import ActionDisplay from "./actionDisplay.tsx";
 export default function ActionAccordion(props: {headerText: string,
     actions: Action[],
     setInvokeActions: Dispatch<SetStateAction<Action[]>>,
-    setCreateAction: Dispatch<SetStateAction<Action[]>>}) {
+    setCreateActions: Dispatch<SetStateAction<Action[]>>,
+    setAssignActions: Dispatch<SetStateAction<Action[]>>}) {
 
     let keyCount = 0
+
 
 
     return(
@@ -17,7 +19,10 @@ export default function ActionAccordion(props: {headerText: string,
                 <AccordionHeader>{props.headerText}</AccordionHeader>
                 <AccordionBody>
                     {props.actions.map((a) => {
-                        return <ActionDisplay key={`AD-${keyCount++}`} action={a} setInvokeActions={props.setInvokeActions} setCreateActions={props.setCreateAction}/>
+                        return <ActionDisplay key={`AD-${keyCount++}`}
+                                              action={a}
+                                              setInvokeActions={props.setInvokeActions}
+                                              setCreateActions={props.setCreateActions} setAssignActions={props.setAssignActions}/>
                     })}
                 </AccordionBody>
             </AccordionItem>

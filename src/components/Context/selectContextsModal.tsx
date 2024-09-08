@@ -285,7 +285,7 @@ export default function SelectContextsModal(props: {buttonName: string | undefin
 
                             <Row className={"mb-3"}>
                                 {getPersistentContextVariables().length > 0 && (
-                                    <Select closeMenuOnSelect={false} isMulti={!props.multiple} name={PERSISTENT_CONTEXT_MULTISELECT_NAME}
+                                    <Select closeMenuOnSelect={false} isMulti={true} name={PERSISTENT_CONTEXT_MULTISELECT_NAME}
                                             options={renderContextVariablesAsOptions(getPersistentContextVariables())} value={selectedPersistentVariables} onChange={onSelectedPersistentVariablesChange}>
                                     </Select>
                                 ) || (<Form.Text muted> No Persistent Context found</Form.Text>)}

@@ -18,6 +18,7 @@ export default function ActionDisplay(props: {
     action: Action | undefined,
     setInvokeActions: Dispatch<SetStateAction<Action[]>>,
     setCreateActions: Dispatch<SetStateAction<Action[]>>,
+    setAssignActions: Dispatch<SetStateAction<Action[]>>,
     onSubmit?: () => void
 }) {
     const [selectedActionType, setSelectedActionType] = React.useState<string>(ActionType.INVOKE);
@@ -44,7 +45,7 @@ export default function ActionDisplay(props: {
             case ActionType.CREATE:
                 return <CreateActionForm action={props.action} setActions={props.setCreateActions} onSubmit={props.onSubmit} />;
             case ActionType.ASSIGN:
-                return <AssignActionForm action={props.action} />;
+                return <AssignActionForm action={props.action} setActions={props.setAssignActions} onSubmit={props.onSubmit} />;
             case ActionType.LOCK:
                 return <LockActionForm action={props.action} />;
             case ActionType.UNLOCK:
@@ -58,7 +59,7 @@ export default function ActionDisplay(props: {
             default:
                 return null;
         }
-    }, [selectedActionType]);
+    }, [selectedActionType, props.action, props.setCreateActions, props.setAssignActions, props.setInvokeActions, props.onSubmit]);
 
     return (
         <div>

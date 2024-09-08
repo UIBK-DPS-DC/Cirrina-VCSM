@@ -45,7 +45,7 @@ export type Transitionn = {
 }
 
 export type InvokeActionProps = {
-    type: ActionType,
+    type: ActionType.INVOKE,
     serviceType: ServiceType,
     isLocal: boolean,
     input: ContextVariable[],
@@ -54,12 +54,19 @@ export type InvokeActionProps = {
 }
 
 export type CreateActionProps = {
-    type: ActionType,
+    type: ActionType.CREATE,
     variable: ContextVariable,
     isPersistent: boolean
 }
 
-export type ActionProps = InvokeActionProps | CreateActionProps | {}
+export type AssignActionProps = {
+    type: ActionType,
+    variable: ContextVariable,
+    expression: string
+
+}
+
+export type ActionProps = InvokeActionProps | CreateActionProps | AssignActionProps | {}
 
 
 

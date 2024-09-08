@@ -110,7 +110,7 @@ export default function CreateActionForm(props: {action: Action | undefined,
 
         let updatedAction: Action;
 
-        if (props.action) {
+        if (props.action && props.action.type === ActionType.CREATE) {
             // If an existing action is provided (props.action), we are editing an existing action.
             const oldCategory = actionService.getActionCategory(props.action, selectedNode.data);
 
@@ -185,6 +185,7 @@ export default function CreateActionForm(props: {action: Action | undefined,
 
 
 
+
     }
 
     return(
@@ -225,7 +226,6 @@ export default function CreateActionForm(props: {action: Action | undefined,
                         </Form.Select>
                     </Form.Group>
 
-                    {/* Warning message if form is not valid */}
                     {!formIsValid && (
                         <div className="text-danger mb-3">
                            Create Action needs to create a Variable
