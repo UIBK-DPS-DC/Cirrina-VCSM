@@ -50,7 +50,7 @@ export default function InvokeActionForm(props: {action: Action | undefined, set
         if(!selectedNode){
             return;
         }
-        if(props.action){
+        if(props.action && props.action.type === ActionType.INVOKE){
             const invokeActionProps = props.action.properties as InvokeActionProps;
             setSelectedInputContextVariables(invokeActionProps.input)
             setServiceIsLocalCheckbox(invokeActionProps.isLocal)

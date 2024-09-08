@@ -428,6 +428,99 @@ describe('ContextVariableService - Linking and Renaming Contexts', () => {
 
 });
 
+describe('ContextVariableService - Renaming with contextCreatedByStateMap', () => {
+    let contextService: ContextVariableService;
+    let context: ContextVariable;
+    let state: State;
+
+    beforeEach(() => {
+        contextService = new ContextVariableService();
+        context = new ContextVariable('InitialContext', 'TestValue');
+        state = new State('TestState');
+    });
+
+    test('renameContext should update contextCreatedByStateMap when renaming', () => {
+        // Register and link the context
+        contextService.registerContext(context);
+        contextService.setContextCreatedBy(context, state);
+
+        // Rename the context
+        contextService.renameContext(context, 'RenamedContext');
+
+        // Check the new name in contextCreatedByStateMap
+        const creatingState = contextService.getCreatingState(context);
+        expect(creatingState).toBe(state);
+
+        // Ensure the old name no longer exists in contextCreatedByStateMap
+        const oldCreatingState = contextService.getCreatingState(new ContextVariable('InitialContext', 'TestValue'));
+        expect(oldCreatingState).toBeUndefined();
+    });
+
+    test('renameContext should handle contextCreatedByStateMap update when no creating state exists', () => {
+        // Register the context but don't set the creating state
+        contextService.registerContext(context);
+
+        // Rename the context
+        contextService.renameContext(context, 'RenamedContext');
+
+        // Ensure the context is renamed correctly
+        expect(context.name).toBe('RenamedContext');
+
+        // Ensure no state is returned for the old or new name
+        const creatingState = contextService.getCreatingState(context);
+        expect(creatingState).toBeUndefined();
+    });
+
+    test('renameContext should not update contextCreatedByStateMap if context does not exist', () => {
+        const nonExistentContext = new ContextVariable('NonExistentContext', 'TestValue');
+        const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation();
+
+        contextService.renameContext(nonExistentContext, 'RenamedContext');
+
+        // Ensure error message is shown and no change in contextCreatedByStateMap
+        expect(consoleErrorSpy).toHaveBeenCalledWith('Context does not exist!');
+        expect(contextService.getCreatingState(nonExistentContext)).toBeUndefined();
+
+        consoleErrorSpy.mockRestore();
+    });
+
+    test('renameContext should not update contextCreatedByStateMap if new name already exists', () => {
+        const existingContext = new ContextVariable('ExistingContext', 'TestValue');
+        contextService.registerContext(existingContext);
+
+        contextService.registerContext(context);
+        contextService.setContextCreatedBy(context, state);
+
+        const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation();
+
+        contextService.renameContext(context, 'ExistingContext');
+
+        // Ensure error message is shown and contextCreatedByStateMap is unchanged
+        expect(consoleErrorSpy).toHaveBeenCalledWith('Context with name ExistingContext already exists!');
+        expect(contextService.getCreatingState(context)).toBe(state); // Old state should still be linked
+
+        consoleErrorSpy.mockRestore();
+    });
+
+    test('renameContext should correctly handle updates in both maps', () => {
+        contextService.registerContext(context);
+        contextService.setContextCreatedBy(context, state);
+        contextService.linkContextToState(context, state);
+
+        contextService.renameContext(context, 'RenamedContext');
+
+        // Ensure both maps are updated
+        expect(contextService.getContextByName('RenamedContext')).toBe(context);
+        expect(contextService.getCreatingState(context)).toBe(state);
+        expect(contextService.getLinkedStateByContextName('RenamedContext')).toBe(state);
+
+        // Ensure old name mappings are gone
+        expect(contextService.getContextByName('InitialContext')).toBeUndefined();
+        expect(contextService.getLinkedStateByContextName('InitialContext')).toBeUndefined();
+        expect(contextService.getCreatingState(new ContextVariable('InitialContext', 'TestValue'))).toBeUndefined();
+    });
+});
+
 describe('ContextService - getContextType and getContextTypeByContextName', () => {
     let contextService: ContextVariableService;
 
@@ -611,4 +704,126 @@ describe('ContextVariableService - deregisterContextByName', () => {
         }).not.toThrow();
     });
 });
+
+describe('ContextVariableService - Created by State', () => {
+    let contextService: ContextVariableService;
+    let state: State;
+    let stateMachine: StateMachine;
+    let contextVariable: ContextVariable;
+
+    beforeEach(() => {
+        contextService = new ContextVariableService();
+        state = new State("TestState");
+        stateMachine = new StateMachine("TestStateMachine");
+        contextVariable = new ContextVariable("TestVariable", "TestValue");
+    });
+
+    describe('setContextCreatedBy', () => {
+        it('should associate the context variable with the given state', () => {
+            contextService.setContextCreatedBy(contextVariable, state);
+
+            const associatedState = contextService.getCreatingState(contextVariable);
+            expect(associatedState).toBe(state);
+        });
+
+        it('should associate the context variable with the given state machine', () => {
+            contextService.setContextCreatedBy(contextVariable, stateMachine);
+
+            const associatedStateMachine = contextService.getCreatingState(contextVariable);
+            expect(associatedStateMachine).toBe(stateMachine);
+        });
+    });
+
+    describe('getCreatingState', () => {
+        it('should return the state that created the context variable', () => {
+            contextService.setContextCreatedBy(contextVariable, state);
+
+            const creatingState = contextService.getCreatingState(contextVariable);
+            expect(creatingState).toBe(state);
+        });
+
+        it('should return the state machine that created the context variable', () => {
+            contextService.setContextCreatedBy(contextVariable, stateMachine);
+
+            const creatingStateMachine = contextService.getCreatingState(contextVariable);
+            expect(creatingStateMachine).toBe(stateMachine);
+        });
+
+        it('should return undefined if no state or state machine has been associated with the context variable', () => {
+            const creatingState = contextService.getCreatingState(contextVariable);
+            expect(creatingState).toBeUndefined();
+        });
+    });
+});
+
+describe('ContextVariableService - deregisterContextByName', () => {
+    let contextService: ContextVariableService;
+    let context: ContextVariable;
+    let state: State;
+
+    beforeEach(() => {
+        contextService = new ContextVariableService();
+        context = new ContextVariable('TestContext', 'TestValue');
+        state = new State('TestState');
+    });
+
+    test('deregisterContextByName should remove the context from _nameToContextMap', () => {
+        contextService.registerContext(context);
+
+        expect(contextService.getContextByName('TestContext')).toBe(context);
+
+        contextService.deregisterContextByName('TestContext');
+
+        expect(contextService.getContextByName('TestContext')).toBeUndefined();
+    });
+
+    test('deregisterContextByName should remove links from _contextToSateOrStateMachineMap', () => {
+        contextService.registerContext(context);
+        contextService.linkContextToState(context, state);
+
+        expect(contextService.getLinkedState(context)).toBe(state);
+
+        contextService.deregisterContextByName('TestContext');
+
+        expect(contextService.getLinkedState(context)).toBeUndefined();
+    });
+
+    test('deregisterContextByName should remove links from _contextCreatedByStateMap', () => {
+        contextService.registerContext(context);
+        contextService.setContextCreatedBy(context, state);
+
+        expect(contextService.getCreatingState(context)).toBe(state);
+
+        contextService.deregisterContextByName('TestContext');
+
+        expect(contextService.getCreatingState(context)).toBeUndefined();
+    });
+
+    test('deregisterContextByName should log a message when context is successfully deregistered', () => {
+        contextService.registerContext(context);
+
+        const consoleLogSpy = jest.spyOn(console, 'log').mockImplementation();
+
+        contextService.deregisterContextByName('TestContext');
+
+        expect(consoleLogSpy).toHaveBeenCalledWith('Context Variable TestContext has been deregistered!');
+        consoleLogSpy.mockRestore();
+    });
+
+    test('deregisterContextByName should do nothing if the context name does not exist', () => {
+        const consoleLogSpy = jest.spyOn(console, 'log').mockImplementation();
+
+        contextService.deregisterContextByName('NonExistentContext');
+
+        expect(consoleLogSpy).not.toHaveBeenCalled();
+        consoleLogSpy.mockRestore();
+    });
+
+    test('deregisterContextByName should not throw an error if maps are empty', () => {
+        expect(() => {
+            contextService.deregisterContextByName('TestContext');
+        }).not.toThrow();
+    });
+});
+
 

@@ -15,11 +15,14 @@ import StateMachine from "../classes/stateMachine.ts";
 export default class ContextVariableService {
     private _nameToContextMap: Map<string, ContextVariable>;
     private _contextToSateOrStateMachineMap: Map<string,StateOrStateMachine>
+    private _contextCreatedByStateMap: Map<string, StateOrStateMachine>
 
 
     public constructor() {
         this._nameToContextMap = new Map();
         this._contextToSateOrStateMachineMap = new Map();
+        this._contextCreatedByStateMap = new Map();
+
     }
 
     /**
@@ -36,7 +39,37 @@ export default class ContextVariableService {
             return;
         }
         this._nameToContextMap.set(context.name, context);
-        console.log("CONTEXT_SERVICE: Context has been registered");
+        console.log(`CONTEXT_SERVICE: Context ${context.name} has been registered`);
+    }
+
+    /**
+     * Associates a context variable with the state or state machine that created it.
+     *
+     * This method updates the internal map `_contextCreatedByStateMap` to store the relationship
+     * between a context variable and the state or state machine that created it. The context's name
+     * is used as the key, and the associated state or state machine is used as the value.
+     *
+     * @param {ContextVariable} context - The context variable being associated.
+     * @param {StateOrStateMachine} state - The state or state machine that created the context variable.
+     */
+    public setContextCreatedBy(context: ContextVariable, state: StateOrStateMachine): void {
+        this._contextCreatedByStateMap.set(context.name, state);
+    }
+
+
+    /**
+     * Retrieves the state or state machine that created the given context variable.
+     *
+     * This method looks up the `_contextCreatedByStateMap` to find the state or state machine
+     * that created the given context variable. The context's name is used as the key for the lookup.
+     * If the context has been associated with a creating state, the associated state or state machine is returned.
+     * Otherwise, `undefined` is returned.
+     *
+     * @param {ContextVariable} context - The context variable whose creating state or state machine is being retrieved.
+     * @returns {StateOrStateMachine | undefined} - The state or state machine that created the context, or `undefined` if not found.
+     */
+    public getCreatingState(context: ContextVariable): StateOrStateMachine | undefined {
+        return this._contextCreatedByStateMap.get(context.name)
     }
 
     /**
@@ -212,6 +245,12 @@ export default class ContextVariableService {
 
         }
 
+        const creatingState = this.getCreatingState(context)
+        if(creatingState){
+            this._contextCreatedByStateMap.delete(context.name);
+            this._contextCreatedByStateMap.set(newName, creatingState);
+        }
+
         context.name = newName;
 
 
@@ -220,21 +259,26 @@ export default class ContextVariableService {
     /**
      * Deregisters (removes) a context variable by its name.
      *
-     * This method removes a context variable from the `_nameToContextMap` and
-     * also removes any association it has in the `_contextToSateOrStateMachineMap`.
-     * It ensures that both the context variable and its links to any state or state machine
-     * are completely removed from the system.
+     * This method removes a context variable from the `_nameToContextMap` if it exists,
+     * and also removes any associations the context has in `_contextToSateOrStateMachineMap`
+     * and `_contextCreatedByStateMap`. If the provided name does not exist, no action is taken.
+     *
+     * - The context is removed from `_nameToContextMap`, which stores the registered context variables.
+     * - Any link between the context and a state or state machine is removed from `_contextToSateOrStateMachineMap`.
+     * - Any link between the context and its creating state or state machine is removed from `_contextCreatedByStateMap`.
      *
      * Logs a message to the console once the context is successfully deregistered.
      *
      * @param {string} name - The name of the context variable to remove.
      */
+
     public deregisterContextByName(name: string): void {
         if(this.isContextNameUnique(name)){
             return;
         }
         this._nameToContextMap.delete(name);
         this._contextToSateOrStateMachineMap.delete(name)
+        this._contextCreatedByStateMap.delete(name)
         console.log(`Context Variable ${name} has been deregistered!`)
     }
 

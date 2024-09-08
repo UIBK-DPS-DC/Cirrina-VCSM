@@ -53,7 +53,13 @@ export type InvokeActionProps = {
     output: ContextVariable[] // Maybe make it Context Variable array
 }
 
-export type ActionProps = InvokeActionProps | {}
+export type CreateActionProps = {
+    type: ActionType,
+    variable: ContextVariable,
+    isPersistent: boolean
+}
+
+export type ActionProps = InvokeActionProps | CreateActionProps | {}
 
 
 

@@ -9,6 +9,7 @@ import Event from "../../classes/event.ts";
 export default function ContextCard(props: {contextVariable: ContextVariable,
     setVars: Dispatch<SetStateAction<ContextVariable[]>>,
     noRegister?: boolean,
+    deregisterOnRemove?: boolean,
     event?: Event,
     onEventEdit?: (event: Event) => void}) {
     const context = useContext(ReactFlowContext) as ReactFlowContextProps;
@@ -22,6 +23,11 @@ export default function ContextCard(props: {contextVariable: ContextVariable,
             if(props.onEventEdit){
                 props.onEventEdit(props.event)
             }
+
+
+        }
+        if(props.deregisterOnRemove){
+            contextService.deregisterContextByName(props.contextVariable.name)
         }
     };
 
