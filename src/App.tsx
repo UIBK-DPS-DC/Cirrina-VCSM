@@ -8,10 +8,10 @@ import {useMemo, useState} from "react";
 import TransitionService from "./services/transitionService.tsx";
 import ActionService from "./services/actionService.tsx";
 import EventService from "./services/eventService.tsx";
-import ContextService from "./services/contextService.tsx";
+import ContextVariableService from "./services/contextVariableService.tsx";
 import GuardService from "./services/guardService.tsx";
 import {Edge, Node, useEdgesState, useNodesState} from "@xyflow/react";
-import {ReactFlowContext} from './utils.ts';
+import {ReactFlowContext} from './utils.tsx';
 import CsmlEditor from "./components/csmlEditor/csmlEditor.tsx";
 import Export from "./components/export.tsx";
 
@@ -24,7 +24,7 @@ export default function App() {
     const transitionService: TransitionService = useMemo(() => new TransitionService(stateOrStateMachineService), [stateOrStateMachineService]);
     const actionService: ActionService = useMemo(() => new ActionService(), []);
     const eventService: EventService = useMemo(() => new EventService(), []);
-    const contextService: ContextService = useMemo(() => new ContextService(), []);
+    const contextService: ContextVariableService = useMemo(() => new ContextVariableService(), []);
     const guardService: GuardService = useMemo(() => new GuardService(), [])
 
 

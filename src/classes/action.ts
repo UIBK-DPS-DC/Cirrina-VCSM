@@ -1,27 +1,29 @@
 import {ActionType} from "../enums.ts";
-import {Context} from "../types.ts";
+import ContextVariable from "./contextVariable.tsx";
 import {
     ActionDescription, AssignActionDescription, CreateActionDescription,
     EventDescription,
     InvokeActionDescription,
     RaiseActionDescription
 } from "../pkl/bindings/collaborative_state_machine_description.pkl.ts";
+import {ActionProps} from "../types.ts";
 
 
 /**
  * Placeholder Action class. Expand once we have the Schema
  */
+//TODO: REFACTOR ACTION CLASS
 export default class Action {
     private _name: string;
     private _type: ActionType
     private _delay: number
-    private _properties: {}
-    private _context: Context | undefined
+    private _properties: ActionProps
+    private _context: ContextVariable[] | undefined
 
     constructor(name: string, type: ActionType, delay = 0) {
         this._name = name;
         this._type = type;
-        this._properties = this.createActionProperties(type)
+        this._properties = {}
         this._delay = delay
         this._context = undefined
 
@@ -60,27 +62,14 @@ export default class Action {
     }
 
 
-    get context(): Context | undefined {
+    get context(): ContextVariable[] | undefined {
         return this._context;
     }
 
-    set context(value: Context | undefined) {
+    set context(value: ContextVariable[] | undefined) {
         this._context = value;
     }
 
-    private createActionProperties(type: ActionType) {
-        switch (type) {
-            case ActionType.RAISE_EVENT: {
-                return {
-                    event: ""
-                }
-            }
-            //TODO: OTHER TYPES
-            default: {
-                return {}
-            }
-        }
-    }
 
 
     // Could be extended to compare fields for non named actions.

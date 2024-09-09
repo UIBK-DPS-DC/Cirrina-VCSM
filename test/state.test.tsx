@@ -1,6 +1,7 @@
 import State from "../src/classes/state";
 import Action from "../src/classes/action";
-import {ActionType} from "../src/enums";
+import ContextVariable from "../src/classes/contextVariable";
+import { ActionType } from "../src/enums";
 import Transition from "../src/classes/transition";
 import Guard from "../src/classes/guard";
 
@@ -13,18 +14,17 @@ describe('State Class', () => {
 
     beforeEach(() => {
         state = new State('TestState');
-
     });
 
     test('should return all actions in the correct order', () => {
-        entryAction1 = new Action('EntryAction1',ActionType.RAISE_EVENT);
-        entryAction2 = new Action('EntryAction2',ActionType.RAISE_EVENT);
-        whileAction1 = new Action('WhileAction1',ActionType.RAISE_EVENT);
-        whileAction2 = new Action('WhileAction2',ActionType.RAISE_EVENT);
-        afterAction1 = new Action('AfterAction1',ActionType.RAISE_EVENT);
-        afterAction2 = new Action('AfterAction2',ActionType.RAISE_EVENT);
-        exitAction1 = new Action('ExitAction1',ActionType.RAISE_EVENT);
-        exitAction2 = new Action('ExitAction2',ActionType.RAISE_EVENT);
+        entryAction1 = new Action('EntryAction1', ActionType.RAISE_EVENT);
+        entryAction2 = new Action('EntryAction2', ActionType.RAISE_EVENT);
+        whileAction1 = new Action('WhileAction1', ActionType.RAISE_EVENT);
+        whileAction2 = new Action('WhileAction2', ActionType.RAISE_EVENT);
+        afterAction1 = new Action('AfterAction1', ActionType.RAISE_EVENT);
+        afterAction2 = new Action('AfterAction2', ActionType.RAISE_EVENT);
+        exitAction1 = new Action('ExitAction1', ActionType.RAISE_EVENT);
+        exitAction2 = new Action('ExitAction2', ActionType.RAISE_EVENT);
 
         state.entry = [entryAction1, entryAction2];
         state.while = [whileAction1, whileAction2];
@@ -59,21 +59,21 @@ describe('State Class', () => {
     });
 
     test('should correctly reflect updates to action arrays', () => {
-        entryAction1 = new Action('EntryAction1',ActionType.RAISE_EVENT);
-        entryAction2 = new Action('EntryAction2',ActionType.RAISE_EVENT);
-        whileAction1 = new Action('WhileAction1',ActionType.RAISE_EVENT);
-        whileAction2 = new Action('WhileAction2',ActionType.RAISE_EVENT);
-        afterAction1 = new Action('AfterAction1',ActionType.RAISE_EVENT);
-        afterAction2 = new Action('AfterAction2',ActionType.RAISE_EVENT);
-        exitAction1 = new Action('ExitAction1',ActionType.RAISE_EVENT);
-        exitAction2 = new Action('ExitAction2',ActionType.RAISE_EVENT);
+        entryAction1 = new Action('EntryAction1', ActionType.RAISE_EVENT);
+        entryAction2 = new Action('EntryAction2', ActionType.RAISE_EVENT);
+        whileAction1 = new Action('WhileAction1', ActionType.RAISE_EVENT);
+        whileAction2 = new Action('WhileAction2', ActionType.RAISE_EVENT);
+        afterAction1 = new Action('AfterAction1', ActionType.RAISE_EVENT);
+        afterAction2 = new Action('AfterAction2', ActionType.RAISE_EVENT);
+        exitAction1 = new Action('ExitAction1', ActionType.RAISE_EVENT);
+        exitAction2 = new Action('ExitAction2', ActionType.RAISE_EVENT);
 
         state.entry = [entryAction1, entryAction2];
         state.while = [whileAction1, whileAction2];
         state.after = [afterAction1, afterAction2];
         state.exit = [exitAction1, exitAction2];
 
-        const newEntryAction = new Action('NewEntryAction',ActionType.RAISE_EVENT);
+        const newEntryAction = new Action('NewEntryAction', ActionType.RAISE_EVENT);
         state.entry = [newEntryAction];
         const allActions = state.getAllActions();
         expect(allActions).toEqual([newEntryAction, whileAction1, whileAction2, afterAction1, afterAction2, exitAction1, exitAction2]);
@@ -114,8 +114,6 @@ describe('State Class', () => {
         expect(state.on).toContain(transition2);
     });
 
-
-
     test('should not add duplicate transitions to the "on" array', () => {
         const transition1 = new Transition('source1', 'target1');
         state.addOnTransition(transition1);
@@ -123,7 +121,6 @@ describe('State Class', () => {
 
         expect(state.on.length).toBe(1);
     });
-
 
     test('should return an empty array when there are no transitions', () => {
         const namedGuards = state.getAllNamedGuards();
@@ -239,5 +236,67 @@ describe('State Class', () => {
 
         const namedActions = state.getAllNamedActions();
         expect(namedActions).toEqual([action1, action3]); // Only named actions should be returned
+    });
+
+    // New tests for removeContext
+    test('should remove a context variable from localContext', () => {
+        const contextVar1 = new ContextVariable('var1', 'value1');
+        const contextVar2 = new ContextVariable('var2', 'value2');
+
+        state.localContext = [contextVar1, contextVar2];
+        state.removeContext(contextVar1);
+
+        expect(state.localContext).toEqual([contextVar2]);
+    });
+
+    test('should remove a context variable from persistentContext', () => {
+        const contextVar1 = new ContextVariable('var1', 'value1');
+        const contextVar2 = new ContextVariable('var2', 'value2');
+
+        state.persistentContext = [contextVar1, contextVar2];
+        state.removeContext(contextVar1);
+
+        expect(state.persistentContext).toEqual([contextVar2]);
+    });
+
+    test('should remove a context variable from staticContext', () => {
+        const contextVar1 = new ContextVariable('var1', 'value1');
+        const contextVar2 = new ContextVariable('var2', 'value2');
+
+        state.staticContext = [contextVar1, contextVar2];
+        state.removeContext(contextVar1);
+
+        expect(state.staticContext).toEqual([contextVar2]);
+    });
+
+    test('should remove a context variable from all context arrays', () => {
+        const contextVar1 = new ContextVariable('var1', 'value1');
+        const contextVar2 = new ContextVariable('var2', 'value2');
+
+        state.localContext = [contextVar1, contextVar2];
+        state.persistentContext = [contextVar1, contextVar2];
+        state.staticContext = [contextVar1, contextVar2];
+
+        state.removeContext(contextVar1);
+
+        expect(state.localContext).toEqual([contextVar2]);
+        expect(state.persistentContext).toEqual([contextVar2]);
+        expect(state.staticContext).toEqual([contextVar2]);
+    });
+
+    test('should not alter contexts if the context variable is not found', () => {
+        const contextVar1 = new ContextVariable('var1', 'value1');
+        const contextVar2 = new ContextVariable('var2', 'value2');
+        const contextVar3 = new ContextVariable('var3', 'value3'); // This one will not be in the context arrays
+
+        state.localContext = [contextVar1, contextVar2];
+        state.persistentContext = [contextVar1, contextVar2];
+        state.staticContext = [contextVar1, contextVar2];
+
+        state.removeContext(contextVar3);
+
+        expect(state.localContext).toEqual([contextVar1, contextVar2]);
+        expect(state.persistentContext).toEqual([contextVar1, contextVar2]);
+        expect(state.staticContext).toEqual([contextVar1, contextVar2]);
     });
 });

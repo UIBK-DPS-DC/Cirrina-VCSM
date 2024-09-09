@@ -1,5 +1,5 @@
 import StateOrStateMachine from "./stateOrStateMachine.ts"
-import {Context} from "../types.ts";
+import ContextVariable from "./contextVariable.tsx";
 import Action from "./action.tsx";
 import State from "./state.ts";
 import Guard from "./guard.tsx";
@@ -11,8 +11,8 @@ export default class StateMachine implements StateOrStateMachine {
 
     private _name: string
     private _states: StateOrStateMachine[] = [];
-    private _localContext: Context[] = [];
-    private _persistentContext: Context[] = [];
+    private _localContext: ContextVariable[] = [];
+    private _persistentContext: ContextVariable[] = [];
     private _guards: string[] = [];
     private _actions: Action[] = [];
     private _abstract = false
@@ -37,19 +37,19 @@ export default class StateMachine implements StateOrStateMachine {
         this._states = value;
     }
 
-    get localContext(): Context[] {
+    get localContext(): ContextVariable[] {
         return this._localContext;
     }
 
-    set localContext(value: Context[]) {
+    set localContext(value: ContextVariable[]) {
         this._localContext = value;
     }
 
-    get persistentContext(): Context[] {
+    get persistentContext(): ContextVariable[] {
         return this._persistentContext;
     }
 
-    set persistentContext(value: Context[]) {
+    set persistentContext(value: ContextVariable[]) {
         this._persistentContext = value;
     }
 
@@ -138,6 +138,19 @@ export default class StateMachine implements StateOrStateMachine {
             return stateOrStatemachine instanceof State;
         });
     }
+
+    public getAllContextVariables(): ContextVariable[] {
+        return this.persistentContext.concat(this.localContext)
+    }
+
+    public removeContext(context: ContextVariable): void {
+        // Remove the context from the localContext array by reference comparison
+        this._localContext = this._localContext.filter(existingContext => existingContext !== context);
+
+        // Remove the context from the persistentContext array by reference comparison
+        this._persistentContext = this._persistentContext.filter(existingContext => existingContext !== context);
+    }
+
 
 
 }

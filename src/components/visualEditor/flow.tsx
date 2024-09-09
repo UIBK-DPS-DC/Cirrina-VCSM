@@ -28,7 +28,7 @@ import {
 import StateMachine from "../../classes/stateMachine.ts";
 import State from "../../classes/state.ts";
 import CsmEdge from "./csmEdgeComponent.tsx";
-import {ReactFlowContext} from "../../utils.ts";
+import {ReactFlowContext} from "../../utils.tsx";
 
 
 const nodeTypes = {
@@ -68,6 +68,7 @@ export default function Flow() {
         setSelectedEdge,
         setShowSidebar,
         stateOrStateMachineService,
+        contextService,
         transitionService
     } = context
 
@@ -168,6 +169,7 @@ export default function Flow() {
 
             /** The parent always needs to before the child in the nodes array.
              * This bock moves the child node to the front of the parent node in the array to always ensure this*/
+            //TODO: Logic for moving statemachines into statemachines.
             if (intersectedBlock) {
                 setNodes((ns: Node<CsmNodeProps> []) => {
                     ns = ns.filter(i => i.id !== node.id)
@@ -176,6 +178,8 @@ export default function Flow() {
                     const secondPart = ns.slice(index + 1);
                     return [...firstPart, node as Node<CsmNodeProps>, ...secondPart];
                 })
+
+
 
 
                 setNodes((ns) =>
@@ -202,10 +206,19 @@ export default function Flow() {
                 stateOrStateMachineService.unlinkNode(node.id)
                 switch (node.type) {
                     case "state-machine-node":
-                        stateOrStateMachineService.unregisterName((node.data.stateMachine as StateMachine).name);
+                        const stateMachine = node.data.stateMachine as StateMachine
+                        stateOrStateMachineService.unregisterName(stateMachine.name);
+                        stateMachine.getAllContextVariables().forEach(variable => {
+                            contextService.deregisterContextByName(variable.name);
+                        })
+
                         break;
                     case "state-node":
-                        stateOrStateMachineService.unregisterName((node.data.state as State).name);
+                        const state = node.data.state as State
+                        stateOrStateMachineService.unregisterName(state.name);
+                        state.getAllContextVariables().forEach(variable => {
+                            contextService.deregisterContextByName(variable.name);
+                        })
                         break;
                     default:
                         stateOrStateMachineService.unregisterName(node.data.name);

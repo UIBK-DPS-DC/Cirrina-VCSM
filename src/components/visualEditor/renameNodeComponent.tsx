@@ -1,9 +1,10 @@
 import React, {useCallback, useContext, useEffect, useState} from "react";
-import {ReactFlowContext} from "../../utils.ts";
+import {Form, Button} from "react-bootstrap";
+import {ReactFlowContext} from "../../utils.tsx";
 import {ReactFlowContextProps} from "../../types.ts";
 
 export default function RenameNodeComponent() {
-    const INPUT_FIELD_NAME = "placeholder"
+    const INPUT_FIELD_NAME = "placeholder";
     const context = useContext(ReactFlowContext) as ReactFlowContextProps;
     const [nodeNameInput, setNodeNameInput] = useState<string>("");
     const {
@@ -13,7 +14,6 @@ export default function RenameNodeComponent() {
         setEdges,
         stateOrStateMachineService
     } = context;
-
 
     useEffect(() => {
         if (selectedNode) {
@@ -92,14 +92,23 @@ export default function RenameNodeComponent() {
 
     },[nodes, selectedNode, setNodes, stateOrStateMachineService, updateTransitionsOnRename])
 
-
-
     return (
         <div className={"rename-node-form-container"}>
-            <form onSubmit={onFormSubmit}>
-                <input type={"text"} name={INPUT_FIELD_NAME} value={nodeNameInput} onChange={onNodeNameInputChange}/>
-                <button type={"submit"}>Save</button>
-            </form>
+            <Form onSubmit={onFormSubmit}>
+                <Form.Group controlId="rename-node-form" className={"mb-3"}>
+                    <Form.Label>Node Name</Form.Label>
+                    <Form.Control
+                        type="text"
+                        name={INPUT_FIELD_NAME}
+                        value={nodeNameInput}
+                        onChange={onNodeNameInputChange}
+                        placeholder="Enter node name"
+                    />
+                </Form.Group>
+                <Button variant="primary" type="submit">
+                    Save
+                </Button>
+            </Form>
         </div>
-    )
+    );
 }

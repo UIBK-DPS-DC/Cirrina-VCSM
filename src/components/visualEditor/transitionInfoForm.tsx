@@ -1,8 +1,10 @@
 import React, {useCallback, useContext, useEffect, useState} from "react";
-import {ReactFlowContext} from "../../utils.ts";
+import {ReactFlowContext} from "../../utils.tsx";
 import {ReactFlowContextProps} from "../../types.ts";
 import State from "../../classes/state.ts";
+import Event from "../../classes/event.ts";
 import Guard from "../../classes/guard.tsx";
+import {EventChannel} from "../../enums.ts";
 
 
 export default function TransitionInfoForm() {
@@ -32,9 +34,9 @@ export default function TransitionInfoForm() {
 
     const renderEventsAsOptions = () => {
         return (
-            eventService.getAllEvents().map((event: string) => {
+            eventService.getAllEvents().map((event: Event) => {
                 return(
-                    <option key={event} value={event}>{event}</option>
+                    <option key={event.name} value={event.name}>{event.name}</option>
                 )
             })
         )
@@ -142,7 +144,8 @@ export default function TransitionInfoForm() {
                 console.error(`Event ${newEventName} is not unique`);
                 return;
             }
-            eventService.registerName(newEventName);
+            const newEvent = new Event(newEventName, EventChannel.EXTERNAL)
+            eventService.registerEvent(newEvent);
             // TODO: Transition class needs to be updated.
             selectedEdge.data.transition.setEvent(newEventName);
 

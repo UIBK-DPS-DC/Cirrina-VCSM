@@ -1,34 +1,34 @@
 import {CsmNodeProps, isState, isStateMachine} from "../types.ts";
 import Action from "../classes/action.ts";
-import {ActionType} from "../enums.ts";
+import Event from "../classes/event.ts";
+import {ActionType, EventChannel} from "../enums.ts";
 
 export default class EventService {
-    private eventNames: Set<string>;
+    private nameToEventMap: Map<string,Event>;
 
     public constructor() {
-        this.eventNames = new Set<string>();
+        this.nameToEventMap = new Map<string,Event>();
     }
 
     /**
-     * Registers an event name.
+     * Registers a new event in the system.
      *
-     * This method checks if the provided `eventName` is unique by comparing it against
-     * a collection of already registered names. If the name is not unique, it logs an
-     * error message to the console and returns `false`. If the name is unique, it adds
-     * the name to the collection and returns `true`.
+     * This method attempts to add a new event to the `nameToEventMap` if the event name is unique.
+     * It first checks whether an event with the same name already exists using the `isNameUnique` method.
+     * If the name is not unique, it logs an error to the console and returns `false`.
+     * If the name is unique, it stores the event in the `nameToEventMap` and logs a confirmation message.
      *
-     * @param {string} eventName - The name of the event to register.
-     * @returns {boolean} - Returns `true` if the name is unique and successfully registered,
-     *                      otherwise returns `false`.
+     * @param {Event} event - The event object to be registered.
+     * @returns {boolean} - Returns `true` if the event is successfully registered, or `false` if an event with the same name already exists.
      */
-    public registerName(eventName: string): boolean {
-        if(!this.isNameUnique(eventName)){
+    public registerEvent(event: Event): boolean {
+        if(!this.isNameUnique(event.name)){
             console.error("Event name already exists!");
             return false;
         }
 
-        this.eventNames.add(eventName);
-        console.log(eventName + " has been registered!");
+        this.nameToEventMap.set(event.name,event);
+        console.log(event.name + " has been registered!");
         return true;
     }
 
@@ -40,9 +40,9 @@ export default class EventService {
      *
      * @param {string | unknown} eventName - The name of the event to unregister.
      */
-    public unregisterName(eventName: string | unknown): void {
+    public unregisterEvent(eventName: string | unknown): void {
         if(typeof eventName === "string" ){
-            this.eventNames.delete(eventName);
+            this.nameToEventMap.delete(eventName);
             console.log(eventName + " has been unregistered!");
         }
         else {
@@ -63,12 +63,122 @@ export default class EventService {
      *                      otherwise returns `false`.
      */
     public isNameUnique(eventName: string): boolean {
-        return ! this.eventNames.has(eventName);
+        return ! this.nameToEventMap.has(eventName);
     }
 
-    public getAllEvents() {
-        return Array.from(this.eventNames.values());
+    /**
+     * Renames an existing event.
+     *
+     * This method renames the provided `Event` to a new name, ensuring that the new name is unique.
+     * It first checks whether the new name is already in use by another event. If the new name is not unique,
+     * an error is logged, and the renaming process is aborted.
+     *
+     * If the new name is unique, the event is first unregistered using its old name, then its `name` property
+     * is updated, and the event is re-registered with the new name.
+     *
+     * @param {Event} event - The event to be renamed.
+     * @param {string} newName - The new name to assign to the event.
+     */
+    public renameEvent(event: Event, newName: string): void {
+
+        if(!this.getEventByName(event.name)){
+            console.error(`Event ${event.name} does not exist!`);
+            return;
+        }
+
+        if(!this.isNameUnique(newName)){
+            console.error(`Event name ${newName} already exists!`);
+            return;
+        }
+        if(!newName.trim()){
+            console.error(`New name cant be empty!`);
+            return;
+        }
+        const oldName = event.name
+        this.unregisterEvent(oldName)
+
+        event.name = newName
+        this.registerEvent(event)
+
+        console.log(`Event ${oldName} has been renamed to ${newName}!`);
+
     }
+
+    /**
+     * Retrieves all registered events.
+     *
+     * This method returns an array of all `Event` objects currently registered in the `nameToEventMap`.
+     * It converts the values of the map (which contains the registered events) into an array.
+     *
+     * @returns {Event[]} An array of all registered `Event` objects.
+     */
+    public getAllEvents(): Event[] {
+        return Array.from(this.nameToEventMap.values());
+    }
+
+    /**
+     * Retrieves all internal events.
+     *
+     * This method filters the array of all registered events to return only those that have
+     * an `EventChannel.INTERNAL` channel.
+     *
+     * @returns {Event[]} An array of `Event` objects that belong to the `INTERNAL` channel.
+     */
+    public getAllInternalEvents(): Event[]{
+        return this.getAllEvents().filter((event: Event) => event.channel === EventChannel.INTERNAL);
+    }
+
+    /**
+     * Retrieves all external events.
+     *
+     * This method filters the array of all registered events to return only those that have
+     * an `EventChannel.EXTERNAL` channel.
+     *
+     * @returns {Event[]} An array of `Event` objects that belong to the `EXTERNAL` channel.
+     */
+    public getAllExternalEvents(): Event[]{
+        return this.getAllEvents().filter((event: Event) => event.channel === EventChannel.EXTERNAL);
+    }
+
+    /**
+     * Retrieves all global events.
+     *
+     * This method filters the array of all registered events to return only those that have
+     * an `EventChannel.GLOBAL` channel.
+     *
+     * @returns {Event[]} An array of `Event` objects that belong to the `GLOBAL` channel.
+     */
+    public getAllGlobalEvents(): Event[]{
+        return this.getAllEvents().filter((event: Event) => event.channel === EventChannel.GLOBAL);
+
+    }
+
+    /**
+     * Retrieves all peripheral events.
+     *
+     * This method filters the array of all registered events to return only those that have
+     * an `EventChannel.PERIPHERAL` channel.
+     *
+     * @returns {Event[]} An array of `Event` objects that belong to the `PERIPHERAL` channel.
+     */
+    public getAllPeripheralEvents(): Event[]{
+        return this.getAllEvents().filter((event: Event) => event.channel === EventChannel.PERIPHERAL);
+    }
+
+    /**
+     * Retrieves an event by its name.
+     *
+     * This method searches for an event in the `nameToEventMap` using the provided event name as the key.
+     * If an event with the specified name exists in the map, it returns the event.
+     * Otherwise, it returns `undefined`.
+     *
+     * @param {string} name - The name of the event to retrieve.
+     * @returns {Event | undefined} - The event object if found, or `undefined` if no event with the specified name exists.
+     */
+    public getEventByName(name: string): Event | undefined {
+        return this.nameToEventMap.get(name);
+    }
+
 
 
     /**
@@ -91,7 +201,7 @@ export default class EventService {
 
         }
         if(isStateMachine(data)){
-            const actions = data.stateMachine.actions.filter((action: Action) => {action.type = ActionType.RAISE_EVENT;})
+            const actions = data.stateMachine.actions.filter((action: Action) => action.type = ActionType.RAISE_EVENT);
             return actions.map((action: Action) => {
                 const props = action.properties as { event: string } // TODO: This probably needs to be dynamic once we have the schema
                 return props.event

@@ -2,6 +2,8 @@ import StateMachine from "../src/classes/stateMachine";
 import {CsmNodeProps} from "../src/types";
 import StateOrStateMachineService from "../src/services/stateOrStateMachineService";
 import State from "../src/classes/state";
+import {ActionType} from "../src/enums";
+import Action from "../src/classes/action";
 
 let service = new StateOrStateMachineService();
 
@@ -350,4 +352,72 @@ describe('stateOrStateMachineService', () => {
     });
 
 
+});
+
+describe("StateOrStateMachineService - removeActionFromState", () => {
+    let stateOrStateMachineService: StateOrStateMachineService;
+    let testState: State;
+    let testAction: Action;
+    let testAction2: Action;
+    let data: CsmNodeProps;
+
+    beforeEach(() => {
+        stateOrStateMachineService = new StateOrStateMachineService();
+
+        // Initialize a state and actions
+        testState = new State("TestState");
+        testAction = new Action("TestAction", ActionType.RAISE_EVENT);
+        testAction2 = new Action("AnotherAction", ActionType.INVOKE);
+
+        // Add actions to various state arrays
+        testState.entry = [testAction, testAction2];
+        testState.while = [testAction];
+        testState.exit = [testAction];
+        testState.after = [testAction2];
+
+        // Set up the data object
+        data = { state: testState };
+    });
+
+    test("should remove an action from the entry array", () => {
+        stateOrStateMachineService.removeActionFromState(testAction, data);
+        expect(testState.entry).toEqual([testAction2]);
+    });
+
+    test("should remove an action from the while array", () => {
+        stateOrStateMachineService.removeActionFromState(testAction, data);
+        expect(testState.while).toEqual([]);
+    });
+
+    test("should remove an action from the exit array", () => {
+        stateOrStateMachineService.removeActionFromState(testAction, data);
+        expect(testState.exit).toEqual([]);
+    });
+
+    test("should not remove other actions from the after array", () => {
+        stateOrStateMachineService.removeActionFromState(testAction, data);
+        expect(testState.after).toEqual([testAction2]);
+    });
+
+    test("should remove an action from all arrays where it exists", () => {
+        stateOrStateMachineService.removeActionFromState(testAction, data);
+        expect(testState.entry).not.toContain(testAction);
+        expect(testState.while).not.toContain(testAction);
+        expect(testState.exit).not.toContain(testAction);
+    });
+
+    test("should not modify the arrays if the action does not exist", () => {
+        const nonExistingAction = new Action("NonExistingAction", ActionType.CREATE);
+        stateOrStateMachineService.removeActionFromState(nonExistingAction, data);
+
+        expect(testState.entry).toEqual([testAction, testAction2]);
+        expect(testState.while).toEqual([testAction]);
+        expect(testState.exit).toEqual([testAction]);
+        expect(testState.after).toEqual([testAction2]);
+    });
+
+    test("should not fail if data is not a state", () => {
+        const invalidData = {} as CsmNodeProps; // Passing invalid data
+        expect(() => stateOrStateMachineService.removeActionFromState(testAction, invalidData)).not.toThrow();
+    });
 });
