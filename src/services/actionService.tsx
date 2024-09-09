@@ -83,6 +83,8 @@ export default class ActionService {
              res = this.registerTimeoutAction(action.name, action);
         }
 
+        console.log("Action has been registered!");
+
         return res
 
 
@@ -119,7 +121,10 @@ export default class ActionService {
 
         if(action.type === ActionType.TIMEOUT){
             this.nameToActionMap.delete(action.name)
+            console.log(`Action ${action.name} has been deregistered`);
         }
+
+        console.log("Action has been deregistered!");
     }
 
     /**

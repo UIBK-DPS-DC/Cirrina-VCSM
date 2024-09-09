@@ -153,6 +153,10 @@ export default function AssignActionForm(props: {action: Action | undefined,
             props.onSubmit();
         }
 
+
+        actionService.deregisterAction(updatedAction);
+        actionService.registerAction(updatedAction);
+
         if(isState(selectedNode.data)){
             const sm = selectedNode.data
             sm.state.entry.forEach(entry => {

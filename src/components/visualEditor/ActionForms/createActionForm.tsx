@@ -173,6 +173,8 @@ export default function CreateActionForm(props: {action: Action | undefined,
             props.onSubmit();
         }
 
+        actionService.deregisterAction(updatedAction);
+        actionService.registerAction(updatedAction);
 
         if(isState(selectedNode.data)){
             const sm = selectedNode.data

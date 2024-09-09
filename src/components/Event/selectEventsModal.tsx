@@ -122,6 +122,7 @@ export default function SelectEventsModal(props:{buttonName: string | undefined 
 
     const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
+        event.stopPropagation()
         if(!selectedNode){
             return;
         }

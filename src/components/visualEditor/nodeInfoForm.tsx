@@ -3,11 +3,11 @@ import { isState, ReactFlowContextProps} from "../../types.ts";
 import Action from "../../classes/action.ts";
 import {ReactFlowContext} from "../../utils.tsx";
 import RenameNodeComponent from "./renameNodeComponent.tsx";
-import ActionDisplay from "./ActionForms/actionDisplay.tsx";
+import ActionDisplay from "../Action/actionDisplay.tsx";
 import Offcanvas from 'react-bootstrap/Offcanvas';
 import {Button, Container, OffcanvasBody, OffcanvasHeader} from "react-bootstrap";
 import CreateContextFormModal from "../Context/createContextFormModal.tsx";
-import ActionAccordion from "./ActionForms/actionAccordion.tsx";
+import ActionAccordion from "../Action/actionAccordion.tsx";
 
 /**
  * NodeInfoForm Component
@@ -113,6 +113,7 @@ export default function NodeInfoForm() {
                                                setCreateActions={setCreateActions}
                                                setAssignActions={setAssignActions}
                                                setRaiseEventActions={setRaiseEventActions}
+                                               setTimeoutActions={setTimeoutActions}
                                 ></ActionDisplay>
                             </div>
                         )}
@@ -129,6 +130,7 @@ export default function NodeInfoForm() {
                                                  setCreateActions={setCreateActions}
                                                  setAssignActions={setAssignActions}
                                                  setRaiseEventActions={setRaiseEventActions}
+                                                 setTimeoutActions={setTimeoutActions}
                                 />
                             )
                             }
@@ -140,6 +142,7 @@ export default function NodeInfoForm() {
                                                  setCreateActions={setCreateActions}
                                                  setAssignActions={setAssignActions}
                                                  setRaiseEventActions={setRaiseEventActions}
+                                                 setTimeoutActions={setTimeoutActions}
                                 />
                             )
                             }
@@ -151,6 +154,7 @@ export default function NodeInfoForm() {
                                                  setCreateActions={setCreateActions}
                                                  setAssignActions={setAssignActions}
                                                  setRaiseEventActions={setRaiseEventActions}
+                                                 setTimeoutActions={setTimeoutActions}
                                 />
                             )
                             }
@@ -162,6 +166,7 @@ export default function NodeInfoForm() {
                                                  setCreateActions={setCreateActions}
                                                  setAssignActions={setAssignActions}
                                                  setRaiseEventActions={setRaiseEventActions}
+                                                 setTimeoutActions={setTimeoutActions}
                                 />
                             )
                             }

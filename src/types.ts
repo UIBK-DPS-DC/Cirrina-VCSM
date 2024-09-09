@@ -22,6 +22,7 @@ import {
     TimeUnit
 } from "./enums.ts";
 import ContextVariable from "./classes/contextVariable.tsx";
+import {ActionDescription} from "./pkl/bindings/collaborative_state_machine_description.pkl.ts";
 
 // One Type to avoid repeating ourselves. Can be expanded/unionized as needed.
 export type CsmNodeProps = {state: State} | {stateMachine: StateMachine} | {name: string};
@@ -71,7 +72,19 @@ export type RaiseEventActionProps = {
     event: Event
 }
 
-export type ActionProps = InvokeActionProps | CreateActionProps | AssignActionProps | RaiseEventActionProps | {}
+export type TimeoutActionProps = {
+    type: ActionType.TIMEOUT,
+    name: string,
+    delay: string,
+    action: Action
+}
+
+export type ActionProps = InvokeActionProps
+    | CreateActionProps
+    | AssignActionProps
+    | RaiseEventActionProps
+    | TimeoutActionProps
+    | {}
 
 
 

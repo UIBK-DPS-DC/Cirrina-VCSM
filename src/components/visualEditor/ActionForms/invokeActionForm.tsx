@@ -14,6 +14,7 @@ import EventCardDisplay from "../../Event/eventCardDisplay.tsx";
 import {InvokeActionProps, isState, ReactFlowContextProps} from "../../../types.ts";
 
 
+
 export default function InvokeActionForm(props: {action: Action | undefined,
     setActions: Dispatch<SetStateAction<Action[]>>,
     onSubmit?: () => void}) {
@@ -197,6 +198,10 @@ export default function InvokeActionForm(props: {action: Action | undefined,
         if (props.onSubmit) {
             props.onSubmit();
         }
+
+        actionService.deregisterAction(updatedAction);
+        actionService.registerAction(updatedAction);
+
 
         if(isState(selectedNode.data)){
             const sm = selectedNode.data

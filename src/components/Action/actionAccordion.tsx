@@ -1,5 +1,5 @@
 import {Accordion, AccordionBody, AccordionHeader, AccordionItem} from "react-bootstrap";
-import Action from "../../../classes/action.ts";
+import Action from "../../classes/action.ts";
 import {Dispatch, SetStateAction} from "react";
 import ActionDisplay from "./actionDisplay.tsx";
 
@@ -8,7 +8,8 @@ export default function ActionAccordion(props: {headerText: string,
     setInvokeActions: Dispatch<SetStateAction<Action[]>>,
     setCreateActions: Dispatch<SetStateAction<Action[]>>,
     setAssignActions: Dispatch<SetStateAction<Action[]>>,
-    setRaiseEventActions: Dispatch<SetStateAction<Action[]>>}) {
+    setRaiseEventActions: Dispatch<SetStateAction<Action[]>>,
+    setTimeoutActions: Dispatch<SetStateAction<Action[]>>}) {
 
     let keyCount = 0
 
@@ -24,7 +25,9 @@ export default function ActionAccordion(props: {headerText: string,
                                               action={a}
                                               setInvokeActions={props.setInvokeActions}
                                               setCreateActions={props.setCreateActions}
-                                              setAssignActions={props.setAssignActions} setRaiseEventActions={props.setRaiseEventActions}/>
+                                              setAssignActions={props.setAssignActions}
+                                              setRaiseEventActions={props.setRaiseEventActions}
+                                              setTimeoutActions={props.setTimeoutActions}/>
                     })}
                 </AccordionBody>
             </AccordionItem>

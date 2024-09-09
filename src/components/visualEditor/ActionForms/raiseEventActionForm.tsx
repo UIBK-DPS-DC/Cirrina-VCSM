@@ -13,7 +13,9 @@ import {isState, RaiseEventActionProps, ReactFlowContextProps} from "../../../ty
 
 export default function RaiseEventActionForm(props: {action: Action | undefined,
     setActions: Dispatch<SetStateAction<Action[]>>,
-    onSubmit?: () => void}) {
+    onSubmit?: () => void,
+    singleAction?: boolean,
+    noCategorySelect?: boolean}) {
 
     const context = useContext(ReactFlowContext) as ReactFlowContextProps;
     const {selectedNode,
@@ -62,7 +64,13 @@ export default function RaiseEventActionForm(props: {action: Action | undefined,
                 return [...prevActions];
             } else {
                 // Add the new variable if it doesn't exist
-                return [...prevActions, newAction];
+                if(props.singleAction) {
+                    console.log("ENTERING SINGLE ACTION")
+                    return [newAction];
+                }
+                else {
+                    return [...prevActions, newAction];
+                }
             }
         });
     }
@@ -76,20 +84,25 @@ export default function RaiseEventActionForm(props: {action: Action | undefined,
     }, [eventToBeRaised]);
 
     useEffect(() => {
-        if(!selectedNode)
-            return
-        if(props.action && props.action.type === ActionType.RAISE_EVENT){
-            const raiseEventProps = props.action.properties as RaiseEventActionProps
-            setEventToBeRaised([raiseEventProps.event])
-            const actionCategory = actionService.getActionCategory(props.action,selectedNode.data)
-            setSelectedEventVars(raiseEventProps.event.data)
-            if(actionCategory) {
-                setSelectedActionCategory(actionCategory)
+        if (!selectedNode) return;
+
+        if (props.action && props.action.type === ActionType.RAISE_EVENT) {
+            const raiseEventProps = props.action.properties as RaiseEventActionProps;
+
+            // Ensure that eventToBeRaised is set correctly
+            if (raiseEventProps && raiseEventProps.event) {
+                setEventToBeRaised([raiseEventProps.event]);
+                setSelectedEventVars(raiseEventProps.event.data || []);
             }
 
-
+            const actionCategory = actionService.getActionCategory(props.action, selectedNode.data);
+            if (actionCategory) {
+                setSelectedActionCategory(actionCategory);
+            }
         }
-    }, []);
+    }, [props.action, selectedNode, actionService]);
+
+
 
     const onSubmit = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault()
@@ -113,7 +126,7 @@ export default function RaiseEventActionForm(props: {action: Action | undefined,
             const oldCategory = actionService.getActionCategory(props.action, selectedNode.data);
 
             // Check if category has changed and update the action in the state node if needed
-            if (oldCategory !== selectedActionCategory as ActionCategory) {
+            if (oldCategory !== selectedActionCategory as ActionCategory && !props.noCategorySelect) {
                 stateOrStateMachineService.removeActionFromState(props.action, selectedNode.data);
                 stateOrStateMachineService.addActionToState(selectedNode.data, props.action, selectedActionCategory as ActionCategory);
             }
@@ -124,13 +137,18 @@ export default function RaiseEventActionForm(props: {action: Action | undefined,
         } else {
             updatedAction = new Action("newAction", ActionType.RAISE_EVENT);
             updatedAction.properties = raiseEventActionProps;
-            stateOrStateMachineService.addActionToState(selectedNode.data, updatedAction, selectedActionCategory as ActionCategory);
+            if(!props.noCategorySelect){
+                stateOrStateMachineService.addActionToState(selectedNode.data, updatedAction, selectedActionCategory as ActionCategory);
+            }
             onActionSubmit(updatedAction);
         }
 
         if (props.onSubmit) {
             props.onSubmit();
         }
+
+        actionService.deregisterAction(updatedAction);
+        actionService.registerAction(updatedAction);
 
         if(isState(selectedNode.data)){
             const sm = selectedNode.data
@@ -181,13 +199,14 @@ export default function RaiseEventActionForm(props: {action: Action | undefined,
                         <EventCard event={eventToBeRaised[0]} setEvents={setEventToBeRaised} vars={eventVars} setVars={setSelectedEventVars}/>
                     )}
 
-
-                    <Form.Group className={"mb-3"}>
-                        <Form.Label>Action Category</Form.Label>
-                        <Form.Select onChange={onSelectedActionCategoryChange} value={selectedActionCategory} className={"mb-3"}>
-                            {renderEnumAsOptions(ActionCategory)}
-                        </Form.Select>
-                    </Form.Group>
+                    {!props.noCategorySelect && (
+                        <Form.Group className={"mb-3"}>
+                            <Form.Label>Action Category</Form.Label>
+                            <Form.Select onChange={onSelectedActionCategoryChange} value={selectedActionCategory} className={"mb-3"}>
+                                {renderEnumAsOptions(ActionCategory)}
+                            </Form.Select>
+                        </Form.Group>
+                    )}
 
                     <Button type={"submit"} disabled={!formIsValid}>
                         {submitButtonText()}

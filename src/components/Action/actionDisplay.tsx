@@ -1,15 +1,15 @@
 import React, { Dispatch, SetStateAction, useCallback, useEffect, useMemo } from "react";
-import { ActionType } from "../../../enums.ts";
-import { renderEnumAsOptions } from "../../../utils.tsx";
-import Action from "../../../classes/action.ts";
-import RaiseEventActionForm from "./raiseEventActionForm.tsx";
-import InvokeActionForm from "./invokeActionForm.tsx";
-import CreateActionForm from "./createActionForm.tsx";
-import AssignActionForm from "./assignActionForm.tsx";
-import LockActionForm from "./lockActionForm.tsx";
-import UnlockActionForm from "./unlockActionForm.tsx";
-import TimeoutActionForm from "./timeoutActionForm.tsx";
-import TimeoutResetActionForm from "./timeoutResetActionForm.tsx";
+import { ActionType } from "../../enums.ts";
+import { renderEnumAsOptions } from "../../utils.tsx";
+import Action from "../../classes/action.ts";
+import RaiseEventActionForm from "../visualEditor/ActionForms/raiseEventActionForm.tsx";
+import InvokeActionForm from "../visualEditor/ActionForms/invokeActionForm.tsx";
+import CreateActionForm from "../visualEditor/ActionForms/createActionForm.tsx";
+import AssignActionForm from "../visualEditor/ActionForms/assignActionForm.tsx";
+import LockActionForm from "../visualEditor/ActionForms/lockActionForm.tsx";
+import UnlockActionForm from "../visualEditor/ActionForms/unlockActionForm.tsx";
+import TimeoutActionForm from "../visualEditor/ActionForms/timeoutActionForm.tsx";
+import TimeoutResetActionForm from "../visualEditor/ActionForms/timeoutResetActionForm.tsx";
 import { Form } from "react-bootstrap";
 
 const ACTION_TYPE_SELECT_NAME = "action-type-select";
@@ -19,7 +19,8 @@ export default function ActionDisplay(props: {
     setInvokeActions: Dispatch<SetStateAction<Action[]>>,
     setCreateActions: Dispatch<SetStateAction<Action[]>>,
     setAssignActions: Dispatch<SetStateAction<Action[]>>,
-    setRaiseEventActions: Dispatch<SetStateAction<Action[]>>
+    setRaiseEventActions: Dispatch<SetStateAction<Action[]>>,
+    setTimeoutActions: Dispatch<SetStateAction<Action[]>>,
     onSubmit?: () => void
 }) {
     const [selectedActionType, setSelectedActionType] = React.useState<string>(ActionType.INVOKE);
@@ -54,7 +55,7 @@ export default function ActionDisplay(props: {
             case ActionType.RAISE_EVENT:
                 return <RaiseEventActionForm action={props.action} setActions={props.setRaiseEventActions} onSubmit={props.onSubmit} />;
             case ActionType.TIMEOUT:
-                return <TimeoutActionForm action={props.action} />;
+                return <TimeoutActionForm action={props.action} setActions={props.setTimeoutActions} onSubmit={props.onSubmit}/>;
             case ActionType.TIMEOUT_RESET:
                 return <TimeoutResetActionForm action={props.action} />;
             default:
