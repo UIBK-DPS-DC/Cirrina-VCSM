@@ -84,6 +84,20 @@ export default function Flow() {
         });
     }, [setNodeHistory]);
 
+    const getAllDescendants = useCallback((node: Node<CsmNodeProps>) => {
+        const children = nodes.filter((n: Node<CsmNodeProps>) => n.parentId === node.id);
+
+        children.forEach((n: Node<CsmNodeProps>) => {
+            if (isStateMachine(n.data)) {
+                const descendants = getAllDescendants(n);
+                children.push(...descendants);
+            }
+        });
+
+        return children;
+    }, [nodes]);
+
+
 
     const onConnect: OnConnect = useCallback(
         (connection: Connection) => {
@@ -159,7 +173,7 @@ export default function Flow() {
 
 
     const onNodeDragStop = useCallback(
-        (_: React.MouseEvent, node: Node) => {
+        (_: React.MouseEvent, node: Node<CsmNodeProps>) => {
             const intersections = getIntersectingNodes(node, false);
             console.log("Intersection:", intersections)
             const intersectedBlock = intersections.findLast(
@@ -171,13 +185,31 @@ export default function Flow() {
              * This bock moves the child node to the front of the parent node in the array to always ensure this*/
             //TODO: Logic for moving statemachines into statemachines.
             if (intersectedBlock) {
-                setNodes((ns: Node<CsmNodeProps> []) => {
-                    ns = ns.filter(i => i.id !== node.id)
-                    const index = ns.findIndex(i => i.id === intersectedBlock.id)
-                    const firstPart = ns.slice(0, index + 1); // index + 1 because it splits at the index meaning the parent would be in the second part if not for the + 1
-                    const secondPart = ns.slice(index + 1);
-                    return [...firstPart, node as Node<CsmNodeProps>, ...secondPart];
-                })
+                if (isState(node.data)) {
+                    setNodes((ns: Node<CsmNodeProps>[]) => {
+                        const newNodes = ns.filter(i => i.id !== node.id);
+                        const index = newNodes.findIndex(i => i.id === intersectedBlock.id);
+                        // Split the nodes array into two parts: before and after the parent
+                        const firstPart = newNodes.slice(0, index + 1);
+                        const secondPart = newNodes.slice(index + 1);
+                        // Insert the child node immediately after the parent
+                        return [...firstPart, node as Node<CsmNodeProps>, ...secondPart];
+                    });
+                }
+
+                if (isStateMachine(node.data)) {
+                    setNodes((ns: Node<CsmNodeProps>[]) => {
+                        const children = getAllDescendants(node);
+                        const newNodes = ns.filter(i => i.id !== node.id && !children.includes(i));
+                        const index = newNodes.findIndex(i => i.id === intersectedBlock.id);
+                        // Split the nodes array into two parts: before and after the parent
+                        const firstPart = newNodes.slice(0, index + 1);
+                        const secondPart = newNodes.slice(index + 1);
+                        // Insert the state machine and its descendants immediately after the parent
+                        return [...firstPart, node, ...children, ...secondPart];
+                    });
+                }
+
 
 
 
