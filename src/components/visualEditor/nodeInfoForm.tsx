@@ -114,6 +114,7 @@ export default function NodeInfoForm() {
                                                setAssignActions={setAssignActions}
                                                setRaiseEventActions={setRaiseEventActions}
                                                setTimeoutActions={setTimeoutActions}
+                                               setTimeoutResetActions={setTimeoutResetActions}
                                 ></ActionDisplay>
                             </div>
                         )}
@@ -131,6 +132,7 @@ export default function NodeInfoForm() {
                                                  setAssignActions={setAssignActions}
                                                  setRaiseEventActions={setRaiseEventActions}
                                                  setTimeoutActions={setTimeoutActions}
+                                                 setTimeoutResetActions={setTimeoutResetActions}
                                 />
                             )
                             }
@@ -143,6 +145,7 @@ export default function NodeInfoForm() {
                                                  setAssignActions={setAssignActions}
                                                  setRaiseEventActions={setRaiseEventActions}
                                                  setTimeoutActions={setTimeoutActions}
+                                                 setTimeoutResetActions={setTimeoutResetActions}
                                 />
                             )
                             }
@@ -155,6 +158,7 @@ export default function NodeInfoForm() {
                                                  setAssignActions={setAssignActions}
                                                  setRaiseEventActions={setRaiseEventActions}
                                                  setTimeoutActions={setTimeoutActions}
+                                                 setTimeoutResetActions={setTimeoutResetActions}
                                 />
                             )
                             }
@@ -167,6 +171,7 @@ export default function NodeInfoForm() {
                                                  setAssignActions={setAssignActions}
                                                  setRaiseEventActions={setRaiseEventActions}
                                                  setTimeoutActions={setTimeoutActions}
+                                                 setTimeoutResetActions={setTimeoutResetActions}
                                 />
                             )
                             }

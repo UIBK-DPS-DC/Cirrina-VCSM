@@ -21,6 +21,7 @@ export default function ActionDisplay(props: {
     setAssignActions: Dispatch<SetStateAction<Action[]>>,
     setRaiseEventActions: Dispatch<SetStateAction<Action[]>>,
     setTimeoutActions: Dispatch<SetStateAction<Action[]>>,
+    setTimeoutResetActions: Dispatch<SetStateAction<Action[]>>
     onSubmit?: () => void
 }) {
     const [selectedActionType, setSelectedActionType] = React.useState<string>(ActionType.INVOKE);
@@ -57,7 +58,7 @@ export default function ActionDisplay(props: {
             case ActionType.TIMEOUT:
                 return <TimeoutActionForm action={props.action} setActions={props.setTimeoutActions} onSubmit={props.onSubmit}/>;
             case ActionType.TIMEOUT_RESET:
-                return <TimeoutResetActionForm action={props.action} />;
+                return <TimeoutResetActionForm action={props.action} setActions={props.setTimeoutResetActions} onSubmit={props.onSubmit} />;
             default:
                 return null;
         }

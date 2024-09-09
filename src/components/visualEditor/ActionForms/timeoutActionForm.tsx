@@ -123,7 +123,6 @@ export default function TimeoutActionForm(props: {action: Action | undefined, se
         }
         if(props.action && props.action.type === ActionType.TIMEOUT){
             const timeoutActionProps = props.action.properties as TimeoutActionProps;
-            console.log(`PROOOOOOOOOOOOOOOOOOOOOOOPS` + timeoutActionProps.name)
             console.log(timeoutActionProps.action.name)
             console.log(timeoutActionProps.action.properties as RaiseEventActionProps)
             setTimeoutAction([timeoutActionProps.action])
@@ -162,7 +161,6 @@ export default function TimeoutActionForm(props: {action: Action | undefined, se
 
         }
 
-        console.log("TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT" + timeoutActionProps.action.type)
 
         let updatedAction: Action;
 
