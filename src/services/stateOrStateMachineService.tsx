@@ -26,6 +26,18 @@ export default class StateOrStateMachineService {
     }
 
 
+    /**
+     * Links a state name to a state machine in the internal mapping.
+     *
+     * This method attempts to link a given state `name` to a state machine identified by `stateMachineID`.
+     * If the state machine doesn't exist and the `create` flag is true, a new entry is created for that
+     * state machine. If the `create` flag is false and the state machine doesn't exist, an error is logged.
+     * The function also ensures no duplicate state names are added to the state machine.
+     *
+     * @param {string} name - The name of the state to link.
+     * @param {string} stateMachineID - The ID of the state machine to link the state to.
+     * @param {boolean} [create=false] - Optional flag to create the state machine if it doesn't exist.
+     */
     public linkStateNameToStatemachine(name: string, stateMachineID: string, create?: boolean) {
         let stateNames = this.statemachineIDToStateNamesMap.get(stateMachineID);
 
