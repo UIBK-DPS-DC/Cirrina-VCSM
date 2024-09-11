@@ -99,6 +99,19 @@ export default class StateOrStateMachineService {
         }
     }
 
+
+    /**
+     * Checks if a state machine contains a specific state.
+     *
+     * This method checks whether a state machine, identified by `stateMachineID`, contains a state
+     * with the name `stateName`. If the state machine doesn't exist, an appropriate message is logged,
+     * and `false` is returned.
+     *
+     * @param {string} stateName - The name of the state to check.
+     * @param {string} stateMachineID - The ID of the state machine to search.
+     * @returns {boolean} - Returns `true` if the state machine contains the state, `false` if the state or
+     *                      state machine does not exist.
+     */
     public stateMachineHasState(stateName: string, stateMachineID: string): boolean {
         const stateNames = this.statemachineIDToStateNamesMap.get(stateMachineID);
         if (!stateNames) {
