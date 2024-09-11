@@ -61,6 +61,19 @@ export default class StateOrStateMachineService {
         }
     }
 
+    /**
+     * Unlinks a state name from a state machine in the internal mapping.
+     *
+     * This method attempts to unlink a given state `name` from a state machine identified by `stateMachineID`.
+     * If the state exists, it is removed from the state machine. If the state machine no longer has any states
+     * after the removal, the state machine entry is deleted. If the state or state machine doesn't exist,
+     * an appropriate message is logged.
+     *
+     * @param {string} name - The name of the state to unlink.
+     * @param {string} stateMachineID - The ID of the state machine to unlink the state from.
+     * @returns {boolean} - Returns `true` if the state was successfully unlinked, `false` if the state or
+     *                      state machine does not exist.
+     */
     public unlinkStateNameFromStatemachine(name: string, stateMachineID: string): boolean {
         const states = this.statemachineIDToStateNamesMap.get(stateMachineID);
         if (states) {
