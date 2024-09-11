@@ -13,12 +13,78 @@ export default class StateOrStateMachineService {
     private id: number = 0
     private stateOrStatemachineNames : Set<string>;
     private nodeIdToStateOrStatemachineMap = new Map<string,StateOrStateMachine>
+    private statemachineIDToStateNamesMap = new Map<string,Set<string>>
+
+
 
     public constructor() {
         this.stateOrStatemachineNames = new Set();
         this.nodeIdToStateOrStatemachineMap = new Map();
+        this.nodeIdToStateOrStatemachineMap = new Map();
+
 
     }
+
+
+    public linkStateNameToStatemachine(name: string, stateMachineID: string, create?: boolean) {
+        let stateNames = this.statemachineIDToStateNamesMap.get(stateMachineID);
+
+        if (!stateNames) {
+            if (!create) {
+                console.error(`Statemachine ${stateMachineID} does not exist.\n`);
+                return;
+            }
+            // Create new entry for state machine if 'create' is true
+            stateNames = new Set([]);
+            this.statemachineIDToStateNamesMap.set(stateMachineID, stateNames);
+        }
+
+        // Avoid duplicates before pushing the state name
+        if (!stateNames.has(name)) {
+            stateNames.add(name);
+            return
+        }
+        else{
+            console.error(`State ${name} already exist on Statemachine ${stateMachineID}`)
+        }
+    }
+
+    public unlinkStateNameFromStatemachine(name: string, stateMachineID: string): boolean {
+        const states = this.statemachineIDToStateNamesMap.get(stateMachineID);
+        if (states) {
+            const deleted = states.delete(name);
+            if (!deleted) {
+                console.log(`State ${name} does not exist in Statemachine ${stateMachineID}.\n`);
+                return false;
+            }
+            else {
+                console.log(`${name} has been unlinked from statemachine with ID ${stateMachineID}`);
+            }
+
+            // If the set becomes empty, remove the state machine entry
+            if (states.size === 0) {
+                this.statemachineIDToStateNamesMap.delete(stateMachineID);
+                console.log(`Statemachine ${stateMachineID} has no more states and has been removed.`);
+            }
+
+            return true;
+        } else {
+            console.log(`Statemachine ${stateMachineID} does not exist.\n`);
+            return false;
+        }
+    }
+
+    public stateMachineHasState(stateName: string, stateMachineID: string): boolean {
+        const stateNames = this.statemachineIDToStateNamesMap.get(stateMachineID);
+        if (!stateNames) {
+            console.log(`Statemachine ${stateMachineID} does not exist.\n`);
+            return false;
+        }
+
+        return stateNames.has(stateName);
+    }
+
+
 
 
 
