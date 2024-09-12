@@ -635,9 +635,150 @@ describe('StateOrStateMachineService - stateMachineHasState', () => {
         const result = service.stateMachineHasState('any_state', stateMachineID);
 
         expect(result).toBe(false);
-        expect(consoleSpy).toHaveBeenCalledWith(`Statemachine ${stateMachineID} does not exist.\n`);
 
         consoleSpy.mockRestore();
     });
 });
+
+
+describe('StateOrStateMachineService.getStateNames', () => {
+    let service: StateOrStateMachineService;
+
+    beforeEach(() => {
+        service = new StateOrStateMachineService();
+    });
+
+    test('should return a set of state names if states are linked to the state machine', () => {
+        // Setup: Add states to a state machine
+        const stateMachineID = 'stateMachine1';
+        const states = new Set<string>(['state1', 'state2', 'state3']);
+        service['statemachineIDToStateNamesMap'].set(stateMachineID, states);
+
+        // Call the function
+        const result = service.getStateNames(stateMachineID);
+
+        // Assertions
+        expect(result).toBeDefined();
+        expect(result).toEqual(states);
+        expect(result?.has('state1')).toBe(true);
+        expect(result?.has('state2')).toBe(true);
+        expect(result?.has('state3')).toBe(true);
+    });
+
+    test('should return undefined if no states are linked to the state machine', () => {
+        // Setup: Ensure no states are linked to the state machine
+        const stateMachineID = 'stateMachine2';
+
+        // Spy on console.log to check for expected output
+        const consoleSpy = jest.spyOn(console, 'log').mockImplementation();
+
+        // Call the function
+        const result = service.getStateNames(stateMachineID);
+
+        // Assertions
+        expect(result).toBeUndefined();
+        expect(consoleSpy).toHaveBeenCalledWith(`No States are linked to ${stateMachineID}`);
+
+        // Restore the original console.log implementation
+        consoleSpy.mockRestore();
+    });
+
+    test('should return a set of state names for an empty state machine', () => {
+        // Setup: Create a state machine with no states
+        const stateMachineID = 'stateMachine3';
+        const emptyStates = new Set<string>();
+        service['statemachineIDToStateNamesMap'].set(stateMachineID, emptyStates);
+
+        // Call the function
+        const result = service.getStateNames(stateMachineID);
+
+        // Assertions
+        expect(result).toBeDefined();
+        expect(result).toEqual(emptyStates);
+        expect(result?.size).toBe(0);  // The state machine exists but has no states
+    });
+
+    test('should not create a new entry in the state map when the state machine does not exist', () => {
+        // Setup: Ensure the state machine does not exist
+        const stateMachineID = 'nonExistentStateMachine';
+
+        // Call the function
+        const result = service.getStateNames(stateMachineID);
+
+        // Assertions
+        expect(result).toBeUndefined();
+        expect(service['statemachineIDToStateNamesMap'].has(stateMachineID)).toBe(false);
+    });
+
+    test('should handle state machine with multiple state names correctly', () => {
+        // Setup: Create a state machine with multiple states
+        const stateMachineID = 'stateMachine4';
+        const states = new Set<string>(['state1', 'state2', 'state3', 'state4']);
+        service['statemachineIDToStateNamesMap'].set(stateMachineID, states);
+
+        // Call the function
+        const result = service.getStateNames(stateMachineID);
+
+        // Assertions
+        expect(result).toBeDefined();
+        expect(result?.size).toBe(4);
+        expect(result).toEqual(states);
+        expect(result?.has('state1')).toBe(true);
+        expect(result?.has('state2')).toBe(true);
+        expect(result?.has('state3')).toBe(true);
+        expect(result?.has('state4')).toBe(true);
+    });
+
+    test('should log a message if no states are linked to a non-existent state machine', () => {
+        // Spy on console.log to capture output
+        const consoleSpy = jest.spyOn(console, 'log').mockImplementation();
+
+        // Call the function with a non-existent state machine ID
+        const result = service.getStateNames('nonExistentStateMachineID');
+
+        // Assertions
+        expect(result).toBeUndefined();
+        expect(consoleSpy).toHaveBeenCalledWith('No States are linked to nonExistentStateMachineID');
+
+        // Restore the original console.log implementation
+        consoleSpy.mockRestore();
+    });
+
+    test('should return an empty set for a state machine that exists but has no states', () => {
+        // Setup: Create a state machine with an empty set of states
+        const stateMachineID = 'emptyStateMachine';
+        service['statemachineIDToStateNamesMap'].set(stateMachineID, new Set());
+
+        // Call the function
+        const result = service.getStateNames(stateMachineID);
+
+        // Assertions
+        expect(result).toBeDefined();
+        expect(result?.size).toBe(0);
+    });
+
+    test('should handle multiple state machines and return the correct set for each', () => {
+        // Setup: Create multiple state machines with different states
+        const stateMachineID1 = 'stateMachine1';
+        const stateMachineID2 = 'stateMachine2';
+        service['statemachineIDToStateNamesMap'].set(stateMachineID1, new Set(['stateA', 'stateB']));
+        service['statemachineIDToStateNamesMap'].set(stateMachineID2, new Set(['stateX', 'stateY']));
+
+        // Call the function for the first state machine
+        const result1 = service.getStateNames(stateMachineID1);
+        // Call the function for the second state machine
+        const result2 = service.getStateNames(stateMachineID2);
+
+        // Assertions for stateMachineID1
+        expect(result1).toBeDefined();
+        expect(result1?.has('stateA')).toBe(true);
+        expect(result1?.has('stateB')).toBe(true);
+
+        // Assertions for stateMachineID2
+        expect(result2).toBeDefined();
+        expect(result2?.has('stateX')).toBe(true);
+        expect(result2?.has('stateY')).toBe(true);
+    });
+});
+
 

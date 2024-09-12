@@ -36,17 +36,18 @@ export default function NodeInfoForm() {
 
 
     //######################################################################################################################################################################################################
-
+    // TODO: Remove underscores once variables are used.
     const[showNewActionForm, setShowNewActionForm] = useState(false);
-    const [invokeActions,setInvokeActions] = useState<Action[]>([]);
-    const [createActions, setCreateActions] = useState<Action[]>([]);
-    const [assignActions, setAssignActions] = useState<Action[]>([]);
-    const [lockActions, setLockActions] = useState<Action[]>([]);
-    const [unlockActions, setUnlockActions] = useState<Action[]>([]);
-    const [raseEventActions, setRaiseEventActions] = useState<Action[]>([]);
-    const [timeoutActions, setTimeoutActions] = useState<Action[]>([]);
-    const [timeoutResetActions, setTimeoutResetActions] = useState<Action[]>([]);
-    const [allAction,setAllActions] = useState<Action[]>([]);
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const [_invokeActions,setInvokeActions] = useState<Action[]>([]);
+    const [_createActions, setCreateActions] = useState<Action[]>([]);
+    const [_assignActions, setAssignActions] = useState<Action[]>([]);
+    const [_lockActions, _setLockActions] = useState<Action[]>([]);
+    const [_unlockActions, _setUnlockActions] = useState<Action[]>([]);
+    const [_raiseEventActions, setRaiseEventActions] = useState<Action[]>([]);
+    const [_timeoutActions, setTimeoutActions] = useState<Action[]>([]);
+    const [_timeoutResetActions, setTimeoutResetActions] = useState<Action[]>([]);
+    const [_allAction,_setAllActions] = useState<Action[]>([]);
 
 
 

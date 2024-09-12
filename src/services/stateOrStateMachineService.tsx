@@ -9,6 +9,9 @@ import Action from "../classes/action.ts";
 import {ActionCategory} from "../enums.ts";
 
 
+export type NO_PARENT = "0"
+export const NO_PARENT: NO_PARENT = "0"
+
 export default class StateOrStateMachineService {
     private id: number = 0
     private stateOrStatemachineNames : Set<string>;
@@ -20,7 +23,8 @@ export default class StateOrStateMachineService {
     public constructor() {
         this.stateOrStatemachineNames = new Set();
         this.nodeIdToStateOrStatemachineMap = new Map();
-        this.nodeIdToStateOrStatemachineMap = new Map();
+        this.statemachineIDToStateNamesMap = new Map();
+        this.statemachineIDToStateNamesMap.set(NO_PARENT, new Set<string>());
 
 
     }
@@ -38,7 +42,7 @@ export default class StateOrStateMachineService {
      * @param {string} stateMachineID - The ID of the state machine to link the state to.
      * @param {boolean} [create=false] - Optional flag to create the state machine if it doesn't exist.
      */
-    public linkStateNameToStatemachine(name: string, stateMachineID: string, create?: boolean) {
+    public linkStateNameToStatemachine(name: string, stateMachineID: string | NO_PARENT, create?: boolean) {
         let stateNames = this.statemachineIDToStateNamesMap.get(stateMachineID);
 
         if (!stateNames) {
@@ -47,18 +51,35 @@ export default class StateOrStateMachineService {
                 return;
             }
             // Create new entry for state machine if 'create' is true
+
             stateNames = new Set([]);
+            const stateMachine = this.getLinkedStateOrStatemachine(stateMachineID)
+            if(stateMachine){
+                stateNames.add(stateMachine.name)
+                console.log(`Statemachine ${stateMachine.name} has been added to initial stateNames!`);
+            }
             this.statemachineIDToStateNamesMap.set(stateMachineID, stateNames);
         }
 
         // Avoid duplicates before pushing the state name
         if (!stateNames.has(name)) {
             stateNames.add(name);
+            console.log(`${name} has been linked to ${stateMachineID}`)
             return
         }
         else{
             console.error(`State ${name} already exist on Statemachine ${stateMachineID}`)
         }
+    }
+
+
+    public getStateNames(stateMachineID: string): Set<string> | undefined {
+        let stateNames = this.statemachineIDToStateNamesMap.get(stateMachineID);
+        if (stateNames === undefined) {
+            console.log(`No States are linked to ${stateMachineID}`);
+            return stateNames;
+        }
+        return stateNames;
     }
 
     /**
@@ -76,17 +97,18 @@ export default class StateOrStateMachineService {
      */
     public unlinkStateNameFromStatemachine(name: string, stateMachineID: string): boolean {
         const states = this.statemachineIDToStateNamesMap.get(stateMachineID);
+
         if (states) {
             const deleted = states.delete(name);
+
             if (!deleted) {
                 console.log(`State ${name} does not exist in Statemachine ${stateMachineID}.\n`);
                 return false;
-            }
-            else {
+            } else {
                 console.log(`${name} has been unlinked from statemachine with ID ${stateMachineID}`);
             }
 
-            // If the set becomes empty, remove the state machine entry
+            // If no states are left, remove the entire state machine entry
             if (states.size === 0) {
                 this.statemachineIDToStateNamesMap.delete(stateMachineID);
                 console.log(`Statemachine ${stateMachineID} has no more states and has been removed.`);
@@ -98,6 +120,7 @@ export default class StateOrStateMachineService {
             return false;
         }
     }
+
 
 
     /**
@@ -480,4 +503,5 @@ export default class StateOrStateMachineService {
     }
 
 }
+
 
