@@ -22,7 +22,6 @@ import {
     TimeUnit
 } from "./enums.ts";
 import ContextVariable from "./classes/contextVariable.tsx";
-import {MatchCaseDescription} from "./pkl/bindings/collaborative_state_machine_description.pkl.ts";
 import MatchCase from "./classes/MatchCase.tsx";
 
 
@@ -99,6 +98,7 @@ export type ActionProps = InvokeActionProps
     | RaiseEventActionProps
     | TimeoutActionProps
     | TimeoutResetActionProps
+    | MatchActionProps
     | {}
 
 
