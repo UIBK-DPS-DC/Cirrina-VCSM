@@ -1,7 +1,8 @@
 import React, {useCallback, useContext, useEffect, useState} from "react";
 import {Form, Button} from "react-bootstrap";
-import {ReactFlowContext} from "../../utils.tsx";
-import {ReactFlowContextProps} from "../../types.ts";
+import {getAllStateNamesInExtent, ReactFlowContext} from "../../utils.tsx";
+import {isStateMachine, ReactFlowContextProps} from "../../types.ts";
+import {NO_PARENT} from "../../services/stateOrStateMachineService.tsx";
 
 export default function RenameNodeComponent() {
     const INPUT_FIELD_NAME = "placeholder";
@@ -20,6 +21,13 @@ export default function RenameNodeComponent() {
             setNodeNameInput(stateOrStateMachineService.getName(selectedNode.data));
         }
     }, [selectedNode, stateOrStateMachineService]);
+
+
+
+
+
+
+
 
     /**
      * Updates the transitions when a node is renamed.
@@ -69,10 +77,32 @@ export default function RenameNodeComponent() {
         console.log(`Logging NEW NAME FROM COMPONENT ${newName}`);
 
         const oldName = stateOrStateMachineService.getName(selectedNode.data);
+        const parentID = selectedNode.parentId  || NO_PARENT;
 
-        if (!stateOrStateMachineService.isNameUnique(newName) && newName !== oldName) {
+
+        console.log("NAMES");
+        getAllStateNamesInExtent(selectedNode,nodes,stateOrStateMachineService).forEach((n) =>{
+            console.log(n)
+        })
+        if (getAllStateNamesInExtent(selectedNode,nodes,stateOrStateMachineService).has(newName) && newName !== oldName && parentID !== NO_PARENT) {
             console.error(`StateOrStateMachine name ${newName} already exists!`);
             return;
+        }
+
+        if(parentID === NO_PARENT) {
+            console.log(`${newName}`)
+            // Check if name exists on the highest level.
+            if(oldName !== newName && stateOrStateMachineService.stateMachineHasState(newName, parentID)){
+                console.error("Name already exists!")
+                return;
+            }
+
+            if(isStateMachine(selectedNode.data) && getAllStateNamesInExtent(selectedNode, nodes,stateOrStateMachineService).has(newName)){
+                console.error(`StateOrStateMachine name ${newName} already exists in extent of ${selectedNode.id}!`);
+                return
+            }
+
+
         }
 
         if (newName && newName !== oldName) {
@@ -84,8 +114,10 @@ export default function RenameNodeComponent() {
                 return node;
             });
 
-            stateOrStateMachineService.unregisterName(oldName);
-            stateOrStateMachineService.registerName(newName);
+            stateOrStateMachineService.unregisterName(oldName)
+            stateOrStateMachineService.registerName(newName)
+            stateOrStateMachineService.unlinkStateNameFromStatemachine(oldName, parentID);
+            stateOrStateMachineService.linkStateNameToStatemachine(newName, parentID, true);
             setNodes(newNodes);
             updateTransitionsOnRename(oldName, newName);
         }

@@ -421,3 +421,364 @@ describe("StateOrStateMachineService - removeActionFromState", () => {
         expect(() => stateOrStateMachineService.removeActionFromState(testAction, invalidData)).not.toThrow();
     });
 });
+
+
+describe('StateOrStateMachineService - Statemachine Name Set', () => {
+    let service: StateOrStateMachineService;
+
+    beforeEach(() => {
+        service = new StateOrStateMachineService();
+    });
+
+    describe('linkStateNameToStatemachine', () => {
+        test('should link state to an existing state machine', () => {
+            const stateMachineID = 'sm_1';
+            const stateName = 'state_1';
+
+            // Create a state machine manually
+            service.linkStateNameToStatemachine('initial_state', stateMachineID, true);
+
+            service.linkStateNameToStatemachine(stateName, stateMachineID);
+
+            // Check if the state has been added
+            const stateNames = service['statemachineIDToStateNamesMap'].get(stateMachineID);
+            expect(stateNames).toContain(stateName);
+        });
+
+        test('should fail to link state to non-existent state machine without create flag', () => {
+            const stateMachineID = 'non_existent_sm';
+            const consoleSpy = jest.spyOn(console, 'error').mockImplementation();
+
+            service.linkStateNameToStatemachine('state_1', stateMachineID);
+
+            expect(consoleSpy).toHaveBeenCalledWith(`Statemachine ${stateMachineID} does not exist.\n`);
+            const stateNames = service['statemachineIDToStateNamesMap'].get(stateMachineID);
+            expect(stateNames).toBeUndefined();
+
+            consoleSpy.mockRestore();
+        });
+
+        test('should create and link state to a new state machine with create flag', () => {
+            const stateMachineID = 'sm_2';
+            const stateName = 'state_1';
+
+            service.linkStateNameToStatemachine(stateName, stateMachineID, true);
+
+            const stateNames = service['statemachineIDToStateNamesMap'].get(stateMachineID);
+            expect(stateNames).toBeDefined();
+            expect(stateNames).toContain(stateName);
+        });
+
+        test('should not allow duplicate state names in a state machine', () => {
+            const stateMachineID = 'sm_3';
+            const stateName = 'state_1';
+            const consoleSpy = jest.spyOn(console, 'error').mockImplementation();
+
+            service.linkStateNameToStatemachine(stateName, stateMachineID, true); // First addition
+            service.linkStateNameToStatemachine(stateName, stateMachineID); // Try to add again
+
+            expect(consoleSpy).toHaveBeenCalledWith(`State ${stateName} already exist on Statemachine ${stateMachineID}`);
+            const stateNames = service['statemachineIDToStateNamesMap'].get(stateMachineID);
+            if(! stateNames){
+                return fail("Failed to return state names")
+            }
+            expect(stateNames.size).toBe(1); // Ensure only one state exists
+
+            consoleSpy.mockRestore();
+        });
+
+        test('should create new state machine and add the state if state machine does not exist', () => {
+            const stateMachineID = 'sm_new';
+            const stateName = 'state_1';
+
+            service.linkStateNameToStatemachine(stateName, stateMachineID, true);
+            const stateNames = service['statemachineIDToStateNamesMap'].get(stateMachineID);
+
+            expect(stateNames).toContain(stateName);
+        });
+    });
+
+    describe('unlinkStateNameFromStatemachine', () => {
+        test('should unlink state from an existing state machine', () => {
+            const stateMachineID = 'sm_4';
+            const stateName = 'state_1';
+
+            service.linkStateNameToStatemachine(stateName, stateMachineID, true);
+            const stateNames = service['statemachineIDToStateNamesMap'].get(stateMachineID);
+            expect(stateNames).toContain(stateName);
+
+            const result = service.unlinkStateNameFromStatemachine(stateName, stateMachineID);
+            expect(result).toBe(true);
+            expect(stateNames).not.toContain(stateName);
+        });
+
+        test('should return false when unlinking state from a non-existent state machine', () => {
+            const stateMachineID = 'non_existent_sm';
+            const result = service.unlinkStateNameFromStatemachine('state_1', stateMachineID);
+            expect(result).toBe(false);
+        });
+
+        test('should return false if state does not exist in the state machine', () => {
+            const stateMachineID = 'sm_5';
+            const stateName = 'non_existent_state';
+            const consoleSpy = jest.spyOn(console, 'log').mockImplementation();
+
+            service.linkStateNameToStatemachine('state_1', stateMachineID, true); // Add a different state
+
+            const result = service.unlinkStateNameFromStatemachine(stateName, stateMachineID);
+            expect(result).toBe(false);
+            expect(consoleSpy).toHaveBeenCalledWith(`State ${stateName} does not exist in Statemachine ${stateMachineID}.\n`);
+
+            consoleSpy.mockRestore();
+        });
+
+        test('should remove the state machine if no more states are left', () => {
+            const stateMachineID = 'sm_6';
+            const stateName = 'state_1';
+            const consoleSpy = jest.spyOn(console, 'log').mockImplementation();
+
+            service.linkStateNameToStatemachine(stateName, stateMachineID, true);
+
+            const result = service.unlinkStateNameFromStatemachine(stateName, stateMachineID);
+            expect(result).toBe(true);
+
+            const stateNames = service['statemachineIDToStateNamesMap'].get(stateMachineID);
+            expect(stateNames).toBeUndefined(); // Check if state machine entry is removed
+
+            expect(consoleSpy).toHaveBeenCalledWith(`Statemachine ${stateMachineID} has no more states and has been removed.`);
+
+            consoleSpy.mockRestore();
+        });
+
+        test('should unlink the last state and remove the state machine', () => {
+            const stateMachineID = 'sm_7';
+            const stateName = 'state_last';
+
+            service.linkStateNameToStatemachine(stateName, stateMachineID, true);
+
+            const result = service.unlinkStateNameFromStatemachine(stateName, stateMachineID);
+            expect(result).toBe(true);
+
+            const stateNames = service['statemachineIDToStateNamesMap'].get(stateMachineID);
+            expect(stateNames).toBeUndefined();
+        });
+    });
+});
+
+
+describe('StateOrStateMachineService - stateMachineHasState', () => {
+    let service: StateOrStateMachineService;
+
+    beforeEach(() => {
+        service = new StateOrStateMachineService();
+    });
+
+    test('should return true if the state exists in the state machine', () => {
+        const stateMachineID = 'sm_1';
+        const stateName = 'state_1';
+
+        // Manually add a state machine and a state
+        service.linkStateNameToStatemachine(stateName, stateMachineID, true);
+
+        const result = service.stateMachineHasState(stateName, stateMachineID);
+        expect(result).toBe(true);
+    });
+
+    test('should return false if the state does not exist in the state machine', () => {
+        const stateMachineID = 'sm_2';
+        const stateName = 'non_existent_state';
+
+        // Manually add a state machine without the state
+        service.linkStateNameToStatemachine('state_1', stateMachineID, true);
+
+        const result = service.stateMachineHasState(stateName, stateMachineID);
+        expect(result).toBe(false);
+    });
+
+    test('should return false if the state machine does not exist', () => {
+        const stateMachineID = 'non_existent_sm';
+        const stateName = 'state_1';
+        const consoleSpy = jest.spyOn(console, 'log').mockImplementation();
+
+        const result = service.stateMachineHasState(stateName, stateMachineID);
+
+        expect(result).toBe(false);
+        expect(consoleSpy).toHaveBeenCalledWith(`Statemachine ${stateMachineID} does not exist.\n`);
+
+        consoleSpy.mockRestore();
+    });
+
+    test('should return true if state is part of a complex state machine with multiple states', () => {
+        const stateMachineID = 'sm_complex';
+        const stateNames = ['state_1', 'state_2', 'state_3'];
+
+        // Manually add a state machine with multiple states
+        stateNames.forEach(stateName => {
+            service.linkStateNameToStatemachine(stateName, stateMachineID, true);
+        });
+
+        // Check that all states exist in the state machine
+        stateNames.forEach(stateName => {
+            const result = service.stateMachineHasState(stateName, stateMachineID);
+            expect(result).toBe(true);
+        });
+    });
+
+    test('should return false if the state machine is empty (no states)', () => {
+        const stateMachineID = 'sm_empty';
+        const consoleSpy = jest.spyOn(console, 'log').mockImplementation();
+
+        // Add a state machine but no states
+        service.linkStateNameToStatemachine('dummy_state', stateMachineID, true);
+        service.unlinkStateNameFromStatemachine('dummy_state', stateMachineID); // Remove the only state
+
+        const result = service.stateMachineHasState('any_state', stateMachineID);
+
+        expect(result).toBe(false);
+
+        consoleSpy.mockRestore();
+    });
+});
+
+
+describe('StateOrStateMachineService.getStateNames', () => {
+    let service: StateOrStateMachineService;
+
+    beforeEach(() => {
+        service = new StateOrStateMachineService();
+    });
+
+    test('should return a set of state names if states are linked to the state machine', () => {
+        // Setup: Add states to a state machine
+        const stateMachineID = 'stateMachine1';
+        const states = new Set<string>(['state1', 'state2', 'state3']);
+        service['statemachineIDToStateNamesMap'].set(stateMachineID, states);
+
+        // Call the function
+        const result = service.getStateNames(stateMachineID);
+
+        // Assertions
+        expect(result).toBeDefined();
+        expect(result).toEqual(states);
+        expect(result?.has('state1')).toBe(true);
+        expect(result?.has('state2')).toBe(true);
+        expect(result?.has('state3')).toBe(true);
+    });
+
+    test('should return undefined if no states are linked to the state machine', () => {
+        // Setup: Ensure no states are linked to the state machine
+        const stateMachineID = 'stateMachine2';
+
+        // Spy on console.log to check for expected output
+        const consoleSpy = jest.spyOn(console, 'log').mockImplementation();
+
+        // Call the function
+        const result = service.getStateNames(stateMachineID);
+
+        // Assertions
+        expect(result).toBeUndefined();
+        expect(consoleSpy).toHaveBeenCalledWith(`No States are linked to ${stateMachineID}`);
+
+        // Restore the original console.log implementation
+        consoleSpy.mockRestore();
+    });
+
+    test('should return a set of state names for an empty state machine', () => {
+        // Setup: Create a state machine with no states
+        const stateMachineID = 'stateMachine3';
+        const emptyStates = new Set<string>();
+        service['statemachineIDToStateNamesMap'].set(stateMachineID, emptyStates);
+
+        // Call the function
+        const result = service.getStateNames(stateMachineID);
+
+        // Assertions
+        expect(result).toBeDefined();
+        expect(result).toEqual(emptyStates);
+        expect(result?.size).toBe(0);  // The state machine exists but has no states
+    });
+
+    test('should not create a new entry in the state map when the state machine does not exist', () => {
+        // Setup: Ensure the state machine does not exist
+        const stateMachineID = 'nonExistentStateMachine';
+
+        // Call the function
+        const result = service.getStateNames(stateMachineID);
+
+        // Assertions
+        expect(result).toBeUndefined();
+        expect(service['statemachineIDToStateNamesMap'].has(stateMachineID)).toBe(false);
+    });
+
+    test('should handle state machine with multiple state names correctly', () => {
+        // Setup: Create a state machine with multiple states
+        const stateMachineID = 'stateMachine4';
+        const states = new Set<string>(['state1', 'state2', 'state3', 'state4']);
+        service['statemachineIDToStateNamesMap'].set(stateMachineID, states);
+
+        // Call the function
+        const result = service.getStateNames(stateMachineID);
+
+        // Assertions
+        expect(result).toBeDefined();
+        expect(result?.size).toBe(4);
+        expect(result).toEqual(states);
+        expect(result?.has('state1')).toBe(true);
+        expect(result?.has('state2')).toBe(true);
+        expect(result?.has('state3')).toBe(true);
+        expect(result?.has('state4')).toBe(true);
+    });
+
+    test('should log a message if no states are linked to a non-existent state machine', () => {
+        // Spy on console.log to capture output
+        const consoleSpy = jest.spyOn(console, 'log').mockImplementation();
+
+        // Call the function with a non-existent state machine ID
+        const result = service.getStateNames('nonExistentStateMachineID');
+
+        // Assertions
+        expect(result).toBeUndefined();
+        expect(consoleSpy).toHaveBeenCalledWith('No States are linked to nonExistentStateMachineID');
+
+        // Restore the original console.log implementation
+        consoleSpy.mockRestore();
+    });
+
+    test('should return an empty set for a state machine that exists but has no states', () => {
+        // Setup: Create a state machine with an empty set of states
+        const stateMachineID = 'emptyStateMachine';
+        service['statemachineIDToStateNamesMap'].set(stateMachineID, new Set());
+
+        // Call the function
+        const result = service.getStateNames(stateMachineID);
+
+        // Assertions
+        expect(result).toBeDefined();
+        expect(result?.size).toBe(0);
+    });
+
+    test('should handle multiple state machines and return the correct set for each', () => {
+        // Setup: Create multiple state machines with different states
+        const stateMachineID1 = 'stateMachine1';
+        const stateMachineID2 = 'stateMachine2';
+        service['statemachineIDToStateNamesMap'].set(stateMachineID1, new Set(['stateA', 'stateB']));
+        service['statemachineIDToStateNamesMap'].set(stateMachineID2, new Set(['stateX', 'stateY']));
+
+        // Call the function for the first state machine
+        const result1 = service.getStateNames(stateMachineID1);
+        // Call the function for the second state machine
+        const result2 = service.getStateNames(stateMachineID2);
+
+        // Assertions for stateMachineID1
+        expect(result1).toBeDefined();
+        expect(result1?.has('stateA')).toBe(true);
+        expect(result1?.has('stateB')).toBe(true);
+
+        // Assertions for stateMachineID2
+        expect(result2).toBeDefined();
+        expect(result2?.has('stateX')).toBe(true);
+        expect(result2?.has('stateY')).toBe(true);
+    });
+});
+
+

@@ -28,7 +28,8 @@ import {
 import StateMachine from "../../classes/stateMachine.ts";
 import State from "../../classes/state.ts";
 import CsmEdge from "./csmEdgeComponent.tsx";
-import {ReactFlowContext} from "../../utils.tsx";
+import {getAllStateNamesInExtent, ReactFlowContext} from "../../utils.tsx";
+import {NO_PARENT} from "../../services/stateOrStateMachineService.tsx";
 
 
 const nodeTypes = {
@@ -84,6 +85,7 @@ export default function Flow() {
         });
     }, [setNodeHistory]);
 
+
     const getAllDescendants = useCallback((node: Node<CsmNodeProps>) => {
         const children = nodes.filter((n: Node<CsmNodeProps>) => n.parentId === node.id);
 
@@ -96,6 +98,7 @@ export default function Flow() {
 
         return children;
     }, [nodes]);
+
 
 
 
@@ -129,7 +132,6 @@ export default function Flow() {
 
             const position = screenToFlowPosition({ x: event.clientX, y: event.clientY });
             const new_name: string = stateOrStateMachineService.generateUniqueName(type);
-            stateOrStateMachineService.registerName(new_name);
 
             const newNode: Node<CsmNodeProps> = {
                 id: getNewNodeId(),
@@ -165,7 +167,10 @@ export default function Flow() {
                 }
             });
 
+            const parentId = newNode.parentId|| NO_PARENT
+            stateOrStateMachineService.linkStateNameToStatemachine(new_name, parentId, true)
             stateOrStateMachineService.linkNode(newNode.id, newNode.data);
+
 
         },
         [screenToFlowPosition, setNodes, stateOrStateMachineService, updateNodeHistory]
@@ -181,11 +186,32 @@ export default function Flow() {
             );
 
 
+            const parentId = node.parentId || NO_PARENT
+            console.log(`PARENT = ${parentId}`)
+            console.log(node.parentId)
+
+
+
+
             /** The parent always needs to before the child in the nodes array.
              * This bock moves the child node to the front of the parent node in the array to always ensure this*/
             //TODO: Logic for moving statemachines into statemachines.
             if (intersectedBlock) {
+                if(node.parentId === intersectedBlock.id){
+                    return;
+                }
+
+                const blockSateNames = getAllStateNamesInExtent(intersectedBlock as Node<CsmNodeProps>,nodes,stateOrStateMachineService)
+                stateOrStateMachineService.unlinkStateNameFromStatemachine(stateOrStateMachineService.getName(node.data),parentId)
+
                 if (isState(node.data)) {
+                    if(blockSateNames && blockSateNames.has(node.data.state.name))  {
+                        console.log(`${node.data.state.name} already exists in extent of ${intersectedBlock.id}`);
+                        //Relink if no update
+                        stateOrStateMachineService.linkStateNameToStatemachine(stateOrStateMachineService.getName(node.data),parentId)
+                        return;
+                    }
+
                     setNodes((ns: Node<CsmNodeProps>[]) => {
                         const newNodes = ns.filter(i => i.id !== node.id);
                         const index = newNodes.findIndex(i => i.id === intersectedBlock.id);
@@ -198,6 +224,12 @@ export default function Flow() {
                 }
 
                 if (isStateMachine(node.data)) {
+                    if(blockSateNames && blockSateNames.has(node.data.stateMachine.name))  {
+                        console.log(`${node.data.stateMachine.name} already exists on ${intersectedBlock.id}`);
+                        //Relink if no update
+                        stateOrStateMachineService.linkStateNameToStatemachine(stateOrStateMachineService.getName(node.data),parentId)
+                        return;
+                    }
                     setNodes((ns: Node<CsmNodeProps>[]) => {
                         const children = getAllDescendants(node);
                         const newNodes = ns.filter(i => i.id !== node.id && !children.includes(i));
@@ -214,6 +246,8 @@ export default function Flow() {
 
 
 
+                stateOrStateMachineService.linkStateNameToStatemachine(stateOrStateMachineService.getName(node.data),intersectedBlock.id, true)
+
                 setNodes((ns) =>
                     ns.map((n) => {
                         if (n.id === node.id) {
@@ -227,6 +261,8 @@ export default function Flow() {
                         return n;
                     })
                 );
+
+
             }
         },
         [setNodes, getIntersectingNodes]
@@ -236,6 +272,7 @@ export default function Flow() {
         (deletedNodes: Node[]) => {
             deletedNodes.forEach(node => {
                 stateOrStateMachineService.unlinkNode(node.id)
+                let parentId: string
                 switch (node.type) {
                     case "state-machine-node":
                         const stateMachine = node.data.stateMachine as StateMachine
@@ -243,6 +280,8 @@ export default function Flow() {
                         stateMachine.getAllContextVariables().forEach(variable => {
                             contextService.deregisterContextByName(variable.name);
                         })
+                        parentId = node.parentId || NO_PARENT
+                        stateOrStateMachineService.unlinkStateNameFromStatemachine(stateMachine.name, parentId)
 
                         break;
                     case "state-node":
@@ -251,9 +290,12 @@ export default function Flow() {
                         state.getAllContextVariables().forEach(variable => {
                             contextService.deregisterContextByName(variable.name);
                         })
+                        parentId = node.parentId|| NO_PARENT
+                        stateOrStateMachineService.unlinkStateNameFromStatemachine(state.name, parentId)
                         break;
                     default:
                         stateOrStateMachineService.unregisterName(node.data.name);
+
                 }
             });
             updateNodeHistory(nodes.filter(n => !deletedNodes.some(d => d.id === n.id)));

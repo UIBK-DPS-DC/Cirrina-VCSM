@@ -9,16 +9,143 @@ import Action from "../classes/action.ts";
 import {ActionCategory} from "../enums.ts";
 
 
+export type NO_PARENT = "0"
+export const NO_PARENT: NO_PARENT = "0"
+
 export default class StateOrStateMachineService {
     private id: number = 0
     private stateOrStatemachineNames : Set<string>;
     private nodeIdToStateOrStatemachineMap = new Map<string,StateOrStateMachine>
+    private statemachineIDToStateNamesMap = new Map<string,Set<string>>
+
+
 
     public constructor() {
         this.stateOrStatemachineNames = new Set();
         this.nodeIdToStateOrStatemachineMap = new Map();
+        this.statemachineIDToStateNamesMap = new Map();
+        this.statemachineIDToStateNamesMap.set(NO_PARENT, new Set<string>());
+
 
     }
+
+
+    /**
+     * Links a state name to a state machine in the internal mapping.
+     *
+     * This method attempts to link a given state `name` to a state machine identified by `stateMachineID`.
+     * If the state machine doesn't exist and the `create` flag is true, a new entry is created for that
+     * state machine. If the `create` flag is false and the state machine doesn't exist, an error is logged.
+     * The function also ensures no duplicate state names are added to the state machine.
+     *
+     * @param {string} name - The name of the state to link.
+     * @param {string} stateMachineID - The ID of the state machine to link the state to.
+     * @param {boolean} [create=false] - Optional flag to create the state machine if it doesn't exist.
+     */
+    public linkStateNameToStatemachine(name: string, stateMachineID: string | NO_PARENT, create?: boolean) {
+        let stateNames = this.statemachineIDToStateNamesMap.get(stateMachineID);
+
+        if (!stateNames) {
+            if (!create) {
+                console.error(`Statemachine ${stateMachineID} does not exist.\n`);
+                return;
+            }
+            // Create new entry for state machine if 'create' is true
+
+            stateNames = new Set([]);
+            const stateMachine = this.getLinkedStateOrStatemachine(stateMachineID)
+            if(stateMachine){
+                stateNames.add(stateMachine.name)
+                console.log(`Statemachine ${stateMachine.name} has been added to initial stateNames!`);
+            }
+            this.statemachineIDToStateNamesMap.set(stateMachineID, stateNames);
+        }
+
+        // Avoid duplicates before pushing the state name
+        if (!stateNames.has(name)) {
+            stateNames.add(name);
+            console.log(`${name} has been linked to ${stateMachineID}`)
+            return
+        }
+        else{
+            console.error(`State ${name} already exist on Statemachine ${stateMachineID}`)
+        }
+    }
+
+
+    public getStateNames(stateMachineID: string): Set<string> | undefined {
+        let stateNames = this.statemachineIDToStateNamesMap.get(stateMachineID);
+        if (stateNames === undefined) {
+            console.log(`No States are linked to ${stateMachineID}`);
+            return stateNames;
+        }
+        return stateNames;
+    }
+
+    /**
+     * Unlinks a state name from a state machine in the internal mapping.
+     *
+     * This method attempts to unlink a given state `name` from a state machine identified by `stateMachineID`.
+     * If the state exists, it is removed from the state machine. If the state machine no longer has any states
+     * after the removal, the state machine entry is deleted. If the state or state machine doesn't exist,
+     * an appropriate message is logged.
+     *
+     * @param {string} name - The name of the state to unlink.
+     * @param {string} stateMachineID - The ID of the state machine to unlink the state from.
+     * @returns {boolean} - Returns `true` if the state was successfully unlinked, `false` if the state or
+     *                      state machine does not exist.
+     */
+    public unlinkStateNameFromStatemachine(name: string, stateMachineID: string): boolean {
+        const states = this.statemachineIDToStateNamesMap.get(stateMachineID);
+
+        if (states) {
+            const deleted = states.delete(name);
+
+            if (!deleted) {
+                console.log(`State ${name} does not exist in Statemachine ${stateMachineID}.\n`);
+                return false;
+            } else {
+                console.log(`${name} has been unlinked from statemachine with ID ${stateMachineID}`);
+            }
+
+            // If no states are left, remove the entire state machine entry
+            if (states.size === 0) {
+                this.statemachineIDToStateNamesMap.delete(stateMachineID);
+                console.log(`Statemachine ${stateMachineID} has no more states and has been removed.`);
+            }
+
+            return true;
+        } else {
+            console.log(`Statemachine ${stateMachineID} does not exist.\n`);
+            return false;
+        }
+    }
+
+
+
+    /**
+     * Checks if a state machine contains a specific state.
+     *
+     * This method checks whether a state machine, identified by `stateMachineID`, contains a state
+     * with the name `stateName`. If the state machine doesn't exist, an appropriate message is logged,
+     * and `false` is returned.
+     *
+     * @param {string} stateName - The name of the state to check.
+     * @param {string} stateMachineID - The ID of the state machine to search.
+     * @returns {boolean} - Returns `true` if the state machine contains the state, `false` if the state or
+     *                      state machine does not exist.
+     */
+    public stateMachineHasState(stateName: string, stateMachineID: string): boolean {
+        const stateNames = this.statemachineIDToStateNamesMap.get(stateMachineID);
+        if (!stateNames) {
+            console.log(`Statemachine ${stateMachineID} does not exist.\n`);
+            return false;
+        }
+
+        return stateNames.has(stateName);
+    }
+
+
 
 
 
@@ -376,4 +503,5 @@ export default class StateOrStateMachineService {
     }
 
 }
+
 
