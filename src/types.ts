@@ -22,6 +22,8 @@ import {
     TimeUnit
 } from "./enums.ts";
 import ContextVariable from "./classes/contextVariable.tsx";
+import {MatchCaseDescription} from "./pkl/bindings/collaborative_state_machine_description.pkl.ts";
+import MatchCase from "./classes/MatchCase.tsx";
 
 
 // One Type to avoid repeating ourselves. Can be expanded/unionized as needed.
@@ -82,6 +84,13 @@ export type TimeoutActionProps = {
 export type TimeoutResetActionProps = {
     type: ActionType.TIMEOUT_RESET,
     action: Action
+}
+
+export type MatchActionProps = {
+    type: ActionType.MATCH
+    value: string
+    cases: Array<MatchCase>
+
 }
 
 export type ActionProps = InvokeActionProps

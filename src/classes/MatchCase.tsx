@@ -26,4 +26,9 @@ export default class MatchCase {
     set action(value: Action) {
         this._action = value;
     }
+
+
+
+
+
 }
