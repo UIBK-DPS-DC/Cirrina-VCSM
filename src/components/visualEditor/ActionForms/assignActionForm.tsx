@@ -11,7 +11,7 @@ import {ActionCategory, ActionType} from "../../../enums.ts";
 
 export default function AssignActionForm(props: {action: Action | undefined,
     setActions: Dispatch<SetStateAction<Action[]>>,
-    onSubmit?: ()=> void}) {
+    onSubmit?: ()=> void, noCategorySelect?: boolean}) {
 
     const context = useContext(ReactFlowContext) as ReactFlowContextProps;
     const {selectedNode,stateOrStateMachineService,
@@ -214,13 +214,14 @@ export default function AssignActionForm(props: {action: Action | undefined,
                           </Form.Control.Feedback>
                       </Col>
                   </Form.Group>
-                  <Form.Group className={"mb-3"}>
-                      <Form.Label>Action Category</Form.Label>
-                      <Form.Select onChange={onSelectedActionCategoryChange} value={selectedActionCategory} className={"mb-3"}>
-                          {renderEnumAsOptions(ActionCategory)}
-                      </Form.Select>
-                  </Form.Group>
-
+                  {!props.noCategorySelect && (
+                      <Form.Group className={"mb-3"}>
+                          <Form.Label>Action Category</Form.Label>
+                          <Form.Select onChange={onSelectedActionCategoryChange} value={selectedActionCategory} className={"mb-3"}>
+                              {renderEnumAsOptions(ActionCategory)}
+                          </Form.Select>
+                      </Form.Group>
+                  )}
 
                   <Button variant="primary" type="submit" disabled={!formIsValid}>
                       {submitButtonText()}

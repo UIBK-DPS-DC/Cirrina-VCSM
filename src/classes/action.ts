@@ -7,20 +7,25 @@ import {
     RaiseActionDescription
 } from "../pkl/bindings/collaborative_state_machine_description.pkl.ts";
 import {ActionProps} from "../types.ts";
-
+;
 
 /**
  * Placeholder Action class. Expand once we have the Schema
  */
 //TODO: REFACTOR ACTION CLASS
 export default class Action {
+    private static id = 0;
+
+    private _id = 0
     private _name: string;
     private _type: ActionType
     private _delay: number
     private _properties: ActionProps
     private _context: ContextVariable[] | undefined
+    private _case: string | undefined
 
     constructor(name: string, type: ActionType, delay = 0) {
+        this._id = Action.id++;
         this._name = name;
         this._type = type;
         this._properties = {}
@@ -29,6 +34,14 @@ export default class Action {
 
     }
 
+
+    get id(): number {
+        return this._id;
+    }
+
+    set id(value: number) {
+        this._id = value;
+    }
 
     get name() {
         return this._name;
@@ -71,8 +84,15 @@ export default class Action {
     }
 
 
+    get case(): string | undefined {
+        return this._case;
+    }
 
-    // Could be extended to compare fields for non named actions.
+    set case(value: string | undefined) {
+        this._case = value;
+    }
+
+// Could be extended to compare fields for non named actions.
     public equals(other: Action) {
         if(this.name){
             return this.name === other.name;

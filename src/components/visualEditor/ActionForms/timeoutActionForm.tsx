@@ -7,7 +7,9 @@ import {isState, RaiseEventActionProps, ReactFlowContextProps, TimeoutActionProp
 import {ActionCategory, ActionType} from "../../../enums.ts";
 
 
-export default function TimeoutActionForm(props: {action: Action | undefined, setActions: Dispatch<SetStateAction<Action[]>>, onSubmit?: () => void}) {
+export default function TimeoutActionForm(props: {action: Action | undefined,
+    setActions: Dispatch<SetStateAction<Action[]>>,
+    onSubmit?: () => void, noCategorySelect? :boolean}) {
 
     const context = useContext(ReactFlowContext) as ReactFlowContextProps;
     const {selectedNode, actionService, stateOrStateMachineService} = context
@@ -249,12 +251,14 @@ export default function TimeoutActionForm(props: {action: Action | undefined, se
                        </Col>
                    </Form.Group>
 
-                   <Form.Group className={"mb-3"}>
-                       <Form.Label>Action Category</Form.Label>
-                       <Form.Select onChange={onSelectedActionCategoryChange} value={selectedActionCategory} className={"mb-3"}>
-                           {renderEnumAsOptions(ActionCategory)}
-                       </Form.Select>
-                   </Form.Group>
+                   {!props.noCategorySelect && (
+                       <Form.Group className={"mb-3"}>
+                           <Form.Label>Action Category</Form.Label>
+                           <Form.Select onChange={onSelectedActionCategoryChange} value={selectedActionCategory} className={"mb-3"}>
+                               {renderEnumAsOptions(ActionCategory)}
+                           </Form.Select>
+                       </Form.Group>
+                   )}
 
                </Form>
                {/* Conditionally render empty or full RaiseEventActionForm */}

@@ -17,7 +17,8 @@ import {InvokeActionProps, isState, ReactFlowContextProps} from "../../../types.
 
 export default function InvokeActionForm(props: {action: Action | undefined,
     setActions: Dispatch<SetStateAction<Action[]>>,
-    onSubmit?: () => void}) {
+    onSubmit?: () => void,
+    noCategorySelect?: boolean}) {
 
     const context = useContext(ReactFlowContext) as ReactFlowContextProps;
     const {selectedNode,
@@ -181,6 +182,7 @@ export default function InvokeActionForm(props: {action: Action | undefined,
 
             // Check if category has changed and update the action in the state node if needed
             if (oldCategory !== selectedActionCategory as ActionCategory) {
+                //TODO provide optional dont add action to state prop.
                 stateOrStateMachineService.removeActionFromState(props.action, selectedNode.data);
                 stateOrStateMachineService.addActionToState(selectedNode.data, props.action, selectedActionCategory as ActionCategory);
             }
@@ -191,6 +193,7 @@ export default function InvokeActionForm(props: {action: Action | undefined,
         } else {
             updatedAction = new Action("newAction", ActionType.INVOKE);
             updatedAction.properties = invokeActionsProperties;
+            //TODO provide optional dont add action to state prop.
             stateOrStateMachineService.addActionToState(selectedNode.data, updatedAction, selectedActionCategory as ActionCategory);
             onActionSubmit(updatedAction);
         }
@@ -284,12 +287,14 @@ export default function InvokeActionForm(props: {action: Action | undefined,
                         <ContextCardDisplay vars={selectedOutputContextVariables} headerText={"Selected Output Vars"} setVars={setSelectedOutputContextVariables} />
                     </Form.Group>
 
-                    <Form.Group className={"mb-3"}>
-                        <Form.Label>Action Category</Form.Label>
-                        <Form.Select onChange={onSelectedActionCategoryChange} value={selectedActionCategory} className={"mb-3"}>
-                            {renderEnumAsOptions(ActionCategory)}
-                        </Form.Select>
-                    </Form.Group>
+                    {!props.noCategorySelect && (
+                        <Form.Group className={"mb-3"}>
+                            <Form.Label>Action Category</Form.Label>
+                            <Form.Select onChange={onSelectedActionCategoryChange} value={selectedActionCategory} className={"mb-3"}>
+                                {renderEnumAsOptions(ActionCategory)}
+                            </Form.Select>
+                        </Form.Group>
+                    )}
 
                     <Button type={"submit"}>{submitButtonText()}</Button>
 

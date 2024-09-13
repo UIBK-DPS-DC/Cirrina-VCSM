@@ -62,7 +62,7 @@ export default function ActionDisplay(props: {
             case ActionType.TIMEOUT_RESET:
                 return <TimeoutResetActionForm action={props.action} setActions={props.setTimeoutResetActions} onSubmit={props.onSubmit} />;
             case ActionType.MATCH:
-                return <MatchActionForm action={props.action} setActions={props.setMatchActions}/>
+                return <MatchActionForm action={props.action} setActions={props.setMatchActions} onSubmit={props.onSubmit}/>
             default:
                 return null;
         }

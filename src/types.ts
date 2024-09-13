@@ -92,6 +92,10 @@ export type MatchActionProps = {
 
 }
 
+export type MatchActionFormProps = {
+    case: string
+}
+
 export type ActionProps = InvokeActionProps
     | CreateActionProps
     | AssignActionProps

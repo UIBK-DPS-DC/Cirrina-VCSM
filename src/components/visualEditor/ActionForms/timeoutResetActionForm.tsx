@@ -13,7 +13,7 @@ import {ActionCategory, ActionType} from "../../../enums.ts";
 
 export default function TimeoutResetActionForm(props: {action: Action | undefined,
     setActions: Dispatch<SetStateAction<Action[]>>,
-    onSubmit?: () => void}) {
+    onSubmit?: () => void, noCategorySelect?: boolean}) {
 
     const context = useContext(ReactFlowContext) as ReactFlowContextProps;
     const {selectedNode,
@@ -202,17 +202,19 @@ export default function TimeoutResetActionForm(props: {action: Action | undefine
                                    {invalidSelectedActionText()}
                                </Form.Control.Feedback>
 
-                               <Form.Group className={"mb-3"}>
-                                   <Form.Label>Action Category</Form.Label>
-                                   <Form.Select onChange={onSelectedActionCategoryChange}
-                                                value={selectedActionCategory}
-                                                className={"mb-3"}
-                                                isValid={true}
-                                   >
-                                       {renderEnumAsOptions(ActionCategory)}
-                                   </Form.Select>
+                               {!props.noCategorySelect && (
+                                   <Form.Group className={"mb-3"}>
+                                       <Form.Label>Action Category</Form.Label>
+                                       <Form.Select onChange={onSelectedActionCategoryChange}
+                                                    value={selectedActionCategory}
+                                                    className={"mb-3"}
+                                                    isValid={true}
+                                       >
+                                           {renderEnumAsOptions(ActionCategory)}
+                                       </Form.Select>
 
-                               </Form.Group>
+                                   </Form.Group>
+                               )}
 
                                <Button type={"submit"} disabled={!selectedActionsIsValid}>
                                    {submitButtonText()}
