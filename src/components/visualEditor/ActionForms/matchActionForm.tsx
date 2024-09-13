@@ -141,7 +141,7 @@ function CaseForm(props: {
             case ActionType.CREATE:
                 return <CreateActionForm action={props.action ? props.action : createAction[0]} setActions={props.action ? props.setActions : setCreateAction} noCategorySelect={true} />;
             case ActionType.ASSIGN:
-                return <AssignActionForm action={props.action ? props.action : assignAction[0]} setActions={props.action ? props.setActions : setAssignAction} noCategorySelect={true} />;
+                return <AssignActionForm action={props.action ? props.action : assignAction[0]} setActions={props.action ? props.setActions : setAssignAction} noCategorySelect={true} dontAddToState={true} />;
             case ActionType.RAISE_EVENT:
                 return <RaiseEventActionForm action={props.action ? props.action : raiseEventAction[0]} setActions={props.action ? props.setActions : setRaiseEventAction} noCategorySelect={true} />;
             case ActionType.TIMEOUT:

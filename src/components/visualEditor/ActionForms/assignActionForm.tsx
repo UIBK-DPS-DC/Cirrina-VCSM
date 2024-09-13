@@ -11,7 +11,7 @@ import {ActionCategory, ActionType} from "../../../enums.ts";
 
 export default function AssignActionForm(props: {action: Action | undefined,
     setActions: Dispatch<SetStateAction<Action[]>>,
-    onSubmit?: ()=> void, noCategorySelect?: boolean}) {
+    onSubmit?: ()=> void, noCategorySelect?: boolean, dontAddToState? :boolean}) {
 
     const context = useContext(ReactFlowContext) as ReactFlowContextProps;
     const {selectedNode,stateOrStateMachineService,
@@ -135,8 +135,10 @@ export default function AssignActionForm(props: {action: Action | undefined,
 
             // Check if category has changed and update the action in the state node if needed
             if (oldCategory !== selectedActionCategory as ActionCategory) {
-                stateOrStateMachineService.removeActionFromState(props.action, selectedNode.data);
-                stateOrStateMachineService.addActionToState(selectedNode.data, props.action, selectedActionCategory as ActionCategory);
+                if(!props.dontAddToState){
+                    stateOrStateMachineService.removeActionFromState(props.action, selectedNode.data);
+                    stateOrStateMachineService.addActionToState(selectedNode.data, props.action, selectedActionCategory as ActionCategory);
+                }
             }
 
             updatedAction = props.action;
@@ -145,7 +147,9 @@ export default function AssignActionForm(props: {action: Action | undefined,
         } else {
             updatedAction = new Action("newAction", ActionType.ASSIGN);
             updatedAction.properties = assignActionsProps;
-            stateOrStateMachineService.addActionToState(selectedNode.data, updatedAction, selectedActionCategory as ActionCategory);
+            if(!props.dontAddToState){
+                stateOrStateMachineService.addActionToState(selectedNode.data, updatedAction, selectedActionCategory as ActionCategory);
+            }
             onActionSubmit(updatedAction);
         }
 
