@@ -137,7 +137,7 @@ function CaseForm(props: {
     const renderActionForm = () => {
         switch (selectedActionType) {
             case ActionType.INVOKE:
-                return <InvokeActionForm action={props.action ? props.action : invokeAction[0]} setActions={props.action ? props.setActions : setInvokeAction} noCategorySelect={true} />;
+                return <InvokeActionForm action={props.action ? props.action : invokeAction[0]} setActions={props.action ? props.setActions : setInvokeAction} noCategorySelect={true} dontAddToState={true} />;
             case ActionType.CREATE:
                 return <CreateActionForm action={props.action ? props.action : createAction[0]} setActions={props.action ? props.setActions : setCreateAction} noCategorySelect={true} dontAddToState={true} />;
             case ActionType.ASSIGN:
