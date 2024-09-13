@@ -11,6 +11,7 @@ import UnlockActionForm from "../visualEditor/ActionForms/unlockActionForm.tsx";
 import TimeoutActionForm from "../visualEditor/ActionForms/timeoutActionForm.tsx";
 import TimeoutResetActionForm from "../visualEditor/ActionForms/timeoutResetActionForm.tsx";
 import { Form } from "react-bootstrap";
+import MatchActionForm from "../visualEditor/ActionForms/matchActionForm.tsx";
 
 const ACTION_TYPE_SELECT_NAME = "action-type-select";
 
@@ -21,7 +22,8 @@ export default function ActionDisplay(props: {
     setAssignActions: Dispatch<SetStateAction<Action[]>>,
     setRaiseEventActions: Dispatch<SetStateAction<Action[]>>,
     setTimeoutActions: Dispatch<SetStateAction<Action[]>>,
-    setTimeoutResetActions: Dispatch<SetStateAction<Action[]>>
+    setTimeoutResetActions: Dispatch<SetStateAction<Action[]>>,
+    setMatchActions: Dispatch<SetStateAction<Action[]>>,
     onSubmit?: () => void
 }) {
     const [selectedActionType, setSelectedActionType] = React.useState<string>(ActionType.INVOKE);
@@ -59,6 +61,8 @@ export default function ActionDisplay(props: {
                 return <TimeoutActionForm action={props.action} setActions={props.setTimeoutActions} onSubmit={props.onSubmit}/>;
             case ActionType.TIMEOUT_RESET:
                 return <TimeoutResetActionForm action={props.action} setActions={props.setTimeoutResetActions} onSubmit={props.onSubmit} />;
+            case ActionType.MATCH:
+                return <MatchActionForm action={props.action} setActions={props.setMatchActions} onSubmit={props.onSubmit}/>
             default:
                 return null;
         }

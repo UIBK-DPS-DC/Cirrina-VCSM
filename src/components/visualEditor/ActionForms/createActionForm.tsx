@@ -9,7 +9,7 @@ import {CreateActionProps, isState, ReactFlowContextProps} from "../../../types.
 import {ActionCategory, ActionType} from "../../../enums.ts";
 
 export default function CreateActionForm(props: {action: Action | undefined,
-    setActions: Dispatch<SetStateAction<Action[]>>, onSubmit?: () => void}) {
+    setActions: Dispatch<SetStateAction<Action[]>>, onSubmit?: () => void, noCategorySelect? :boolean}) {
 
     const context = useContext(ReactFlowContext) as ReactFlowContextProps
     const {selectedNode,
@@ -63,10 +63,13 @@ export default function CreateActionForm(props: {action: Action | undefined,
     }
 
     useEffect(() => {
+        console.log("YOU ARE HERE")
+        console.log(props.action)
         if(!selectedNode){
             return
         }
         if(props.action && props.action.type === ActionType.CREATE){
+            console.log("NO YOU ARE HEERERER")
             const createActionProps = props.action.properties as CreateActionProps
             setVariableToBeCreated([createActionProps.variable])
             setVariableIsPersistent(createActionProps.isPersistent)
@@ -75,7 +78,7 @@ export default function CreateActionForm(props: {action: Action | undefined,
                 setSelectedActionCategory(actionCategory)
             }
         }
-    }, []);
+    }, [props.action]);
 
     useEffect(() => {
         validateForm();
@@ -221,12 +224,14 @@ export default function CreateActionForm(props: {action: Action | undefined,
                         <Form.Check type={"checkbox"} checked={variableIsPersistent} onChange={onVariableIsPersistentChange}/>
                     </Form.Group>
 
-                    <Form.Group className={"mb-3"}>
-                        <Form.Label>Action Category</Form.Label>
-                        <Form.Select onChange={onSelectedActionCategoryChange} value={selectedActionCategory} className={"mb-3"}>
-                            {renderEnumAsOptions(ActionCategory)}
-                        </Form.Select>
-                    </Form.Group>
+                    {!props.noCategorySelect && (
+                        <Form.Group className={"mb-3"}>
+                            <Form.Label>Action Category</Form.Label>
+                            <Form.Select onChange={onSelectedActionCategoryChange} value={selectedActionCategory} className={"mb-3"}>
+                                {renderEnumAsOptions(ActionCategory)}
+                            </Form.Select>
+                        </Form.Group>
+                    )}
 
                     {!formIsValid && (
                         <div className="text-danger mb-3">

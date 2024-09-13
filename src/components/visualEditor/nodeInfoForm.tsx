@@ -42,11 +42,10 @@ export default function NodeInfoForm() {
     const [_invokeActions,setInvokeActions] = useState<Action[]>([]);
     const [_createActions, setCreateActions] = useState<Action[]>([]);
     const [_assignActions, setAssignActions] = useState<Action[]>([]);
-    const [_lockActions, _setLockActions] = useState<Action[]>([]);
-    const [_unlockActions, _setUnlockActions] = useState<Action[]>([]);
     const [_raiseEventActions, setRaiseEventActions] = useState<Action[]>([]);
     const [_timeoutActions, setTimeoutActions] = useState<Action[]>([]);
     const [_timeoutResetActions, setTimeoutResetActions] = useState<Action[]>([]);
+    const [_MatchActions, setMatchActions] = useState<Action[]>([]);
     const [_allAction,_setAllActions] = useState<Action[]>([]);
 
 
@@ -116,6 +115,7 @@ export default function NodeInfoForm() {
                                                setRaiseEventActions={setRaiseEventActions}
                                                setTimeoutActions={setTimeoutActions}
                                                setTimeoutResetActions={setTimeoutResetActions}
+                                               setMatchActions={setMatchActions}
                                 ></ActionDisplay>
                             </div>
                         )}
@@ -134,6 +134,7 @@ export default function NodeInfoForm() {
                                                  setRaiseEventActions={setRaiseEventActions}
                                                  setTimeoutActions={setTimeoutActions}
                                                  setTimeoutResetActions={setTimeoutResetActions}
+                                                 setMatchActions={setMatchActions}
                                 />
                             )
                             }
@@ -147,6 +148,7 @@ export default function NodeInfoForm() {
                                                  setRaiseEventActions={setRaiseEventActions}
                                                  setTimeoutActions={setTimeoutActions}
                                                  setTimeoutResetActions={setTimeoutResetActions}
+                                                 setMatchActions={setMatchActions}
                                 />
                             )
                             }
@@ -160,6 +162,7 @@ export default function NodeInfoForm() {
                                                  setRaiseEventActions={setRaiseEventActions}
                                                  setTimeoutActions={setTimeoutActions}
                                                  setTimeoutResetActions={setTimeoutResetActions}
+                                                 setMatchActions={setMatchActions}
                                 />
                             )
                             }
@@ -173,6 +176,7 @@ export default function NodeInfoForm() {
                                                  setRaiseEventActions={setRaiseEventActions}
                                                  setTimeoutActions={setTimeoutActions}
                                                  setTimeoutResetActions={setTimeoutResetActions}
+                                                 setMatchActions={setMatchActions}
                                 />
                             )
                             }

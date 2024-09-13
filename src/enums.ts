@@ -6,7 +6,8 @@ export enum ActionType {
     "UNLOCK" = "unlock",
     "RAISE_EVENT" = "raise",
     "TIMEOUT" = "timeout",
-    "TIMEOUT_RESET" = "timeoutReset"
+    "TIMEOUT_RESET" = "timeoutReset",
+    "MATCH" = "match"
 }
 
 export enum ContextType {

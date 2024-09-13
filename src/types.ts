@@ -22,6 +22,7 @@ import {
     TimeUnit
 } from "./enums.ts";
 import ContextVariable from "./classes/contextVariable.tsx";
+import MatchCase from "./classes/MatchCase.tsx";
 
 
 // One Type to avoid repeating ourselves. Can be expanded/unionized as needed.
@@ -84,12 +85,24 @@ export type TimeoutResetActionProps = {
     action: Action
 }
 
+export type MatchActionProps = {
+    type: ActionType.MATCH
+    value: string
+    cases: Array<MatchCase>
+
+}
+
+export type MatchActionFormProps = {
+    case: string
+}
+
 export type ActionProps = InvokeActionProps
     | CreateActionProps
     | AssignActionProps
     | RaiseEventActionProps
     | TimeoutActionProps
     | TimeoutResetActionProps
+    | MatchActionProps
     | {}
 
 

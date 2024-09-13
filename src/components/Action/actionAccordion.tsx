@@ -10,7 +10,8 @@ export default function ActionAccordion(props: {headerText: string,
     setAssignActions: Dispatch<SetStateAction<Action[]>>,
     setRaiseEventActions: Dispatch<SetStateAction<Action[]>>,
     setTimeoutActions: Dispatch<SetStateAction<Action[]>>,
-    setTimeoutResetActions: Dispatch<SetStateAction<Action[]>>}) {
+    setTimeoutResetActions: Dispatch<SetStateAction<Action[]>>,
+    setMatchActions: Dispatch<SetStateAction<Action[]>>,}) {
 
     let keyCount = 0
 
@@ -30,6 +31,7 @@ export default function ActionAccordion(props: {headerText: string,
                                               setRaiseEventActions={props.setRaiseEventActions}
                                               setTimeoutActions={props.setTimeoutActions}
                                               setTimeoutResetActions={props.setTimeoutResetActions}
+                                              setMatchActions={props.setMatchActions}
                         />
                     })}
                 </AccordionBody>
