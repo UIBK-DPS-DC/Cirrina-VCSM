@@ -189,8 +189,18 @@ export default class PklService {
             pkl += `${this.stateMachineToPKL(stateMachine, indentLevel + 2)}\n`
         })
         pkl += `${this.getIndent(indentLevel + 1)}}\n`
-        pkl += `${this.getIndent(indentLevel + 1)}localContext {}\n`
-        pkl += `${this.getIndent(indentLevel + 1)}persistentContext {}\n`
+
+        if(description.localContext){
+            pkl += `${this.getIndent(indentLevel + 1)}localContext {\n`
+            pkl +=  `${this.contextDescriptionToPKL(description.localContext, indentLevel +2)}\n`
+            pkl += `${this.getIndent(indentLevel + 1)}}\n`
+        }
+
+        if(description.persistentContext){
+            pkl += `${this.getIndent(indentLevel + 1)}persistentContext {\n`
+            pkl +=  `${this.contextDescriptionToPKL(description.persistentContext, indentLevel +2)}\n`
+            pkl += `${this.getIndent(indentLevel + 1)}}\n`
+        }
         pkl += `${this.getIndent(indentLevel)}}\n`
 
 
