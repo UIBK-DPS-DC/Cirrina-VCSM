@@ -1,5 +1,5 @@
 import Action from "../../../classes/action.ts";
-import React, {SetStateAction, useContext, useEffect, useState} from "react";
+import React, {SetStateAction, useContext, useEffect, useRef, useState} from "react";
 import {Button, Card, Col, Container, Form, ModalBody, Row,} from "react-bootstrap";
 import {ActionCategory, ActionType} from "../../../enums.ts";
 import {ReactFlowContext, renderEnumAsOptions} from "../../../utils.tsx";
@@ -13,12 +13,25 @@ import Modal from "react-bootstrap/Modal";
 import {isState, MatchActionProps, ReactFlowContextProps} from "../../../types.ts";
 import MatchCase from "../../../classes/MatchCase.tsx";
 
+
+let idCounter = 0
+
 function CaseForm(props: {
     action: Action | undefined;
     setActions: React.Dispatch<SetStateAction<Action[]>>;
     onSubmit?: () => void;
     clearAfterSubmit?: boolean;
 }) {
+
+
+    const instanceId = useRef(++idCounter).current;
+    let formCount = 0
+
+    const formId = `${instanceId}-${formCount++}`
+
+    useEffect(() => {
+        console.log(`FORM ID : ${formId}`)
+    }, []);
     const [action, setAction] = useState<Action | undefined>(undefined);
 
     const [invokeAction, setInvokeAction] = useState<Action[]>([]);
@@ -137,11 +150,11 @@ function CaseForm(props: {
     const renderActionForm = () => {
         switch (selectedActionType) {
             case ActionType.INVOKE:
-                return <InvokeActionForm action={props.action ? props.action : invokeAction[0]} setActions={props.action ? props.setActions : setInvokeAction} noCategorySelect={true} />;
+                return <InvokeActionForm action={props.action ? props.action : invokeAction[0]} setActions={props.action ? props.setActions : setInvokeAction} noCategorySelect={true} dontAddToState={true} />;
             case ActionType.CREATE:
-                return <CreateActionForm action={props.action ? props.action : createAction[0]} setActions={props.action ? props.setActions : setCreateAction} noCategorySelect={true} />;
+                return <CreateActionForm action={props.action ? props.action : createAction[0]} setActions={props.action ? props.setActions : setCreateAction} noCategorySelect={true} dontAddToState={true} />;
             case ActionType.ASSIGN:
-                return <AssignActionForm action={props.action ? props.action : assignAction[0]} setActions={props.action ? props.setActions : setAssignAction} noCategorySelect={true} />;
+                return <AssignActionForm action={props.action ? props.action : assignAction[0]} setActions={props.action ? props.setActions : setAssignAction} noCategorySelect={true} dontAddToState={true} />;
             case ActionType.RAISE_EVENT:
                 return <RaiseEventActionForm action={props.action ? props.action : raiseEventAction[0]} setActions={props.action ? props.setActions : setRaiseEventAction} noCategorySelect={true} />;
             case ActionType.TIMEOUT:
@@ -149,7 +162,7 @@ function CaseForm(props: {
             case ActionType.TIMEOUT_RESET:
                 return <TimeoutResetActionForm action={props.action ? props.action : timeOutResetAction[0]} setActions={props.action ? props.setActions : setTimeoutResetAction} noCategorySelect={true} />;
             case ActionType.MATCH:
-                return <MatchActionForm action={props.action ? props.action : matchAction[0]} setActions={props.action ? props.setActions : setMatchAction} />;
+                return <MatchActionForm action={props.action ? props.action : matchAction[0]} setActions={props.action ? props.setActions : setMatchAction}  dontAddToState={true}/>;
             default:
                 return null;
         }
@@ -158,6 +171,8 @@ function CaseForm(props: {
     const onSubmit = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         event.stopPropagation();
+
+        console.log("I AM HERE")
 
         if (!action) {
             return;
@@ -192,7 +207,7 @@ function CaseForm(props: {
         <Card>
             <Card.Header>{props.action ? "Edit Action" : "Create Action"}</Card.Header>
             <Card.Body>
-                <Form className={"mb-3"} validated={formIsValid} id={`${props.action? props.action.id.toString() : "alpha"}formInner`} onSubmit={onSubmit}>
+                <Form className={"mb-3"} validated={formIsValid} id={formId} onSubmit={onSubmit}>
                     <Form.Group as={Row} className="mb-3">
                         <Form.Label column sm={"3"}>Case</Form.Label>
                         <Col sm={8}>
@@ -211,7 +226,7 @@ function CaseForm(props: {
                 </Form>
                 <Container className={"mb-3"}>{renderActionForm()}</Container>
                 <Container className={"align-content-center"}>
-                    {!props.action && <Button variant={"primary"} type={"submit"} form={`${"alpha"}formInner`} disabled={!formIsValid}>Add Action</Button>}
+                    {!props.action && <Button variant={"primary"} type={"submit"} form={formId} disabled={!formIsValid}>Add Action</Button>}
                 </Container>
             </Card.Body>
         </Card>
@@ -223,7 +238,15 @@ export default function MatchActionForm(props: {
     setActions: React.Dispatch<SetStateAction<Action[]>>,
     onSubmit?: () => void,
     noCategorySelect?: boolean
+    dontAddToState? :boolean
 }) {
+
+    const instanceId = useRef(++idCounter).current;
+    let formCount = 0
+
+    const formId = `${instanceId}-${formCount++}`
+
+
     const context = useContext(ReactFlowContext) as ReactFlowContextProps;
     const { selectedNode , actionService, stateOrStateMachineService} = context;
 
@@ -336,8 +359,10 @@ export default function MatchActionForm(props: {
 
             // Check if category has changed and update the action in the state node if needed
             if (oldCategory !== selectedActionCategory as ActionCategory) {
-                stateOrStateMachineService.removeActionFromState(props.action, selectedNode.data);
-                stateOrStateMachineService.addActionToState(selectedNode.data, props.action, selectedActionCategory as ActionCategory);
+                if(!props.dontAddToState){
+                    stateOrStateMachineService.removeActionFromState(props.action, selectedNode.data);
+                    stateOrStateMachineService.addActionToState(selectedNode.data, props.action, selectedActionCategory as ActionCategory);
+                }
             }
 
             updatedAction = props.action;
@@ -346,7 +371,9 @@ export default function MatchActionForm(props: {
         } else {
             updatedAction = new Action("", ActionType.MATCH);
             updatedAction.properties = matchActionProps;
-            stateOrStateMachineService.addActionToState(selectedNode.data, updatedAction, selectedActionCategory as ActionCategory);
+            if(!props.dontAddToState){
+                stateOrStateMachineService.addActionToState(selectedNode.data, updatedAction, selectedActionCategory as ActionCategory);
+            }
             onActionSubmit(updatedAction);
         }
 
@@ -373,7 +400,7 @@ export default function MatchActionForm(props: {
             <Card.Header>{props.action ? "Edit Match Action" : "Create new Match Action"}</Card.Header>
             <Card.Body>
                 <Card.Title className={"text-center"}>Action properties</Card.Title>
-                <Form className={"mb-3"} validated={formIsValid} id={"matchActionForm"} onSubmit={onSubmit}>
+                <Form className={"mb-3"} validated={formIsValid} id={formId} onSubmit={onSubmit}>
                     <Form.Group as={Row} controlId={"formExpression"} className={"mb-3"}>
                         <Form.Label column sm={"3"}>Expression: </Form.Label>
                         <Col sm={8}>
@@ -423,7 +450,7 @@ export default function MatchActionForm(props: {
                         </Card>
                     ))}
                 </Container>
-                <Button type={"submit"} form={"matchActionForm"} disabled={!formIsValid}>{props.action ? "Save Changes" : "Create Action"}</Button>
+                <Button type={"submit"} form={formId} disabled={!formIsValid}>{props.action ? "Save Changes" : "Create Action"} </Button>
             </Card.Body>
         </Card>
     );

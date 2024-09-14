@@ -9,7 +9,7 @@ import {CreateActionProps, isState, ReactFlowContextProps} from "../../../types.
 import {ActionCategory, ActionType} from "../../../enums.ts";
 
 export default function CreateActionForm(props: {action: Action | undefined,
-    setActions: Dispatch<SetStateAction<Action[]>>, onSubmit?: () => void, noCategorySelect? :boolean}) {
+    setActions: Dispatch<SetStateAction<Action[]>>, onSubmit?: () => void, noCategorySelect? :boolean, dontAddToState? :boolean}) {
 
     const context = useContext(ReactFlowContext) as ReactFlowContextProps
     const {selectedNode,
@@ -119,11 +119,13 @@ export default function CreateActionForm(props: {action: Action | undefined,
 
             // Check if the action category has changed. If so, we must update the action's category in the state or state machine.
             if (oldCategory !== selectedActionCategory as ActionCategory) {
-                // Remove the action from its old category in the state or state machine.
-                stateOrStateMachineService.removeActionFromState(props.action, selectedNode.data);
+                if(!props.dontAddToState){
+                    // Remove the action from its old category in the state or state machine.
+                    stateOrStateMachineService.removeActionFromState(props.action, selectedNode.data);
 
-                // Add the action to its new category in the state or state machine.
-                stateOrStateMachineService.addActionToState(selectedNode.data, props.action, selectedActionCategory as ActionCategory);
+                    // Add the action to its new category in the state or state machine.
+                    stateOrStateMachineService.addActionToState(selectedNode.data, props.action, selectedActionCategory as ActionCategory);
+                }
             }
 
             // Update the existing action's properties with the newly created action properties.
@@ -159,7 +161,9 @@ export default function CreateActionForm(props: {action: Action | undefined,
             updatedAction.properties = createActionProps;
 
             // Add the newly created action to the state or state machine.
-            stateOrStateMachineService.addActionToState(selectedNode.data, updatedAction, selectedActionCategory as ActionCategory);
+            if(!props.dontAddToState){
+                stateOrStateMachineService.addActionToState(selectedNode.data, updatedAction, selectedActionCategory as ActionCategory);
+            }
 
             // Call the onActionSubmit function to update the action in the parent component's state.
             onActionSubmit(updatedAction);

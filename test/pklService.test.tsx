@@ -1,13 +1,22 @@
 import Guard from "../src/classes/guard";
 import Action from "../src/classes/action";
 import PklService from "../src/services/pklService";
-import {ActionType} from "../src/enums";
+import {ActionType, EventChannel} from "../src/enums";
 import {
     CollaborativeStateMachineDescription,
-    CreateActionDescription, GuardDescription, InvokeActionDescription,
+    ContextDescription,
+    ContextVariableDescription,
+    ContextVariableReferenceDescription,
+    CreateActionDescription,
+    EventDescription,
+    GuardDescription,
+    InvokeActionDescription,
     OnTransitionDescription,
-    StateDescription, StateMachineDescription, TransitionDescription
+    StateDescription,
+    StateMachineDescription,
+    TransitionDescription
 } from "../src/pkl/bindings/collaborative_state_machine_description.pkl";
+
 
 describe('Guard.toPKL', () => {
 
@@ -41,15 +50,6 @@ describe('Guard.toPKL', () => {
         console.log(PklService.actionToPKL(action.toDescription()));
     })
 
-    it("Invoke Action",()=>{
-        const action = new Action("Test", ActionType.INVOKE)
-        action.properties = {
-            description: "description",
-            serviceType: "Type",
-            serviceLevel: "Service Level"
-        }
-        console.log(PklService.actionToPKL(action.toDescription()));
-    })
 
     it("Create Action", ()=> {
         const action = new Action("Test", ActionType.CREATE);
@@ -90,7 +90,87 @@ describe('Guard.toPKL', () => {
             actions: [action1.toDescription(),action2.toDescription()], else: "", event: "Event a", guards: [guard1.toDescription(),guard2.toDescription()], target: "Target State"
 
         }
-        console.log(PklService.transitionToPKL(description));
+        console.log(PklService.transitionDescriptionToPKL(description));
+    })
+
+
+    it("Context", () => {
+        const contextVariableDescription: ContextVariableDescription = {
+            name: "contextName", value: "contextValue"
+
+        }
+
+        console.log(PklService.contextVariableDescriptionToPKL(contextVariableDescription,0,false))
+    })
+
+    it ("Context Description", () => {
+        const contextVariableDescription1: ContextVariableDescription = {
+            name: "contextName2", value: "contextValue2"
+
+        }
+        const contextVariableDescription2: ContextVariableDescription = {
+            name: "contextName2", value: "contextValue2"
+
+        }
+
+        const contextVariableDescription3: ContextVariableDescription = {
+            name: "contextName3", value: "contextValue3"
+
+        }
+        const contextDescription: ContextDescription = {
+            variables: [contextVariableDescription1, contextVariableDescription2, contextVariableDescription3]
+
+        }
+
+        console.log(PklService.contextDescriptionToPKL(contextDescription))
+    })
+
+
+
+    it("ContextReference", () => {
+        const contextReferenceDescription: ContextVariableReferenceDescription = {
+            reference: "example"
+
+        }
+
+        console.log(PklService.contextReferenceToPKL(contextReferenceDescription));
+    })
+
+    it("Event", () => {
+        const contextDescription1: ContextVariableDescription = {
+            name: "contextName1", value: "contextValue1"
+
+        }
+        const contextDescription2: ContextVariableDescription = {
+            name: "contextName2", value: "contextValue2"
+
+        }
+        const contextDescription3: ContextVariableDescription = {
+            name: "contextName3", value: "contextValue3"
+
+        }
+        const eventDescription: EventDescription = {
+            channel: EventChannel.GLOBAL,
+            data: [contextDescription1,contextDescription2,contextDescription3],
+            name: "Event Name"
+
+        }
+
+        console.log(PklService.eventToPKL(eventDescription))
+
+
+    })
+
+    it ("onTransitionDescription", () => {
+        const onTransitionDescription: OnTransitionDescription = {
+            actions: [],
+            else: "Else",
+            event: "Event a",
+            guards: [],
+            target: ""
+        }
+
+        console.log(PklService.onTransitionDescriptionToPKL(onTransitionDescription));
     })
 
     it("State", () => {

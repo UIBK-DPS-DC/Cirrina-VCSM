@@ -3,6 +3,7 @@
  */
 import {EventChannel} from "../enums.ts";
 import ContextVariable from "./contextVariable.tsx";
+import {EventDescription} from "../pkl/bindings/collaborative_state_machine_description.pkl.ts";
 
 //TODO: Actually use this class. Expand with pkl binds
 export default class Event {
@@ -44,6 +45,14 @@ export default class Event {
 
     public addContextVariable(context: ContextVariable) {
         this._data.push(context);
+    }
+
+    public toDescription(): EventDescription {
+        return {
+            channel: this.channel,
+            data: this._data,
+            name: this._name
+        }
     }
 
 
