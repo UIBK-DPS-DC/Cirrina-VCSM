@@ -216,7 +216,6 @@ export default class PklService {
         pkl += `${this.getIndent(indentLevel + 1)}persistentContext {}\n`
 
 
-
         return pkl;
 
     }
@@ -237,6 +236,7 @@ export default class PklService {
         description.data.forEach((context) =>{
             pkl+= `${this.contextToPKL(context, indentLevel + 2)}\n`
         })
+        pkl += `${this.getIndent(indentLevel + 1)}}\n`
         pkl += `${this.getIndent(indentLevel + 1)}channel = "${description.channel}"\n`
         pkl += `${this.getIndent(indentLevel)}}`
         return pkl
