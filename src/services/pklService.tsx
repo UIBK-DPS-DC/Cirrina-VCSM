@@ -11,7 +11,7 @@ import {
     OnTransitionDescription,
     RaiseActionDescription,
     StateDescription,
-    StateMachineDescription, TransitionDescription
+    StateMachineDescription, TimeoutActionDescription, TimeoutResetActionDescription, TransitionDescription
 } from "../pkl/bindings/collaborative_state_machine_description.pkl.ts";
 import {ActionType} from "../enums.ts";
 
@@ -100,10 +100,40 @@ export default class PklService {
                 pkl += `${this.getIndent(indentLevel)}new MatchActionDescription {\n`
 
                 pkl += `${this.getIndent(indentLevel + 1)}value = "${matchDescription.value}"`
-                pkl += `${this.getIndent(indentLevel + 1)}`
+
+
+
+                pkl += `${this.getIndent(indentLevel + 1)}cases {\n`
+
+                matchDescription.cases.forEach((matchCase) => {
+                    pkl += `${this.matchCaseDescriptionToPKL(matchCase, indentLevel +2)}\n`
+                })
+                pkl  += `${this.getIndent(indentLevel + 1)}}\n`
 
                 pkl += `${this.getIndent(indentLevel)}}\n`
 
+                return pkl
+            }
+
+            case ActionType.TIMEOUT: {
+                const timeoutActionDescription = description as TimeoutActionDescription
+                pkl += `${this.getIndent(indentLevel)}new TimeoutActionDescription {\n`
+
+                pkl += `${this.getIndent(indentLevel + 1)}name = "${timeoutActionDescription.name}"\n`
+                pkl += `${this.getIndent(indentLevel + 1)}delay = "${timeoutActionDescription.delay}"\n`
+                pkl += `${this.getIndent(indentLevel + 1)}action = ${this.actionToPKL(timeoutActionDescription.action,indentLevel + 1)}\n`
+
+                pkl += `${this.getIndent(indentLevel)}}\n`
+                return pkl
+            }
+
+            case ActionType.TIMEOUT_RESET: {
+                const timeoutResetActionDescription = description as TimeoutResetActionDescription
+                pkl += `${this.getIndent(indentLevel)}new TimeoutResetActionDescription {\n`
+
+                pkl += `${this.getIndent(indentLevel + 1)}action = "${timeoutResetActionDescription.action}"`
+
+                pkl += `${this.getIndent(indentLevel)}}\n`
                 return pkl
             }
 
@@ -383,11 +413,13 @@ export default class PklService {
     public static matchCaseDescriptionToPKL(description: MatchCaseDescription, indentLevel = 0) {
         let pkl = ""
         pkl += `${this.getIndent(indentLevel)}new {\n`
-        pkl += `${this.getIndent(indentLevel + 1)}\`case\` = ${description.case}\n`
+        pkl += `${this.getIndent(indentLevel + 1)}\`case\` = "${description.case}"\n`
         pkl += `${this.getIndent(indentLevel + 1)}action = ${this.actionToPKL(description.action,indentLevel + 1)}\n`
 
 
         pkl += `${this.getIndent(indentLevel)}}\n`
+
+        return pkl
     }
 
 
