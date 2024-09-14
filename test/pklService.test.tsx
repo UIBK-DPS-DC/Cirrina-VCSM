@@ -1,10 +1,10 @@
 import Guard from "../src/classes/guard";
 import Action from "../src/classes/action";
 import PklService from "../src/services/pklService";
-import {ActionType} from "../src/enums";
+import {ActionType, EventChannel} from "../src/enums";
 import {
-    CollaborativeStateMachineDescription,
-    CreateActionDescription, GuardDescription, InvokeActionDescription,
+    CollaborativeStateMachineDescription, ContextVariableDescription,
+    CreateActionDescription, EventDescription, GuardDescription, InvokeActionDescription,
     OnTransitionDescription,
     StateDescription, StateMachineDescription, TransitionDescription
 } from "../src/pkl/bindings/collaborative_state_machine_description.pkl";
@@ -91,6 +91,41 @@ describe('Guard.toPKL', () => {
 
         }
         console.log(PklService.transitionToPKL(description));
+    })
+
+
+    it("Context", () => {
+        const contextDescription: ContextVariableDescription = {
+            name: "contextName", value: "contextValue"
+
+        }
+
+        console.log(PklService.contextToPKL(contextDescription))
+    })
+
+    it("Event", () => {
+        const contextDescription1: ContextVariableDescription = {
+            name: "contextName1", value: "contextValue1"
+
+        }
+        const contextDescription2: ContextVariableDescription = {
+            name: "contextName2", value: "contextValue2"
+
+        }
+        const contextDescription3: ContextVariableDescription = {
+            name: "contextName3", value: "contextValue3"
+
+        }
+        const eventDescription: EventDescription = {
+            channel: EventChannel.GLOBAL,
+            data: [contextDescription1,contextDescription2,contextDescription3],
+            name: "Event Name"
+
+        }
+
+        console.log(PklService.eventToPKL(eventDescription))
+
+
     })
 
     it("State", () => {

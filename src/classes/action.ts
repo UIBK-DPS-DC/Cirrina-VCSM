@@ -6,7 +6,7 @@ import {
     InvokeActionDescription,
     RaiseActionDescription
 } from "../pkl/bindings/collaborative_state_machine_description.pkl.ts";
-import {ActionProps} from "../types.ts";
+import {ActionProps, InvokeActionProps} from "../types.ts";
 ;
 
 /**
@@ -116,18 +116,17 @@ export default class Action {
 
             case ActionType.INVOKE: {
 
-                const props = this.properties as {
-                        description: string,
-                        serviceType: string,
-                        serviceLevel: string
-                    }
+                const invokeActionProps = this.properties as InvokeActionProps
+
                 const description: InvokeActionDescription = {
-                    done: [],
-                    input: [],
-                    isLocal: false,
-                    output: [],
-                    serviceType: props.serviceType,
-                    type: "invoke"
+                    done: invokeActionProps.done.map((e) => e.toDescription()),
+                    input: invokeActionProps.input.map((a) => a.toDescription()),
+                    isLocal: invokeActionProps.isLocal,
+                    output: invokeActionProps.output.map((a) =>{
+                        return {reference: a.name}
+                    }),
+                    serviceType: invokeActionProps.serviceType,
+                    type: ActionType.INVOKE
 
                 }
                 return description;

@@ -1,7 +1,7 @@
 import {
     ActionDescription,
-    AssignActionDescription, CollaborativeStateMachineDescription,
-    CreateActionDescription,
+    AssignActionDescription, CollaborativeStateMachineDescription, ContextVariableDescription,
+    CreateActionDescription, EventDescription,
     GuardDescription,
     InvokeActionDescription, OnTransitionDescription,
     RaiseActionDescription, StateDescription, StateMachineDescription
@@ -191,6 +191,28 @@ export default class PklService {
 
 
         return pkl;
+
+    }
+
+    public static contextToPKL(description: ContextVariableDescription, indentLevel = 0) {
+        let pkl = ""
+        pkl += `${this.getIndent(indentLevel)}new {\n`
+        pkl += `${this.getIndent(indentLevel + 1)}name = "${description.name}"\n`
+        pkl += `${this.getIndent(indentLevel + 1)}value = "${description.value}"\n`
+        pkl += `${this.getIndent(indentLevel)}}`
+        return pkl
+    }
+
+    public static eventToPKL(description : EventDescription, indentLevel = 0) {
+        let pkl = `${this.getIndent(indentLevel)}new {\n`
+        pkl += `${this.getIndent(indentLevel + 1)}name = "${description.name}"\n`
+        pkl += `${this.getIndent(indentLevel + 1)}data {\n`
+        description.data.forEach((context) =>{
+            pkl+= `${this.contextToPKL(context, indentLevel + 2)}\n`
+        })
+        pkl += `${this.getIndent(indentLevel + 1)}channel = "${description.channel}"\n`
+        pkl += `${this.getIndent(indentLevel)}}`
+        return pkl
 
     }
 
