@@ -50,15 +50,6 @@ describe('Guard.toPKL', () => {
         console.log(PklService.actionToPKL(action.toDescription()));
     })
 
-    it("Invoke Action",()=>{
-        const action = new Action("Test", ActionType.INVOKE)
-        action.properties = {
-            description: "description",
-            serviceType: "Type",
-            serviceLevel: "Service Level"
-        }
-        console.log(PklService.actionToPKL(action.toDescription()));
-    })
 
     it("Create Action", ()=> {
         const action = new Action("Test", ActionType.CREATE);
@@ -99,7 +90,7 @@ describe('Guard.toPKL', () => {
             actions: [action1.toDescription(),action2.toDescription()], else: "", event: "Event a", guards: [guard1.toDescription(),guard2.toDescription()], target: "Target State"
 
         }
-        console.log(PklService.transitionToPKL(description));
+        console.log(PklService.transitionDescriptionToPKL(description));
     })
 
 
