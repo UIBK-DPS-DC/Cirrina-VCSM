@@ -100,7 +100,7 @@ describe('Guard.toPKL', () => {
 
         }
 
-        console.log(PklService.contextVariableDescriptionToPKL(contextVariableDescription))
+        console.log(PklService.contextVariableDescriptionToPKL(contextVariableDescription,0,false))
     })
 
     it ("Context Description", () => {

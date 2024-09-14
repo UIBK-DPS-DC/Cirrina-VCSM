@@ -17,7 +17,7 @@ import {ActionType} from "../enums.ts";
 
 export default class PklService {
     public static guardToPKL(description: GuardDescription, indentLevel = 0){
-        let pkl =`${this.getIndent(indentLevel)}new {\n`;
+        let pkl =`${this.getIndent(indentLevel)}new GuardDescription {\n`;
         pkl+= `${this.getIndent(indentLevel + 1)}expression = "${description.expression}"\n`
         pkl+= `${this.getIndent(indentLevel)}}\n`
         return pkl
@@ -185,7 +185,7 @@ export default class PklService {
         pkl += `${this.getIndent(indentLevel + 1)}}\n`
 
 
-        if(description.always){
+        if(description.always.length > 0){
             pkl += `${this.getIndent(indentLevel + 1)}always {\n`
 
             description.always.forEach((transition) =>{
@@ -197,19 +197,19 @@ export default class PklService {
 
 
 
-        if(description.localContext){
+        if(description.localContext.variables.length > 0){
             pkl += `${this.getIndent(indentLevel + 1)}localContext {\n`
             pkl +=  `${this.contextDescriptionToPKL(description.localContext, indentLevel +2)}\n`
             pkl += `${this.getIndent(indentLevel + 1)}}\n`
         }
 
-        if(description.persistentContext){
+        if(description.persistentContext.variables.length > 0){
             pkl += `${this.getIndent(indentLevel + 1)}persistentContext {\n`
             pkl +=  `${this.contextDescriptionToPKL(description.persistentContext, indentLevel +2)}\n`
             pkl += `${this.getIndent(indentLevel + 1)}}\n`
         }
 
-        if(description.staticContext){
+        if(description.staticContext.variables.length > 0){
             pkl += `${this.getIndent(indentLevel + 1)}staticContext {\n`
             pkl +=  `${this.contextDescriptionToPKL(description.staticContext, indentLevel +2)}\n`
             pkl += `${this.getIndent(indentLevel + 1)}}\n`
@@ -238,13 +238,13 @@ export default class PklService {
         })
         pkl += `${this.getIndent(indentLevel + 1)}}\n`
 
-        if(description.localContext){
+        if(description.localContext && description.localContext.variables.length > 0){
             pkl += `${this.getIndent(indentLevel + 1)}localContext {\n`
             pkl +=  `${this.contextDescriptionToPKL(description.localContext, indentLevel +2)}\n`
             pkl += `${this.getIndent(indentLevel + 1)}}\n`
         }
 
-        if(description.persistentContext){
+        if(description.persistentContext && description.persistentContext.variables.length > 0){
             pkl += `${this.getIndent(indentLevel + 1)}persistentContext {\n`
             pkl +=  `${this.contextDescriptionToPKL(description.persistentContext, indentLevel +2)}\n`
             pkl += `${this.getIndent(indentLevel + 1)}}\n`
@@ -271,13 +271,13 @@ export default class PklService {
         })
         pkl += `${this.getIndent(indentLevel + 1)}}\n`
 
-        if(description.localContext){
+        if(description.localContext && description.localContext.variables.length > 0){
             pkl += `${this.getIndent(indentLevel + 1)}localContext {\n`
             pkl +=  `${this.contextDescriptionToPKL(description.localContext, indentLevel +2)}\n`
             pkl += `${this.getIndent(indentLevel + 1)}}\n`
         }
 
-        if(description.persistentContext){
+        if(description.persistentContext && description.persistentContext.variables.length > 0){
             pkl += `${this.getIndent(indentLevel + 1)}persistentContext {\n`
             pkl +=  `${this.contextDescriptionToPKL(description.persistentContext, indentLevel +2)}\n`
             pkl += `${this.getIndent(indentLevel + 1)}}\n`
@@ -290,7 +290,7 @@ export default class PklService {
 
     public static contextVariableDescriptionToPKL(description: ContextVariableDescription, indentLevel = 0, isNew: boolean): string {
         let pkl = ""
-        pkl += `${this.getIndent(indentLevel)}"${isNew? "new" : "variable"}" {\n`
+        pkl += `${this.getIndent(indentLevel)} ${isNew? "new" : "variable"} {\n`
         pkl += `${this.getIndent(indentLevel + 1)}name = "${description.name}"\n`
         pkl += `${this.getIndent(indentLevel + 1)}value = "${description.value}"\n`
         pkl += `${this.getIndent(indentLevel)}}\n`
