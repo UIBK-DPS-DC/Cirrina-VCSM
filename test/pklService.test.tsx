@@ -3,11 +3,12 @@ import Action from "../src/classes/action";
 import PklService from "../src/services/pklService";
 import {ActionType, EventChannel} from "../src/enums";
 import {
-    CollaborativeStateMachineDescription, ContextVariableDescription,
+    CollaborativeStateMachineDescription, ContextVariableDescription, ContextVariableReferenceDescription,
     CreateActionDescription, EventDescription, GuardDescription, InvokeActionDescription,
     OnTransitionDescription,
     StateDescription, StateMachineDescription, TransitionDescription
 } from "../src/pkl/bindings/collaborative_state_machine_description.pkl";
+import {InvokeActionProps} from "../src/types";
 
 describe('Guard.toPKL', () => {
 
@@ -43,6 +44,10 @@ describe('Guard.toPKL', () => {
 
     it("Invoke Action",()=>{
         const action = new Action("Test", ActionType.INVOKE)
+        const invokeProps: InvokeActionProps = {
+            done: [], input: [], isLocal: false, output: [], serviceType: undefined, type: undefined
+
+        }
         action.properties = {
             description: "description",
             serviceType: "Type",
@@ -101,6 +106,15 @@ describe('Guard.toPKL', () => {
         }
 
         console.log(PklService.contextToPKL(contextDescription))
+    })
+
+    it("ContextReference", () => {
+        const contextReferenceDescription: ContextVariableReferenceDescription = {
+            reference: "example"
+
+        }
+
+        console.log(PklService.contextReferenceToPKL(contextReferenceDescription));
     })
 
     it("Event", () => {
