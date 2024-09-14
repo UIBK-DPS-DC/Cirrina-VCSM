@@ -219,7 +219,11 @@ export default class PklService {
             pkl += `${this.getIndent(indentLevel + 1)}}\n`
         }
 
-        pkl += `${this.getIndent(indentLevel + 1)}persistentContext {}\n`
+        if(description.persistentContext){
+            pkl += `${this.getIndent(indentLevel + 1)}persistentContext {\n`
+            pkl +=  `${this.contextDescriptionToPKL(description.persistentContext, indentLevel +2)}\n`
+            pkl += `${this.getIndent(indentLevel + 1)}}\n`
+        }
 
 
         return pkl;
