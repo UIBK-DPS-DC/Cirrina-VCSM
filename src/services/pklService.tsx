@@ -15,6 +15,11 @@ import {
 } from "../pkl/bindings/collaborative_state_machine_description.pkl.ts";
 import {ActionType} from "../enums.ts";
 
+
+const PKL_URL = "https://raw.githubusercontent.com/UIBK-DPS-DC/Cirrina-Specifications/main/pkl/CollaborativeStateMachineDescription.pkl"
+
+
+
 export default class PklService {
     public static guardToPKL(description: GuardDescription, indentLevel = 0){
         let pkl =`${this.getIndent(indentLevel)}new GuardDescription {\n`;
@@ -262,14 +267,17 @@ export default class PklService {
 
     public static collaborativeStateMachineToPKL(description: CollaborativeStateMachineDescription, indentLevel = 0) {
         let pkl = ""
-        pkl += `${this.getIndent(indentLevel + 1)}name = "${description.name}"\n`
-        pkl += `${this.getIndent(indentLevel + 1)}version = "${description.version}"\n`
+        pkl += `${this.getIndent(indentLevel)}amends "${PKL_URL}"\n`
+        pkl += `${this.getIndent(indentLevel)}import "${PKL_URL}"\n`
+        pkl += `${this.getIndent(indentLevel)}\n\n\n`
+        pkl += `${this.getIndent(indentLevel)}name = "${description.name}"\n`
+        pkl += `${this.getIndent(indentLevel)}version = "${description.version}"\n`
 
-        pkl += `${this.getIndent(indentLevel + 1)}stateMachines {\n`
+        pkl += `${this.getIndent(indentLevel)}stateMachines {\n`
         description.stateMachines.forEach((stateMachine) =>{
-            pkl += `${this.stateMachineToPKL(stateMachine, indentLevel +2)}\n`
+            pkl += `${this.stateMachineToPKL(stateMachine, indentLevel +1)}\n`
         })
-        pkl += `${this.getIndent(indentLevel + 1)}}\n`
+        pkl += `${this.getIndent(indentLevel)}}\n`
 
         if(description.localContext && description.localContext.variables.length > 0){
             pkl += `${this.getIndent(indentLevel + 1)}localContext {\n`
