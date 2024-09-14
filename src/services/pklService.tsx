@@ -162,10 +162,30 @@ export default class PklService {
         })
         pkl += `${this.getIndent(indentLevel + 1)}}\n`
 
-        pkl += `${this.getIndent(indentLevel + 1)}always {}\n`
 
-        pkl += `${this.getIndent(indentLevel + 1)}localContext {}\n`
-        pkl += `${this.getIndent(indentLevel + 1)}staticContext {}\n`
+        if(description.always){
+            // TODO
+        }
+
+
+
+        if(description.localContext){
+            pkl += `${this.getIndent(indentLevel + 1)}localContext {\n`
+            pkl +=  `${this.contextDescriptionToPKL(description.localContext, indentLevel +2)}\n`
+            pkl += `${this.getIndent(indentLevel + 1)}}\n`
+        }
+
+        if(description.persistentContext){
+            pkl += `${this.getIndent(indentLevel + 1)}persistentContext {\n`
+            pkl +=  `${this.contextDescriptionToPKL(description.persistentContext, indentLevel +2)}\n`
+            pkl += `${this.getIndent(indentLevel + 1)}}\n`
+        }
+
+        if(description.staticContext){
+            pkl += `${this.getIndent(indentLevel + 1)}staticContext {\n`
+            pkl +=  `${this.contextDescriptionToPKL(description.staticContext, indentLevel +2)}\n`
+            pkl += `${this.getIndent(indentLevel + 1)}}\n`
+        }
         pkl += `${this.getIndent(indentLevel)}}\n`
 
 
@@ -245,7 +265,7 @@ export default class PklService {
         pkl += `${this.getIndent(indentLevel)}new {\n`
         pkl += `${this.getIndent(indentLevel + 1)}name = "${description.name}"\n`
         pkl += `${this.getIndent(indentLevel + 1)}value = "${description.value}"\n`
-        pkl += `${this.getIndent(indentLevel)}}`
+        pkl += `${this.getIndent(indentLevel)}}\n`
         return pkl
     }
 
@@ -258,7 +278,7 @@ export default class PklService {
         })
         pkl += `${this.getIndent(indentLevel + 1)}}\n`
         pkl += `${this.getIndent(indentLevel + 1)}channel = "${description.channel}"\n`
-        pkl += `${this.getIndent(indentLevel)}}`
+        pkl += `${this.getIndent(indentLevel)}}\n`
         return pkl
 
     }
@@ -267,7 +287,7 @@ export default class PklService {
         let pkl = ""
         pkl += `${this.getIndent(indentLevel)}new {\n`
         pkl += `${this.getIndent(indentLevel + 1)}reference = "${description.reference}"\n`
-        pkl += `${this.getIndent(indentLevel)}}`
+        pkl += `${this.getIndent(indentLevel)}}\n`
         return pkl;
     }
 
@@ -278,8 +298,49 @@ export default class PklService {
             pkl += `${this.contextVariableDescriptionToPKL(variable, indentLevel +2)}\n`
         })
 
-        pkl += `${this.getIndent(indentLevel)}}`
+        pkl += `${this.getIndent(indentLevel)}}\n`
         return pkl;
+    }
+
+    public static onTransitionDescriptionToPKL (description: OnTransitionDescription, indentLevel = 0) {
+        let pkl = ""
+        pkl += `${this.getIndent(indentLevel)} new {\n`
+
+        pkl += `${this.getIndent(indentLevel + 1)}event = "${description.event}"\n`
+
+        if(description.target){
+            pkl += `${this.getIndent(indentLevel + 1)}target = "${description.target}"\n`
+        }
+
+        if(description.guards.length > 0){
+            pkl+= `${this.getIndent(indentLevel + 1)}guards {\n`
+
+            description.guards.forEach((guard) => {
+                pkl+= `${this.guardToPKL(guard, indentLevel +2)}\n`
+            })
+
+            pkl+= `${this.getIndent(indentLevel + 1)}}\n`
+
+        }
+
+        if(description.actions.length > 0) {
+            pkl += `${this.getIndent(indentLevel + 1)}actions {\n`
+
+            description.actions.forEach((action) => {
+                pkl+= `${this.actionToPKL(action, indentLevel +2)}\n`
+            })
+
+            pkl += `${this.getIndent(indentLevel + 1)}}\n`
+        }
+
+        if(description.else){
+            pkl += `${this.getIndent(indentLevel + 1)}else = "${description.else}"\n`
+        }
+
+
+        pkl+= `${this.getIndent(indentLevel)}}\n`
+        return pkl
+
     }
 
 

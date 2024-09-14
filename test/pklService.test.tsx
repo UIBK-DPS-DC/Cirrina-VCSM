@@ -170,6 +170,18 @@ describe('Guard.toPKL', () => {
 
     })
 
+    it ("onTransitionDescription", () => {
+        const onTransitionDescription: OnTransitionDescription = {
+            actions: [],
+            else: "Else",
+            event: "Event a",
+            guards: [],
+            target: ""
+        }
+
+        console.log(PklService.onTransitionDescriptionToPKL(onTransitionDescription));
+    })
+
     it("State", () => {
         const actionDescription1: InvokeActionDescription = {
             done: [], input: [], isLocal: false, output: [], serviceType: "Service type",
