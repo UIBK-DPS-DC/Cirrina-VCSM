@@ -3,12 +3,20 @@ import Action from "../src/classes/action";
 import PklService from "../src/services/pklService";
 import {ActionType, EventChannel} from "../src/enums";
 import {
-    CollaborativeStateMachineDescription, ContextVariableDescription, ContextVariableReferenceDescription,
-    CreateActionDescription, EventDescription, GuardDescription, InvokeActionDescription,
+    CollaborativeStateMachineDescription,
+    ContextDescription,
+    ContextVariableDescription,
+    ContextVariableReferenceDescription,
+    CreateActionDescription,
+    EventDescription,
+    GuardDescription,
+    InvokeActionDescription,
     OnTransitionDescription,
-    StateDescription, StateMachineDescription, TransitionDescription
+    StateDescription,
+    StateMachineDescription,
+    TransitionDescription
 } from "../src/pkl/bindings/collaborative_state_machine_description.pkl";
-import {InvokeActionProps} from "../src/types";
+
 
 describe('Guard.toPKL', () => {
 
@@ -44,10 +52,6 @@ describe('Guard.toPKL', () => {
 
     it("Invoke Action",()=>{
         const action = new Action("Test", ActionType.INVOKE)
-        const invokeProps: InvokeActionProps = {
-            done: [], input: [], isLocal: false, output: [], serviceType: undefined, type: undefined
-
-        }
         action.properties = {
             description: "description",
             serviceType: "Type",
@@ -100,13 +104,37 @@ describe('Guard.toPKL', () => {
 
 
     it("Context", () => {
-        const contextDescription: ContextVariableDescription = {
+        const contextVariableDescription: ContextVariableDescription = {
             name: "contextName", value: "contextValue"
 
         }
 
-        console.log(PklService.contextToPKL(contextDescription))
+        console.log(PklService.contextVariableDescriptionToPKL(contextVariableDescription))
     })
+
+    it ("Context Description", () => {
+        const contextVariableDescription1: ContextVariableDescription = {
+            name: "contextName2", value: "contextValue2"
+
+        }
+        const contextVariableDescription2: ContextVariableDescription = {
+            name: "contextName2", value: "contextValue2"
+
+        }
+
+        const contextVariableDescription3: ContextVariableDescription = {
+            name: "contextName3", value: "contextValue3"
+
+        }
+        const contextDescription: ContextDescription = {
+            variables: [contextVariableDescription1, contextVariableDescription2, contextVariableDescription3]
+
+        }
+
+        console.log(PklService.contextDescriptionToPKL(contextDescription))
+    })
+
+
 
     it("ContextReference", () => {
         const contextReferenceDescription: ContextVariableReferenceDescription = {

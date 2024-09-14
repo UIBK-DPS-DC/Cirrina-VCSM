@@ -1,7 +1,7 @@
 import {
     ActionDescription,
     AssignActionDescription,
-    CollaborativeStateMachineDescription,
+    CollaborativeStateMachineDescription, ContextDescription,
     ContextVariableDescription,
     ContextVariableReferenceDescription,
     CreateActionDescription,
@@ -76,7 +76,7 @@ export default class PklService {
 
                 pkl += `${this.getIndent(indentLevel + 1)}input {\n`
                 invokeDescription.input.forEach(context => {
-                    pkl += `${this.contextToPKL(context, indentLevel +2)}\n`
+                    pkl += `${this.contextVariableDescriptionToPKL(context, indentLevel +2)}\n`
                 })
                 pkl += `${this.getIndent(indentLevel + 1)}}\n`
 
@@ -212,7 +212,13 @@ export default class PklService {
             pkl += `${this.stateMachineToPKL(stateMachine, indentLevel +2)}\n`
         })
         pkl += `${this.getIndent(indentLevel + 1)}}\n`
-        pkl += `${this.getIndent(indentLevel + 1)}localContext {}\n`
+
+        if(description.localContext){
+            pkl += `${this.getIndent(indentLevel + 1)}localContext {\n`
+            pkl +=  `${this.contextDescriptionToPKL(description.localContext, indentLevel +2)}\n`
+            pkl += `${this.getIndent(indentLevel + 1)}}\n`
+        }
+
         pkl += `${this.getIndent(indentLevel + 1)}persistentContext {}\n`
 
 
@@ -220,7 +226,7 @@ export default class PklService {
 
     }
 
-    public static contextToPKL(description: ContextVariableDescription, indentLevel = 0) {
+    public static contextVariableDescriptionToPKL(description: ContextVariableDescription, indentLevel = 0) {
         let pkl = ""
         pkl += `${this.getIndent(indentLevel)}new {\n`
         pkl += `${this.getIndent(indentLevel + 1)}name = "${description.name}"\n`
@@ -234,7 +240,7 @@ export default class PklService {
         pkl += `${this.getIndent(indentLevel + 1)}name = "${description.name}"\n`
         pkl += `${this.getIndent(indentLevel + 1)}data {\n`
         description.data.forEach((context) =>{
-            pkl+= `${this.contextToPKL(context, indentLevel + 2)}\n`
+            pkl+= `${this.contextVariableDescriptionToPKL(context, indentLevel + 2)}\n`
         })
         pkl += `${this.getIndent(indentLevel + 1)}}\n`
         pkl += `${this.getIndent(indentLevel + 1)}channel = "${description.channel}"\n`
@@ -247,6 +253,17 @@ export default class PklService {
         let pkl = ""
         pkl += `${this.getIndent(indentLevel)}new {\n`
         pkl += `${this.getIndent(indentLevel + 1)}reference = "${description.reference}"\n`
+        pkl += `${this.getIndent(indentLevel)}}`
+        return pkl;
+    }
+
+    public static contextDescriptionToPKL(description: ContextDescription, indentLevel = 0) {
+        let pkl = ""
+        pkl += `${this.getIndent(indentLevel)}variables {\n`
+        description.variables.forEach((variable) => {
+            pkl += `${this.contextVariableDescriptionToPKL(variable, indentLevel +2)}\n`
+        })
+
         pkl += `${this.getIndent(indentLevel)}}`
         return pkl;
     }
