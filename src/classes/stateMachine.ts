@@ -117,11 +117,11 @@ export default class StateMachine implements StateOrStateMachine {
 
     public toDescription():StateMachineDescription {
         const description: StateMachineDescription = {
-            localContext: null,
+            localContext: {variables: this.localContext.map((v) => v.toDescription())},
             name: this.name,
-            persistentContext: null,
-            stateMachines: this.getAllStateMachines().map((sm) => {return sm.toDescription()}),
-            states: this.getAllStates().map((s) => {return s.toDescription()}),
+            persistentContext: {variables: this.persistentContext.map((v) => v.toDescription())},
+            stateMachines: this.getAllStateMachines().map((sm) =>  sm.toDescription()),
+            states: this.getAllStates().map((s) => s.toDescription()),
 
         }
         return description;

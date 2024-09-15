@@ -1,4 +1,5 @@
 import Action from "./action.ts";
+import {MatchCaseDescription} from "../pkl/bindings/collaborative_state_machine_description.pkl.ts";
 
 export default class MatchCase {
 
@@ -25,6 +26,19 @@ export default class MatchCase {
 
     set action(value: Action) {
         this._action = value;
+    }
+
+
+    public toDescription(): MatchCaseDescription {
+        const description: MatchCaseDescription = {
+            action: this.action,
+            case: this.expression
+
+        }
+
+        return description
+
+
     }
 
 

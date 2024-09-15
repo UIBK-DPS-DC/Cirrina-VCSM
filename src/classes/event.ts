@@ -48,6 +48,8 @@ export default class Event {
     }
 
     public toDescription(): EventDescription {
+        console.log("ENTERING")
+        console.log(this.name);
         return {
             channel: this.channel,
             data: this._data,

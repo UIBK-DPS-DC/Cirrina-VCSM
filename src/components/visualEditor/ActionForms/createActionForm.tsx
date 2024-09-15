@@ -85,7 +85,8 @@ export default function CreateActionForm(props: {action: Action | undefined,
     }, [variableToBeCreated]);
 
     useEffect(() => {
-        console.log(`Creating ${variableToBeCreated.toString()}`);
+        console.log(`Creating ${variableToBeCreated[0] ? variableToBeCreated[0].name : ""}`);
+
     }, [variableToBeCreated, setVariableToBeCreated]);
 
 
