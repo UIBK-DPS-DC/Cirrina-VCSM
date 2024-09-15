@@ -1,12 +1,22 @@
 import {ActionType} from "../enums.ts";
 import ContextVariable from "./contextVariable.tsx";
 import {
-    ActionDescription, AssignActionDescription, CreateActionDescription,
-    EventDescription,
+    ActionDescription,
+    AssignActionDescription,
+    CreateActionDescription,
     InvokeActionDescription,
-    RaiseActionDescription
+    MatchActionDescription,
+    RaiseActionDescription, TimeoutActionDescription, TimeoutResetActionDescription
 } from "../pkl/bindings/collaborative_state_machine_description.pkl.ts";
-import {ActionProps, InvokeActionProps} from "../types.ts";
+import {
+    ActionProps,
+    AssignActionProps,
+    CreateActionProps,
+    InvokeActionProps,
+    MatchActionProps,
+    RaiseEventActionProps, TimeoutActionProps, TimeoutResetActionProps
+} from "../types.ts";
+
 ;
 
 /**
@@ -103,22 +113,24 @@ export default class Action {
     public toDescription():ActionDescription {
         switch(this.type){
             case ActionType.RAISE_EVENT: {
-                const props = this.properties as {event: string}
-                const eventDescription: EventDescription = {
-                    channel: "global", data: [], name: props.event
+               const raiseEventProps = this.properties as RaiseEventActionProps;
 
-                }
-                const description: RaiseActionDescription = {
-                    event: eventDescription, type: "raise"
-                }
-                return description;
+               const raiseEventDescription: RaiseActionDescription  = {
+                   event: raiseEventProps.event.toDescription(),
+                   type: ActionType.RAISE_EVENT,
+               }
+
+
+               return raiseEventDescription
             }
+
+
 
             case ActionType.INVOKE: {
 
                 const invokeActionProps = this.properties as InvokeActionProps
 
-                const description: InvokeActionDescription = {
+                const invokeActionDescription: InvokeActionDescription = {
                     done: invokeActionProps.done.map((e) => e.toDescription()),
                     input: invokeActionProps.input.map((a) => a.toDescription()),
                     isLocal: invokeActionProps.isLocal,
@@ -129,31 +141,73 @@ export default class Action {
                     type: ActionType.INVOKE
 
                 }
-                return description;
+                return invokeActionDescription;
             }
             case ActionType.CREATE: {
-                const props = this.properties as {
-                    description: string,
-                    variable: string,
-                    value: string,
-                    isPersistent: boolean
-                }
 
-                const description: CreateActionDescription = {
-                    isPersistent: props.isPersistent , type: "create", variable: {name: props.variable, value: props.value}
 
-                }
-                return description;
+              const createActionProps = this.properties as CreateActionProps
+              const createActionDescription: CreateActionDescription = {
+                  isPersistent: createActionProps.isPersistent,
+                  type: ActionType.CREATE,
+                  variable: createActionProps.variable.toDescription()
+
+              }
+
+              return createActionDescription
+
+
             }
 
             case ActionType.ASSIGN: {
-                const props = this.properties as {variable: string, value: string}
-                const description: AssignActionDescription = {
-                    type: "assign", variable: {name: props.variable, value: props.value}
+                const assignActionProps = this.properties as AssignActionProps
+
+                const assignActionDescription: AssignActionDescription = {
+                    type: ActionType.ASSIGN,
+                    variable: assignActionProps.variable.toDescription()
+                }
+
+                return assignActionDescription
+            }
+
+            case ActionType.MATCH: {
+                const matchActionProps = this.properties as MatchActionProps
+
+                const matchActionDescription: MatchActionDescription = {
+                    cases: matchActionProps.cases.map((c) => c.toDescription()),
+                    type: matchActionProps.type,
+                    value: matchActionProps.value,
 
                 }
-                return description;
+
+                return matchActionDescription
             }
+
+            case ActionType.TIMEOUT: {
+                const timeoutActionProps =  this.properties as TimeoutActionProps
+
+                const timeOutActionDescription: TimeoutActionDescription = {
+                    action: timeoutActionProps.action.toDescription(),
+                    delay: timeoutActionProps.delay,
+                    name: timeoutActionProps.name,
+                    type: ActionType.TIMEOUT
+
+                }
+
+                return timeOutActionDescription
+            }
+
+            case ActionType.TIMEOUT_RESET: {
+                const timeoutResetActionProps = this.properties as TimeoutResetActionProps
+
+                const timeOutResetActionDescription: TimeoutResetActionDescription = {
+                    action: timeoutResetActionProps.action.name,
+                    type: ActionType.TIMEOUT_RESET
+                }
+                return timeOutResetActionDescription
+            }
+
+
             default: {
                 // TODO: HANDLE OTHER TYPES.
                 return {type: "lock"}

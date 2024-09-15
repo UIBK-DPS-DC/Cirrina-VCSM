@@ -224,18 +224,18 @@ export default class State implements StateOrStateMachine {
 
     public toDescription(): StateDescription {
         const description: StateDescription = {
-            after: [],
-            always: [],
+            after: this.after.map((action) => action.toDescription()),
+            always: this.always.map((transition) => transition.toDescription()),
             entry: this.entry.map((action) => action.toDescription()),
             exit: this.exit.map((action) => action.toDescription()),
             initial: this.initial,
-            localContext: { variables: [] },
+            localContext: { variables: this.localContext.map((v) => v.toDescription()) },
             name: this.name,
             on: this.on.map((transition) => transition.toDescription()),
-            persistentContext: { variables: [] },
-            staticContext: { variables: [] },
+            persistentContext: { variables: this.persistentContext.map((v) => v.toDescription()) },
+            staticContext: { variables: this.staticContext.map((v) => v.toDescription() ) },
             terminal: this.terminal,
-            while: []
+            while: this.while.map((action) => action.toDescription())
         };
 
         return description;
