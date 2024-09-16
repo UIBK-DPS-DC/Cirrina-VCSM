@@ -379,7 +379,8 @@ export default function Flow() {
                 type: 'csm-edge',
                 markerEnd: {type: MarkerType.Arrow},
                 markerStart:{type: MarkerType.Arrow},
-                data: {transition: newTransition}
+                data: {transition: newTransition},
+                zIndex: 1
 
             }
 
