@@ -360,6 +360,19 @@ export default function Flow() {
 
     const onNodeContextMenu = useCallback((event: React.MouseEvent, node: Node<CsmNodeProps>) => {
         event.preventDefault();
+
+        if(isState(node.data)){
+            const newEdge: Edge<CsmEdgeProps> = {
+                id: getNewEdgeId(), source: node.id , sourceHandle: "s", target: node.id, targetHandle: "t", markerEnd: {type: MarkerType.Arrow}, markerStart:{type: MarkerType.Arrow}
+
+            }
+
+            setEdges((prevs) => [...prevs, newEdge]);
+            return
+
+        }
+
+
         const connectedEdges: Edge<CsmEdgeProps>[] = [];
         setNodes((prevNodes) => {
             const descendants = getAllDescendants(node);
