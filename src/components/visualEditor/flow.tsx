@@ -362,12 +362,28 @@ export default function Flow() {
         event.preventDefault();
 
         if(isState(node.data)){
+            const connection: Connection = {
+                source: node.id, sourceHandle: "s", target: node.id, targetHandle: "t"
+
+            }
+            const newTransition = transitionService.connectionToTransition(connection);
+
+            if(!newTransition) {
+                return;
+            }
+
+
             const newEdge: Edge<CsmEdgeProps> = {
-                id: getNewEdgeId(), source: node.id , sourceHandle: "s", target: node.id, targetHandle: "t", markerEnd: {type: MarkerType.Arrow}, markerStart:{type: MarkerType.Arrow}
+                id: getNewEdgeId(),
+                ...connection,
+                type: 'csm-edge',
+                markerEnd: {type: MarkerType.Arrow},
+                markerStart:{type: MarkerType.Arrow},
+                data: {transition: newTransition}
 
             }
 
-            setEdges((prevs) => [...prevs, newEdge]);
+            setEdges(eds => addEdge(newEdge, eds));
             return
 
         }
@@ -438,6 +454,7 @@ export default function Flow() {
 
     const onEdgeClick = useCallback(
         (_: React.MouseEvent, edge: Edge<CsmEdgeProps>) => {
+            console.log("JO")
             if (selectedNode) {
                 setSelectedNode(null);
             }

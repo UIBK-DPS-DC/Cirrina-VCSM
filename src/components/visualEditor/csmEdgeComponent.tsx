@@ -12,6 +12,8 @@ export default function CsmEdge({
                                     targetX,
                                     targetY,
                                     markerEnd,
+                                    target,
+                                    source,
                                     data,
 
                                 }: EdgeProps<TransitionEdge>) {
@@ -40,28 +42,49 @@ export default function CsmEdge({
         setInfoString(generateInfoString(data?.transition))
     }, [edges,setEdges]);
 
+
+    const radiusX = (sourceX - targetX) * 0.8;
+    const radiusY = 30;
+    const internalPath = `M ${sourceX - 5} ${sourceY + 3} A ${radiusX} ${radiusY} 0 1 0 ${
+        targetX + 2
+    } ${targetY}`;
+
+
+
     return (
         <>
-            <BaseEdge id={id} path={edgePath} markerEnd={markerEnd} />
-            <EdgeLabelRenderer>
-                {selectedEdge?.id === id && infoString && (
-                    <div
-                        style={{
-                            position: 'absolute',
-                            transform: `translate(-50%, -100%) translate(${targetX}px,${targetY}px)`,
-                            background: '#34c9eb',
-                            padding: 10,
-                            borderRadius: 5,
-                            fontSize: 12,
-                            fontWeight: 500,
-                        }}
-                        className="nodrag nopan"
-                    >
-                        {infoString}
-                    </div>
-                )}
+            {target !== source && (
+                <>
+                    <BaseEdge id={id} path={edgePath} markerEnd={markerEnd} />
+                    <EdgeLabelRenderer>
+                        {selectedEdge?.id === id && infoString && (
+                            <div
+                                style={{
+                                    position: 'absolute',
+                                    transform: `translate(-50%, -100%) translate(${targetX}px,${targetY}px)`,
+                                    background: '#34c9eb',
+                                    padding: 10,
+                                    borderRadius: 5,
+                                    fontSize: 12,
+                                    fontWeight: 500,
+                                }}
+                                className="nodrag nopan"
+                            >
+                                {infoString}
+                            </div>
+                        )}
 
-            </EdgeLabelRenderer>
+                    </EdgeLabelRenderer>
+                </>
+            ) || (
+                <path
+                    id={id}
+                    className="react-flow__edge-path"
+                    d={internalPath}
+                    markerEnd={markerEnd}
+                />
+            )}
+
         </>
     );
 
