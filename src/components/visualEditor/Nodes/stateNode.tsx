@@ -15,9 +15,9 @@ export function StateNode ({data}: NodeProps<StateNode>) {
 
     return (
         <div className="react-flow__node-default">
-            <Handle type={"target"} position={Position.Top}/>
+            <Handle type={"target"} position={Position.Top} id={"a"}/>
             {data.state.name && <div>{data.state.name}</div>}
-            <Handle type={"source"} position={Position.Bottom}/>
+            <Handle type={"source"} position={Position.Bottom} id={"b"}/>
         </div>
     );
 }
