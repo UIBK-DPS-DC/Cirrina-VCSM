@@ -1,4 +1,4 @@
-import React, { useCallback, useContext } from 'react';
+import React, {useCallback, useContext} from 'react';
 import {
     addEdge,
     Background,
@@ -6,30 +6,26 @@ import {
     ConnectionLineType,
     Controls,
     Edge,
+    MarkerType,
     MiniMap,
     Node,
     type NodeTypes,
     type OnConnect,
     ReactFlow,
-    useReactFlow, useUpdateNodeInternals
+    useReactFlow,
+    useUpdateNodeInternals
 } from '@xyflow/react';
 
 import '@xyflow/react/dist/style.css';
-import { StateNode } from "./Nodes/stateNode.tsx";
-import { StateMachineNode } from "./Nodes/stateMachineNode.tsx";
-import {
-    CsmEdgeProps,
-    CsmNodeProps,
-    isState,
-    isStateMachine,
-    ReactFlowContextProps
-} from "../../types.ts";
+import {StateNode} from "./Nodes/stateNode.tsx";
+import {StateMachineNode} from "./Nodes/stateMachineNode.tsx";
+import {CsmEdgeProps, CsmNodeProps, isState, isStateMachine, ReactFlowContextProps} from "../../types.ts";
 
 import StateMachine from "../../classes/stateMachine.ts";
 import State from "../../classes/state.ts";
 import CsmEdge from "./csmEdgeComponent.tsx";
 import {getAllStateNamesInExtent, getParentNode, ReactFlowContext} from "../../utils.tsx";
-import { NO_PARENT } from "../../services/stateOrStateMachineService.tsx";
+import {NO_PARENT} from "../../services/stateOrStateMachineService.tsx";
 
 const nodeTypes = {
     'state-node': StateNode,
@@ -173,7 +169,10 @@ export default function Flow() {
         (connection: Connection) => {
             const newTransition = transitionService.connectionToTransition(connection);
             if (newTransition) {
-                const edge: Edge<CsmEdgeProps> = { id: getNewEdgeId(), ...connection, type: 'csm-edge', data: { transition: newTransition }, zIndex: 1 };
+                const edge: Edge<CsmEdgeProps> = { id: getNewEdgeId(),
+                    ...connection,
+                    type: 'csm-edge',
+                    data: { transition: newTransition }, zIndex: 1, markerEnd: {type: MarkerType.ArrowClosed}};
                 setEdges(eds => addEdge(edge, eds));
             }
         },

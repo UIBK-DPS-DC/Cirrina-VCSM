@@ -1,4 +1,4 @@
-import {BaseEdge, EdgeLabelRenderer, type EdgeProps, getSmoothStepPath} from '@xyflow/react';
+import {BaseEdge, EdgeLabelRenderer, type EdgeProps, getBezierPath, MarkerType} from '@xyflow/react';
 
 import {ReactFlowContextProps, TransitionEdge} from "../../types.ts";
 import {useContext, useEffect, useState} from "react";
@@ -11,10 +11,11 @@ export default function CsmEdge({
                                     sourceY,
                                     targetX,
                                     targetY,
+                                    markerEnd,
                                     data,
 
                                 }: EdgeProps<TransitionEdge>) {
-    const [edgePath] = getSmoothStepPath({ sourceX, sourceY, targetX, targetY });
+    const [edgePath] = getBezierPath({ sourceX, sourceY, targetX, targetY });
     const [infoString,setInfoString] = useState<string>("");
 
     const context = useContext(ReactFlowContext) as ReactFlowContextProps;
@@ -41,7 +42,7 @@ export default function CsmEdge({
 
     return (
         <>
-            <BaseEdge id={id} path={edgePath} />
+            <BaseEdge id={id} path={edgePath} markerEnd={markerEnd} />
             <EdgeLabelRenderer>
                 {selectedEdge?.id === id && infoString && (
                     <div
