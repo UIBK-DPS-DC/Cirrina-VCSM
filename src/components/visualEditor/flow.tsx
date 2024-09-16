@@ -1,22 +1,22 @@
-import React, { useCallback, useContext} from 'react';
+import React, { useCallback, useContext } from 'react';
 import {
     addEdge,
     Background,
     Connection,
     ConnectionLineType,
     Controls,
-    Edge,
+    Edge, getConnectedEdges, getIncomers,
     MiniMap,
     Node,
     type NodeTypes,
     type OnConnect,
     ReactFlow,
-    useReactFlow
+    useReactFlow, useUpdateNodeInternals
 } from '@xyflow/react';
 
 import '@xyflow/react/dist/style.css';
-import {StateNode} from "./Nodes/stateNode.tsx";
-import {StateMachineNode} from "./Nodes/stateMachineNode.tsx";
+import { StateNode } from "./Nodes/stateNode.tsx";
+import { StateMachineNode } from "./Nodes/stateMachineNode.tsx";
 import {
     CsmEdgeProps,
     CsmNodeProps,
@@ -28,9 +28,8 @@ import {
 import StateMachine from "../../classes/stateMachine.ts";
 import State from "../../classes/state.ts";
 import CsmEdge from "./csmEdgeComponent.tsx";
-import {getAllStateNamesInExtent, ReactFlowContext} from "../../utils.tsx";
-import {NO_PARENT} from "../../services/stateOrStateMachineService.tsx";
-
+import { getAllStateNamesInExtent, ReactFlowContext } from "../../utils.tsx";
+import { NO_PARENT } from "../../services/stateOrStateMachineService.tsx";
 
 const nodeTypes = {
     'state-node': StateNode,
@@ -42,18 +41,61 @@ const edgeTypes = {
 }
 
 const NODE_HISTORY_LENGTH = 10;
-/*
-const initialNodes: Node<CsmNodeProps>[] = [];
-const initialEdges: Edge<CsmEdgeProps>[] = [];
-*/
 
 let nodeId = 0;
 let edgeId = 0;
 const getNewNodeId = () => `node_${nodeId++}`;
 const getNewEdgeId = () => `edge_${edgeId++}`;
 
+const defaultNodeBorder = '1px solid black';
+
+const hideEdge = (edge: Edge<CsmEdgeProps>, hidden: boolean) =>  {
+    return {
+        ...edge,
+        hidden,
+    };
+};
+
+const hideNode = (node: Node<CsmNodeProps>, hidden: boolean) =>  {
+    if (isState(node.data)) {
+        return {
+            ...node,
+            hidden
+        };
+    }
+    if (isStateMachine(node.data)) {
+        node.data.visibleResize = !node.data.visibleResize;
+        if (hidden) {
+            node.data.draggable = !node.data.draggable;
+        }
+
+        if (node.style) {
+            node.style.border = node.style.border === "hidden" ? defaultNodeBorder : "hidden";
+        }
+
+        if (node.style && node.style?.border === "hidden") {
+            console.log(node.style);
+            console.log("Setting");
+            node.data.prevSize = {
+                height: node.height,
+                width: node.width
+            };
+            console.log(node.data.prevSize);
+            node.height = 0;
+            node.width = 0;
+            console.log("Hiding ");
+            console.log(`${node.style.height}`);
+        } else {
+            node.height = node.data.prevSize?.height || 150;
+            node.width = node.data.prevSize?.width || 250;
+        }
+    }
+    return node;
+};
+
 export default function Flow() {
     const context: ReactFlowContextProps = useContext(ReactFlowContext) as ReactFlowContextProps;
+    const updateNodeInternals = useUpdateNodeInternals();
 
     const {
         nodes,
@@ -71,7 +113,7 @@ export default function Flow() {
         stateOrStateMachineService,
         contextService,
         transitionService
-    } = context
+    } = context;
 
     const { getIntersectingNodes, screenToFlowPosition } = useReactFlow();
 
@@ -84,7 +126,6 @@ export default function Flow() {
             }
         });
     }, [setNodeHistory]);
-
 
     const getAllDescendants = useCallback((node: Node<CsmNodeProps>) => {
         const children = nodes.filter((n: Node<CsmNodeProps>) => n.parentId === node.id);
@@ -99,18 +140,13 @@ export default function Flow() {
         return children;
     }, [nodes]);
 
-
-
-
     const onConnect: OnConnect = useCallback(
         (connection: Connection) => {
-            // TODO: Add this new transition to the relevant states and statemachines.
-            const newTransition = transitionService.connectionToTransition(connection)
-            if(newTransition) {
-                const edge: Edge<CsmEdgeProps> = { id: getNewEdgeId(), ...connection, type: 'csm-edge', data: {transition: newTransition}, zIndex: 1 };
+            const newTransition = transitionService.connectionToTransition(connection);
+            if (newTransition) {
+                const edge: Edge<CsmEdgeProps> = { id: getNewEdgeId(), ...connection, type: 'csm-edge', data: { transition: newTransition }, zIndex: 1 };
                 setEdges(eds => addEdge(edge, eds));
             }
-
         },
         [setEdges, transitionService]
     );
@@ -125,27 +161,22 @@ export default function Flow() {
             event.preventDefault();
 
             const type = event.dataTransfer.getData('application/reactflow');
-
             if (!type) {
                 return;
             }
 
             const position = screenToFlowPosition({ x: event.clientX, y: event.clientY });
             const new_name: string = stateOrStateMachineService.generateUniqueName(type);
+            const newId = getNewNodeId();
 
-            const newNode: Node<CsmNodeProps> = {
-                id: getNewNodeId(),
+            let newNode: Node<CsmNodeProps> = {
+                id: newId,
                 type,
                 position,
-                data: stateOrStateMachineService.getDefaultData(type, new_name),
+                data: stateOrStateMachineService.getDefaultData(type, new_name, newId),
             };
 
-            // TODO: DELETE WHEN FINISHED
-            console.log(`New State or statemachine : ${isState(newNode.data) ? newNode.data.state.name : 
-                isStateMachine(newNode.data)? newNode.data.stateMachine.name : "none"}`)
-
-
-            // TODO add this to stylesheet
+            // Add style if it's a state machine node
             if (type === 'state-machine-node') {
                 newNode.style = {
                     background: 'transparent',
@@ -155,98 +186,89 @@ export default function Flow() {
                     borderRadius: 15,
                     height: 150,
                 };
+
+                newNode = {
+                    ...newNode,
+                    dragHandle: '.custom-drag-handle',
+                };
+
+                if (isStateMachine(newNode.data)) {
+                    newNode.data.prevSize = {
+                        height: newNode.height,
+                        width: newNode.width
+                    };
+                }
             }
 
             setNodes(nds => {
-                if (type === 'state-machine-node') {
-                    updateNodeHistory([newNode, ...nds]);
-                    return [newNode, ...nds];
-                } else {
-                    updateNodeHistory([...nds, newNode]);
-                    return [...nds, newNode];
-                }
+                updateNodeHistory([...nds, newNode]);
+                return [...nds, newNode];
             });
 
-            const parentId = newNode.parentId|| NO_PARENT
-            stateOrStateMachineService.linkStateNameToStatemachine(new_name, parentId, true)
+            const parentId = newNode.parentId || NO_PARENT;
+            stateOrStateMachineService.linkStateNameToStatemachine(new_name, parentId, true);
             stateOrStateMachineService.linkNode(newNode.id, newNode.data);
-
-
         },
         [screenToFlowPosition, setNodes, stateOrStateMachineService, updateNodeHistory]
     );
 
-
     const onNodeDragStop = useCallback(
         (_: React.MouseEvent, node: Node<CsmNodeProps>) => {
             const intersections = getIntersectingNodes(node, false);
-            console.log("Intersection:", intersections)
-            const intersectedBlock = intersections.findLast(
-                (n) => n.type === "state-machine-node"
-            );
+            const intersectedBlock = intersections.findLast((n) => n.type === "state-machine-node");
 
+            const parentId = node.parentId || NO_PARENT;
 
-            const parentId = node.parentId || NO_PARENT
-            console.log(`PARENT = ${parentId}`)
-            console.log(node.parentId)
+            setNodes((ns: Node<CsmNodeProps>[]) => {
+                return ns.map((n) => {
+                    if (isState(n.data) && !n.hidden) {
+                        n.data.prevPosition = { x: n.position.x, y: n.position.y };
+                    }
+                    if (isStateMachine(n.data) && !n.data.draggable) {
+                        n.data.prevPosition = { x: n.position.x, y: n.position.y };
+                    }
+                    return n;
+                });
+            });
 
-
-
-
-            /** The parent always needs to before the child in the nodes array.
-             * This bock moves the child node to the front of the parent node in the array to always ensure this*/
-            //TODO: Logic for moving statemachines into statemachines.
             if (intersectedBlock) {
-                if(node.parentId === intersectedBlock.id){
-                    return;
-                }
+                if (node.parentId === intersectedBlock.id) return;
 
-                const blockSateNames = getAllStateNamesInExtent(intersectedBlock as Node<CsmNodeProps>,nodes,stateOrStateMachineService)
-                stateOrStateMachineService.unlinkStateNameFromStatemachine(stateOrStateMachineService.getName(node.data),parentId)
+                const blockStateNames = getAllStateNamesInExtent(intersectedBlock as Node<CsmNodeProps>, nodes, stateOrStateMachineService);
+                stateOrStateMachineService.unlinkStateNameFromStatemachine(stateOrStateMachineService.getName(node.data), parentId);
 
                 if (isState(node.data)) {
-                    if(blockSateNames && blockSateNames.has(node.data.state.name))  {
-                        console.log(`${node.data.state.name} already exists in extent of ${intersectedBlock.id}`);
-                        //Relink if no update
-                        stateOrStateMachineService.linkStateNameToStatemachine(stateOrStateMachineService.getName(node.data),parentId)
+                    if (blockStateNames && blockStateNames.has(node.data.state.name)) {
+                        stateOrStateMachineService.linkStateNameToStatemachine(stateOrStateMachineService.getName(node.data), parentId);
                         return;
                     }
 
                     setNodes((ns: Node<CsmNodeProps>[]) => {
                         const newNodes = ns.filter(i => i.id !== node.id);
                         const index = newNodes.findIndex(i => i.id === intersectedBlock.id);
-                        // Split the nodes array into two parts: before and after the parent
                         const firstPart = newNodes.slice(0, index + 1);
                         const secondPart = newNodes.slice(index + 1);
-                        // Insert the child node immediately after the parent
                         return [...firstPart, node as Node<CsmNodeProps>, ...secondPart];
                     });
                 }
 
                 if (isStateMachine(node.data)) {
-                    if(blockSateNames && blockSateNames.has(node.data.stateMachine.name))  {
-                        console.log(`${node.data.stateMachine.name} already exists on ${intersectedBlock.id}`);
-                        //Relink if no update
-                        stateOrStateMachineService.linkStateNameToStatemachine(stateOrStateMachineService.getName(node.data),parentId)
+                    if (blockStateNames && blockStateNames.has(node.data.stateMachine.name)) {
+                        stateOrStateMachineService.linkStateNameToStatemachine(stateOrStateMachineService.getName(node.data), parentId);
                         return;
                     }
+
                     setNodes((ns: Node<CsmNodeProps>[]) => {
                         const children = getAllDescendants(node);
                         const newNodes = ns.filter(i => i.id !== node.id && !children.includes(i));
                         const index = newNodes.findIndex(i => i.id === intersectedBlock.id);
-                        // Split the nodes array into two parts: before and after the parent
                         const firstPart = newNodes.slice(0, index + 1);
                         const secondPart = newNodes.slice(index + 1);
-                        // Insert the state machine and its descendants immediately after the parent
                         return [...firstPart, node, ...children, ...secondPart];
                     });
                 }
 
-
-
-
-
-                stateOrStateMachineService.linkStateNameToStatemachine(stateOrStateMachineService.getName(node.data),intersectedBlock.id, true)
+                stateOrStateMachineService.linkStateNameToStatemachine(stateOrStateMachineService.getName(node.data), intersectedBlock.id, true);
 
                 setNodes((ns) =>
                     ns.map((n) => {
@@ -256,70 +278,116 @@ export default function Flow() {
                                 parentId: intersectedBlock.id,
                                 extent: "parent",
                                 position: n.parentId !== intersectedBlock.id ? { x: 10, y: 10 } : n.position,
+                                expandParent: true
                             };
                         }
                         return n;
                     })
                 );
-
-
             }
         },
-        [setNodes, getIntersectingNodes]
+        [setNodes, getIntersectingNodes, nodes, stateOrStateMachineService]
     );
 
     const onNodesDelete = useCallback(
         (deletedNodes: Node[]) => {
             deletedNodes.forEach(node => {
-                stateOrStateMachineService.unlinkNode(node.id)
-                let parentId: string
+                stateOrStateMachineService.unlinkNode(node.id);
+                let parentId: string;
                 switch (node.type) {
                     case "state-machine-node":
-                        const stateMachine = node.data.stateMachine as StateMachine
+                        const stateMachine = node.data.stateMachine as StateMachine;
                         stateOrStateMachineService.unregisterName(stateMachine.name);
                         stateMachine.getAllContextVariables().forEach(variable => {
                             contextService.deregisterContextByName(variable.name);
-                        })
-                        parentId = node.parentId || NO_PARENT
-                        stateOrStateMachineService.unlinkStateNameFromStatemachine(stateMachine.name, parentId)
-
+                        });
+                        parentId = node.parentId || NO_PARENT;
+                        stateOrStateMachineService.unlinkStateNameFromStatemachine(stateMachine.name, parentId);
                         break;
                     case "state-node":
-                        const state = node.data.state as State
+                        const state = node.data.state as State;
                         stateOrStateMachineService.unregisterName(state.name);
                         state.getAllContextVariables().forEach(variable => {
                             contextService.deregisterContextByName(variable.name);
-                        })
-                        parentId = node.parentId|| NO_PARENT
-                        stateOrStateMachineService.unlinkStateNameFromStatemachine(state.name, parentId)
+                        });
+                        parentId = node.parentId || NO_PARENT;
+                        stateOrStateMachineService.unlinkStateNameFromStatemachine(state.name, parentId);
                         break;
                     default:
                         stateOrStateMachineService.unregisterName(node.data.name);
-
                 }
             });
             updateNodeHistory(nodes.filter(n => !deletedNodes.some(d => d.id === n.id)));
         },
-        [stateOrStateMachineService, updateNodeHistory, nodes]
+        [stateOrStateMachineService, updateNodeHistory, nodes, contextService]
     );
 
-    const onNodeClick = useCallback((_: React.MouseEvent, node: Node<CsmNodeProps>) => {
-        if(selectedEdge){
-            setSelectedEdge(null)
+    const onNodeClick = useCallback((e: React.MouseEvent, node: Node<CsmNodeProps>) => {
+        if (selectedEdge) {
+            setSelectedEdge(null);
         }
         setSelectedNode(node);
         setShowSidebar(true);
     }, [selectedEdge, setSelectedNode, setShowSidebar, setSelectedEdge]);
 
+    const onNodeContextMenu = useCallback((event: React.MouseEvent, node: Node<CsmNodeProps>) => {
+        event.preventDefault();
+        const connectedEdges: Edge<CsmEdgeProps>[] = [];
+        setNodes((prevNodes) => {
+            const descendants = getAllDescendants(node);
+            return prevNodes.map((n) => {
+
+                if (descendants.includes(n)) {
+                    if (isState(n.data)) {
+                        if (!n.hidden) {
+                            n.position = { x: 0, y: 0 };
+                        } else {
+                            n.position = n.data.prevPosition ? n.data.prevPosition : node.position;
+                        }
+                        return hideNode(n, !n.hidden);
+                    }
+
+                    if (isStateMachine(n.data)) {
+                        if (n.data.draggable) {
+                            n.position = { x: 0, y: 0 };
+                        } else {
+                            n.position = n.data.prevPosition ? n.data.prevPosition : node.position;
+                        }
+                        return hideNode(n, true);
+                    }
+
+                    return n;
+                }
+
+                if (n.id === node.id) {
+                    return hideNode(n, false);
+                }
+
+                return n;
+            });
+        });
+
+        connectedEdges.filter((value, index, array) => array.indexOf(value) === index);
+
+        setEdges((eds) => {
+            return eds.map((e) => {
+                if (connectedEdges.includes(e)) {
+                    return hideEdge(e, !e.hidden);
+                }
+                return e;
+            });
+        });
+    }, [nodes, edges, onNodeClick, onNodeDragStop, onNodesChange]);
+
     const onEdgeClick = useCallback(
         (_: React.MouseEvent, edge: Edge<CsmEdgeProps>) => {
-            if(selectedNode){
-                setSelectedNode(null)
+            if (selectedNode) {
+                setSelectedNode(null);
             }
-            setSelectedEdge(edge)
+            setSelectedEdge(edge);
             setShowSidebar(true);
         }, [selectedNode, setSelectedEdge, setShowSidebar, setSelectedNode]
-    )
+    );
 
     const onPaneClick = useCallback(() => {
         setShowSidebar(false);
@@ -327,29 +395,29 @@ export default function Flow() {
 
     return (
         <div className={"flow-container"}>
-                <ReactFlow
-                    nodes={nodes}
-                    nodeTypes={nodeTypes}
-                    onNodesChange={onNodesChange}
-                    edges={edges}
-                    onEdgesChange={onEdgesChange}
-                    edgeTypes={edgeTypes}
-                    onConnect={onConnect}
-                    onPaneClick={onPaneClick}
-                    onNodeClick={onNodeClick}
-                    onEdgeClick={onEdgeClick}
-                    onNodesDelete={onNodesDelete}
-                    onDragOver={onDragOver}
-                    onDrop={onDrop}
-                    onNodeDragStop={onNodeDragStop}
-                    fitView
-                    connectionLineType={ConnectionLineType.Bezier}
-                >
-                    <Background />
-                    <MiniMap />
-                    <Controls />
-                </ReactFlow>
-
+            <ReactFlow
+                nodes={nodes}
+                nodeTypes={nodeTypes}
+                onNodesChange={onNodesChange}
+                edges={edges}
+                onEdgesChange={onEdgesChange}
+                edgeTypes={edgeTypes}
+                onConnect={onConnect}
+                onPaneClick={onPaneClick}
+                onNodeClick={onNodeClick}
+                onNodeContextMenu={onNodeContextMenu}
+                onEdgeClick={onEdgeClick}
+                onNodesDelete={onNodesDelete}
+                onDragOver={onDragOver}
+                onDrop={onDrop}
+                onNodeDragStop={onNodeDragStop}
+                fitView
+                connectionLineType={ConnectionLineType.Bezier}
+            >
+                <Background />
+                <MiniMap />
+                <Controls />
+            </ReactFlow>
         </div>
     );
 }

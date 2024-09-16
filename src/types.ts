@@ -26,7 +26,13 @@ import MatchCase from "./classes/MatchCase.tsx";
 
 
 // One Type to avoid repeating ourselves. Can be expanded/unionized as needed.
-export type CsmNodeProps = {state: State} | {stateMachine: StateMachine} | {name: string};
+export type CsmNodeProps = {state: State, prevPosition?: {x: number, y: number}} |
+    {stateMachine: StateMachine,
+        draggable?: boolean,
+        visibleResize?: boolean,
+        prevSize? : {height?:  number, width?:  number},
+        prevPosition?: {x: number, y: number},prevParentId?: string}
+    | {name: string};
 export type CsmEdgeProps = {transition: Transition}
 
 export type NodeType =
@@ -112,11 +118,17 @@ export type ActionProps = InvokeActionProps
 
 
 export type StateNode = Node<{
-   state : State
+   state : State,
+    prevPosition?: {x: number, y: number}
 }, 'state-node'>;
 
 export type StateMachineNode = Node<{
-   stateMachine : StateMachine
+   stateMachine : StateMachine,
+    visibleResize? : boolean,
+    draggable? : boolean,
+    prevSize? : {height: number, width: number},
+    prevPosition?: {x: number, y: number},
+    prevParentId? :string
 }, 'state-machine-node'>;
 
 export type TransitionEdge = Edge<{

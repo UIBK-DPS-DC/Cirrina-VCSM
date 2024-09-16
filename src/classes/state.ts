@@ -4,10 +4,14 @@ import ContextVariable from "./contextVariable.tsx";
 import Transition from "./transition.ts";
 import Guard from "./guard.tsx";
 import {StateDescription} from "../pkl/bindings/collaborative_state_machine_description.pkl.ts";
+import Action from "./action.ts";
+import {name} from "lodash";
+import * as console from "node:console";
 
 
 export default class State implements StateOrStateMachine {
 
+    private _nodeId: string | undefined
     private _name: string
     private _initial = false;
     private _terminal = false;
@@ -28,6 +32,13 @@ export default class State implements StateOrStateMachine {
     }
 
 
+    get nodeId(): string | undefined {
+        return this._nodeId;
+    }
+
+    set nodeId(value: string | undefined) {
+        this._nodeId = value;
+    }
 
     public get name(): string {
         return this._name

@@ -7,8 +7,11 @@ import {
     StateMachineDescription
 } from "../pkl/bindings/collaborative_state_machine_description.pkl.ts";
 
+
+
 export default class StateMachine implements StateOrStateMachine {
 
+    private _nodeId: string | undefined
     private _name: string
     private _states: StateOrStateMachine[] = [];
     private _localContext: ContextVariable[] = [];
@@ -19,6 +22,15 @@ export default class StateMachine implements StateOrStateMachine {
 
     public constructor(name: string) {
         this._name = name
+    }
+
+
+    get nodeId(): string | undefined {
+        return this._nodeId;
+    }
+
+    set nodeId(value: string | undefined) {
+        this._nodeId = value;
     }
 
     public get name(): string {

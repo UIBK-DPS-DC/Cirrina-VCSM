@@ -474,25 +474,31 @@ export default class StateOrStateMachineService {
     }
 
 
-    public getDefaultState(name: string): State {
+    public getDefaultState(name: string, id: string): State {
         // add default config here
+        const newState = new State(name)
+        newState.nodeId = id
         return new State(name);
     }
 
-    public getDefaultStateMachine(name: string): StateMachine {
+    public getDefaultStateMachine(name: string, id: string): StateMachine {
         // add default config here
-        return new StateMachine(name);
+        const newStatemachine =  new StateMachine(name);
+        newStatemachine.nodeId = id
+        return newStatemachine
     }
 
-    public getDefaultData(type: string, name :string) {
+    public getDefaultData(type: string, name :string, id: string, resizeVisible = true, draggable = true) {
         switch (type) {
             case "state-node":
                 return {
-                    "state": this.getDefaultState(name ? name : "" ),
+                    "state": this.getDefaultState(name ? name : "" , id),
                 };
             case "state-machine-node":
                 return {
-                    "stateMachine": this.getDefaultStateMachine(name ? name : ""),
+                    "stateMachine": this.getDefaultStateMachine(name ? name : "", id),
+                    "visibleResize": resizeVisible,
+                    "draggable": draggable
                 };
             default:
                 return{
