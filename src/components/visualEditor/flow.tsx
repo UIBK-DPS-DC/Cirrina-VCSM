@@ -5,7 +5,7 @@ import {
     Connection,
     ConnectionLineType,
     Controls,
-    Edge, getConnectedEdges, getIncomers,
+    Edge,
     MiniMap,
     Node,
     type NodeTypes,
@@ -28,7 +28,7 @@ import {
 import StateMachine from "../../classes/stateMachine.ts";
 import State from "../../classes/state.ts";
 import CsmEdge from "./csmEdgeComponent.tsx";
-import { getAllStateNamesInExtent, ReactFlowContext } from "../../utils.tsx";
+import {getAllStateNamesInExtent, getParentNode, ReactFlowContext} from "../../utils.tsx";
 import { NO_PARENT } from "../../services/stateOrStateMachineService.tsx";
 
 const nodeTypes = {
@@ -49,49 +49,7 @@ const getNewEdgeId = () => `edge_${edgeId++}`;
 
 const defaultNodeBorder = '1px solid black';
 
-const hideEdge = (edge: Edge<CsmEdgeProps>, hidden: boolean) =>  {
-    return {
-        ...edge,
-        hidden,
-    };
-};
 
-const hideNode = (node: Node<CsmNodeProps>, hidden: boolean) =>  {
-    if (isState(node.data)) {
-        return {
-            ...node,
-            hidden
-        };
-    }
-    if (isStateMachine(node.data)) {
-        node.data.visibleResize = !node.data.visibleResize;
-        if (hidden) {
-            node.data.draggable = !node.data.draggable;
-        }
-
-        if (node.style) {
-            node.style.border = node.style.border === "hidden" ? defaultNodeBorder : "hidden";
-        }
-
-        if (node.style && node.style?.border === "hidden") {
-            console.log(node.style);
-            console.log("Setting");
-            node.data.prevSize = {
-                height: node.height,
-                width: node.width
-            };
-            console.log(node.data.prevSize);
-            node.height = 0;
-            node.width = 0;
-            console.log("Hiding ");
-            console.log(`${node.style.height}`);
-        } else {
-            node.height = node.data.prevSize?.height || 150;
-            node.width = node.data.prevSize?.width || 250;
-        }
-    }
-    return node;
-};
 
 export default function Flow() {
     const context: ReactFlowContextProps = useContext(ReactFlowContext) as ReactFlowContextProps;
@@ -139,6 +97,77 @@ export default function Flow() {
 
         return children;
     }, [nodes]);
+
+
+    const hideEdge = (edge: Edge<CsmEdgeProps>, hidden: boolean) =>  {
+        return {
+            ...edge,
+            hidden,
+        };
+    };
+
+    const hideNode = (node: Node<CsmNodeProps>, hidden: boolean) =>  {
+        const parent = getParentNode(node, nodes)
+
+        // Checks if parent is already collapsed. To ensure node visibility is not reset since it should already be hidden
+        if(parent && isStateMachine(parent.data)){
+            if(! parent.data.visibleResize && ! parent.data.draggable && node.hidden){
+                return  node
+            }
+        }
+
+        if (isState(node.data)) {
+            return {
+                ...node,
+                hidden
+            };
+        }
+        if (isStateMachine(node.data)) {
+            node.data.visibleResize = !node.data.visibleResize;
+            if (hidden) {
+                node.data.draggable = !node.data.draggable;
+            }
+
+            if (node.style) {
+                node.style.border = node.style.border === "hidden" ? defaultNodeBorder : "hidden";
+            }
+
+            // SM has just been hidden. Backing up properties
+            if (node.style && node.style?.border === "hidden") {
+                console.log(node.style);
+                console.log("Setting");
+                node.data.prevSize = {
+                    height: node.height,
+                    width: node.width
+                };
+                console.log(node.data.prevSize);
+                node.height = 0;
+                node.width = 0;
+                console.log("Hiding ");
+                console.log(`${node.style.height}`);
+
+            }
+            // SM has just been unhidden. Restore previous properties
+            else {
+                console.log(`Restoring ${node.id} to previous sizes`)
+                // Statemachine node has a default height of 150 and undefined width
+                node.height = node.data.prevSize?.height || 150;
+                node.width = node.data.prevSize?.width || undefined
+
+                if(hidden){
+                    node.position.x = node.data?.prevPosition?.x || 0
+                    node.position.y = node.data?.prevPosition?.y || 0
+
+                    console.log(node.position.x, node.position.y)
+                    updateNodeInternals(node.id)
+                }
+
+                console.log(`Height: ${node.height}, Width ${node.width}`)
+            }
+        }
+        updateNodeInternals(node.id)
+        return node;
+    };
 
     const onConnect: OnConnect = useCallback(
         (connection: Connection) => {
@@ -224,7 +253,7 @@ export default function Flow() {
                     if (isState(n.data) && !n.hidden) {
                         n.data.prevPosition = { x: n.position.x, y: n.position.y };
                     }
-                    if (isStateMachine(n.data) && !n.data.draggable) {
+                    if (isStateMachine(n.data) && n.data.draggable) {
                         n.data.prevPosition = { x: n.position.x, y: n.position.y };
                     }
                     return n;
@@ -278,7 +307,7 @@ export default function Flow() {
                                 parentId: intersectedBlock.id,
                                 extent: "parent",
                                 position: n.parentId !== intersectedBlock.id ? { x: 10, y: 10 } : n.position,
-                                expandParent: true
+                                expandParent: false
                             };
                         }
                         return n;
@@ -322,7 +351,7 @@ export default function Flow() {
         [stateOrStateMachineService, updateNodeHistory, nodes, contextService]
     );
 
-    const onNodeClick = useCallback((e: React.MouseEvent, node: Node<CsmNodeProps>) => {
+    const onNodeClick = useCallback((_: React.MouseEvent, node: Node<CsmNodeProps>) => {
         if (selectedEdge) {
             setSelectedEdge(null);
         }
@@ -338,6 +367,29 @@ export default function Flow() {
             return prevNodes.map((n) => {
 
                 if (descendants.includes(n)) {
+
+                    if (isStateMachine(n.data)) {
+
+                        // draggable but not resizable means collapsed child statemachine.
+                        if(n.data.draggable && !n.data.visibleResize){
+                            n.position = {x: 0, y: 0}
+                            n.data.draggable = false;
+                            updateNodeInternals(n.id)
+                            return n
+                        }
+
+                        else {
+                            if (n.data.draggable) {
+                                n.position = { x: 0, y: 0 };
+                            } else {
+                                n.position = n.data.prevPosition ? n.data.prevPosition : node.position;
+                            }
+
+                            return hideNode(n, true);
+                        }
+
+                    }
+
                     if (isState(n.data)) {
                         if (!n.hidden) {
                             n.position = { x: 0, y: 0 };
@@ -345,15 +397,6 @@ export default function Flow() {
                             n.position = n.data.prevPosition ? n.data.prevPosition : node.position;
                         }
                         return hideNode(n, !n.hidden);
-                    }
-
-                    if (isStateMachine(n.data)) {
-                        if (n.data.draggable) {
-                            n.position = { x: 0, y: 0 };
-                        } else {
-                            n.position = n.data.prevPosition ? n.data.prevPosition : node.position;
-                        }
-                        return hideNode(n, true);
                     }
 
                     return n;
@@ -377,6 +420,8 @@ export default function Flow() {
                 return e;
             });
         });
+
+        nodes.forEach((n) => updateNodeInternals(n.id))
     }, [nodes, edges, onNodeClick, onNodeDragStop, onNodesChange]);
 
     const onEdgeClick = useCallback(

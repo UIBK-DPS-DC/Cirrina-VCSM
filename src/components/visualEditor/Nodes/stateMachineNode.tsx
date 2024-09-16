@@ -5,7 +5,7 @@ import {ReactFlowContext} from "../../../utils.tsx";
 
 export function StateMachineNode ({data, selected}: NodeProps<StateMachineNode>) {
 
-    const [resizeIsVisible, setResizeIsVisible] = useState<boolean>(data.visibleResize ? data.visibleResize : false);
+    const [resizeIsVisible, setResizeIsVisible] = useState<boolean>(data.visibleResize ? data.visibleResize : true);
     const [draggable, setDraggable] = useState<boolean>(data.draggable ? data.draggable : true);
 
     const context = useContext(ReactFlowContext) as ReactFlowContextProps;
@@ -40,27 +40,26 @@ export function StateMachineNode ({data, selected}: NodeProps<StateMachineNode>)
 
 
     return (
-        <>
-            {(
-                <div className="react-flow__node-group">
-                        <NodeResizer
-                            color="#ff0071"
-                            isVisible={resizeIsVisible}
-                            minWidth={0}
-                            minHeight={0}>
-
-                        </NodeResizer>
-
-                    {draggable && (
-                        <div style={labelStyle}>
-                            {data.stateMachine.name}
-                            {/* Use the class specified at node.dragHandle here */}
-                            <span className="custom-drag-handle" style={dragHandleStyle}/>
-                        </div>
-                    )}
-                </div>
+        <div
+            className={`react-flow__node-group ${!draggable ? 'not-draggable' : ''}`}
+            style={{visibility: draggable ? 'visible' : 'hidden'}}
+        >
+            {resizeIsVisible && (
+                <NodeResizer
+                    color="#ff0071"
+                    isVisible={resizeIsVisible}
+                    minWidth={0}
+                    minHeight={0}
+                />
             )}
-        </>
+
+            <div style={labelStyle}>
+                {data.stateMachine.name}
+                <span className="custom-drag-handle" style={dragHandleStyle}/>
+            </div>
+        </div>
 
     );
+
+
 }

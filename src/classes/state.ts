@@ -4,8 +4,6 @@ import ContextVariable from "./contextVariable.tsx";
 import Transition from "./transition.ts";
 import Guard from "./guard.tsx";
 import {StateDescription} from "../pkl/bindings/collaborative_state_machine_description.pkl.ts";
-import Action from "./action.ts";
-import {name} from "lodash";
 import * as console from "node:console";
 
 
