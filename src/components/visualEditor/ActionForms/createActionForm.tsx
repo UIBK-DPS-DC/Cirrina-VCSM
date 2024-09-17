@@ -8,13 +8,13 @@ import {ReactFlowContext, renderEnumAsOptions} from "../../../utils.tsx";
 import {CreateActionProps, isState, ReactFlowContextProps} from "../../../types.ts";
 import {ActionCategory, ActionType} from "../../../enums.ts";
 import {Simulate} from "react-dom/test-utils";
-import select = Simulate.select;
+
 
 export default function CreateActionForm(props: {action: Action | undefined,
     setActions: Dispatch<SetStateAction<Action[]>>,
     onSubmit?: () => void,
     noCategorySelect? :boolean,
-    dontAddToState? :boolean, showDeleteButton?: boolean}) {
+    dontAddToState? :boolean, dontShowDeleteButton?: boolean}) {
 
 
 
@@ -267,7 +267,7 @@ export default function CreateActionForm(props: {action: Action | undefined,
                     )}
 
 
-                    {props.action && (
+                    {props.action && !props.dontShowDeleteButton && (
                         <Row className={"mb-3"}>
                             <Col sm={6}>
                                 <Button type={"submit"} disabled={!formIsValid}>{submitButtonText()}</Button>
