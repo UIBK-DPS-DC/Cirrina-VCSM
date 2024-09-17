@@ -15,11 +15,12 @@ export default function RaiseEventActionForm(props: {action: Action | undefined,
     setActions: Dispatch<SetStateAction<Action[]>>,
     onSubmit?: () => void,
     singleAction?: boolean,
-    noCategorySelect?: boolean}) {
+    noCategorySelect?: boolean,
+    dontShowDeleteButton?: boolean}) {
 
     const context = useContext(ReactFlowContext) as ReactFlowContextProps;
     const {selectedNode,
-    actionService, stateOrStateMachineService} = context
+    actionService, stateOrStateMachineService, eventService} = context
 
     const headerText = () => props.action ? "Edit Raise Event Action" : "Create Raise Event Action"
     const submitButtonText = () => props.action ? "Save Changes" : "Create"
@@ -101,6 +102,25 @@ export default function RaiseEventActionForm(props: {action: Action | undefined,
             }
         }
     }, [props.action, selectedNode, actionService]);
+
+    const onDeleteButtonPress = () => {
+
+        if(!selectedNode){
+            return;
+        }
+
+        if(!props.action || ! (props.action.type === ActionType.RAISE_EVENT)){
+            return
+        }
+
+        const raiseEventProps = props.action.properties as RaiseEventActionProps;
+
+
+        stateOrStateMachineService.removeActionFromState(props.action, selectedNode.data)
+        eventService.unregisterEvent(raiseEventProps.event.name)
+        props.setActions((prevActions) => prevActions.filter((a) => a !== props.action))
+
+    }
 
 
 
@@ -208,10 +228,21 @@ export default function RaiseEventActionForm(props: {action: Action | undefined,
                         </Form.Group>
                     )}
 
-                    <Button type={"submit"} disabled={!formIsValid}>
-                        {submitButtonText()}
-                    </Button>
 
+                    {props.action && !props.dontShowDeleteButton && (
+                        <Row className={"mb-3"}>
+                            <Col sm={6}>
+                                <Button type={"submit"} disabled={!formIsValid}>{submitButtonText()}</Button>
+                            </Col>
+                            <Col sm={6}>
+                                <Button variant={"danger"} onClick={onDeleteButtonPress}>Delete</Button>
+                            </Col>
+                        </Row>
+                    ) || (
+                        <Button type={"submit"} disabled={!formIsValid}>
+                            {submitButtonText()}
+                        </Button>
+                    )}
                 </Form>
             </Card.Body>
         </Card>
