@@ -12,8 +12,8 @@ import {ActionCategory, ActionType} from "../../../enums.ts";
 export default function AssignActionForm(props: {action: Action | undefined,
     setActions: Dispatch<SetStateAction<Action[]>>,
     onSubmit?: ()=> void,
-    noCategorySelect?: boolean
-    , dontAddToState? :boolean,
+    noCategorySelect?: boolean,
+    dontAddToState? :boolean,
     dontShowDeleteButton? :boolean}) {
 
     const context = useContext(ReactFlowContext) as ReactFlowContextProps;

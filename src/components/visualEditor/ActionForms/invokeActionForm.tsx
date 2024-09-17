@@ -18,7 +18,9 @@ import {InvokeActionProps, isState, ReactFlowContextProps} from "../../../types.
 export default function InvokeActionForm(props: {action: Action | undefined,
     setActions: Dispatch<SetStateAction<Action[]>>,
     onSubmit?: () => void,
-    noCategorySelect?: boolean, dontAddToState? :boolean }) {
+    noCategorySelect?: boolean,
+    dontAddToState? :boolean,
+    dontShowDeleteButton? :boolean }) {
 
     const context = useContext(ReactFlowContext) as ReactFlowContextProps;
     const {selectedNode,
@@ -155,6 +157,21 @@ export default function InvokeActionForm(props: {action: Action | undefined,
                 return [...prevEvents, newEvent];
             }
         })
+    }
+
+    const onDeleteButtonPress = () => {
+
+        if(!selectedNode){
+            return;
+        }
+
+        if(!props.action){
+            return
+        }
+
+        stateOrStateMachineService.removeActionFromState(props.action, selectedNode.data)
+        props.setActions((prevActions) => prevActions.filter((a) => a !== props.action))
+
     }
 
     const onFormSubmit = (event: React.FormEvent<HTMLFormElement>) => {
@@ -299,7 +316,21 @@ export default function InvokeActionForm(props: {action: Action | undefined,
                         </Form.Group>
                     )}
 
-                    <Button type={"submit"}>{submitButtonText()}</Button>
+
+                    {props.action && !props.dontShowDeleteButton && (
+                        <Row className={"mb-3"}>
+                            <Col sm={6}>
+                                <Button type={"submit"} >{submitButtonText()}</Button>
+                            </Col>
+                            <Col sm={6}>
+                                <Button variant={"danger"} onClick={onDeleteButtonPress}>Delete</Button>
+                            </Col>
+                        </Row>
+                    ) || (
+                        <Button type={"submit"}>{submitButtonText()}</Button>
+                    )}
+
+
 
                 </Form>
             </Card.Body>
