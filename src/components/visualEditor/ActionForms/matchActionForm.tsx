@@ -21,6 +21,7 @@ function CaseForm(props: {
     setActions: React.Dispatch<SetStateAction<Action[]>>;
     onSubmit?: () => void;
     clearAfterSubmit?: boolean;
+
 }) {
 
 
@@ -239,12 +240,15 @@ export default function MatchActionForm(props: {
     onSubmit?: () => void,
     noCategorySelect?: boolean
     dontAddToState? :boolean
+    dontShowDeleteButton? : boolean
+
 }) {
 
     const instanceId = useRef(++idCounter).current;
     let formCount = 0
 
     const formId = `${instanceId}-${formCount++}`
+    const submitButtonText = () => props.action ? "Save Changes" : "Create Action"
 
 
     const context = useContext(ReactFlowContext) as ReactFlowContextProps;
@@ -327,6 +331,23 @@ export default function MatchActionForm(props: {
             }
         });
     };
+
+    const onDeleteButtonPress = () => {
+
+        if(!selectedNode){
+            return;
+        }
+
+        if(!props.action){
+            return
+        }
+
+        stateOrStateMachineService.removeActionFromState(props.action, selectedNode.data)
+        props.setActions((prevActions) => prevActions.filter((a) => a !== props.action))
+
+    }
+
+
 
     const onSubmit = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
@@ -451,7 +472,21 @@ export default function MatchActionForm(props: {
                         </Card>
                     ))}
                 </Container>
-                <Button type={"submit"} form={formId} disabled={!formIsValid}>{props.action ? "Save Changes" : "Create Action"} </Button>
+
+                {props.action && !props.dontShowDeleteButton && (
+                    <Row className={"mb-3"}>
+                        <Col sm={6}>
+                            <Button type={"submit"} disabled={!formIsValid}>{submitButtonText()}</Button>
+                        </Col>
+                        <Col sm={6}>
+                            <Button variant={"danger"} onClick={onDeleteButtonPress}>Delete</Button>
+                        </Col>
+                    </Row>
+                ) || (
+                    <Button type={"submit"} form={formId} disabled={!formIsValid}>
+                        {submitButtonText()}
+                    </Button>
+                )}
             </Card.Body>
         </Card>
     );
