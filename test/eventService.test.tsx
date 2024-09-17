@@ -33,7 +33,7 @@ describe('EventService', () => {
 
         expect(result).toBe(false);
         expect(eventService.getAllEvents().length).toBe(1);  // Only one event should be registered
-        expect(console.error).toHaveBeenCalledWith("Event name already exists!");
+        expect(console.error).toHaveBeenCalledWith("EVENT_SERVICE:  Event name already exists!");
     });
 
     test('unregisterEvent should remove a registered event by name', () => {
@@ -48,7 +48,7 @@ describe('EventService', () => {
         console.warn = jest.fn();  // Mock console.warn to verify it gets called
 
         eventService.unregisterEvent(123);  // Invalid event name type
-        expect(console.warn).toHaveBeenCalledWith("Invalid name type: unable to unregister", 123);
+        expect(console.warn).toHaveBeenCalledWith("EVENT_SERVICE: Invalid name type: unable to unregister", 123);
     });
 
     test('isNameUnique should return true for a unique event name', () => {
@@ -291,7 +291,7 @@ describe("EventService - renameEvent", () => {
         expect(eventService.getEventByName("Event2")).toBeDefined();
 
         // Ensure that the error was logged
-        expect(console.error).toHaveBeenCalledWith("Event name Event2 already exists!");
+        expect(console.error).toHaveBeenCalledWith("EVENT_SERvICE: Event name Event2 already exists!");
     });
 
     test("should unregister the old event and register it with the new name", () => {
@@ -330,7 +330,7 @@ describe("EventService - renameEvent", () => {
         expect(eventService.getEventByName("EventB")).toBeDefined();
 
         // Ensure an error was logged
-        expect(console.error).toHaveBeenCalledWith("Event name EventB already exists!");
+        expect(console.error).toHaveBeenCalledWith("EVENT_SERvICE: Event name EventB already exists!");
     });
 
     test("should log the renaming action", () => {
@@ -342,7 +342,7 @@ describe("EventService - renameEvent", () => {
         eventService.renameEvent(event, "RenamedEvent");
 
         // Ensure the renaming action is logged
-        expect(console.log).toHaveBeenCalledWith("Event LogEventTest has been renamed to RenamedEvent!");
+        expect(console.log).toHaveBeenCalledWith("EVENT_SERVICE Event LogEventTest has been renamed to RenamedEvent!");
     });
 
     test("should handle renaming to an empty string or invalid name", () => {
@@ -374,6 +374,6 @@ describe("EventService - renameEvent", () => {
         expect(eventService.getEventByName("NewName")).toBeUndefined();
 
         // Ensure the error was logged
-        expect(console.error).toHaveBeenCalledWith("Event UnregisteredEvent does not exist!");
+        expect(console.error).toHaveBeenCalledWith("EVENT_SERVICE: Event UnregisteredEvent does not exist!");
     });
 });
