@@ -23,12 +23,12 @@ export default class EventService {
      */
     public registerEvent(event: Event): boolean {
         if(!this.isNameUnique(event.name)){
-            console.error("Event name already exists!");
+            console.error("EVENT_SERVICE:  Event name already exists!");
             return false;
         }
 
         this.nameToEventMap.set(event.name,event);
-        console.log(event.name + " has been registered!");
+        console.log("Event_SERIVICE: " + event.name + " has been registered!");
         return true;
     }
 
@@ -43,10 +43,10 @@ export default class EventService {
     public unregisterEvent(eventName: string | unknown): void {
         if(typeof eventName === "string" ){
             this.nameToEventMap.delete(eventName);
-            console.log(eventName + " has been unregistered!");
+            console.log("EVENT_SERVICE: " +  eventName + " has been unregistered!");
         }
         else {
-            console.warn("Invalid name type: unable to unregister", eventName);
+            console.warn("EVENT_SERVICE: Invalid name type: unable to unregister", eventName);
         }
 
     }
@@ -82,16 +82,16 @@ export default class EventService {
     public renameEvent(event: Event, newName: string): void {
 
         if(!this.getEventByName(event.name)){
-            console.error(`Event ${event.name} does not exist!`);
+            console.error(`EVENT_SERVICE: Event ${event.name} does not exist!`);
             return;
         }
 
         if(!this.isNameUnique(newName)){
-            console.error(`Event name ${newName} already exists!`);
+            console.error(`EVENT_SERvICE: Event name ${newName} already exists!`);
             return;
         }
         if(!newName.trim()){
-            console.error(`New name cant be empty!`);
+            console.error(`EVENT_SERVICE: New name cant be empty!`);
             return;
         }
         const oldName = event.name
@@ -100,7 +100,7 @@ export default class EventService {
         event.name = newName
         this.registerEvent(event)
 
-        console.log(`Event ${oldName} has been renamed to ${newName}!`);
+        console.log(`EVENT_SERVICE Event ${oldName} has been renamed to ${newName}!`);
 
     }
 

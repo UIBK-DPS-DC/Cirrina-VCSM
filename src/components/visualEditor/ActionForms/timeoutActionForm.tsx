@@ -9,10 +9,12 @@ import {ActionCategory, ActionType} from "../../../enums.ts";
 
 export default function TimeoutActionForm(props: {action: Action | undefined,
     setActions: Dispatch<SetStateAction<Action[]>>,
-    onSubmit?: () => void, noCategorySelect? :boolean}) {
+    onSubmit?: () => void,
+    noCategorySelect? :boolean,
+    dontShowDeleteButton? :boolean}) {
 
     const context = useContext(ReactFlowContext) as ReactFlowContextProps;
-    const {selectedNode, actionService, stateOrStateMachineService} = context
+    const {selectedNode, actionService, stateOrStateMachineService, eventService} = context
 
     const oldName = props.action ? props.action.name : undefined
     const formID = "timeoutForm"
@@ -144,6 +146,24 @@ export default function TimeoutActionForm(props: {action: Action | undefined,
 
     const validateForm = () => {
         return actionNameInputIsValid && timeOutExpressionInputIsValid && raiseActionIsValid;
+    }
+
+    const onDeleteButtonPress = () => {
+
+        if(!selectedNode){
+            return;
+        }
+
+        if(!props.action || ! (props.action.type === ActionType.TIMEOUT)){
+            return
+        }
+
+        const raiseEventProps = (props.action.properties as TimeoutActionProps).action.properties as RaiseEventActionProps;
+
+        eventService.unregisterEvent(raiseEventProps.event.name)
+        stateOrStateMachineService.removeActionFromState(props.action, selectedNode.data)
+        props.setActions((prevActions) => prevActions.filter((a) => a !== props.action))
+
     }
 
     const onSubmit = (event: React.FormEvent<HTMLFormElement>) => {
@@ -279,7 +299,20 @@ export default function TimeoutActionForm(props: {action: Action | undefined,
                        noCategorySelect={true}
                    />
                )}
-                <Button disabled={!validateForm()} form={formID} type={"submit"} className={"mt-3"}>{submitButtonText()}</Button>
+               {props.action && !props.dontShowDeleteButton && (
+                   <Row className={"mb-3"}>
+                       <Col sm={6}>
+                           <Button type={"submit"}>{submitButtonText()}</Button>
+                       </Col>
+                       <Col sm={6}>
+                           <Button variant={"danger"} onClick={onDeleteButtonPress}>Delete</Button>
+                       </Col>
+                   </Row>
+               ) || (
+                   <Button disabled={!validateForm()} form={formID} type={"submit"} className={"mt-3"}>
+                       {submitButtonText()}
+                   </Button>
+               )}
            </Card.Body>
        </Card>
     )
