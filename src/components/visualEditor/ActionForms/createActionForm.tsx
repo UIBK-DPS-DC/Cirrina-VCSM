@@ -7,7 +7,6 @@ import ContextCard from "../../Context/contextCard.tsx";
 import {ReactFlowContext, renderEnumAsOptions} from "../../../utils.tsx";
 import {CreateActionProps, isState, ReactFlowContextProps} from "../../../types.ts";
 import {ActionCategory, ActionType} from "../../../enums.ts";
-import {Simulate} from "react-dom/test-utils";
 
 
 export default function CreateActionForm(props: {action: Action | undefined,
