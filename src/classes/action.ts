@@ -111,6 +111,7 @@ export default class Action {
     }
 
     public toDescription():ActionDescription {
+        console.log(`AAAAAAAAAAAAAAAAAAAAAAAAAAAA ${this.type}`)
         switch(this.type){
             case ActionType.RAISE_EVENT: {
                const raiseEventProps = this.properties as RaiseEventActionProps;
@@ -153,6 +154,9 @@ export default class Action {
                   variable: createActionProps.variable.toDescription()
 
               }
+
+              console.log("AAAAAAAAAAAAAAAAAAAAAAA")
+              console.log(createActionProps)
 
               return createActionDescription
 

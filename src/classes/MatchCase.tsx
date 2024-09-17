@@ -31,7 +31,7 @@ export default class MatchCase {
 
     public toDescription(): MatchCaseDescription {
         const description: MatchCaseDescription = {
-            action: this.action,
+            action: this.action.toDescription(),
             case: this.expression
 
         }

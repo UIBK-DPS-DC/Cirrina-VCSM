@@ -63,6 +63,7 @@ export default function CreateActionForm(props: {action: Action | undefined,
         }
 
         stateOrStateMachineService.removeActionFromState(props.action, selectedNode.data)
+        contextService.deregisterContextByName(variableToBeCreated[0].name)
         props.setActions((prevActions) => prevActions.filter((a) => a !== props.action))
 
     }

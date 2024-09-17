@@ -152,7 +152,7 @@ function CaseForm(props: {
             case ActionType.INVOKE:
                 return <InvokeActionForm action={props.action ? props.action : invokeAction[0]} setActions={props.action ? props.setActions : setInvokeAction} noCategorySelect={true} dontAddToState={true} />;
             case ActionType.CREATE:
-                return <CreateActionForm action={props.action ? props.action : createAction[0]} setActions={props.action ? props.setActions : setCreateAction} noCategorySelect={true} dontAddToState={true} />;
+                return <CreateActionForm action={props.action ? props.action : createAction[0]} setActions={props.action ? props.setActions : setCreateAction} noCategorySelect={true} dontAddToState={true}  />;
             case ActionType.ASSIGN:
                 return <AssignActionForm action={props.action ? props.action : assignAction[0]} setActions={props.action ? props.setActions : setAssignAction} noCategorySelect={true} dontAddToState={true} />;
             case ActionType.RAISE_EVENT:
@@ -343,6 +343,7 @@ export default function MatchActionForm(props: {
                 return;
             }
             matchCases.push(new MatchCase(a.case, a));
+            console.log(`Adding ${a.type} to match cases`)
         });
 
         const matchActionProps: MatchActionProps = {
