@@ -4,7 +4,7 @@ import Modal from "react-bootstrap/Modal";
 import React, {Dispatch, SetStateAction, useCallback, useContext, useEffect, useState} from "react";
 import {ReactFlowContext} from "../../utils.tsx";
 import {ReactFlowContextProps} from "../../types.ts";
-import Select, {ActionMeta, OnChangeValue} from "react-select";
+import {ActionMeta, OnChangeValue} from "react-select";
 import CreatableSelect from 'react-select/creatable';
 import {EventChannel} from "../../enums.ts";
 
