@@ -11,7 +11,10 @@ import {ActionCategory, ActionType} from "../../../enums.ts";
 
 export default function AssignActionForm(props: {action: Action | undefined,
     setActions: Dispatch<SetStateAction<Action[]>>,
-    onSubmit?: ()=> void, noCategorySelect?: boolean, dontAddToState? :boolean}) {
+    onSubmit?: ()=> void,
+    noCategorySelect?: boolean
+    , dontAddToState? :boolean,
+    dontShowDeleteButton? :boolean}) {
 
     const context = useContext(ReactFlowContext) as ReactFlowContextProps;
     const {selectedNode,stateOrStateMachineService,
@@ -104,6 +107,21 @@ export default function AssignActionForm(props: {action: Action | undefined,
                 return [...prevActions, newAction];
             }
         });
+    }
+
+    const onDeleteButtonPress = () => {
+
+        if(!selectedNode){
+            return;
+        }
+
+        if(!props.action){
+            return
+        }
+
+        stateOrStateMachineService.removeActionFromState(props.action, selectedNode.data)
+        props.setActions((prevActions) => prevActions.filter((a) => a !== props.action))
+
     }
 
     const onRemove = () => {
@@ -227,9 +245,22 @@ export default function AssignActionForm(props: {action: Action | undefined,
                       </Form.Group>
                   )}
 
-                  <Button variant="primary" type="submit" disabled={!formIsValid}>
-                      {submitButtonText()}
-                  </Button>
+
+                  {props.action && !props.dontShowDeleteButton && (
+                      <Row className={"mb-3"}>
+                          <Col sm={6}>
+                              <Button type={"submit"} disabled={!formIsValid}>{submitButtonText()}</Button>
+                          </Col>
+                          <Col sm={6}>
+                              <Button variant={"danger"} onClick={onDeleteButtonPress}>Delete</Button>
+                          </Col>
+                      </Row>
+                  ) || (
+                      <Button variant="primary" type="submit" disabled={!formIsValid}>
+                          {submitButtonText()}
+                      </Button>
+                  )}
+
               </Form>
           </Card.Body>
 
