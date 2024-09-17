@@ -1,10 +1,12 @@
 import {Button, Container, Form, Row} from "react-bootstrap";
 import Event from "../../classes/event.ts";
 import Modal from "react-bootstrap/Modal";
-import React, {Dispatch, SetStateAction, useContext, useEffect, useState} from "react";
+import React, {Dispatch, SetStateAction, useCallback, useContext, useEffect, useState} from "react";
 import {ReactFlowContext} from "../../utils.tsx";
 import {ReactFlowContextProps} from "../../types.ts";
 import Select, {ActionMeta, OnChangeValue} from "react-select";
+import CreatableSelect from 'react-select/creatable';
+import {EventChannel} from "../../enums.ts";
 
 
 export default function SelectEventsModal(props:{buttonName: string | undefined , modalTitle: string | undefined, events: Event[] | [], setEvents: Dispatch<SetStateAction<Event[]>>} ) {
@@ -16,6 +18,7 @@ export default function SelectEventsModal(props:{buttonName: string | undefined 
     const EXTERNAL_EVENTS_SELECT_NAME  = "external-event-select";
     const GLOBAL_EVENTS_SELECT_NAME = "global-event-select";
     const PERIPHERAL_EVENTS_SELECT_NAME = "peripheral-event-select";
+
 
     const [show,setShow]=React.useState(false);
 
@@ -100,18 +103,58 @@ export default function SelectEventsModal(props:{buttonName: string | undefined 
     const getEventLabel = (event: Event) => {
         return `${event.name} - ${event.channel}`
     }
-    const renderEventsAsOptions = (events: Event[]) => {
+    const renderEventsAsOptions = useCallback(((events: Event[]) => {
         return events.map((e) => {
             return {value: e.name, label: getEventLabel(e)}
         })
 
 
-    }
+    }),[eventService])
 
     const getSelectedOptions = (selectedEvents: string[], allEvents: Event[]) => {
         const options = renderEventsAsOptions(allEvents);
         return options.filter(option => selectedEvents.includes(option.value));
     }
+
+    const onInternalEventCreate = (eventName: string) => {
+        const res = eventService.registerEvent(new Event(eventName, EventChannel.INTERNAL))
+        if(res){
+            setSelectedInternalEvents((prevEvents) => [...prevEvents, {value: eventName, label: eventName}])
+            return
+        }
+        console.error(`Event with name ${eventName} already exists`)
+    }
+
+    const onExternalEventCreate = (eventName: string) => {
+        const res = eventService.registerEvent(new Event(eventName, EventChannel.EXTERNAL))
+        if(res){
+            setSelectedExternalEvents((prevEvents) => [...prevEvents, {value: eventName, label: eventName}])
+            return
+        }
+        console.error(`Event with name ${eventName} already exists`)
+    }
+
+    const onGlobalEventCreate = (eventName: string) => {
+        const res = eventService.registerEvent(new Event(eventName, EventChannel.GLOBAL))
+        if(res){
+            setSelectedGlobalEvents((prevEvents) => [...prevEvents, {value: eventName, label: eventName}])
+            return
+        }
+        console.error(`Event with name ${eventName} already exists`)
+    }
+
+    const onPeripheralEventCreate = (eventName: string) => {
+        const res = eventService.registerEvent(new Event(eventName, EventChannel.PERIPHERAL))
+        if(res){
+            setSelectedPeripheralEvents((prevEvents) => [...prevEvents, {value: eventName, label: eventName}])
+            return
+        }
+        console.error(`Event with name ${eventName} already exists`)
+    }
+
+
+
+
 
     useEffect(() => {
         setSelectedInternalEvents(getSelectedOptions(props.events.map((e) => e.name), eventService.getAllInternalEvents()))
@@ -191,11 +234,13 @@ export default function SelectEventsModal(props:{buttonName: string | undefined 
                                     <Form.Label>Internal Events</Form.Label>
                                 </Row>
                                 <Row className={"mb-3"}>
-                                    {eventService.getAllInternalEvents().length > 0 && (
-                                        <Select closeMenuOnSelect={false} isMulti={true} name={INTERNAL_EVENTS_SELECT_NAME}
-                                                options={renderEventsAsOptions(eventService.getAllInternalEvents())} value={selectedInternalEvents} onChange={onSelectedInternalEventsChange}>
-                                        </Select>
-                                    ) || (<Form.Text muted>No internal events found</Form.Text>)}
+                                        <CreatableSelect closeMenuOnSelect={false}
+                                                         isMulti={true}
+                                                         name={INTERNAL_EVENTS_SELECT_NAME}
+                                                         options={renderEventsAsOptions(eventService.getAllInternalEvents())}
+                                                         value={selectedInternalEvents} onChange={onSelectedInternalEventsChange}
+                                                         onCreateOption={onInternalEventCreate}>
+                                        </CreatableSelect>
                                 </Row>
                             </Form.Group>
 
@@ -204,11 +249,13 @@ export default function SelectEventsModal(props:{buttonName: string | undefined 
                                     <Form.Label>External Events</Form.Label>
                                 </Row>
                                 <Row className={"mb-3"}>
-                                    {eventService.getAllExternalEvents().length > 0 && (
-                                        <Select closeMenuOnSelect={false} isMulti={true} name={EXTERNAL_EVENTS_SELECT_NAME}
-                                                options={renderEventsAsOptions(eventService.getAllExternalEvents())} value={selectedExternalEvents} onChange={onSelectedExternalEventsChange}>
-                                        </Select>
-                                    ) || (<Form.Text muted>No External events found</Form.Text>)}
+                                        <CreatableSelect closeMenuOnSelect={false}
+                                                         isMulti={true}
+                                                         name={EXTERNAL_EVENTS_SELECT_NAME}
+                                                         options={renderEventsAsOptions(eventService.getAllExternalEvents())}
+                                                         value={selectedExternalEvents} onChange={onSelectedExternalEventsChange}
+                                                         onCreateOption={onExternalEventCreate}>
+                                        </CreatableSelect>
                                 </Row>
                             </Form.Group>
 
@@ -217,11 +264,13 @@ export default function SelectEventsModal(props:{buttonName: string | undefined 
                                     <Form.Label>Global Events</Form.Label>
                                 </Row>
                                 <Row className={"mb-3"}>
-                                    {eventService.getAllGlobalEvents().length > 0 && (
-                                        <Select closeMenuOnSelect={false} isMulti={true} name={GLOBAL_EVENTS_SELECT_NAME}
-                                                options={renderEventsAsOptions(eventService.getAllGlobalEvents())} value={selectedGlobalEvents} onChange={onSelectedGlobalEventsChange}>
-                                        </Select>
-                                    ) || (<Form.Text muted>No Global events found</Form.Text>)}
+                                        <CreatableSelect closeMenuOnSelect={false}
+                                                         isMulti={true}
+                                                         name={GLOBAL_EVENTS_SELECT_NAME}
+                                                         options={renderEventsAsOptions(eventService.getAllGlobalEvents())}
+                                                         value={selectedGlobalEvents} onChange={onSelectedGlobalEventsChange}
+                                                         onCreateOption={onGlobalEventCreate}>
+                                        </CreatableSelect>
                                 </Row>
                             </Form.Group>
 
@@ -230,11 +279,14 @@ export default function SelectEventsModal(props:{buttonName: string | undefined 
                                     <Form.Label>Peripheral Events</Form.Label>
                                 </Row>
                                 <Row className={"mb-3"}>
-                                    {eventService.getAllPeripheralEvents().length > 0 && (
-                                        <Select closeMenuOnSelect={false} isMulti={true} name={PERIPHERAL_EVENTS_SELECT_NAME}
-                                                options={renderEventsAsOptions(eventService.getAllPeripheralEvents())} value={selectedPeripheralEvents} onChange={onSelectedPeripheralEventsChange}>
-                                        </Select>
-                                    ) || (<Form.Text muted>No Peripheral events found</Form.Text>)}
+
+                                        <CreatableSelect closeMenuOnSelect={false}
+                                                         isMulti={true}
+                                                         name={PERIPHERAL_EVENTS_SELECT_NAME}
+                                                         options={renderEventsAsOptions(eventService.getAllPeripheralEvents())}
+                                                         value={selectedPeripheralEvents} onChange={onSelectedPeripheralEventsChange}
+                                                         onCreateOption={onPeripheralEventCreate}>
+                                        </CreatableSelect>
                                 </Row>
                             </Form.Group>
                             <Button type={"submit"}>Save Selection</Button>
