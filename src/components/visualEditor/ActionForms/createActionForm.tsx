@@ -8,8 +8,14 @@ import {ReactFlowContext, renderEnumAsOptions} from "../../../utils.tsx";
 import {CreateActionProps, isState, ReactFlowContextProps} from "../../../types.ts";
 import {ActionCategory, ActionType} from "../../../enums.ts";
 
+
 export default function CreateActionForm(props: {action: Action | undefined,
-    setActions: Dispatch<SetStateAction<Action[]>>, onSubmit?: () => void, noCategorySelect? :boolean, dontAddToState? :boolean}) {
+    setActions: Dispatch<SetStateAction<Action[]>>,
+    onSubmit?: () => void,
+    noCategorySelect? :boolean,
+    dontAddToState? :boolean, dontShowDeleteButton?: boolean}) {
+
+
 
     const context = useContext(ReactFlowContext) as ReactFlowContextProps
     const {selectedNode,
@@ -44,6 +50,22 @@ export default function CreateActionForm(props: {action: Action | undefined,
                 return [...prevActions, newAction];
             }
         });
+    }
+
+    const onDeleteButtonPress = () => {
+
+        if(!selectedNode){
+            return;
+        }
+
+        if(!props.action){
+            return
+        }
+
+        stateOrStateMachineService.removeActionFromState(props.action, selectedNode.data)
+        contextService.deregisterContextByName(variableToBeCreated[0].name)
+        props.setActions((prevActions) => prevActions.filter((a) => a !== props.action))
+
     }
 
     const onVariableIsPersistentChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -244,7 +266,21 @@ export default function CreateActionForm(props: {action: Action | undefined,
                         </div>
                     )}
 
-                    <Button type={"submit"} disabled={!formIsValid}>{submitButtonText()}</Button>
+
+                    {props.action && !props.dontShowDeleteButton && (
+                        <Row className={"mb-3"}>
+                            <Col sm={6}>
+                                <Button type={"submit"} disabled={!formIsValid}>{submitButtonText()}</Button>
+                            </Col>
+                            <Col sm={6}>
+                                <Button variant={"danger"} onClick={onDeleteButtonPress}>Delete</Button>
+                            </Col>
+                        </Row>
+                    ) || (
+                        <Button type={"submit"} disabled={!formIsValid}>{submitButtonText()}</Button>
+                    )}
+
+
 
                 </Form>
             </Card.Body>
