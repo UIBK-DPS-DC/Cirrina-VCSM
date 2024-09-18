@@ -4,16 +4,19 @@ import {ReactFlowContextProps} from "../../types.ts";
 import Offcanvas from "react-bootstrap/Offcanvas";
 import {Button, Col, Form, InputGroup, OffcanvasBody, OffcanvasHeader, OffcanvasTitle, Row} from "react-bootstrap";
 import Guard from "../../classes/guard.tsx";
+import GuardCard from "../Guard/guardCard.tsx";
+
+
 
 
 export default function TransitionInfoForm() {
+    let guardCount = 0
     const context = useContext(ReactFlowContext) as ReactFlowContextProps;
     const {selectedEdge, showSidebar, setShowSidebar} = context
 
     const [guardInput, setGuardInput] = useState<string>("")
     const [guardInputIsValid, setGuardInputIsValid] = useState<boolean>(false)
     const [guards, setGuards] = useState<Guard[]>(selectedEdge?.data?.transition.getGuards || []);
-
 
 
 
@@ -50,6 +53,7 @@ export default function TransitionInfoForm() {
         const newGuard = new Guard(guardInput)
         selectedEdge.data.transition.addGuard(newGuard)
         setGuards((prevGuards) => [...prevGuards, newGuard])
+        setGuardInput("")
 
 
     }
@@ -117,6 +121,9 @@ export default function TransitionInfoForm() {
                             </Form.Group>
 
                         </Form>
+                        {guards.length > 0 && (
+                            guards.map((guard) =><GuardCard key={guardCount++} guard={guard} setGuards={setGuards}/>)
+                        )}
                     </OffcanvasBody>
 
                 </Offcanvas>
