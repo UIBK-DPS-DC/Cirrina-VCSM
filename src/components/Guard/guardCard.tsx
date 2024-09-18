@@ -71,10 +71,10 @@ export default function GuardCard(props: {guard: Guard,
             <Card.Body>
                 <Form onSubmit={onSubmit}>
                     <Form.Group as={Row} className={"mb-3"}>
-                        <Form.Label column sm={"2"}>
+                        <Form.Label column sm={"3"}>
                             Expression:
                         </Form.Label>
-                        <Col sm={10}>
+                        <Col sm={9}>
                             <Form.Control type={"text"}
                                           value={currentGuardExpression}
                                           onChange={onCurrentGuardExpressionChange}

@@ -2,15 +2,24 @@ import React, {useContext, useEffect, useState} from "react";
 import {ReactFlowContext} from "../../utils.tsx";
 import {ReactFlowContextProps} from "../../types.ts";
 import Offcanvas from "react-bootstrap/Offcanvas";
-import {Button, Col, Form, InputGroup, OffcanvasBody, OffcanvasHeader, OffcanvasTitle, Row} from "react-bootstrap";
+import {
+    Button,
+    Col,
+    Container,
+    Form,
+    InputGroup,
+    OffcanvasBody,
+    OffcanvasHeader,
+    OffcanvasTitle,
+    Row
+} from "react-bootstrap";
 import Guard from "../../classes/guard.tsx";
-import GuardCard from "../Guard/guardCard.tsx";
+import GuardDisplay from "../Guard/guardDisplay.tsx";
 
 
 
 
 export default function TransitionInfoForm() {
-    let guardCount = 0
     const context = useContext(ReactFlowContext) as ReactFlowContextProps;
     const {selectedEdge, showSidebar, setShowSidebar} = context
 
@@ -128,7 +137,9 @@ export default function TransitionInfoForm() {
 
                         </Form>
                         {guards.length > 0 && (
-                            guards.map((guard) =><GuardCard key={guardCount++} guard={guard} setGuards={setGuards} onDelete={onGuardDelete}/>)
+                            <Container className={"mb-3"}>
+                                <GuardDisplay guards={guards} setGuards={setGuards} onDelete={onGuardDelete} />
+                            </Container>
                         )}
                     </OffcanvasBody>
 
