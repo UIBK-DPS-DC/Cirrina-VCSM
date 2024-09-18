@@ -101,10 +101,8 @@ export default function GuardCard(props: {guard: Guard,
                             </Col>
                         </Row>
                     </Form.Group>
-
                 </Form>
             </Card.Body>
         </Card>
-
     )
 }

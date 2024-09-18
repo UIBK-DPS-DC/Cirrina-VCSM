@@ -33,7 +33,7 @@ export default function TransitionInfoForm() {
 
     const onGuardDelete = (guard: Guard) => {
         if(selectedEdge?.data?.transition) {
-            console.log(`Hi ${guard.expression}`)
+            selectedEdge.data.transition.removeGuard(guard)
         }
     }
 
