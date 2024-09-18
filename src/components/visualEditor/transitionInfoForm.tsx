@@ -31,6 +31,12 @@ export default function TransitionInfoForm() {
         return !!guardExpression.trim()
     }
 
+    const onGuardDelete = (guard: Guard) => {
+        if(selectedEdge?.data?.transition) {
+            console.log(`Hi ${guard.expression}`)
+        }
+    }
+
 
 
 
@@ -122,7 +128,7 @@ export default function TransitionInfoForm() {
 
                         </Form>
                         {guards.length > 0 && (
-                            guards.map((guard) =><GuardCard key={guardCount++} guard={guard} setGuards={setGuards}/>)
+                            guards.map((guard) =><GuardCard key={guardCount++} guard={guard} setGuards={setGuards} onDelete={onGuardDelete}/>)
                         )}
                     </OffcanvasBody>
 

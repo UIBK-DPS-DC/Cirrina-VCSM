@@ -3,7 +3,7 @@ import React, {SetStateAction, useEffect, useState} from "react";
 import {Button, Card, Col, Form, Row} from "react-bootstrap";
 
 export default function GuardCard(props: {guard: Guard,
-    setGuards: React.Dispatch<SetStateAction<Guard[]>>, onDelete?: () => void}) {
+    setGuards: React.Dispatch<SetStateAction<Guard[]>>, onSubmit?: () => void, onDelete? : (guard: Guard) => void}) {
 
     const [previousExpression, setPreviousExpression] = useState<string>(props.guard.expression)
     const [currentGuardExpression, setCurrentGuardExpression] = useState<string>(props.guard.expression)
@@ -35,7 +35,30 @@ export default function GuardCard(props: {guard: Guard,
         event.preventDefault()
         event.stopPropagation()
 
-        console.log("Submit button pressed!")
+        props.guard.expression = currentGuardExpression;
+        setPreviousExpression(currentGuardExpression)
+
+        props.setGuards((prevGuards: Guard[]) => { return prevGuards})
+
+        if(props.onSubmit){
+            props.onSubmit
+        }
+
+
+    }
+
+    const onDelete = (event: React.MouseEvent<HTMLButtonElement>) => {
+        event.preventDefault()
+        event.stopPropagation()
+
+        props.setGuards((prevGuards: Guard[]) => {
+            return prevGuards.filter((g) => g !== props.guard)
+        })
+
+        if(props.onDelete) {
+            props.onDelete(props.guard)
+        }
+
     }
 
 
@@ -72,7 +95,7 @@ export default function GuardCard(props: {guard: Guard,
                                 </Button>
                             </Col>
                             <Col sm={4}>
-                                <Button variant={"danger"}>
+                                <Button variant={"danger"} onClick={onDelete}>
                                     Delete Guard
                                 </Button>
                             </Col>

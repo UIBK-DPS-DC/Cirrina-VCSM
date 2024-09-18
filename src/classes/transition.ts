@@ -97,6 +97,12 @@ export default class Transition {
         this._guards.push(guard);
     }
 
+    public removeGuard(guard: Guard): void {
+        this._guards = this._guards.filter((g) => g !== guard);
+    }
+
+
+
 
 
     private getNewId(){
@@ -106,7 +112,7 @@ export default class Transition {
 
     public getAllNamedGuards() {
         return this._guards.filter((guard) => {
-            return guard.name
+            return !!guard.name.trim()
         })
     }
 
