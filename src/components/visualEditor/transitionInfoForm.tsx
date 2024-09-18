@@ -18,6 +18,7 @@ import GuardDisplay from "../Guard/guardDisplay.tsx";
 import Action from "../../classes/action.ts";
 import SelectEventsModal from "../Event/selectEventsModal.tsx";
 import Event from "../../classes/event.ts";
+import SelectSingleEventModal from "../Event/selectSingleEventModal.tsx";
 
 
 
@@ -32,7 +33,7 @@ export default function TransitionInfoForm() {
     const [guardInputIsValid, setGuardInputIsValid] = useState<boolean>(false)
     const [guards, setGuards] = useState<Guard[]>(selectedEdge?.data?.transition.getGuards || []);
     const [actions, setActions] = useState<Action[]>(selectedEdge?.data?.transition.getActions || [])
-    const [onEvent, setOnEvent] = useState<Event[]>([])
+    const [onEvent, setOnEvent] = useState<Event | undefined>()
 
 
 
@@ -146,8 +147,13 @@ export default function TransitionInfoForm() {
                                 <Form.Label column sm={"2"}>
                                     On:
                                 </Form.Label>
-                                <Col sm={10}>
-                                    <SelectEventsModal buttonName={"Select Event"} modalTitle={"Events"} events={onEvent} setEvents={setOnEvent} multiple={false}/>
+                                {onEvent && (
+                                    <Col sm={5}>
+                                        <Form.Control type={"text"} value={onEvent.name} disabled={true}/>
+                                    </Col>
+                                )}
+                                <Col sm={onEvent ? 5 : 10}>
+                                    <SelectSingleEventModal event={onEvent} setEvent={setOnEvent}></SelectSingleEventModal>
                                 </Col>
                             </Form.Group>
 
@@ -158,7 +164,6 @@ export default function TransitionInfoForm() {
                             </Container>
                         )}
 
-                        <h2>{onEvent[0]?.name}</h2>
 
 
                     </OffcanvasBody>
