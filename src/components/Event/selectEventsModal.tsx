@@ -9,10 +9,13 @@ import CreatableSelect from 'react-select/creatable';
 import {EventChannel} from "../../enums.ts";
 
 
-export default function SelectEventsModal(props:{buttonName: string | undefined , modalTitle: string | undefined, events: Event[] | [], setEvents: Dispatch<SetStateAction<Event[]>>} ) {
+export default function SelectEventsModal(props:{buttonName: string | undefined,
+    modalTitle: string | undefined,
+    events: Event[] | [],
+    setEvents: Dispatch<SetStateAction<Event[]>>, multiple?: boolean} ) {
 
     const context = useContext(ReactFlowContext) as ReactFlowContextProps
-    const {eventService, selectedNode} = context;
+    const {eventService, selectedNode,selectedEdge} = context;
 
     const INTERNAL_EVENTS_SELECT_NAME = "internal-event-select";
     const EXTERNAL_EVENTS_SELECT_NAME  = "external-event-select";
@@ -21,6 +24,9 @@ export default function SelectEventsModal(props:{buttonName: string | undefined 
 
 
     const [show,setShow]=React.useState(false);
+
+    const allowMultiple = () => props.multiple !== undefined ? props.multiple : true
+    const isSelectDisabled = () => !allowMultiple() && ((selectedExternalEvents.length + selectedInternalEvents.length + selectedGlobalEvents.length + selectedPeripheralEvents.length) > 0)
 
     const handleShow = () => setShow(true)
     const handleClose = () => setShow(false);
@@ -152,6 +158,14 @@ export default function SelectEventsModal(props:{buttonName: string | undefined 
         console.error(`Event with name ${eventName} already exists`)
     }
 
+    const clearEvents = () => {
+        const events: {label: string, value: string}[]  = []
+        setSelectedInternalEvents(events)
+        setSelectedGlobalEvents(events)
+        setSelectedPeripheralEvents(events)
+        setSelectedExternalEvents(events)
+        props.setEvents([])
+    }
 
 
 
@@ -166,7 +180,7 @@ export default function SelectEventsModal(props:{buttonName: string | undefined 
     const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         event.stopPropagation()
-        if(!selectedNode){
+        if(!selectedNode && !selectedEdge){
             return;
         }
 
@@ -235,13 +249,21 @@ export default function SelectEventsModal(props:{buttonName: string | undefined 
                                 </Row>
                                 <Row className={"mb-3"}>
                                         <CreatableSelect closeMenuOnSelect={false}
-                                                         isMulti={true}
+                                                         isMulti={allowMultiple()}
+                                                         isDisabled={isSelectDisabled()}
                                                          name={INTERNAL_EVENTS_SELECT_NAME}
                                                          options={renderEventsAsOptions(eventService.getAllInternalEvents())}
-                                                         value={selectedInternalEvents} onChange={onSelectedInternalEventsChange}
+                                                         value={selectedInternalEvents}
+                                                        //@ts-ignore
+                                                         onChange={onSelectedInternalEventsChange}
                                                          onCreateOption={onInternalEventCreate}>
                                         </CreatableSelect>
                                 </Row>
+                                {isSelectDisabled() && selectedInternalEvents.length > 0 && (
+                                    <Button variant="danger" className={"mb-3"} onClick={clearEvents}>
+                                        Remove
+                                    </Button>
+                                )}
                             </Form.Group>
 
                             <Form.Group controlId={"formExternalEvents"}>
@@ -250,10 +272,13 @@ export default function SelectEventsModal(props:{buttonName: string | undefined 
                                 </Row>
                                 <Row className={"mb-3"}>
                                         <CreatableSelect closeMenuOnSelect={false}
-                                                         isMulti={true}
+                                                         isMulti={allowMultiple()}
+                                                         isDisabled={isSelectDisabled()}
                                                          name={EXTERNAL_EVENTS_SELECT_NAME}
                                                          options={renderEventsAsOptions(eventService.getAllExternalEvents())}
-                                                         value={selectedExternalEvents} onChange={onSelectedExternalEventsChange}
+                                                         value={selectedExternalEvents}
+                                                         //@ts-ignore
+                                                         onChange={onSelectedExternalEventsChange}
                                                          onCreateOption={onExternalEventCreate}>
                                         </CreatableSelect>
                                 </Row>
@@ -265,10 +290,13 @@ export default function SelectEventsModal(props:{buttonName: string | undefined 
                                 </Row>
                                 <Row className={"mb-3"}>
                                         <CreatableSelect closeMenuOnSelect={false}
-                                                         isMulti={true}
+                                                         isMulti={allowMultiple()}
+                                                         isDisabled={isSelectDisabled()}
                                                          name={GLOBAL_EVENTS_SELECT_NAME}
                                                          options={renderEventsAsOptions(eventService.getAllGlobalEvents())}
-                                                         value={selectedGlobalEvents} onChange={onSelectedGlobalEventsChange}
+                                                         value={selectedGlobalEvents}
+                                                         //@ts-ignore
+                                                         onChange={onSelectedGlobalEventsChange}
                                                          onCreateOption={onGlobalEventCreate}>
                                         </CreatableSelect>
                                 </Row>
@@ -281,10 +309,13 @@ export default function SelectEventsModal(props:{buttonName: string | undefined 
                                 <Row className={"mb-3"}>
 
                                         <CreatableSelect closeMenuOnSelect={false}
-                                                         isMulti={true}
+                                                         isMulti={allowMultiple()}
+                                                         isDisabled={isSelectDisabled()}
                                                          name={PERIPHERAL_EVENTS_SELECT_NAME}
                                                          options={renderEventsAsOptions(eventService.getAllPeripheralEvents())}
-                                                         value={selectedPeripheralEvents} onChange={onSelectedPeripheralEventsChange}
+                                                         value={selectedPeripheralEvents}
+                                                         //@ts-ignore
+                                                         onChange={onSelectedPeripheralEventsChange}
                                                          onCreateOption={onPeripheralEventCreate}>
                                         </CreatableSelect>
                                 </Row>

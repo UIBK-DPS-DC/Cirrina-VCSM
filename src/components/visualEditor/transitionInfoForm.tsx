@@ -15,17 +15,24 @@ import {
 } from "react-bootstrap";
 import Guard from "../../classes/guard.tsx";
 import GuardDisplay from "../Guard/guardDisplay.tsx";
+import Action from "../../classes/action.ts";
+import SelectEventsModal from "../Event/selectEventsModal.tsx";
+import Event from "../../classes/event.ts";
 
 
 
 
 export default function TransitionInfoForm() {
     const context = useContext(ReactFlowContext) as ReactFlowContextProps;
-    const {selectedEdge, showSidebar, setShowSidebar} = context
+    const {selectedEdge, showSidebar, setShowSidebar,
+    eventService, actionService} = context
+
 
     const [guardInput, setGuardInput] = useState<string>("")
     const [guardInputIsValid, setGuardInputIsValid] = useState<boolean>(false)
     const [guards, setGuards] = useState<Guard[]>(selectedEdge?.data?.transition.getGuards || []);
+    const [actions, setActions] = useState<Action[]>(selectedEdge?.data?.transition.getActions || [])
+    const [onEvent, setOnEvent] = useState<Event[]>([])
 
 
 
@@ -135,12 +142,25 @@ export default function TransitionInfoForm() {
                                 </Col>
                             </Form.Group>
 
+                            <Form.Group as={Row} className={"mb-3"}>
+                                <Form.Label column sm={"2"}>
+                                    On:
+                                </Form.Label>
+                                <Col sm={10}>
+                                    <SelectEventsModal buttonName={"Select Event"} modalTitle={"Events"} events={onEvent} setEvents={setOnEvent} multiple={false}/>
+                                </Col>
+                            </Form.Group>
+
                         </Form>
                         {guards.length > 0 && (
                             <Container className={"mb-3"}>
                                 <GuardDisplay guards={guards} setGuards={setGuards} onDelete={onGuardDelete} />
                             </Container>
                         )}
+
+                        <h2>{onEvent[0]?.name}</h2>
+
+
                     </OffcanvasBody>
 
                 </Offcanvas>
