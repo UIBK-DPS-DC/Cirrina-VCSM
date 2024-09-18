@@ -1,16 +1,65 @@
-import {useContext} from "react";
+import React, {useContext, useEffect, useState} from "react";
 import {ReactFlowContext} from "../../utils.tsx";
 import {ReactFlowContextProps} from "../../types.ts";
 import Offcanvas from "react-bootstrap/Offcanvas";
-import {OffcanvasBody, OffcanvasHeader, OffcanvasTitle} from "react-bootstrap";
+import {Button, Col, Form, InputGroup, OffcanvasBody, OffcanvasHeader, OffcanvasTitle, Row} from "react-bootstrap";
+import Guard from "../../classes/guard.tsx";
 
 
 export default function TransitionInfoForm() {
     const context = useContext(ReactFlowContext) as ReactFlowContextProps;
     const {selectedEdge, showSidebar, setShowSidebar} = context
 
-    const offcanvasTitle = () => selectedEdge?.data ?
+    const [guardInput, setGuardInput] = useState<string>("")
+    const [guardInputIsValid, setGuardInputIsValid] = useState<boolean>(false)
+    const [guards, setGuards] = useState<Guard[]>(selectedEdge?.data?.transition.getGuards || []);
+
+
+
+
+
+    const offcanvasTitle = () => selectedEdge?.data?.transition ?
         selectedEdge.data.transition.getSource() + " => " + selectedEdge.data.transition.getTarget() : "Unknown"
+
+    const invalidGuardInputText = () => "Please provide a valid expression"
+
+    const validateGuardInput = (guardExpression: string) => {
+        // TODO: Guard verification logic
+        return !!guardExpression.trim()
+    }
+
+
+
+
+
+
+
+    const onGuardInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setGuardInput(event.target.value)
+    }
+
+    const onAddGuardClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+        event.preventDefault()
+        event.stopPropagation()
+
+        if(!selectedEdge?.data?.transition){
+            return
+        }
+
+
+        const newGuard = new Guard(guardInput)
+        selectedEdge.data.transition.addGuard(newGuard)
+        setGuards((prevGuards) => [...prevGuards, newGuard])
+
+
+    }
+
+
+    useEffect(() => {
+        setGuardInputIsValid(validateGuardInput(guardInput))
+    }, [guardInput]);
+
+
 
     return (
         <>
@@ -27,7 +76,47 @@ export default function TransitionInfoForm() {
                     </OffcanvasHeader>
 
                     <OffcanvasBody>
-                        Transition form
+                        <Form>
+
+                            <Form.Group as={Row} className={"mb-3"}>
+                                <Form.Label column sm={"2"}>Source State: </Form.Label>
+                                <Col sm={10}>
+                                    <Form.Control type={"text"}
+                                                  disabled={true}
+                                                  value={selectedEdge.data.transition.getSource()}
+                                    />
+                                </Col>
+                            </Form.Group>
+
+                            <Form.Group as={Row} className={"mb-3"}>
+                                <Form.Label column sm={"2"}>Target State: </Form.Label>
+                                <Col sm={10}>
+                                    <Form.Control type={"text"}
+                                                  disabled={true}
+                                                  value={selectedEdge.data.transition.getTarget()}
+                                    />
+                                </Col>
+                            </Form.Group>
+
+                            <Form.Group as={Row} className="mb-3">
+                                <Form.Label column sm={"2"}>
+                                    Add Guard:
+                                </Form.Label>
+                                <Col sm={10}>
+                                    <InputGroup>
+                                        <Form.Control type={"text"} value={guardInput} onChange={onGuardInputChange} isValid={guardInputIsValid} isInvalid={!guardInputIsValid && guardInput !== ""}/>
+                                        <Button disabled={!guardInputIsValid} onClick={onAddGuardClick}>
+                                            Add
+                                            <i className={"bi bi-plus-circle"}></i>
+                                        </Button>
+                                        <Form.Control.Feedback type={"invalid"}>
+                                            {invalidGuardInputText()}
+                                        </Form.Control.Feedback>
+                                    </InputGroup>
+                                </Col>
+                            </Form.Group>
+
+                        </Form>
                     </OffcanvasBody>
 
                 </Offcanvas>
