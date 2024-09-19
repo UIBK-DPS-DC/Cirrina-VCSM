@@ -14,7 +14,7 @@ import {isState, MatchActionProps, ReactFlowContextProps} from "../../../types.t
 import MatchCase from "../../../classes/MatchCase.tsx";
 
 
-let idCounter = 0
+
 
 function CaseForm(props: {
     action: Action | undefined;
@@ -155,11 +155,11 @@ function CaseForm(props: {
             case ActionType.ASSIGN:
                 return <AssignActionForm action={props.action ? props.action : assignAction[0]} setActions={props.action ? props.setActions : setAssignAction} noCategorySelect={true} dontAddToState={true} />;
             case ActionType.RAISE_EVENT:
-                return <RaiseEventActionForm action={props.action ? props.action : raiseEventAction[0]} setActions={props.action ? props.setActions : setRaiseEventAction} noCategorySelect={true} />;
+                return <RaiseEventActionForm action={props.action ? props.action : raiseEventAction[0]} setActions={props.action ? props.setActions : setRaiseEventAction} noCategorySelect={true}  dontAddToEdge={true}/>;
             case ActionType.TIMEOUT:
-                return <TimeoutActionForm action={props.action ? props.action : timeoutAction[0]} setActions={props.action ? props.setActions : setTimeoutAction} noCategorySelect={true} />;
+                return <TimeoutActionForm action={props.action ? props.action : timeoutAction[0]} setActions={props.action ? props.setActions : setTimeoutAction} noCategorySelect={true} dontAddToState={true} />;
             case ActionType.TIMEOUT_RESET:
-                return <TimeoutResetActionForm action={props.action ? props.action : timeOutResetAction[0]} setActions={props.action ? props.setActions : setTimeoutResetAction} noCategorySelect={true} />;
+                return <TimeoutResetActionForm action={props.action ? props.action : timeOutResetAction[0]} setActions={props.action ? props.setActions : setTimeoutResetAction} noCategorySelect={true} dontAddToState={true} />;
             case ActionType.MATCH:
                 return <MatchActionForm action={props.action ? props.action : matchAction[0]} setActions={props.action ? props.setActions : setMatchAction} noCategorySelect={true} dontAddToState={true}/>;
             default:

@@ -14,14 +14,14 @@ export default function TimeoutResetActionForm(props: {action: Action | undefine
     setActions: Dispatch<SetStateAction<Action[]>>,
     onSubmit?: () => void,
     noCategorySelect?: boolean,
-    dontShowDeleteButton? :boolean}) {
+    dontShowDeleteButton? :boolean, dontAddToState?: boolean}) {
 
     const context = useContext(ReactFlowContext) as ReactFlowContextProps;
-    const {selectedNode, actionService, stateOrStateMachineService} = context;
+    const {selectedNode, actionService, stateOrStateMachineService, selectedEdge} = context;
 
     const [selectedAction, setSelectedAction] = useState<string>("");
     const [selectedActionCategory, setSelectedActionCategory] = useState<string>(ActionCategory.ENTRY_ACTION);
-    const [selectedActionsIsValid, setSelectedActionIsValid] = useState<boolean>(false);
+    const [selectedActionsIsValid, setSelectedActionIsValid] = useState<boolean>(true);
 
     const headerText = () => props.action ? "Edit Timeout Reset Action" : "Create Timeout Reset Action";
     const submitButtonText = () => props.action ? "Update Timeout Reset Action" : "Create";
@@ -43,7 +43,7 @@ export default function TimeoutResetActionForm(props: {action: Action | undefine
     // Validate that the selected action exists in the available timeout actions
     const validateSelectedAction = (action: string) => {
         const availableActions = actionService.getActionsByType(ActionType.TIMEOUT);
-        return availableActions.some((timeoutAction: Action) => timeoutAction.name === action) || !!props.action;
+        return !! selectedAction//availableActions.some((timeoutAction: Action) => timeoutAction.name === action) || !!props.action;
     };
 
     const onSelectedActionChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
@@ -124,7 +124,9 @@ export default function TimeoutResetActionForm(props: {action: Action | undefine
         event.preventDefault();
         event.stopPropagation();
 
-        if (!selectedNode) return;
+        if (!selectedNode && !selectedEdge) {
+            return;
+        }
 
         const action = actionService.getActionByName(selectedAction);
         if (!action) return;
@@ -135,28 +137,77 @@ export default function TimeoutResetActionForm(props: {action: Action | undefine
         };
 
         let updatedAction: Action;
-        if (props.action) {
-            const oldCategory = actionService.getActionCategory(props.action, selectedNode.data);
-            if (oldCategory !== selectedActionCategory as ActionCategory) {
-                stateOrStateMachineService.removeActionFromState(props.action, selectedNode.data);
-                stateOrStateMachineService.addActionToState(selectedNode.data, props.action, selectedActionCategory as ActionCategory);
+
+        if(selectedEdge){
+
+            if(props.action){
+                updatedAction = props.action;
+                updatedAction.properties = timeoutResetActionsProps;
+                onActionSubmit(updatedAction);
+
+                actionService.deregisterAction(updatedAction);
+                actionService.registerAction(updatedAction);
+
+                if(selectedEdge.data){
+                    selectedEdge.data.transition.removeAction(updatedAction)
+                    selectedEdge.data.transition.addAction(updatedAction)
+                }
+
+                if (props.onSubmit) {
+                    props.onSubmit();
+                }
+                return
             }
-            updatedAction = props.action;
-            updatedAction.properties = timeoutResetActionsProps;
-            onActionSubmit(updatedAction);
-        } else {
-            updatedAction = new Action("", ActionType.TIMEOUT_RESET);
-            updatedAction.properties = timeoutResetActionsProps;
-            stateOrStateMachineService.addActionToState(selectedNode.data, updatedAction, selectedActionCategory as ActionCategory);
-            onActionSubmit(updatedAction);
+            else {
+                updatedAction = new Action("", ActionType.TIMEOUT_RESET);
+                updatedAction.properties = timeoutResetActionsProps;
+
+                onActionSubmit(updatedAction);
+
+                if (selectedEdge.data && !props.dontAddToState) {
+                    selectedEdge.data.transition.addAction(updatedAction)
+                }
+
+                actionService.deregisterAction(updatedAction);
+                actionService.registerAction(updatedAction);
+
+                if(props.onSubmit){
+                    props.onSubmit()
+                }
+
+                return
+            }
+
         }
 
-        if (props.onSubmit) {
-            props.onSubmit();
-        }
+        if(selectedNode) {
 
-        actionService.deregisterAction(updatedAction);
-        actionService.registerAction(updatedAction);
+
+            if (props.action) {
+                const oldCategory = actionService.getActionCategory(props.action, selectedNode.data);
+                if (oldCategory !== selectedActionCategory as ActionCategory && !props.dontAddToState) {
+                    stateOrStateMachineService.removeActionFromState(props.action, selectedNode.data);
+                    stateOrStateMachineService.addActionToState(selectedNode.data, props.action, selectedActionCategory as ActionCategory);
+                }
+                updatedAction = props.action;
+                updatedAction.properties = timeoutResetActionsProps;
+                onActionSubmit(updatedAction);
+            } else {
+                updatedAction = new Action("", ActionType.TIMEOUT_RESET);
+                updatedAction.properties = timeoutResetActionsProps;
+                if (!props.dontAddToState) {
+                    stateOrStateMachineService.addActionToState(selectedNode.data, updatedAction, selectedActionCategory as ActionCategory);
+                }
+                onActionSubmit(updatedAction);
+            }
+
+            if (props.onSubmit) {
+                props.onSubmit();
+            }
+
+            actionService.deregisterAction(updatedAction);
+            actionService.registerAction(updatedAction);
+        }
     };
 
     return (

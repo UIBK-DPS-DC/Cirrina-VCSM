@@ -2,7 +2,7 @@ import {Button, Container, Form, ModalBody, Row} from "react-bootstrap";
 import React, {Dispatch, SetStateAction, useCallback, useContext, useEffect, useState} from "react";
 import Modal from "react-bootstrap/Modal";
 import {ReactFlowContext} from "../../utils.tsx";
-import {CsmNodeProps, isState, ReactFlowContextProps} from "../../types.ts";
+import {CsmNodeProps, ReactFlowContextProps} from "../../types.ts";
 import {Node} from "@xyflow/react";
 import ContextVariable from "../../classes/contextVariable.tsx";
 import Select, { ActionMeta, OnChangeValue } from 'react-select'
@@ -16,7 +16,7 @@ export default function SelectContextsModal(props: {buttonName: string | undefin
     const context = useContext(ReactFlowContext) as ReactFlowContextProps;
     const {nodes,
     selectedNode,
-    contextService} = context
+    contextService, selectedEdge} = context
 
     const PERSISTENT_CONTEXT_MULTISELECT_NAME = "selected-persistent-context"
     const LOCAL_CONTEXT_MULTISELECT_NAME = "selected-local-context"
@@ -82,12 +82,29 @@ export default function SelectContextsModal(props: {buttonName: string | undefin
      * @returns {ContextVariable[]} - An array of unique local context variables.
      */
     const getKnownLocalContext = useCallback(() => {
-        if(!selectedNode){
+
+        if(!selectedNode && !selectedEdge){
             return []
         }
-        return getKnownContextVariables(selectedNode)[0].filter((value, index, vars) => {
-            return vars.indexOf(value) === index;
-        })
+
+        if(selectedNode){
+            return getKnownContextVariables(selectedNode)[0].filter((value, index, vars) => {
+                return vars.indexOf(value) === index;
+            })
+        }
+
+        if(selectedEdge){
+            const sourceNode = nodes.find((n) => n.id === selectedEdge.source);
+            if(sourceNode){
+                return getKnownContextVariables(sourceNode)[0].filter((value, index, vars) => {
+                    return vars.indexOf(value) === index;
+                })
+            }
+        }
+
+
+
+        return []
     },[getKnownContextVariables])
 
     /**
@@ -100,12 +117,27 @@ export default function SelectContextsModal(props: {buttonName: string | undefin
      *                                            or undefined if no node is selected.
      */
     const getKnownStaticContext = useCallback(() => {
-        if(!selectedNode){
+        if(!selectedNode && !selectedEdge){
             return []
         }
-        return getKnownContextVariables(selectedNode)[1].filter((value, index, vars) => {
-            return vars.indexOf(value) === index;
-        })
+
+        if(selectedNode){
+            return getKnownContextVariables(selectedNode)[1].filter((value, index, vars) => {
+                return vars.indexOf(value) === index;
+            })
+        }
+
+        if(selectedEdge){
+            const sourceNode = nodes.find((n) => n.id === selectedEdge.source);
+            if(sourceNode){
+                return getKnownContextVariables(sourceNode)[1].filter((value, index, vars) => {
+                    return vars.indexOf(value) === index;
+                })
+            }
+        }
+
+        return []
+
     },[getKnownContextVariables])
 
 
@@ -217,7 +249,7 @@ export default function SelectContextsModal(props: {buttonName: string | undefin
         event.preventDefault()
         event.stopPropagation()
 
-        if(!selectedNode){
+        if(!selectedNode && !selectedEdge){
             return;
         }
 
@@ -305,7 +337,6 @@ export default function SelectContextsModal(props: {buttonName: string | undefin
                             </Row>
                         </Form.Group>
 
-                        {selectedNode && isState(selectedNode.data) && (
                             <Form.Group controlId={"fromStaticContext"}>
                                 <Row>
                                     <Form.Label>Static Context</Form.Label>
@@ -318,7 +349,6 @@ export default function SelectContextsModal(props: {buttonName: string | undefin
                                     ) || (<Form.Text muted> No Static Context found</Form.Text>)}
                                 </Row>
                             </Form.Group>
-                        )}
 
                         <Button type={"submit"}>Save Selection</Button>
 

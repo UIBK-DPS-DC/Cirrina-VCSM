@@ -120,19 +120,19 @@ export default function TransitionInfoForm() {
     const renderActionForm = () => {
         switch (selectedActionType) {
             case ActionType.INVOKE:
-                return <InvokeActionForm action={invokeAction[0]} setActions={setInvokeAction} noCategorySelect={true} dontAddToState={true} onSubmit={onInvokeActionSubmit}/>;
+                return <InvokeActionForm action={invokeAction[0]} setActions={setInvokeAction} noCategorySelect={true} dontAddToState={false} onSubmit={onInvokeActionSubmit}/>;
             case ActionType.CREATE:
-                return <CreateActionForm action={createAction[0]} setActions={setCreateAction} noCategorySelect={true} dontAddToState={true} onSubmit={onCreateActionSubmit}  />;
+                return <CreateActionForm action={createAction[0]} setActions={setCreateAction} noCategorySelect={true} dontAddToState={false} onSubmit={onCreateActionSubmit}  />;
             case ActionType.ASSIGN:
-                return <AssignActionForm action={assignAction[0]} setActions={ setAssignAction} noCategorySelect={true} dontAddToState={true} onSubmit={onAssignActionSubmit} />;
+                return <AssignActionForm action={assignAction[0]} setActions={ setAssignAction} noCategorySelect={true} dontAddToState={false} onSubmit={onAssignActionSubmit} />;
             case ActionType.RAISE_EVENT:
-                return <RaiseEventActionForm action={raiseEventAction[0]} setActions={setRaiseEventAction} noCategorySelect={true} onSubmit={onRaiseEventActionSubmit}/>;
+                return <RaiseEventActionForm action={raiseEventAction[0]} setActions={setRaiseEventAction} noCategorySelect={true} dontAddToEdge={false} onSubmit={onRaiseEventActionSubmit}/>;
             case ActionType.TIMEOUT:
                 return <TimeoutActionForm action={timeoutAction[0]} setActions={setTimeoutAction} noCategorySelect={true} onSubmit={onTimeoutActionSubmit}/>;
             case ActionType.TIMEOUT_RESET:
                 return <TimeoutResetActionForm action={timeOutResetAction[0]} setActions={setTimeoutResetAction} noCategorySelect={true} onSubmit={onTimeoutResetActionSubmit}/>;
             case ActionType.MATCH:
-                return <MatchActionForm action={undefined} setActions={setMatchAction}  dontAddToState={true} onSubmit={onMatchActionSubmit}/>;
+                return <MatchActionForm action={undefined} setActions={setMatchAction}  dontAddToState={false} onSubmit={onMatchActionSubmit}/>;
             default:
                 return null;
         }
