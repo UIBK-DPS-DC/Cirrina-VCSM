@@ -42,7 +42,9 @@ export default function TimeoutResetActionForm(props: {action: Action | undefine
 
     // Validate that the selected action exists in the available timeout actions
     const validateSelectedAction = (action: string) => {
+        console.log(action)
         const availableActions = actionService.getActionsByType(ActionType.TIMEOUT);
+        console.log(availableActions)
         return !! selectedAction//availableActions.some((timeoutAction: Action) => timeoutAction.name === action) || !!props.action;
     };
 

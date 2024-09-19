@@ -131,7 +131,9 @@ export default class Transition {
     // TODO: Expand for internal transitions.
     public toDescription(): OnTransitionDescription {
         const description: OnTransitionDescription = {
-            actions: [], else: null, event: this.getEvent(),
+            actions: this.getActions().map((a) => a.toDescription()) ,
+            else: null,
+            event: this.getEvent(),
             guards: this.getGuards().map((guard)=> {return guard.toDescription()}),
             target: this.target
 

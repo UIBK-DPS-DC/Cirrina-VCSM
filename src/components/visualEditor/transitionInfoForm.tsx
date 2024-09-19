@@ -3,6 +3,7 @@ import {ReactFlowContext, renderEnumAsOptions} from "../../utils.tsx";
 import {ReactFlowContextProps} from "../../types.ts";
 import Offcanvas from "react-bootstrap/Offcanvas";
 import {
+    Accordion, AccordionHeader,
     Button,
     Col,
     Container,
@@ -34,8 +35,7 @@ let idCounter = 0
 
 export default function TransitionInfoForm() {
     const context = useContext(ReactFlowContext) as ReactFlowContextProps;
-    const {selectedEdge, showSidebar, setShowSidebar,
-    eventService, actionService} = context
+    const {selectedEdge, showSidebar, setShowSidebar} = context
 
     const instanceId = useRef(++idCounter).current;
     let formCount = 0
@@ -46,7 +46,7 @@ export default function TransitionInfoForm() {
     const [guardInput, setGuardInput] = useState<string>("")
     const [guardInputIsValid, setGuardInputIsValid] = useState<boolean>(false)
     const [guards, setGuards] = useState<Guard[]>(selectedEdge?.data?.transition.getGuards || []);
-    const [actions, setActions] = useState<Action[]>(selectedEdge?.data?.transition.getActions || [])
+    const [_actions, setActions] = useState<Action[]>(selectedEdge?.data?.transition.getActions || [])
     const [onEvent, setOnEvent] = useState<Event | undefined>()
 
 
@@ -156,9 +156,11 @@ export default function TransitionInfoForm() {
     }
 
 
-
-
-
+    useEffect(() => {
+        if(selectedEdge?.data && onEvent){
+            selectedEdge.data.transition.setEvent(onEvent.name)
+        }
+    }, [onEvent]);
 
 
     const onGuardInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -299,7 +301,73 @@ export default function TransitionInfoForm() {
                             </Modal>
                         </Container>
 
-                        {selectedEdge.data.transition.getActions().map((actionType) => (<h2 key={actionType.id}>Hi ${actionType.id}</h2>))}
+                        <Accordion>
+                            <Accordion.Item eventKey={"0"}>
+                                <AccordionHeader>
+                                    On Actions
+                                </AccordionHeader>
+                                <Accordion.Body>
+                                    {selectedEdge.data.transition.getActions().map((a) => {
+                                        switch (a.type) {
+                                            case ActionType.CREATE: {
+                                                return (
+                                                    <Container className={"mb-3"} key={a.id}>
+                                                        <CreateActionForm action={a} setActions={setCreateAction} onSubmit={onCreateActionSubmit} noCategorySelect={true} />
+                                                    </Container>
+                                                )
+                                            }
+                                            case ActionType.ASSIGN: {
+                                                return(
+                                                    <Container className={"mb-3"} key={a.id}>
+                                                        <AssignActionForm action={a} setActions={setAssignAction} onSubmit={onAssignActionSubmit} noCategorySelect={true}/>
+                                                    </Container>
+                                                )
+                                            }
+                                            case ActionType.RAISE_EVENT: {
+                                                return (
+                                                    <Container className={"mb-3"} key={a.id}>
+                                                        <RaiseEventActionForm action={a} setActions={setRaiseEventAction} onSubmit={onRaiseEventActionSubmit} noCategorySelect={true}/>
+                                                    </Container>
+                                                )
+                                            }
+                                            case ActionType.TIMEOUT: {
+                                                return (
+                                                    <Container className={"mb-3"} key={a.id}>
+                                                        <TimeoutActionForm action={a} setActions={setTimeoutAction} onSubmit={onTimeoutActionSubmit} noCategorySelect={true} />
+                                                    </Container>
+                                                )
+                                            }
+
+                                            case ActionType.TIMEOUT_RESET: {
+                                                return(
+                                                    <Container className={"mb-3"} key={a.id}>
+                                                        <TimeoutResetActionForm action={a} setActions={setTimeoutResetAction} onSubmit={onTimeoutResetActionSubmit} noCategorySelect={true}/>
+                                                    </Container>
+                                                )
+                                            }
+                                            case ActionType.INVOKE: {
+                                                return (
+                                                    <Container className={"mb-3"} key={a.id}>
+                                                        <InvokeActionForm action={a} setActions={setInvokeAction} onSubmit={onInvokeActionSubmit} noCategorySelect={true}/>
+                                                    </Container>
+                                                )
+                                            }
+                                            case ActionType.MATCH: {
+                                                return (
+                                                    <Container className={"mb-3"} key={a.id}>
+                                                        <MatchActionForm action={a} setActions={setMatchAction} onSubmit={onMatchActionSubmit} noCategorySelect={true}/>
+                                                    </Container>
+                                                    )
+                                            }
+                                            default: {
+                                                return <></>
+                                            }
+                                        }
+                                    })}
+                                </Accordion.Body>
+                            </Accordion.Item>
+                        </Accordion>
+
 
                     </OffcanvasBody>
 
