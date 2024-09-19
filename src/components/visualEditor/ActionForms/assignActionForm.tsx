@@ -112,7 +112,7 @@ export default function AssignActionForm(props: {action: Action | undefined,
 
     const onDeleteButtonPress = () => {
 
-        if(!selectedNode){
+        if(!selectedNode && !selectedEdge){
             return;
         }
 
@@ -120,7 +120,14 @@ export default function AssignActionForm(props: {action: Action | undefined,
             return
         }
 
-        stateOrStateMachineService.removeActionFromState(props.action, selectedNode.data)
+        if(selectedNode){
+            stateOrStateMachineService.removeActionFromState(props.action, selectedNode.data)
+        }
+
+        if(selectedEdge?.data){
+            selectedEdge.data.transition.removeAction(props.action)
+        }
+
         props.setActions((prevActions) => prevActions.filter((a) => a !== props.action))
 
     }
