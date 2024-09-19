@@ -337,7 +337,7 @@ export default function MatchActionForm(props: {
 
     const onDeleteButtonPress = () => {
 
-        if(!selectedNode){
+        if(!selectedNode && !selectedEdge){
             return;
         }
 
@@ -345,7 +345,15 @@ export default function MatchActionForm(props: {
             return
         }
 
-        stateOrStateMachineService.removeActionFromState(props.action, selectedNode.data)
+        if(selectedNode){
+            stateOrStateMachineService.removeActionFromState(props.action, selectedNode.data)
+        }
+
+        if(selectedEdge?.data){
+            selectedEdge.data.transition.removeAction(props.action)
+        }
+
+
         props.setActions((prevActions) => prevActions.filter((a) => a !== props.action))
 
     }
