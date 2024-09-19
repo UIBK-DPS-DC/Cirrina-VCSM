@@ -59,7 +59,7 @@ export default function AssignActionForm(props: {action: Action | undefined,
     }, [selectedVar, expressionInput]);
 
     useEffect(() => {
-        if(!selectedNode){
+        if(!selectedNode && !selectedEdge){
             return
         }
 
@@ -68,11 +68,12 @@ export default function AssignActionForm(props: {action: Action | undefined,
             setSelectedVar([assignActionsProps.variable]);
             setExpressionInput(assignActionsProps.expression);
 
-            const actionCategory = actionService.getActionCategory(props.action,selectedNode.data)
-            if(actionCategory) {
-                setSelectedActionCategory(actionCategory)
+            if(selectedNode){
+                const actionCategory = actionService.getActionCategory(props.action,selectedNode.data)
+                if(actionCategory) {
+                    setSelectedActionCategory(actionCategory)
+                }
             }
-
         }
 
     }, []);
@@ -145,8 +146,29 @@ export default function AssignActionForm(props: {action: Action | undefined,
         let updatedAction: Action
 
 
+        // EDGE LOGIC
         if(selectedEdge){
-            // EDGE LOGIC
+
+            if(props.action){
+                console.log("I EXIST")
+                updatedAction = props.action;
+                updatedAction.properties = assignActionsProps;
+                onActionSubmit(updatedAction);
+
+                if(selectedEdge.data){
+                    selectedEdge.data.transition.removeAction(updatedAction)
+                    selectedEdge.data.transition.addAction(updatedAction)
+                }
+
+                if (props.onSubmit) {
+                    props.onSubmit();
+                }
+                return
+
+
+
+            }
+
             updatedAction = new Action("newAction", ActionType.ASSIGN);
             updatedAction.properties = assignActionsProps;
 
@@ -159,7 +181,10 @@ export default function AssignActionForm(props: {action: Action | undefined,
             actionService.deregisterAction(updatedAction);
             actionService.registerAction(updatedAction);
 
-            // Add action to transition
+            if(selectedEdge.data){
+                selectedEdge.data.transition.addAction(updatedAction)
+            }
+
 
 
 

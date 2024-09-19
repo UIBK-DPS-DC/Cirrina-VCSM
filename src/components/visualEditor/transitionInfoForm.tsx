@@ -66,23 +66,73 @@ export default function TransitionInfoForm() {
     const handleShow = () => setShowActionModal(true)
     const handleClose = () => setShowActionModal(false)
 
+    const onInvokeActionSubmit = () => {
+        setActions((prev) => [...prev, invokeAction[0]])
+        setInvokeAction([])
+        handleClose()
+    }
+
+    const onCreateActionSubmit = () => {
+        setActions((prev) => [...prev, createAction[0]])
+        setCreateAction([])
+        handleClose()
+
+    }
+
+    const onAssignActionSubmit = () => {
+        setActions((prev) => [...prev,assignAction[0]])
+        setAssignAction([])
+        handleClose()
+    }
+
+    const onRaiseEventActionSubmit = () => {
+        setActions((prev) => [...prev, raiseEventAction[0]])
+        setRaiseEventAction([])
+        handleClose()
+    }
+
+    const onTimeoutActionSubmit = () => {
+        setActions((prev) => [...prev, timeoutAction[0]])
+        setTimeoutAction([])
+        handleClose()
+    }
+
+    const onTimeoutResetActionSubmit = () => {
+        setActions((prev) => [...prev, timeOutResetAction[0]])
+        setTimeoutResetAction([])
+        handleClose()
+    }
+
+    const onMatchActionSubmit = () => {
+        setActions((prev) => [...prev, matchAction[0]])
+        setMatchAction([])
+        handleClose()
+    }
+
+
+
+
+
+
+
+
 
     const renderActionForm = () => {
         switch (selectedActionType) {
             case ActionType.INVOKE:
-                return <InvokeActionForm action={invokeAction[0]} setActions={setInvokeAction} noCategorySelect={true} dontAddToState={true} onSubmit={handleClose}/>;
+                return <InvokeActionForm action={invokeAction[0]} setActions={setInvokeAction} noCategorySelect={true} dontAddToState={true} onSubmit={onInvokeActionSubmit}/>;
             case ActionType.CREATE:
-                return <CreateActionForm action={createAction[0]} setActions={setCreateAction} noCategorySelect={true} dontAddToState={true} onSubmit={handleClose}  />;
+                return <CreateActionForm action={createAction[0]} setActions={setCreateAction} noCategorySelect={true} dontAddToState={true} onSubmit={onCreateActionSubmit}  />;
             case ActionType.ASSIGN:
-                return <AssignActionForm action={assignAction[0]} setActions={ setAssignAction} noCategorySelect={true} dontAddToState={true} onSubmit={handleClose} />;
+                return <AssignActionForm action={assignAction[0]} setActions={ setAssignAction} noCategorySelect={true} dontAddToState={true} onSubmit={onAssignActionSubmit} />;
             case ActionType.RAISE_EVENT:
-                return <RaiseEventActionForm action={raiseEventAction[0]} setActions={setRaiseEventAction} noCategorySelect={true} onSubmit={handleClose}/>;
+                return <RaiseEventActionForm action={raiseEventAction[0]} setActions={setRaiseEventAction} noCategorySelect={true} onSubmit={onRaiseEventActionSubmit}/>;
             case ActionType.TIMEOUT:
-                return <TimeoutActionForm action={timeoutAction[0]} setActions={setTimeoutAction} noCategorySelect={true} onSubmit={handleClose}/>;
+                return <TimeoutActionForm action={timeoutAction[0]} setActions={setTimeoutAction} noCategorySelect={true} onSubmit={onTimeoutActionSubmit}/>;
             case ActionType.TIMEOUT_RESET:
-                return <TimeoutResetActionForm action={timeOutResetAction[0]} setActions={setTimeoutResetAction} noCategorySelect={true} onSubmit={handleClose}/>;
+                return <TimeoutResetActionForm action={timeOutResetAction[0]} setActions={setTimeoutResetAction} noCategorySelect={true} onSubmit={onTimeoutResetActionSubmit}/>;
             case ActionType.MATCH:
-                return <MatchActionForm action={matchAction[0]} setActions={setMatchAction}  dontAddToState={true} onSubmit={handleClose}/>;
+                return <MatchActionForm action={matchAction[0]} setActions={setMatchAction}  dontAddToState={true} onSubmit={onMatchActionSubmit}/>;
             default:
                 return null;
         }
@@ -249,6 +299,7 @@ export default function TransitionInfoForm() {
                             </Modal>
                         </Container>
 
+                        {selectedEdge.data.transition.getActions().map((actionType) => (<h2 key={actionType.id}>Hi ${actionType.id}</h2>))}
 
                     </OffcanvasBody>
 
