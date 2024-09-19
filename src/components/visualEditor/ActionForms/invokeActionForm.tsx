@@ -25,7 +25,7 @@ export default function InvokeActionForm(props: {action: Action | undefined,
     const context = useContext(ReactFlowContext) as ReactFlowContextProps;
     const {selectedNode,
     stateOrStateMachineService,
-    actionService} = context;
+    actionService, selectedEdge} = context;
 
 
     const submitButtonText = () => props.action ? "Save Changes" : "Create Action"
@@ -53,7 +53,7 @@ export default function InvokeActionForm(props: {action: Action | undefined,
     }, [selectedActionCategory]);
 
     useEffect(() => {
-        if(!selectedNode){
+        if(!selectedNode && !selectedEdge){
             return;
         }
         if(props.action && props.action.type === ActionType.INVOKE){
@@ -64,11 +64,12 @@ export default function InvokeActionForm(props: {action: Action | undefined,
             setSelectedEventsWhenDone(invokeActionProps.done)
             setSelectedServiceType(invokeActionProps.serviceType)
 
-            const actionCategory = actionService.getActionCategory(props.action,selectedNode.data)
-            if(actionCategory) {
-                setSelectedActionCategory(actionCategory)
+            if(selectedNode){
+                const actionCategory = actionService.getActionCategory(props.action,selectedNode.data)
+                if(actionCategory) {
+                    setSelectedActionCategory(actionCategory)
+                }
             }
-            // TODO: Continue
 
             const eventVars = invokeActionProps.done.map((e) => e.data).flat()
             setSelectedEventVars(eventVars)
@@ -177,7 +178,7 @@ export default function InvokeActionForm(props: {action: Action | undefined,
     const onFormSubmit = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         event.stopPropagation();
-        if (!selectedNode) {
+        if (!selectedNode && !selectedEdge) {
             return;
         }
 
@@ -192,47 +193,93 @@ export default function InvokeActionForm(props: {action: Action | undefined,
 
         let updatedAction: Action;
 
-        // Handle updating an existing action
-        if (props.action) {
 
-            const oldCategory = actionService.getActionCategory(props.action, selectedNode.data);
 
-            // Check if category has changed and update the action in the state node if needed
-            if (oldCategory !== selectedActionCategory as ActionCategory) {
-                if(!props.dontAddToState){
-                    stateOrStateMachineService.removeActionFromState(props.action, selectedNode.data);
-                    stateOrStateMachineService.addActionToState(selectedNode.data, props.action, selectedActionCategory as ActionCategory);
+        if(selectedEdge){
+
+            if(props.action){
+                updatedAction = props.action;
+                updatedAction.properties = invokeActionsProperties;
+                onActionSubmit(updatedAction);
+
+                actionService.deregisterAction(updatedAction);
+                actionService.registerAction(updatedAction);
+
+                if(selectedEdge.data){
+                    selectedEdge.data.transition.removeAction(updatedAction)
+                    selectedEdge.data.transition.addAction(updatedAction)
+                }
+
+                if (props.onSubmit) {
+                    props.onSubmit();
+                }
+            }
+            else {
+                updatedAction = new Action("newAction", ActionType.INVOKE);
+                updatedAction.properties = invokeActionsProperties;
+
+
+                actionService.deregisterAction(updatedAction);
+                actionService.registerAction(updatedAction);
+
+                if(selectedEdge.data){
+                    selectedEdge.data.transition.addAction(updatedAction)
+                }
+
+                onActionSubmit(updatedAction);
+                if (props.onSubmit) {
+                    props.onSubmit();
                 }
             }
 
-            updatedAction = props.action;
-            updatedAction.properties = invokeActionsProperties;
-            onActionSubmit(updatedAction);
-        } else {
-            updatedAction = new Action("newAction", ActionType.INVOKE);
-            updatedAction.properties = invokeActionsProperties;
-            //TODO provide optional dont add action to state prop.
-            if(!props.dontAddToState){
-                stateOrStateMachineService.addActionToState(selectedNode.data, updatedAction, selectedActionCategory as ActionCategory);
+            return
+        }
+
+
+
+
+        if(selectedNode) {
+            // Handle updating an existing action
+            if (props.action) {
+
+                const oldCategory = actionService.getActionCategory(props.action, selectedNode.data);
+
+                // Check if category has changed and update the action in the state node if needed
+                if (oldCategory !== selectedActionCategory as ActionCategory) {
+                    if (!props.dontAddToState) {
+                        stateOrStateMachineService.removeActionFromState(props.action, selectedNode.data);
+                        stateOrStateMachineService.addActionToState(selectedNode.data, props.action, selectedActionCategory as ActionCategory);
+                    }
+                }
+
+                updatedAction = props.action;
+                updatedAction.properties = invokeActionsProperties;
+                onActionSubmit(updatedAction);
+            } else {
+                updatedAction = new Action("newAction", ActionType.INVOKE);
+                updatedAction.properties = invokeActionsProperties;
+                //TODO provide optional dont add action to state prop.
+                if (!props.dontAddToState) {
+                    stateOrStateMachineService.addActionToState(selectedNode.data, updatedAction, selectedActionCategory as ActionCategory);
+                }
+                onActionSubmit(updatedAction);
             }
-            onActionSubmit(updatedAction);
+
+            if (props.onSubmit) {
+                props.onSubmit();
+            }
+
+            actionService.deregisterAction(updatedAction);
+            actionService.registerAction(updatedAction);
+
+
+            if (isState(selectedNode.data)) {
+                const sm = selectedNode.data
+                sm.state.entry.forEach(entry => {
+                    console.log(entry.properties)
+                })
+            }
         }
-
-        if (props.onSubmit) {
-            props.onSubmit();
-        }
-
-        actionService.deregisterAction(updatedAction);
-        actionService.registerAction(updatedAction);
-
-
-        if(isState(selectedNode.data)){
-            const sm = selectedNode.data
-            sm.state.entry.forEach(entry => {
-                console.log(entry.properties)
-            })
-        }
-
     };
 
 
