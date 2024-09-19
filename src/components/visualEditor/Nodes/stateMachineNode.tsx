@@ -1,4 +1,4 @@
-import {NodeProps, NodeResizer} from "@xyflow/react";
+import {Handle, NodeProps, NodeResizer, Position} from "@xyflow/react";
 import {ReactFlowContextProps, type StateMachineNode} from "../../../types.ts";
 import {useContext, useEffect, useState} from "react";
 import {ReactFlowContext} from "../../../utils.tsx";
@@ -12,14 +12,6 @@ export function StateMachineNode ({data, selected}: NodeProps<StateMachineNode>)
 
     const {nodes, setNodes} = context
 
-    const dragHandleStyle = {
-        display: 'inline-block',
-        width: 25,
-        height: 25,
-        backgroundColor: 'teal',
-        marginLeft: 5,
-        borderRadius: '50%',
-    };
 
     const labelStyle = {
         display: 'flex',
@@ -40,24 +32,89 @@ export function StateMachineNode ({data, selected}: NodeProps<StateMachineNode>)
 
 
     return (
-        <div
-            className={`react-flow__node-group ${!draggable ? 'not-draggable' : ''}`}
-            style={{visibility: draggable ? 'visible' : 'hidden'}}
-        >
-            {resizeIsVisible && (
-                <NodeResizer
-                    color="#ff0071"
-                    isVisible={resizeIsVisible}
-                    minWidth={0}
-                    minHeight={0}
-                />
-            )}
+        <>
 
-            <div style={labelStyle}>
-                {data.stateMachine.name}
-                <span className="custom-drag-handle" style={dragHandleStyle}/>
+            <div
+                className={`react-flow__node-group ${!draggable ? 'not-draggable' : ''}`}
+                style={{visibility: draggable ? 'visible' : 'hidden'}}
+            >
+
+
+                {resizeIsVisible && (
+                    <NodeResizer
+                        color="#ff0071"
+                        isVisible={resizeIsVisible}
+                        minWidth={0}
+                        minHeight={0}
+                    />
+                )}
+
+
+                <div style={labelStyle}>
+
+                    <span className="custom-drag-handle">{data.stateMachine.name} </span>
+
+                </div>
+
+
+
+
+                <>
+                    <Handle
+                        type="source"
+                        position={Position.Top}
+                        style={{
+                            position: "absolute",
+                            right: "100%",
+                            left: 0,
+                            transform: "translateY(250%)",
+                        }}
+                        id={"a"}
+                    />
+
+                    <Handle
+                        type="target"
+                        position={Position.Top}
+                        style={{
+                            position: "absolute",
+                            right: "100%",
+                            left: 0,
+                            transform: "translateY(250%)",
+                        }}
+                        id={"b"}
+                    />
+
+                    <Handle
+                        type="source"
+                        position={Position.Top}
+                        style={{
+                            position: "absolute",
+                            right: "100%",
+                            left: 0,
+                            transform: "translateY(250%) translateX(2550%)",
+                        }}
+                        id={"c"}
+                    />
+
+                    <Handle
+                        type="target"
+                        position={Position.Top}
+                        style={{
+                            position: "absolute",
+                            right: "100%",
+                            left: 0,
+                            transform: "translateY(250%) translateX(2550%)",
+                        }}
+                        id={"d"}
+                    />
+
+                </>
+
+
+
             </div>
-        </div>
+        </>
+
 
     );
 

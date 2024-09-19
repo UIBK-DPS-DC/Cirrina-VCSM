@@ -1,4 +1,4 @@
-import {BaseEdge, EdgeLabelRenderer, type EdgeProps, getBezierPath, MarkerType} from '@xyflow/react';
+import {BaseEdge, EdgeLabelRenderer, type EdgeProps, getBezierPath} from '@xyflow/react';
 
 import {ReactFlowContextProps, TransitionEdge} from "../../types.ts";
 import {useContext, useEffect, useState} from "react";
