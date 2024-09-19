@@ -122,7 +122,7 @@ export default function TimeoutActionForm(props: {action: Action | undefined,
     }, [actionNameInput,timeoutExpressionInput,timeoutAction]);
 
     useEffect(() => {
-        if(!selectedNode){
+        if(!selectedNode && !selectedEdge){
             return
         }
         if(props.action && props.action.type === ActionType.TIMEOUT){
@@ -133,9 +133,11 @@ export default function TimeoutActionForm(props: {action: Action | undefined,
             setActionNameInput(timeoutActionProps.name)
             setTimeoutExpressionInput(timeoutActionProps.delay)
 
-            const category = actionService.getActionCategory(props.action,selectedNode.data)
-            if(category){
-                setSelectedActionCategory(category)
+            if(selectedNode){
+                const category = actionService.getActionCategory(props.action,selectedNode.data)
+                if(category){
+                    setSelectedActionCategory(category)
+                }
             }
 
             console.log(!!timeoutAction)
@@ -150,7 +152,7 @@ export default function TimeoutActionForm(props: {action: Action | undefined,
 
     const onDeleteButtonPress = () => {
 
-        if(!selectedNode){
+        if(!selectedNode && !selectedEdge){
             return;
         }
 
@@ -161,7 +163,14 @@ export default function TimeoutActionForm(props: {action: Action | undefined,
         const raiseEventProps = (props.action.properties as TimeoutActionProps).action.properties as RaiseEventActionProps;
 
         eventService.unregisterEvent(raiseEventProps.event.name)
-        stateOrStateMachineService.removeActionFromState(props.action, selectedNode.data)
+        if(selectedNode){
+            stateOrStateMachineService.removeActionFromState(props.action, selectedNode.data)
+        }
+
+        if(selectedEdge?.data){
+            selectedEdge.data.transition.removeAction(props.action)
+        }
+
         props.setActions((prevActions) => prevActions.filter((a) => a !== props.action))
 
     }
