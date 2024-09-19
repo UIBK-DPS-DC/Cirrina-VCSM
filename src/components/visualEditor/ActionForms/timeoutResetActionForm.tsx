@@ -45,7 +45,7 @@ export default function TimeoutResetActionForm(props: {action: Action | undefine
         console.log(action)
         const availableActions = actionService.getActionsByType(ActionType.TIMEOUT);
         console.log(availableActions)
-        return !! selectedAction//availableActions.some((timeoutAction: Action) => timeoutAction.name === action) || !!props.action;
+        return !! selectedAction || !! props.action//availableActions.some((timeoutAction: Action) => timeoutAction.name === action) || !!props.action;
     };
 
     const onSelectedActionChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
@@ -79,46 +79,45 @@ export default function TimeoutResetActionForm(props: {action: Action | undefine
     }, []);
 
     useEffect(() => {
-        if(!selectedNode){
+        const timeoutActions = actionService.getActionsByType(ActionType.TIMEOUT);
+        if(timeoutActions.length > 0){
+            setSelectedAction(timeoutActions[0].name)
+        }
+    }, [actionService]);
+
+    useEffect(() => {
+        if(!selectedNode && !selectedEdge){
             return
         }
         if (props.action && props.action.type === ActionType.TIMEOUT_RESET) {
             const timeoutResetActionProps = props.action.properties as TimeoutResetActionProps;
             setSelectedAction(timeoutResetActionProps.action.name);
-            const category = actionService.getActionCategory(props.action, selectedNode?.data);
-            if (category) {
-                setSelectedActionCategory(category);
+            if(selectedNode){
+                const category = actionService.getActionCategory(props.action, selectedNode?.data);
+                if (category) {
+                    setSelectedActionCategory(category);
+                }
             }
             setSelectedActionIsValid(validateSelectedAction(timeoutResetActionProps.action.name));
         }
-    }, [props.action]);
+    }, [props.action, selectedNode, selectedAction, actionService, renderTimeoutActionAsOptions]);
 
-    useEffect(() => {
-        if (!selectedNode) {
-            return;
-        }
-
-        const timeoutActions = actionService.getActionsByType(ActionType.TIMEOUT);
-
-        if (timeoutActions.length > 0 && !selectedAction) {
-            setSelectedAction(timeoutActions[0].name);
-        }
-
-        if (props.action && props.action.type === ActionType.TIMEOUT_RESET) {
-            const category = actionService.getActionCategory(props.action, selectedNode.data);
-            if (category) {
-                setSelectedActionCategory(category);
-            }
-        }
-    }, [props.action, selectedNode, selectedAction, actionService]);
 
     useEffect(() => {
         setSelectedActionIsValid(validateSelectedAction(selectedAction));
-    }, [selectedAction]);
+    }, [selectedAction, renderTimeoutActionAsOptions]);
 
     const onDeleteButtonPress = () => {
-        if (!selectedNode || !props.action) return;
-        stateOrStateMachineService.removeActionFromState(props.action, selectedNode.data);
+        if ((!selectedNode && !selectedEdge) || !props.action) return;
+
+        if(selectedNode){
+            stateOrStateMachineService.removeActionFromState(props.action, selectedNode.data);
+        }
+
+        if(selectedEdge?.data){
+            selectedEdge.data.transition.removeAction(props.action)
+        }
+
         props.setActions((prevActions) => prevActions.filter((a) => a !== props.action));
     };
 
