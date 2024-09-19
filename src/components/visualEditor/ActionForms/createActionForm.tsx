@@ -21,7 +21,7 @@ export default function CreateActionForm(props: {action: Action | undefined,
     const {selectedNode,
     actionService,
     stateOrStateMachineService,
-    contextService} = context
+    contextService, selectedEdge} = context
 
     const cardHeaderText = () => props.action ? "Edit Create Action" : "New Create Action"
     const submitButtonText = () => props.action ? "Update Action" : "Create Action"
@@ -85,19 +85,20 @@ export default function CreateActionForm(props: {action: Action | undefined,
     }
 
     useEffect(() => {
-        console.log("YOU ARE HERE")
         console.log(props.action)
-        if(!selectedNode){
+        if(!selectedNode && !selectedEdge){
             return
         }
         if(props.action && props.action.type === ActionType.CREATE){
-            console.log("NO YOU ARE HEERERER")
             const createActionProps = props.action.properties as CreateActionProps
             setVariableToBeCreated([createActionProps.variable])
             setVariableIsPersistent(createActionProps.isPersistent)
-            const actionCategory = actionService.getActionCategory(props.action,selectedNode.data)
-            if(actionCategory) {
-                setSelectedActionCategory(actionCategory)
+
+            if(selectedNode){
+                const actionCategory = actionService.getActionCategory(props.action,selectedNode.data)
+                if(actionCategory) {
+                    setSelectedActionCategory(actionCategory)
+                }
             }
         }
     }, [props.action]);
@@ -116,7 +117,7 @@ export default function CreateActionForm(props: {action: Action | undefined,
         event.preventDefault()
         event.stopPropagation()
 
-        if(!selectedNode){
+        if(!selectedNode && !selectedEdge){
             return;
         }
 
@@ -134,84 +135,158 @@ export default function CreateActionForm(props: {action: Action | undefined,
 
 
 
-        let updatedAction: Action;
+        if(selectedEdge){
+            let updatedAction: Action;
 
-        if (props.action && props.action.type === ActionType.CREATE) {
-            // If an existing action is provided (props.action), we are editing an existing action.
-            const oldCategory = actionService.getActionCategory(props.action, selectedNode.data);
+            if(props.action){
+                // Update the existing action's properties with the newly created action properties.
+                updatedAction = props.action;
+                updatedAction.properties = createActionProps;
 
-            // Check if the action category has changed. If so, we must update the action's category in the state or state machine.
-            if (oldCategory !== selectedActionCategory as ActionCategory) {
-                if(!props.dontAddToState){
-                    // Remove the action from its old category in the state or state machine.
-                    stateOrStateMachineService.removeActionFromState(props.action, selectedNode.data);
+                // Call the onActionSubmit function to update the action in the parent component's state.
+                onActionSubmit(updatedAction);
 
-                    // Add the action to its new category in the state or state machine.
-                    stateOrStateMachineService.addActionToState(selectedNode.data, props.action, selectedActionCategory as ActionCategory);
+                // Handle the case where the variable name has changed.
+                if (oldVariableName && oldVariableName !== variableToBeCreated[0].name) {
+                    // If the old variable name exists and the new variable name is different, handle renaming logic.
+
+                    // Check if the context with the old name is the same object as the newly created variable.
+                    if (contextService.getContextByName(oldVariableName) === variableToBeCreated[0]) {
+                        // Rename the context if the names don't match and the context is the same.
+                        const newName = variableToBeCreated[0].name;
+                        variableToBeCreated[0].name = oldVariableName;  // Temporarily set back to the old name
+                        contextService.renameContext(variableToBeCreated[0], newName);  // Perform the renaming
+                    } else {
+                            contextService.registerContext(variableToBeCreated[0]);  // Register the new context variable
+                        }
+                    }
+
+                // If there is a provided onSubmit callback, call it after the form has been submitted successfully.
+
+
+                actionService.deregisterAction(updatedAction);
+                actionService.registerAction(updatedAction);
+                if(selectedEdge.data){
+                    selectedEdge.data.transition.removeAction(updatedAction)
+                    selectedEdge.data.transition.addAction(updatedAction)
+                }
+
+                if (props.onSubmit) {
+                    props.onSubmit();
+                }
+                return
+            }
+
+            else {
+                updatedAction = new Action("newAction", ActionType.CREATE);
+
+                // Set the properties of the new action with the createActionProps defined earlier.
+                updatedAction.properties = createActionProps;
+                // Call the onActionSubmit function to update the action in the parent component's state.
+                onActionSubmit(updatedAction);
+
+
+                actionService.deregisterAction(updatedAction);
+                actionService.registerAction(updatedAction);
+
+                if(selectedEdge.data){
+                    selectedEdge.data.transition.addAction(updatedAction)
+                }
+
+
+                if (props.onSubmit) {
+                    props.onSubmit();
                 }
             }
 
-            // Update the existing action's properties with the newly created action properties.
-            updatedAction = props.action;
-            updatedAction.properties = createActionProps;
+            return
+        }
 
-            // Call the onActionSubmit function to update the action in the parent component's state.
-            onActionSubmit(updatedAction);
 
-            // Handle the case where the variable name has changed.
-            if (oldVariableName && oldVariableName !== variableToBeCreated[0].name) {
-                // If the old variable name exists and the new variable name is different, handle renaming logic.
 
-                // Check if the context with the old name is the same object as the newly created variable.
-                if (contextService.getContextByName(oldVariableName) === variableToBeCreated[0]) {
-                    // Rename the context if the names don't match and the context is the same.
-                    const newName = variableToBeCreated[0].name;
-                    variableToBeCreated[0].name = oldVariableName;  // Temporarily set back to the old name
-                    contextService.renameContext(variableToBeCreated[0], newName);  // Perform the renaming
-                } else {
-                    // If the context is a new variable, register it as a new context and associate it with the state.
-                    if (isState(selectedNode.data)) {
-                        contextService.registerContext(variableToBeCreated[0]);  // Register the new context variable
-                        contextService.setContextCreatedBy(variableToBeCreated[0], selectedNode.data.state);  // Set the state that created the context
+
+
+        if(selectedNode){
+            let updatedAction: Action;
+
+            if (props.action && props.action.type === ActionType.CREATE) {
+                // If an existing action is provided (props.action), we are editing an existing action.
+                const oldCategory = actionService.getActionCategory(props.action, selectedNode.data);
+
+                // Check if the action category has changed. If so, we must update the action's category in the state or state machine.
+                if (oldCategory !== selectedActionCategory as ActionCategory) {
+                    if(!props.dontAddToState){
+                        // Remove the action from its old category in the state or state machine.
+                        stateOrStateMachineService.removeActionFromState(props.action, selectedNode.data);
+
+                        // Add the action to its new category in the state or state machine.
+                        stateOrStateMachineService.addActionToState(selectedNode.data, props.action, selectedActionCategory as ActionCategory);
                     }
                 }
+
+                // Update the existing action's properties with the newly created action properties.
+                updatedAction = props.action;
+                updatedAction.properties = createActionProps;
+
+                // Call the onActionSubmit function to update the action in the parent component's state.
+                onActionSubmit(updatedAction);
+
+                // Handle the case where the variable name has changed.
+                if (oldVariableName && oldVariableName !== variableToBeCreated[0].name) {
+                    // If the old variable name exists and the new variable name is different, handle renaming logic.
+
+                    // Check if the context with the old name is the same object as the newly created variable.
+                    if (contextService.getContextByName(oldVariableName) === variableToBeCreated[0]) {
+                        // Rename the context if the names don't match and the context is the same.
+                        const newName = variableToBeCreated[0].name;
+                        variableToBeCreated[0].name = oldVariableName;  // Temporarily set back to the old name
+                        contextService.renameContext(variableToBeCreated[0], newName);  // Perform the renaming
+                    } else {
+                        // If the context is a new variable, register it as a new context and associate it with the state.
+                        if (isState(selectedNode.data)) {
+                            contextService.registerContext(variableToBeCreated[0]);  // Register the new context variable
+                            contextService.setContextCreatedBy(variableToBeCreated[0], selectedNode.data.state);  // Set the state that created the context
+                        }
+                    }
+                }
+            } else {
+                // If no existing action is provided, create a new action.
+                updatedAction = new Action("newAction", ActionType.CREATE);
+
+                // Set the properties of the new action with the createActionProps defined earlier.
+                updatedAction.properties = createActionProps;
+
+                // Add the newly created action to the state or state machine.
+                if(!props.dontAddToState){
+                    stateOrStateMachineService.addActionToState(selectedNode.data, updatedAction, selectedActionCategory as ActionCategory);
+                }
+
+                // Call the onActionSubmit function to update the action in the parent component's state.
+                onActionSubmit(updatedAction);
+
+                // Register the new context variable and associate it with the state.
+                if (isState(selectedNode.data)) {
+                    contextService.registerContext(variableToBeCreated[0]);  // Register the new context variable
+                    contextService.setContextCreatedBy(variableToBeCreated[0], selectedNode.data.state);  // Set the state that created the context
+                }
             }
-        } else {
-            // If no existing action is provided, create a new action.
-            updatedAction = new Action("newAction", ActionType.CREATE);
 
-            // Set the properties of the new action with the createActionProps defined earlier.
-            updatedAction.properties = createActionProps;
-
-            // Add the newly created action to the state or state machine.
-            if(!props.dontAddToState){
-                stateOrStateMachineService.addActionToState(selectedNode.data, updatedAction, selectedActionCategory as ActionCategory);
+            // If there is a provided onSubmit callback, call it after the form has been submitted successfully.
+            if (props.onSubmit) {
+                props.onSubmit();
             }
 
-            // Call the onActionSubmit function to update the action in the parent component's state.
-            onActionSubmit(updatedAction);
+            actionService.deregisterAction(updatedAction);
+            actionService.registerAction(updatedAction);
 
-            // Register the new context variable and associate it with the state.
-            if (isState(selectedNode.data)) {
-                contextService.registerContext(variableToBeCreated[0]);  // Register the new context variable
-                contextService.setContextCreatedBy(variableToBeCreated[0], selectedNode.data.state);  // Set the state that created the context
+            if(isState(selectedNode.data)){
+                const sm = selectedNode.data
+                sm.state.entry.forEach(entry => {
+                    console.log(entry.properties)
+                })
             }
         }
 
-        // If there is a provided onSubmit callback, call it after the form has been submitted successfully.
-        if (props.onSubmit) {
-            props.onSubmit();
-        }
-
-        actionService.deregisterAction(updatedAction);
-        actionService.registerAction(updatedAction);
-
-        if(isState(selectedNode.data)){
-            const sm = selectedNode.data
-            sm.state.entry.forEach(entry => {
-                console.log(entry.properties)
-            })
-        }
 
 
 
