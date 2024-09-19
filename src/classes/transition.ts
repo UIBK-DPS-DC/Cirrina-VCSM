@@ -101,6 +101,18 @@ export default class Transition {
         this._guards = this._guards.filter((g) => g !== guard);
     }
 
+    public addAction(action: Action): void {
+        if(this._actions.some(existingAction => existingAction === action)){
+            console.warn(`Action ${action.name} already exists`)
+            return;
+        }
+        this._actions.push(action)
+    }
+
+    public removeAction(action: Action): void {
+        this._actions = this._actions.filter((a) => a !== action);
+    }
+
 
 
 

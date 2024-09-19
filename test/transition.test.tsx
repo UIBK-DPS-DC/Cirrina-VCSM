@@ -267,3 +267,68 @@ describe('Transition class - addGuard and removeGuard', () => {
     });
 });
 
+describe('Transition Class - addAction and removeAction Methods', () => {
+    let transition: Transition;
+    let action1: Action;
+    let action2: Action;
+
+    beforeEach(() => {
+        transition = new Transition('state1', 'state2');
+        action1 = new Action('action1', ActionType.RAISE_EVENT);
+        action2 = new Action('action2', ActionType.ASSIGN);
+    });
+
+    describe('addAction', () => {
+        it('should add an action to the transition', () => {
+            transition.addAction(action1);
+            expect(transition.getActions()).toContain(action1);
+        });
+
+        it('should add multiple actions to the transition', () => {
+            transition.addAction(action1);
+            transition.addAction(action2);
+            expect(transition.getActions()).toContain(action1);
+            expect(transition.getActions()).toContain(action2);
+        });
+
+        it('should not add the same action more than once (by reference)', () => {
+            transition.addAction(action1);
+            transition.addAction(action1); // Adding the same action again
+            expect(transition.getActions()).toEqual([action1]); // Should only have one instance of action1
+        });
+    });
+
+    describe('removeAction', () => {
+        it('should remove an action from the transition', () => {
+            transition.addAction(action1);
+            transition.removeAction(action1);
+            expect(transition.getActions()).not.toContain(action1);
+        });
+
+        it('should only remove the specified action', () => {
+            transition.addAction(action1);
+            transition.addAction(action2);
+            transition.removeAction(action1);
+            expect(transition.getActions()).not.toContain(action1);
+            expect(transition.getActions()).toContain(action2);
+        });
+
+        it('should do nothing if the action to be removed is not present', () => {
+            transition.addAction(action1);
+            transition.removeAction(action2); // action2 is not in the list
+            expect(transition.getActions()).toContain(action1);
+            expect(transition.getActions()).not.toContain(action2);
+        });
+
+        it('should handle removing actions correctly when there are multiple instances (different references)', () => {
+            const action3 = new Action('action1', ActionType.RAISE_EVENT); // Different instance with the same name
+            transition.addAction(action1);
+            transition.addAction(action3);
+
+            transition.removeAction(action1); // Only removes the first instance
+            expect(transition.getActions()).toContain(action3);
+            expect(transition.getActions()).not.toContain(action1);
+        });
+    });
+});
+

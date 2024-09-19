@@ -18,7 +18,7 @@ export default function AssignActionForm(props: {action: Action | undefined,
 
     const context = useContext(ReactFlowContext) as ReactFlowContextProps;
     const {selectedNode,stateOrStateMachineService,
-    actionService} = context
+    actionService, selectedEdge} = context
 
 
 
@@ -132,7 +132,7 @@ export default function AssignActionForm(props: {action: Action | undefined,
         event.preventDefault()
         event.stopPropagation()
 
-        if(!selectedNode){
+        if(!selectedNode && !selectedEdge){
             return
         }
 
@@ -145,46 +145,72 @@ export default function AssignActionForm(props: {action: Action | undefined,
         let updatedAction: Action
 
 
-
-
-        if (props.action) {
-
-            const oldCategory = actionService.getActionCategory(props.action, selectedNode.data);
-
-            // Check if category has changed and update the action in the state node if needed
-            if (oldCategory !== selectedActionCategory as ActionCategory) {
-                if(!props.dontAddToState){
-                    stateOrStateMachineService.removeActionFromState(props.action, selectedNode.data);
-                    stateOrStateMachineService.addActionToState(selectedNode.data, props.action, selectedActionCategory as ActionCategory);
-                }
-            }
-
-            updatedAction = props.action;
-            updatedAction.properties = assignActionsProps;
-            onActionSubmit(updatedAction);
-        } else {
+        if(selectedEdge){
+            // EDGE LOGIC
             updatedAction = new Action("newAction", ActionType.ASSIGN);
             updatedAction.properties = assignActionsProps;
-            if(!props.dontAddToState){
-                stateOrStateMachineService.addActionToState(selectedNode.data, updatedAction, selectedActionCategory as ActionCategory);
-            }
+
             onActionSubmit(updatedAction);
+            if (props.onSubmit) {
+                props.onSubmit();
+            }
+
+
+            actionService.deregisterAction(updatedAction);
+            actionService.registerAction(updatedAction);
+
+            // Add action to transition
+
+
+
+
         }
 
-        if (props.onSubmit) {
-            props.onSubmit();
+
+
+
+        if(selectedNode){
+
+            if (props.action) {
+
+                const oldCategory = actionService.getActionCategory(props.action, selectedNode.data);
+
+                // Check if category has changed and update the action in the state node if needed
+                if (oldCategory !== selectedActionCategory as ActionCategory) {
+                    if(!props.dontAddToState){
+                        stateOrStateMachineService.removeActionFromState(props.action, selectedNode.data);
+                        stateOrStateMachineService.addActionToState(selectedNode.data, props.action, selectedActionCategory as ActionCategory);
+                    }
+                }
+
+                updatedAction = props.action;
+                updatedAction.properties = assignActionsProps;
+                onActionSubmit(updatedAction);
+            } else {
+                updatedAction = new Action("newAction", ActionType.ASSIGN);
+                updatedAction.properties = assignActionsProps;
+                if(!props.dontAddToState){
+                    stateOrStateMachineService.addActionToState(selectedNode.data, updatedAction, selectedActionCategory as ActionCategory);
+                }
+                onActionSubmit(updatedAction);
+            }
+
+            if (props.onSubmit) {
+                props.onSubmit();
+            }
+
+
+            actionService.deregisterAction(updatedAction);
+            actionService.registerAction(updatedAction);
+
+            if(isState(selectedNode.data)){
+                const sm = selectedNode.data
+                sm.state.entry.forEach(entry => {
+                    console.log(entry.properties)
+                })
+            }
         }
 
-
-        actionService.deregisterAction(updatedAction);
-        actionService.registerAction(updatedAction);
-
-        if(isState(selectedNode.data)){
-            const sm = selectedNode.data
-            sm.state.entry.forEach(entry => {
-                console.log(entry.properties)
-            })
-        }
 
     }
 
