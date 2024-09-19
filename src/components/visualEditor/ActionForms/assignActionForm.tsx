@@ -155,7 +155,7 @@ export default function AssignActionForm(props: {action: Action | undefined,
                 updatedAction.properties = assignActionsProps;
                 onActionSubmit(updatedAction);
 
-                if(selectedEdge.data){
+                if(selectedEdge.data && !props.dontAddToState){
                     selectedEdge.data.transition.removeAction(updatedAction)
                     selectedEdge.data.transition.addAction(updatedAction)
                 }
@@ -181,7 +181,7 @@ export default function AssignActionForm(props: {action: Action | undefined,
             actionService.deregisterAction(updatedAction);
             actionService.registerAction(updatedAction);
 
-            if(selectedEdge.data){
+            if(selectedEdge.data && !props.dontAddToState){
                 selectedEdge.data.transition.addAction(updatedAction)
             }
 

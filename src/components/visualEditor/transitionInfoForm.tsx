@@ -132,7 +132,7 @@ export default function TransitionInfoForm() {
             case ActionType.TIMEOUT_RESET:
                 return <TimeoutResetActionForm action={timeOutResetAction[0]} setActions={setTimeoutResetAction} noCategorySelect={true} onSubmit={onTimeoutResetActionSubmit}/>;
             case ActionType.MATCH:
-                return <MatchActionForm action={matchAction[0]} setActions={setMatchAction}  dontAddToState={true} onSubmit={onMatchActionSubmit}/>;
+                return <MatchActionForm action={undefined} setActions={setMatchAction}  dontAddToState={true} onSubmit={onMatchActionSubmit}/>;
             default:
                 return null;
         }

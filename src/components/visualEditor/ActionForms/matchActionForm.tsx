@@ -25,10 +25,8 @@ function CaseForm(props: {
 }) {
 
 
-    const instanceId = useRef(++idCounter).current;
-    let formCount = 0
+    const formId = useRef(`form-${Math.random().toString(36).substring(2, 15)}`).current;
 
-    const formId = `${instanceId}-${formCount++}`
 
     useEffect(() => {
         console.log(`FORM ID : ${formId}`)
@@ -163,7 +161,7 @@ function CaseForm(props: {
             case ActionType.TIMEOUT_RESET:
                 return <TimeoutResetActionForm action={props.action ? props.action : timeOutResetAction[0]} setActions={props.action ? props.setActions : setTimeoutResetAction} noCategorySelect={true} />;
             case ActionType.MATCH:
-                return <MatchActionForm action={props.action ? props.action : matchAction[0]} setActions={props.action ? props.setActions : setMatchAction}  dontAddToState={true}/>;
+                return <MatchActionForm action={props.action ? props.action : matchAction[0]} setActions={props.action ? props.setActions : setMatchAction} noCategorySelect={true} dontAddToState={true}/>;
             default:
                 return null;
         }
@@ -244,15 +242,14 @@ export default function MatchActionForm(props: {
 
 }) {
 
-    const instanceId = useRef(++idCounter).current;
-    let formCount = 0
 
-    const formId = `${instanceId}-${formCount++}`
+    const formId = useRef(`form-${Math.random().toString(36).substring(2, 15)}`).current;
+
     const submitButtonText = () => props.action ? "Save Changes" : "Create Action"
 
 
     const context = useContext(ReactFlowContext) as ReactFlowContextProps;
-    const { selectedNode , actionService, stateOrStateMachineService} = context;
+    const { selectedNode , actionService, stateOrStateMachineService, selectedEdge} = context;
 
     const [expressionInput, setExpressionInput] = useState<string>("");
     const [caseActions, setCaseActions] = useState<Action[]>([]);
@@ -268,6 +265,10 @@ export default function MatchActionForm(props: {
         setShow(true);
     };
 
+    useEffect(() => {
+        console.log(`FORM ID : ${formId}`)
+        console.log(selectedEdge)
+    }, []);
     const handleClose = () => {
         setShow(false);
     };
@@ -300,7 +301,8 @@ export default function MatchActionForm(props: {
 
 
     useEffect(() => {
-            if(!selectedNode){
+
+            if(!selectedNode && ! selectedEdge){
                 return
             }
             if(props.action && props.action.type === ActionType.MATCH) {
@@ -309,11 +311,12 @@ export default function MatchActionForm(props: {
                 const actions = matchActionProps.cases.map((mc) => mc.action)
                 setCaseActions(actions)
 
-                const actionCategory = actionService.getActionCategory(props.action,selectedNode.data)
-                if(actionCategory) {
-                    setSelectedActionCategory(actionCategory)
+                if(selectedNode){
+                    const actionCategory = actionService.getActionCategory(props.action,selectedNode.data)
+                    if(actionCategory) {
+                        setSelectedActionCategory(actionCategory)
+                    }
                 }
-
 
             }
     }, [props.action, selectedActionCategory]);
@@ -353,7 +356,12 @@ export default function MatchActionForm(props: {
         event.preventDefault();
         event.stopPropagation();
 
-        if (!selectedNode || caseActions.length < 1) {
+        console.log("hi")
+        console.log(selectedEdge)
+
+        //*
+
+        if ((!selectedNode && !selectedEdge) || caseActions.length < 1) {
             return;
         }
 
@@ -375,43 +383,96 @@ export default function MatchActionForm(props: {
 
         let updatedAction: Action
 
-        if (props.action && props.action.type === ActionType.MATCH) {
+        if(selectedEdge){
 
-            const oldCategory = actionService.getActionCategory(props.action, selectedNode.data);
+            console.log("Mate")
 
-            // Check if category has changed and update the action in the state node if needed
-            if (oldCategory !== selectedActionCategory as ActionCategory) {
-                if(!props.dontAddToState){
-                    stateOrStateMachineService.removeActionFromState(props.action, selectedNode.data);
-                    stateOrStateMachineService.addActionToState(selectedNode.data, props.action, selectedActionCategory as ActionCategory);
+            if (props.action && props.action.type === ActionType.MATCH) {
+                updatedAction = props.action;
+                updatedAction.properties = matchActionProps;
+                onActionSubmit(updatedAction);
+
+                console.log("EXISTING")
+
+                actionService.deregisterAction(updatedAction);
+                actionService.registerAction(updatedAction);
+
+                if(selectedEdge.data && !props.dontAddToState){
+                    selectedEdge.data.transition.removeAction(updatedAction)
+                    selectedEdge.data.transition.addAction(updatedAction)
                 }
-            }
 
-            updatedAction = props.action;
-            updatedAction.properties = matchActionProps;
-            onActionSubmit(updatedAction);
-        } else {
-            updatedAction = new Action("", ActionType.MATCH);
-            updatedAction.properties = matchActionProps;
-            if(!props.dontAddToState){
-                stateOrStateMachineService.addActionToState(selectedNode.data, updatedAction, selectedActionCategory as ActionCategory);
+                if (props.onSubmit) {
+                    props.onSubmit();
+                }
+                return
+
+
             }
-            onActionSubmit(updatedAction);
+            else {
+                console.log("NEW")
+                updatedAction = new Action("", ActionType.MATCH);
+                updatedAction.properties = matchActionProps;
+
+
+                actionService.deregisterAction(updatedAction);
+                actionService.registerAction(updatedAction);
+
+
+                onActionSubmit(updatedAction);
+
+
+
+                if(selectedEdge.data && !props.dontAddToState){
+                    selectedEdge.data.transition.addAction(updatedAction)
+                }
+                if (props.onSubmit) {
+                    props.onSubmit();
+                }
+
+            }
+            return
         }
 
-        if (props.onSubmit) {
-            props.onSubmit();
-        }
+        if(selectedNode) {
+            if (props.action && props.action.type === ActionType.MATCH) {
 
-        actionService.deregisterAction(updatedAction);
-        actionService.registerAction(updatedAction);
+                const oldCategory = actionService.getActionCategory(props.action, selectedNode.data);
+
+                // Check if category has changed and update the action in the state node if needed
+                if (oldCategory !== selectedActionCategory as ActionCategory) {
+                    if (!props.dontAddToState) {
+                        stateOrStateMachineService.removeActionFromState(props.action, selectedNode.data);
+                        stateOrStateMachineService.addActionToState(selectedNode.data, props.action, selectedActionCategory as ActionCategory);
+                    }
+                }
+
+                updatedAction = props.action;
+                updatedAction.properties = matchActionProps;
+                onActionSubmit(updatedAction);
+            } else {
+                updatedAction = new Action("", ActionType.MATCH);
+                updatedAction.properties = matchActionProps;
+                if (!props.dontAddToState) {
+                    stateOrStateMachineService.addActionToState(selectedNode.data, updatedAction, selectedActionCategory as ActionCategory);
+                }
+                onActionSubmit(updatedAction);
+            }
+
+            if (props.onSubmit) {
+                props.onSubmit();
+            }
+
+            actionService.deregisterAction(updatedAction);
+            actionService.registerAction(updatedAction);
 
 
-        if(isState(selectedNode.data)){
-            const sm = selectedNode.data
-            sm.state.entry.forEach(entry => {
-                console.log(entry.properties)
-            })
+            if (isState(selectedNode.data)) {
+                const sm = selectedNode.data
+                sm.state.entry.forEach(entry => {
+                    console.log(entry.properties)
+                })
+            }
         }
 
     };

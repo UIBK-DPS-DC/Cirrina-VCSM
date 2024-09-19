@@ -205,7 +205,7 @@ export default function InvokeActionForm(props: {action: Action | undefined,
                 actionService.deregisterAction(updatedAction);
                 actionService.registerAction(updatedAction);
 
-                if(selectedEdge.data){
+                if(selectedEdge.data && !props.dontAddToState){
                     selectedEdge.data.transition.removeAction(updatedAction)
                     selectedEdge.data.transition.addAction(updatedAction)
                 }
@@ -222,7 +222,7 @@ export default function InvokeActionForm(props: {action: Action | undefined,
                 actionService.deregisterAction(updatedAction);
                 actionService.registerAction(updatedAction);
 
-                if(selectedEdge.data){
+                if(selectedEdge.data && !props.dontAddToState){
                     selectedEdge.data.transition.addAction(updatedAction)
                 }
 
