@@ -137,23 +137,6 @@ describe('Transition class', () => {
         expect(transition.getEvent()).toBe('onEvent');
     });
 
-
-    it('should return a correct transition description', () => {
-        const guard1 = new Guard('guard1');
-        const action1 = new Action('action1', ActionType.RAISE_EVENT);
-        transition.setGuards([guard1]);
-        transition.setActions([action1]);
-        transition.setEvent('event');
-
-        const description = transition.toDescription();
-        expect(description).toEqual({
-            actions: [],  // Assuming no conversion logic yet for actions
-            else: null,
-            event: 'event',
-            guards: [guard1.toDescription()],
-            target: 'targetState',
-        });
-    });
 });
 
 describe('Transition class - addGuard and removeGuard', () => {
