@@ -18,7 +18,7 @@ export default function AssignActionForm(props: {action: Action | undefined,
 
     const context = useContext(ReactFlowContext) as ReactFlowContextProps;
     const {selectedNode,stateOrStateMachineService,
-    actionService} = context
+    actionService, selectedEdge} = context
 
 
 
@@ -59,7 +59,7 @@ export default function AssignActionForm(props: {action: Action | undefined,
     }, [selectedVar, expressionInput]);
 
     useEffect(() => {
-        if(!selectedNode){
+        if(!selectedNode && !selectedEdge){
             return
         }
 
@@ -68,11 +68,12 @@ export default function AssignActionForm(props: {action: Action | undefined,
             setSelectedVar([assignActionsProps.variable]);
             setExpressionInput(assignActionsProps.expression);
 
-            const actionCategory = actionService.getActionCategory(props.action,selectedNode.data)
-            if(actionCategory) {
-                setSelectedActionCategory(actionCategory)
+            if(selectedNode){
+                const actionCategory = actionService.getActionCategory(props.action,selectedNode.data)
+                if(actionCategory) {
+                    setSelectedActionCategory(actionCategory)
+                }
             }
-
         }
 
     }, []);
@@ -111,7 +112,7 @@ export default function AssignActionForm(props: {action: Action | undefined,
 
     const onDeleteButtonPress = () => {
 
-        if(!selectedNode){
+        if(!selectedNode && !selectedEdge){
             return;
         }
 
@@ -119,7 +120,14 @@ export default function AssignActionForm(props: {action: Action | undefined,
             return
         }
 
-        stateOrStateMachineService.removeActionFromState(props.action, selectedNode.data)
+        if(selectedNode){
+            stateOrStateMachineService.removeActionFromState(props.action, selectedNode.data)
+        }
+
+        if(selectedEdge?.data){
+            selectedEdge.data.transition.removeAction(props.action)
+        }
+
         props.setActions((prevActions) => prevActions.filter((a) => a !== props.action))
 
     }
@@ -132,7 +140,7 @@ export default function AssignActionForm(props: {action: Action | undefined,
         event.preventDefault()
         event.stopPropagation()
 
-        if(!selectedNode){
+        if(!selectedNode && !selectedEdge){
             return
         }
 
@@ -145,46 +153,96 @@ export default function AssignActionForm(props: {action: Action | undefined,
         let updatedAction: Action
 
 
+        // EDGE LOGIC
+        if(selectedEdge){
 
+            if(props.action){
+                console.log("I EXIST")
+                updatedAction = props.action;
+                updatedAction.properties = assignActionsProps;
+                onActionSubmit(updatedAction);
 
-        if (props.action) {
-
-            const oldCategory = actionService.getActionCategory(props.action, selectedNode.data);
-
-            // Check if category has changed and update the action in the state node if needed
-            if (oldCategory !== selectedActionCategory as ActionCategory) {
-                if(!props.dontAddToState){
-                    stateOrStateMachineService.removeActionFromState(props.action, selectedNode.data);
-                    stateOrStateMachineService.addActionToState(selectedNode.data, props.action, selectedActionCategory as ActionCategory);
+                if(selectedEdge.data && !props.dontAddToState){
+                    selectedEdge.data.transition.removeAction(updatedAction)
+                    selectedEdge.data.transition.addAction(updatedAction)
                 }
+
+                if (props.onSubmit) {
+                    props.onSubmit();
+                }
+                return
+
+
+
             }
 
-            updatedAction = props.action;
-            updatedAction.properties = assignActionsProps;
-            onActionSubmit(updatedAction);
-        } else {
             updatedAction = new Action("newAction", ActionType.ASSIGN);
             updatedAction.properties = assignActionsProps;
-            if(!props.dontAddToState){
-                stateOrStateMachineService.addActionToState(selectedNode.data, updatedAction, selectedActionCategory as ActionCategory);
-            }
+
             onActionSubmit(updatedAction);
+            if (props.onSubmit) {
+                props.onSubmit();
+            }
+
+
+            actionService.deregisterAction(updatedAction);
+            actionService.registerAction(updatedAction);
+
+            if(selectedEdge.data && !props.dontAddToState){
+                selectedEdge.data.transition.addAction(updatedAction)
+            }
+
+
+
+
+
         }
 
-        if (props.onSubmit) {
-            props.onSubmit();
+
+
+
+        if(selectedNode){
+
+            if (props.action) {
+
+                const oldCategory = actionService.getActionCategory(props.action, selectedNode.data);
+
+                // Check if category has changed and update the action in the state node if needed
+                if (oldCategory !== selectedActionCategory as ActionCategory) {
+                    if(!props.dontAddToState){
+                        stateOrStateMachineService.removeActionFromState(props.action, selectedNode.data);
+                        stateOrStateMachineService.addActionToState(selectedNode.data, props.action, selectedActionCategory as ActionCategory);
+                    }
+                }
+
+                updatedAction = props.action;
+                updatedAction.properties = assignActionsProps;
+                onActionSubmit(updatedAction);
+            } else {
+                updatedAction = new Action("newAction", ActionType.ASSIGN);
+                updatedAction.properties = assignActionsProps;
+                if(!props.dontAddToState){
+                    stateOrStateMachineService.addActionToState(selectedNode.data, updatedAction, selectedActionCategory as ActionCategory);
+                }
+                onActionSubmit(updatedAction);
+            }
+
+            if (props.onSubmit) {
+                props.onSubmit();
+            }
+
+
+            actionService.deregisterAction(updatedAction);
+            actionService.registerAction(updatedAction);
+
+            if(isState(selectedNode.data)){
+                const sm = selectedNode.data
+                sm.state.entry.forEach(entry => {
+                    console.log(entry.properties)
+                })
+            }
         }
 
-
-        actionService.deregisterAction(updatedAction);
-        actionService.registerAction(updatedAction);
-
-        if(isState(selectedNode.data)){
-            const sm = selectedNode.data
-            sm.state.entry.forEach(entry => {
-                console.log(entry.properties)
-            })
-        }
 
     }
 

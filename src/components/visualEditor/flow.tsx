@@ -173,10 +173,18 @@ export default function Flow() {
                     ...connection,
                     type: 'csm-edge',
                     data: { transition: newTransition }, zIndex: 1, markerEnd: {type: MarkerType.ArrowClosed}};
+                const sourceState = nodes.find((n) => n.id === connection.source)
+                if (sourceState && isState(sourceState.data)) {
+                    sourceState.data.state.addOnTransition(newTransition)
+                }
+
                 setEdges(eds => addEdge(edge, eds));
             }
+
+
+
         },
-        [setEdges, transitionService]
+        [setEdges, transitionService, nodes]
     );
 
     const onDragOver = useCallback((event: React.DragEvent<HTMLDivElement>) => {

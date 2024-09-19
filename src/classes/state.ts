@@ -4,7 +4,7 @@ import ContextVariable from "./contextVariable.tsx";
 import Transition from "./transition.ts";
 import Guard from "./guard.tsx";
 import {StateDescription} from "../pkl/bindings/collaborative_state_machine_description.pkl.ts";
-import * as console from "node:console";
+
 
 
 export default class State implements StateOrStateMachine {
@@ -224,7 +224,7 @@ export default class State implements StateOrStateMachine {
             }
         })
         if(!found){
-            console.log(`Added Transition ${newTransition.getId()} to State ${this.name}`)
+           // console.log(`Added Transition ${newTransition.getId()} to State ${this.name}`)
             this.on.push(newTransition);
         }
 

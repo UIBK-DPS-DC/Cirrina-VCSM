@@ -97,6 +97,24 @@ export default class Transition {
         this._guards.push(guard);
     }
 
+    public removeGuard(guard: Guard): void {
+        this._guards = this._guards.filter((g) => g !== guard);
+    }
+
+    public addAction(action: Action): void {
+        if(this._actions.some(existingAction => existingAction === action)){
+            console.warn(`Action ${action.name} already exists`)
+            return;
+        }
+        this._actions.push(action)
+    }
+
+    public removeAction(action: Action): void {
+        this._actions = this._actions.filter((a) => a !== action);
+    }
+
+
+
 
 
     private getNewId(){
@@ -106,14 +124,16 @@ export default class Transition {
 
     public getAllNamedGuards() {
         return this._guards.filter((guard) => {
-            return guard.name
+            return !!guard.name.trim()
         })
     }
 
     // TODO: Expand for internal transitions.
     public toDescription(): OnTransitionDescription {
         const description: OnTransitionDescription = {
-            actions: [], else: null, event: this.getEvent(),
+            actions: this.getActions().map((a) => a.toDescription()) ,
+            else: null,
+            event: this.getEvent(),
             guards: this.getGuards().map((guard)=> {return guard.toDescription()}),
             target: this.target
 

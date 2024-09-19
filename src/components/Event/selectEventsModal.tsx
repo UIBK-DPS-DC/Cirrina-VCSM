@@ -9,10 +9,13 @@ import CreatableSelect from 'react-select/creatable';
 import {EventChannel} from "../../enums.ts";
 
 
-export default function SelectEventsModal(props:{buttonName: string | undefined , modalTitle: string | undefined, events: Event[] | [], setEvents: Dispatch<SetStateAction<Event[]>>} ) {
+export default function SelectEventsModal(props:{buttonName: string | undefined,
+    modalTitle: string | undefined,
+    events: Event[] | [],
+    setEvents: Dispatch<SetStateAction<Event[]>>, multiple?: boolean} ) {
 
     const context = useContext(ReactFlowContext) as ReactFlowContextProps
-    const {eventService, selectedNode} = context;
+    const {eventService, selectedNode,selectedEdge} = context;
 
     const INTERNAL_EVENTS_SELECT_NAME = "internal-event-select";
     const EXTERNAL_EVENTS_SELECT_NAME  = "external-event-select";
@@ -21,6 +24,9 @@ export default function SelectEventsModal(props:{buttonName: string | undefined 
 
 
     const [show,setShow]=React.useState(false);
+
+    const allowMultiple = () => props.multiple !== undefined ? props.multiple : true
+    const isSelectDisabled = () => !allowMultiple() && ((selectedExternalEvents.length + selectedInternalEvents.length + selectedGlobalEvents.length + selectedPeripheralEvents.length) > 0)
 
     const handleShow = () => setShow(true)
     const handleClose = () => setShow(false);
@@ -153,7 +159,15 @@ export default function SelectEventsModal(props:{buttonName: string | undefined 
     }
 
 
-
+    useEffect(() => {
+        console.log(`Is Select disabled : ${isSelectDisabled()}`)
+        console.log(`Allow Multiple ${allowMultiple()}`)
+        console.log(`Total events length ${selectedExternalEvents.length + selectedInternalEvents.length + selectedGlobalEvents.length + selectedPeripheralEvents.length}`)
+        console.log(`EXTERNAL ${selectedExternalEvents}`)
+        console.log(`INTERNAL ${selectedInternalEvents}`)
+        console.log(`GLOBAL ${selectedGlobalEvents}`)
+        console.log(`PERIPERAL ${selectedPeripheralEvents}`)
+    }, [selectedPeripheralEvents,selectedGlobalEvents,selectedExternalEvents,selectedInternalEvents]);
 
 
     useEffect(() => {
@@ -166,7 +180,7 @@ export default function SelectEventsModal(props:{buttonName: string | undefined 
     const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         event.stopPropagation()
-        if(!selectedNode){
+        if(!selectedNode && !selectedEdge){
             return;
         }
 
@@ -238,7 +252,8 @@ export default function SelectEventsModal(props:{buttonName: string | undefined 
                                                          isMulti={true}
                                                          name={INTERNAL_EVENTS_SELECT_NAME}
                                                          options={renderEventsAsOptions(eventService.getAllInternalEvents())}
-                                                         value={selectedInternalEvents} onChange={onSelectedInternalEventsChange}
+                                                         value={selectedInternalEvents}
+                                                         onChange={onSelectedInternalEventsChange}
                                                          onCreateOption={onInternalEventCreate}>
                                         </CreatableSelect>
                                 </Row>
@@ -253,7 +268,8 @@ export default function SelectEventsModal(props:{buttonName: string | undefined 
                                                          isMulti={true}
                                                          name={EXTERNAL_EVENTS_SELECT_NAME}
                                                          options={renderEventsAsOptions(eventService.getAllExternalEvents())}
-                                                         value={selectedExternalEvents} onChange={onSelectedExternalEventsChange}
+                                                         value={selectedExternalEvents}
+                                                         onChange={onSelectedExternalEventsChange}
                                                          onCreateOption={onExternalEventCreate}>
                                         </CreatableSelect>
                                 </Row>
@@ -268,7 +284,8 @@ export default function SelectEventsModal(props:{buttonName: string | undefined 
                                                          isMulti={true}
                                                          name={GLOBAL_EVENTS_SELECT_NAME}
                                                          options={renderEventsAsOptions(eventService.getAllGlobalEvents())}
-                                                         value={selectedGlobalEvents} onChange={onSelectedGlobalEventsChange}
+                                                         value={selectedGlobalEvents}
+                                                         onChange={onSelectedGlobalEventsChange}
                                                          onCreateOption={onGlobalEventCreate}>
                                         </CreatableSelect>
                                 </Row>
@@ -284,7 +301,8 @@ export default function SelectEventsModal(props:{buttonName: string | undefined 
                                                          isMulti={true}
                                                          name={PERIPHERAL_EVENTS_SELECT_NAME}
                                                          options={renderEventsAsOptions(eventService.getAllPeripheralEvents())}
-                                                         value={selectedPeripheralEvents} onChange={onSelectedPeripheralEventsChange}
+                                                         value={selectedPeripheralEvents}
+                                                         onChange={onSelectedPeripheralEventsChange}
                                                          onCreateOption={onPeripheralEventCreate}>
                                         </CreatableSelect>
                                 </Row>

@@ -12,7 +12,7 @@ import ContextCardDisplay from "../Context/contextCardDisplay.tsx";
 export default function CreateEventForm(props: { event: Event | undefined, onSubmit: (event: Event) => void, setVars?:  Dispatch<SetStateAction<ContextVariable[]>> }) {
 
     const context = useContext(ReactFlowContext) as ReactFlowContextProps;
-    const { eventService, selectedNode } = context;
+    const { eventService, selectedNode , selectedEdge} = context;
 
     const oldEventName = props.event?.name;
     const buttonText = () => props.event ? "Save Changes" : "Create Event";
@@ -84,7 +84,7 @@ export default function CreateEventForm(props: { event: Event | undefined, onSub
         event.preventDefault();
         event.stopPropagation()
 
-        if (!selectedNode) {
+        if (!selectedNode && !selectedEdge) {
             return;
         }
 

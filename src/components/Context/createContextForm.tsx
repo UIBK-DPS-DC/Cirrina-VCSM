@@ -8,7 +8,7 @@ import {ContextType} from "../../enums.ts";
 export default function CreateContextForm(props: {variable: ContextVariable | undefined, onClose: () => void, onSubmit: (updatedVariable: ContextVariable) => void, noRegister?:boolean}) {
 
     const context = useContext(ReactFlowContext) as ReactFlowContextProps;
-    const {contextService, selectedNode} = context;
+    const {contextService, selectedNode, selectedEdge} = context;
 
     const VARIABLE_NAME_FIELD_NAME = "variable-name";
     const EXPRESSION_FIELD_NAME = "expression";
@@ -90,7 +90,7 @@ export default function CreateContextForm(props: {variable: ContextVariable | un
     const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         event.stopPropagation()
-        if (!selectedNode?.data) {
+        if (!selectedNode?.data && !selectedEdge) {
             return;
         }
 
@@ -102,7 +102,7 @@ export default function CreateContextForm(props: {variable: ContextVariable | un
         if (props.variable) {
 
 
-            if(!props.noRegister){
+            if(!props.noRegister && selectedNode){
                 contextService.removeContext(props.variable, selectedNode.data);
                 contextService.addContext(props.variable, selectedNode.data, contextType as ContextType);
             }
@@ -122,7 +122,7 @@ export default function CreateContextForm(props: {variable: ContextVariable | un
 
         } else {
             const newContext = new ContextVariable(variableName, expression);
-            if(!props.noRegister) {
+            if(!props.noRegister && selectedNode) {
                 contextService.registerContext(newContext);
                 contextService.addContext(newContext, selectedNode.data, contextType as ContextType);
                 contextService.linkContextToStateByData(newContext, selectedNode.data);

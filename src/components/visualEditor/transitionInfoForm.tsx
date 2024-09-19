@@ -1,289 +1,382 @@
-import React, {useCallback, useContext, useEffect, useState} from "react";
-import {ReactFlowContext} from "../../utils.tsx";
+import React, {useContext, useEffect, useRef, useState} from "react";
+import {ReactFlowContext, renderEnumAsOptions} from "../../utils.tsx";
 import {ReactFlowContextProps} from "../../types.ts";
-import State from "../../classes/state.ts";
-import Event from "../../classes/event.ts";
+import Offcanvas from "react-bootstrap/Offcanvas";
+import {
+    Accordion, AccordionHeader,
+    Button,
+    Col,
+    Container,
+    Form,
+    InputGroup, ModalBody,
+    OffcanvasBody,
+    OffcanvasHeader,
+    OffcanvasTitle,
+    Row
+} from "react-bootstrap";
 import Guard from "../../classes/guard.tsx";
-import {EventChannel} from "../../enums.ts";
+import GuardDisplay from "../Guard/guardDisplay.tsx";
+import Action from "../../classes/action.ts";
+import Event from "../../classes/event.ts";
+import SelectSingleEventModal from "../Event/selectSingleEventModal.tsx";
+import {ActionType} from "../../enums.ts";
+import InvokeActionForm from "./ActionForms/invokeActionForm.tsx";
+import CreateActionForm from "./ActionForms/createActionForm.tsx";
+import AssignActionForm from "./ActionForms/assignActionForm.tsx";
+import RaiseEventActionForm from "./ActionForms/raiseEventActionForm.tsx";
+import TimeoutActionForm from "./ActionForms/timeoutActionForm.tsx";
+import TimeoutResetActionForm from "./ActionForms/timeoutResetActionForm.tsx";
+import MatchActionForm from "./ActionForms/matchActionForm.tsx";
+import Modal from "react-bootstrap/Modal";
+
+
+let idCounter = 0
 
 
 export default function TransitionInfoForm() {
     const context = useContext(ReactFlowContext) as ReactFlowContextProps;
-    const {
-        selectedEdge,
-        showSidebar,
-        eventService,
-        stateOrStateMachineService,
-        setEdges,
-        edges,
-        guardService
-    } = context;
+    const {selectedEdge, showSidebar, setShowSidebar} = context
+
+    const instanceId = useRef(++idCounter).current;
+    let formCount = 0
+
+    const formId = `${instanceId}-${formCount++}`
 
 
-    const [selectedEvent, setSelectedEvent] = useState<string>("new-event")
-    const [newEventValueInput, setNewEventValueInput] = useState("");
-    const [selectedGuardCategory, setSelectedGuardCategory] = useState("no-guard")
-    const [transitionGuardInputValue, setTransitionGuardInputValue] = useState<string>("")
-    const [guardSelectionValue, setGuardSelectionValue] = useState<string>("")
-    const [saveAsNamedGuardCheckbox, setSaveAsNamedGuardCheckbox] = useState<boolean>(false);
-    const [newNamedGuardInput, setNewNamedGuardInput] = useState<string>("")
+    const [guardInput, setGuardInput] = useState<string>("")
+    const [guardInputIsValid, setGuardInputIsValid] = useState<boolean>(false)
+    const [guards, setGuards] = useState<Guard[]>(selectedEdge?.data?.transition.getGuards || []);
+    const [_actions, setActions] = useState<Action[]>(selectedEdge?.data?.transition.getActions || [])
+    const [onEvent, setOnEvent] = useState<Event | undefined>()
+
+
+
+    const [invokeAction, setInvokeAction] = useState<Action[]>([]);
+    const [createAction, setCreateAction] = useState<Action[]>([]);
+    const [assignAction, setAssignAction] = useState<Action[]>([]);
+    const [raiseEventAction, setRaiseEventAction] = useState<Action[]>([]);
+    const [timeoutAction, setTimeoutAction] = useState<Action[]>([]);
+    const [timeOutResetAction, setTimeoutResetAction] = useState<Action[]>([]);
+    const [matchAction, setMatchAction] = useState<Action[]>([]);
+    const [selectedActionType, setSelectedActionType] = useState<string>(ActionType.CREATE);
+
+
+    const [showActionModal, setShowActionModal] = useState<boolean>(false)
+
+    const handleShow = () => setShowActionModal(true)
+    const handleClose = () => setShowActionModal(false)
+
+    const onInvokeActionSubmit = () => {
+        setActions((prev) => [...prev, invokeAction[0]])
+        setInvokeAction([])
+        handleClose()
+    }
+
+    const onCreateActionSubmit = () => {
+        setActions((prev) => [...prev, createAction[0]])
+        setCreateAction([])
+        handleClose()
+
+    }
+
+    const onAssignActionSubmit = () => {
+        setActions((prev) => [...prev,assignAction[0]])
+        setAssignAction([])
+        handleClose()
+    }
+
+    const onRaiseEventActionSubmit = () => {
+        setActions((prev) => [...prev, raiseEventAction[0]])
+        setRaiseEventAction([])
+        handleClose()
+    }
+
+    const onTimeoutActionSubmit = () => {
+        setActions((prev) => [...prev, timeoutAction[0]])
+        setTimeoutAction([])
+        handleClose()
+    }
+
+    const onTimeoutResetActionSubmit = () => {
+        setActions((prev) => [...prev, timeOutResetAction[0]])
+        setTimeoutResetAction([])
+        handleClose()
+    }
+
+    const onMatchActionSubmit = () => {
+        setActions((prev) => [...prev, matchAction[0]])
+        setMatchAction([])
+        handleClose()
+    }
+
+
+
+
+
+
+
+
+
+    const renderActionForm = () => {
+        switch (selectedActionType) {
+            case ActionType.INVOKE:
+                return <InvokeActionForm action={invokeAction[0]} setActions={setInvokeAction} noCategorySelect={true} dontAddToState={false} onSubmit={onInvokeActionSubmit}/>;
+            case ActionType.CREATE:
+                return <CreateActionForm action={createAction[0]} setActions={setCreateAction} noCategorySelect={true} dontAddToState={false} onSubmit={onCreateActionSubmit}  />;
+            case ActionType.ASSIGN:
+                return <AssignActionForm action={assignAction[0]} setActions={ setAssignAction} noCategorySelect={true} dontAddToState={false} onSubmit={onAssignActionSubmit} />;
+            case ActionType.RAISE_EVENT:
+                return <RaiseEventActionForm action={raiseEventAction[0]} setActions={setRaiseEventAction} noCategorySelect={true} dontAddToEdge={false} onSubmit={onRaiseEventActionSubmit}/>;
+            case ActionType.TIMEOUT:
+                return <TimeoutActionForm action={timeoutAction[0]} setActions={setTimeoutAction} noCategorySelect={true} onSubmit={onTimeoutActionSubmit}/>;
+            case ActionType.TIMEOUT_RESET:
+                return <TimeoutResetActionForm action={timeOutResetAction[0]} setActions={setTimeoutResetAction} noCategorySelect={true} onSubmit={onTimeoutResetActionSubmit}/>;
+            case ActionType.MATCH:
+                return <MatchActionForm action={undefined} setActions={setMatchAction}  dontAddToState={false} onSubmit={onMatchActionSubmit}/>;
+            default:
+                return null;
+        }
+    };
+
+
+    const offcanvasTitle = () => selectedEdge?.data?.transition ?
+        selectedEdge.data.transition.getSource() + " => " + selectedEdge.data.transition.getTarget() : "Unknown"
+
+    const invalidGuardInputText = () => "Please provide a valid expression"
+
+    const validateGuardInput = (guardExpression: string) => {
+        // TODO: Guard verification logic
+        return !!guardExpression.trim()
+    }
+
+    const onGuardDelete = (guard: Guard) => {
+        if(selectedEdge?.data?.transition) {
+            selectedEdge.data.transition.removeGuard(guard)
+        }
+    }
+
 
     useEffect(() => {
-        console.log(`Save as named guard checkbox checked: ${saveAsNamedGuardCheckbox}`)
-    }, [saveAsNamedGuardCheckbox]);
+        if(selectedEdge?.data && onEvent){
+            selectedEdge.data.transition.setEvent(onEvent.name)
+        }
+    }, [onEvent]);
 
-    const renderEventsAsOptions = () => {
-        return (
-            eventService.getAllEvents().map((event: Event) => {
-                return(
-                    <option key={event.name} value={event.name}>{event.name}</option>
-                )
-            })
-        )
+
+    const onGuardInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setGuardInput(event.target.value)
     }
 
-    const renderGuardsAsOptions = () => {
-        return(
-            guardService.getAllGuardNames().map((guardName: string) => {
-                return <option key={guardName} value={guardName}>{guardName + `: ${guardService.getGuardExpression(guardName)}`}</option>
-            })
-        )
-    }
+    const onSelectedActionTypeChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+        setSelectedActionType(event.target.value);
+    };
 
-    const onSelectedEventChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-        setSelectedEvent(event.target.value);
-    }
-
-    const onNewEventInputValueChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setNewEventValueInput(event.target.value);
-    }
-
-    const onSelectedGuardCategoryChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-        setSelectedGuardCategory(event.target.value)
-    }
-
-    const onTransitionGuardInputValueChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setTransitionGuardInputValue(event.target.value);
-    }
-
-    const onGuardSelectionValueChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-        setGuardSelectionValue(event.target.value);
-    }
-
-    const onSaveAsNamedGuardCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setSaveAsNamedGuardCheckbox(event.target.checked);
-    }
-
-    const onNewNamedGuardInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setNewNamedGuardInput(event.target.value);
-    }
-
-
-
-
-
-
-    const onFormSubmit = useCallback((event: React.FormEvent<HTMLFormElement>) => {
+    const onAddGuardClick = (event: React.MouseEvent<HTMLButtonElement>) => {
         event.preventDefault()
-        if(!selectedEdge?.data) return;
+        event.stopPropagation()
 
-
-
-        const formElements = event.currentTarget.elements as typeof event.currentTarget.elements & {
-            //EVENT
-            "transition-event-select": HTMLSelectElement,
-            "new-event-input": HTMLInputElement,
-
-
-            //GUARDS
-            "transition-guard-category-select": HTMLSelectElement,
-            "transition-guard-input": HTMLInputElement,
-            "existing-guard-selection": HTMLSelectElement,
-            "save-named-guard-checkbox" :HTMLInputElement,
-            "new-named-guard-name-input": HTMLInputElement,
-
-
-
-
-        }
-
-        const selectedEvent = formElements["transition-event-select"]?.value
-        const newEventName = formElements["new-event-input"]?.value
-
-        const guardCategory = formElements["transition-guard-category-select"]?.value
-        const guardExpression = formElements["transition-guard-input"]?.value
-        const existingGuard = formElements["existing-guard-selection"]?.value
-        const saveAsNamedGuard  = formElements["save-named-guard-checkbox"]?.checked
-        const newNamedGuardName = formElements["new-named-guard-name-input"]?.value
-
-
-
-
-
-        console.log(`Received Guard Category ${guardCategory}`)
-        console.log(guardExpression)
-        console.log(existingGuard)
-        console.log(saveAsNamedGuard)
-        console.log(newNamedGuardName)
-
-
-
-        const sourceState =
-            stateOrStateMachineService.getStateOrStateMachineByName(selectedEdge.data.transition.getSource())
-        if(!sourceState) {
-            console.error(`Source state ${selectedEdge.data.transition.getSource()} could not be found`);
-            return;
-        }
-
-        if(selectedEvent === "new-event") {
-            if(! newEventName) {
-                console.error("New Event Name is missing");
-                return;
-            }
-            if(!eventService.isNameUnique(newEventName)) {
-                console.error(`Event ${newEventName} is not unique`);
-                return;
-            }
-            const newEvent = new Event(newEventName, EventChannel.EXTERNAL)
-            eventService.registerEvent(newEvent);
-            // TODO: Transition class needs to be updated.
-            selectedEdge.data.transition.setEvent(newEventName);
-
-
-        }
-        else {
-            selectedEdge.data.transition.setEvent(selectedEvent);
-        }
-
-        if(guardCategory !== "no-guard"){
-            if(guardCategory === "existing-guard") {
-                const existingGuardObject = guardService.getGuardByName(existingGuard)
-                if(!existingGuardObject) {
-                    console.error(`Guard ${existingGuard} not found`);
-                    return
-                }
-                selectedEdge.data.transition.addGuard(existingGuardObject);
-            }
-            else {
-                // TODO: VALIDATE EXPRESSION HERE
-                if(saveAsNamedGuard) {
-                    const newGuard = new Guard(guardExpression,newNamedGuardName)
-                    guardService.registerGuard(newGuard);
-                    selectedEdge.data.transition.addGuard(newGuard);
-                }
-                else{
-                    const newGuard = new Guard(guardExpression);
-                    selectedEdge.data.transition.addGuard(newGuard);
-                }
-
-            }
+        if(!selectedEdge?.data?.transition){
+            return
         }
 
 
-        if(sourceState instanceof State) {
-            sourceState.addOnTransition(selectedEdge.data.transition);
-            console.log(sourceState);
-            console.log(sourceState.on);
-            setEdges(eds => {
-                return eds.map((e) => {
-                    if(e.id === selectedEdge.id) {
-                        if(selectedEdge.data) {
-                            e.data = {
-                                ...e.data,
-                                transition: selectedEdge.data.transition
-                            };
-                            return e;
-
-                        }
-                        return e;
-
-                    }
-                    return e;
-                })
-            });
-
-        }
-        else{
-            // TODO: Separate logic for Statemachines?
-        }
-
-        console.log(selectedEdge.data.transition.getGuards());
+        const newGuard = new Guard(guardInput)
+        selectedEdge.data.transition.addGuard(newGuard)
+        setGuards((prevGuards) => [...prevGuards, newGuard])
+        setGuardInput("")
 
 
-    },[selectedEdge,selectedEvent,eventService,stateOrStateMachineService,setEdges,edges])
+    }
+
+
+    useEffect(() => {
+        setGuardInputIsValid(validateGuardInput(guardInput))
+    }, [guardInput]);
 
 
 
+    return (
+        <>
+            {showSidebar && selectedEdge && selectedEdge.data && (
+                <Offcanvas show={showSidebar}
+                           scroll={true} backdrop={false}
+                           placement={"end"}
+                           style={{ width: '30vw' }}>
 
+                    <OffcanvasHeader closeButton={true} onClick={() => {setShowSidebar(false)}}>
+                        <OffcanvasTitle>
+                            {offcanvasTitle()}
+                        </OffcanvasTitle>
+                    </OffcanvasHeader>
 
+                    <OffcanvasBody>
+                        <Form id={formId}>
 
+                            <Form.Group as={Row} className={"mb-3"}>
+                                <Form.Label column sm={"2"}>Source State: </Form.Label>
+                                <Col sm={10}>
+                                    <Form.Control type={"text"}
+                                                  disabled={true}
+                                                  value={selectedEdge.data.transition.getSource()}
+                                    />
+                                </Col>
+                            </Form.Group>
 
-    return(
-        showSidebar && selectedEdge && selectedEdge.data &&(
-            <div className="edge-form">
-                <form onSubmit={onFormSubmit}>
-                    <h3>Hi dad! Its me {selectedEdge.id}</h3>
-                    <h2>I
-                        connect {selectedEdge.data.transition.getSource()} to {selectedEdge.data.transition.getTarget()}</h2>
-                    <h4>ON: {selectedEdge.data.transition.getEvent()}</h4>
+                            <Form.Group as={Row} className={"mb-3"}>
+                                <Form.Label column sm={"2"}>Target State: </Form.Label>
+                                <Col sm={10}>
+                                    <Form.Control type={"text"}
+                                                  disabled={true}
+                                                  value={selectedEdge.data.transition.getTarget()}
+                                    />
+                                </Col>
+                            </Form.Group>
 
-                    <label htmlFor="transition-event-select">On : </label>
-                    <select id="transition-event-select" name="transition-event-select" onChange={onSelectedEventChange}
-                            value={selectedEvent}>
-                        {renderEventsAsOptions()}
-                        <option key="new-event" value="new-event">New Event</option>
-                    </select>
-                    {selectedEvent === "new-event" && (
-                        <div className="new-event-input-container">
-                            <label htmlFor="new-event-input">New Event Name: </label>
-                            <input type="text" id="new-event-input" name="new-event-input" placeholder="New Event Name" value={newEventValueInput} onChange={onNewEventInputValueChange}/>
-                        </div>
-                    )}
-                    <br/>
-                    <hr/>
-                    <h3>Optional</h3>
-                    <div className="transition-guard-container">
-                        <label htmlFor="transition-guard-category-select">Add Guard </label>
-                        <select id="transition-guard-category-select" name="transition-guard-category-select" value={selectedGuardCategory} onChange={onSelectedGuardCategoryChange}>
-                            <option key="no-guard" value="no-guard">No</option>
-                            <option key="new-guard" value="new-guard">New Guard</option>
-                            <option key="existing-guard" value="existing-guard">Use Existing Guard</option>
-                        </select>
-                        <br/>
-                        {selectedGuardCategory === "new-guard" && (
-                            <div className="transition-guard-input-container">
-                                <label htmlFor="transition-guard-input">Guard: </label>
-                                <input type="text" name="transition-guard-input" id="transition-guard-input" value={transitionGuardInputValue} onChange={onTransitionGuardInputValueChange}/>
-                                <br/>
-                                <label htmlFor="save-named-guard-checkbox">Save as named Guard?  </label>
-                                <input type="checkbox" name ="save-named-guard-checkbox" id="save-named-guard-checkbox" checked={saveAsNamedGuardCheckbox} onChange={onSaveAsNamedGuardCheckboxChange}/>
-                                {saveAsNamedGuardCheckbox && (
-                                    <div className="new-named-guard-input-container">
-                                        <label htmlFor="new-named-guard-name-input">Guard Name: </label>
-                                        <input type="text" id="new-named-guard-name-input" name="new-named-guard-name-input" value={newNamedGuardInput} onChange={onNewNamedGuardInputChange}/>
-                                    </div>
+                            <Form.Group as={Row} className="mb-3">
+                                <Form.Label column sm={"2"}>
+                                    Add Guard:
+                                </Form.Label>
+                                <Col sm={10}>
+                                    <InputGroup>
+                                        <Form.Control type={"text"} value={guardInput} onChange={onGuardInputChange} isValid={guardInputIsValid} isInvalid={!guardInputIsValid && guardInput !== ""}/>
+                                        <Button disabled={!guardInputIsValid} onClick={onAddGuardClick}>
+                                            Add
+                                            <i className={"bi bi-plus-circle"}></i>
+                                        </Button>
+                                        <Form.Control.Feedback type={"invalid"}>
+                                            {invalidGuardInputText()}
+                                        </Form.Control.Feedback>
+                                    </InputGroup>
+                                </Col>
+                            </Form.Group>
+
+                            <Form.Group as={Row} className={"mb-3"}>
+                                <Form.Label column sm={"2"}>
+                                    On:
+                                </Form.Label>
+                                {onEvent && (
+                                    <Col sm={5}>
+                                        <Form.Control type={"text"} value={onEvent.name} disabled={true}/>
+                                    </Col>
                                 )}
-                            </div>
+                                <Col sm={onEvent ? 5 : 10}>
+                                    <SelectSingleEventModal event={onEvent} setEvent={setOnEvent}></SelectSingleEventModal>
+                                </Col>
+                            </Form.Group>
+
+                        </Form>
+                        {guards.length > 0 && (
+                            <Container className={"mb-3"}>
+                                <GuardDisplay guards={guards} setGuards={setGuards} onDelete={onGuardDelete} />
+                            </Container>
                         )}
-                        {selectedGuardCategory === "existing-guard" && guardService.getAllGuardNames().length > 0 && (
-                            <div className="existing-guard-select-container">
-                                <select id="existing-guard-selection" name="existing-guard-selection" value={guardSelectionValue} onChange={onGuardSelectionValueChange} >
-                                    {renderGuardsAsOptions()}
-                                </select>
-                            </div>
 
-                        ) || selectedGuardCategory === "existing-guard" && (
-                            <h4>No existing guards found</h4>
-                        )
+                        <Container className={"mb-3"}>
+                            <Button onClick={handleShow}>
+                                Add Action
+                                <i className="bi bi-plus-circle"></i>
+                            </Button>
 
-                        }
-                    </div>
-                    <hr/>
-                    <button type="submit">Save Changes</button>
-                </form>
-            </div>
-        )
+                            <Modal show={showActionModal} size={"lg"} onHide={handleClose}>
+                                <Modal.Header closeButton>
+                                    <Modal.Title>Add Action</Modal.Title>
+                                </Modal.Header>
+
+                                <ModalBody>
+                                    <Row className={"mb-3"}>
+                                        <Form.Label column sm={"4"}>Action type:</Form.Label>
+                                        <Col sm={8}>
+                                            <Form.Select value={selectedActionType} onChange={onSelectedActionTypeChange}>
+                                                {renderEnumAsOptions(ActionType)}
+                                            </Form.Select>
+                                        </Col>
+                                    </Row>
+                                    {renderActionForm()}
+                                </ModalBody>
+
+                                <Modal.Footer>
+                                    <Button variant="secondary" onClick={handleClose}>Close</Button>
+                                </Modal.Footer>
+
+                            </Modal>
+                        </Container>
+
+                        <Accordion>
+                            <Accordion.Item eventKey={"0"}>
+                                <AccordionHeader>
+                                    On Actions
+                                </AccordionHeader>
+                                <Accordion.Body>
+                                    {selectedEdge.data.transition.getActions().map((a) => {
+                                        switch (a.type) {
+                                            case ActionType.CREATE: {
+                                                return (
+                                                    <Container className={"mb-3"} key={a.id}>
+                                                        <CreateActionForm action={a} setActions={setCreateAction} onSubmit={onCreateActionSubmit} noCategorySelect={true} />
+                                                    </Container>
+                                                )
+                                            }
+                                            case ActionType.ASSIGN: {
+                                                return(
+                                                    <Container className={"mb-3"} key={a.id}>
+                                                        <AssignActionForm action={a} setActions={setAssignAction} onSubmit={onAssignActionSubmit} noCategorySelect={true}/>
+                                                    </Container>
+                                                )
+                                            }
+                                            case ActionType.RAISE_EVENT: {
+                                                return (
+                                                    <Container className={"mb-3"} key={a.id}>
+                                                        <RaiseEventActionForm action={a} setActions={setRaiseEventAction} onSubmit={onRaiseEventActionSubmit} noCategorySelect={true}/>
+                                                    </Container>
+                                                )
+                                            }
+                                            case ActionType.TIMEOUT: {
+                                                return (
+                                                    <Container className={"mb-3"} key={a.id}>
+                                                        <TimeoutActionForm action={a} setActions={setTimeoutAction} onSubmit={onTimeoutActionSubmit} noCategorySelect={true} />
+                                                    </Container>
+                                                )
+                                            }
+
+                                            case ActionType.TIMEOUT_RESET: {
+                                                return(
+                                                    <Container className={"mb-3"} key={a.id}>
+                                                        <TimeoutResetActionForm action={a} setActions={setTimeoutResetAction} onSubmit={onTimeoutResetActionSubmit} noCategorySelect={true}/>
+                                                    </Container>
+                                                )
+                                            }
+                                            case ActionType.INVOKE: {
+                                                return (
+                                                    <Container className={"mb-3"} key={a.id}>
+                                                        <InvokeActionForm action={a} setActions={setInvokeAction} onSubmit={onInvokeActionSubmit} noCategorySelect={true}/>
+                                                    </Container>
+                                                )
+                                            }
+                                            case ActionType.MATCH: {
+                                                return (
+                                                    <Container className={"mb-3"} key={a.id}>
+                                                        <MatchActionForm action={a} setActions={setMatchAction} onSubmit={onMatchActionSubmit} noCategorySelect={true}/>
+                                                    </Container>
+                                                    )
+                                            }
+                                            default: {
+                                                return <></>
+                                            }
+                                        }
+                                    })}
+                                </Accordion.Body>
+                            </Accordion.Item>
+                        </Accordion>
+
+
+                    </OffcanvasBody>
+
+                </Offcanvas>
+            )}
+        </>
     )
+
+
 
 
 }
