@@ -576,9 +576,14 @@ export default function Flow() {
 
                                // If there is at least one common event, perform the necessary action
                                if (hasCommonEvent) {
+
+                                   // Dynamically set source and target handle depending on position
+                                   const sourceHandle:string = otherNode.position.x > n.position.x ? "c" : "a"
+                                   const targetHandle: string = otherNode.position.x > n.position.x ? "b" : "d"
+
                                    console.log(`Node ${otherNode.id} consumes an event raised by Node ${n.id}`);
                                    const connection: Connection = {
-                                       source: n.id, sourceHandle: "a", target: otherNode.id, targetHandle: "d"
+                                       source: n.id, sourceHandle: sourceHandle, target: otherNode.id, targetHandle: targetHandle
 
                                    }
                                    const newTransition = transitionService.connectionToTransition(connection)
