@@ -35,7 +35,7 @@ let idCounter = 0
 
 export default function TransitionInfoForm() {
     const context = useContext(ReactFlowContext) as ReactFlowContextProps;
-    const {selectedEdge, showSidebar, setShowSidebar} = context
+    const {selectedEdge, showSidebar, setShowSidebar, eventService} = context
 
     const instanceId = useRef(++idCounter).current;
     let formCount = 0
@@ -46,7 +46,7 @@ export default function TransitionInfoForm() {
     const [guardInput, setGuardInput] = useState<string>("")
     const [guardInputIsValid, setGuardInputIsValid] = useState<boolean>(false)
     const [guards, setGuards] = useState<Guard[]>(selectedEdge?.data?.transition.getGuards || []);
-    const [_actions, setActions] = useState<Action[]>(selectedEdge?.data?.transition.getActions || [])
+    const [actions, setActions] = useState<Action[]>(selectedEdge?.data?.transition.getActions || [])
     const [onEvent, setOnEvent] = useState<Event | undefined>()
 
 
@@ -162,6 +162,21 @@ export default function TransitionInfoForm() {
         }
     }, [onEvent]);
 
+    useEffect(() => {
+        if(selectedEdge?.data){
+            const eventToBeSet = eventService.getEventByName(selectedEdge.data.transition.getEvent())
+            if(eventToBeSet){
+                setOnEvent(eventToBeSet)
+            }
+            else {
+                setOnEvent(undefined)
+            }
+
+            setGuards(selectedEdge.data.transition.getGuards())
+        }
+
+    }, [selectedEdge, selectedEdge?.data]);
+
 
     const onGuardInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setGuardInput(event.target.value)
@@ -201,7 +216,8 @@ export default function TransitionInfoForm() {
                 <Offcanvas show={showSidebar}
                            scroll={true} backdrop={false}
                            placement={"end"}
-                           style={{ width: '30vw' }}>
+                           style={{ width: '30vw' }}
+                           data-bs-theme="dark">
 
                     <OffcanvasHeader closeButton={true} onClick={() => {setShowSidebar(false)}}>
                         <OffcanvasTitle>
@@ -301,74 +317,74 @@ export default function TransitionInfoForm() {
                             </Modal>
                         </Container>
 
-                        <Accordion>
-                            <Accordion.Item eventKey={"0"}>
-                                <AccordionHeader>
-                                    On Actions
-                                </AccordionHeader>
-                                <Accordion.Body>
-                                    {selectedEdge.data.transition.getActions().map((a) => {
-                                        switch (a.type) {
-                                            case ActionType.CREATE: {
-                                                return (
-                                                    <Container className={"mb-3"} key={a.id}>
-                                                        <CreateActionForm action={a} setActions={setCreateAction} onSubmit={onCreateActionSubmit} noCategorySelect={true} />
-                                                    </Container>
-                                                )
-                                            }
-                                            case ActionType.ASSIGN: {
-                                                return(
-                                                    <Container className={"mb-3"} key={a.id}>
-                                                        <AssignActionForm action={a} setActions={setAssignAction} onSubmit={onAssignActionSubmit} noCategorySelect={true}/>
-                                                    </Container>
-                                                )
-                                            }
-                                            case ActionType.RAISE_EVENT: {
-                                                return (
-                                                    <Container className={"mb-3"} key={a.id}>
-                                                        <RaiseEventActionForm action={a} setActions={setRaiseEventAction} onSubmit={onRaiseEventActionSubmit} noCategorySelect={true}/>
-                                                    </Container>
-                                                )
-                                            }
-                                            case ActionType.TIMEOUT: {
-                                                return (
-                                                    <Container className={"mb-3"} key={a.id}>
-                                                        <TimeoutActionForm action={a} setActions={setTimeoutAction} onSubmit={onTimeoutActionSubmit} noCategorySelect={true} />
-                                                    </Container>
-                                                )
-                                            }
-
-                                            case ActionType.TIMEOUT_RESET: {
-                                                return(
-                                                    <Container className={"mb-3"} key={a.id}>
-                                                        <TimeoutResetActionForm action={a} setActions={setTimeoutResetAction} onSubmit={onTimeoutResetActionSubmit} noCategorySelect={true}/>
-                                                    </Container>
-                                                )
-                                            }
-                                            case ActionType.INVOKE: {
-                                                return (
-                                                    <Container className={"mb-3"} key={a.id}>
-                                                        <InvokeActionForm action={a} setActions={setInvokeAction} onSubmit={onInvokeActionSubmit} noCategorySelect={true}/>
-                                                    </Container>
-                                                )
-                                            }
-                                            case ActionType.MATCH: {
-                                                return (
-                                                    <Container className={"mb-3"} key={a.id}>
-                                                        <MatchActionForm action={a} setActions={setMatchAction} onSubmit={onMatchActionSubmit} noCategorySelect={true}/>
-                                                    </Container>
+                        {actions.length > 0 && (
+                            <Accordion>
+                                <Accordion.Item eventKey={"0"}>
+                                    <AccordionHeader>
+                                        On Actions
+                                    </AccordionHeader>
+                                    <Accordion.Body>
+                                        {selectedEdge.data.transition.getActions().map((a) => {
+                                            switch (a.type) {
+                                                case ActionType.CREATE: {
+                                                    return (
+                                                        <Container className={"mb-3"} key={a.id}>
+                                                            <CreateActionForm action={a} setActions={setCreateAction} onSubmit={onCreateActionSubmit} noCategorySelect={true} />
+                                                        </Container>
                                                     )
-                                            }
-                                            default: {
-                                                return <></>
-                                            }
-                                        }
-                                    })}
-                                </Accordion.Body>
-                            </Accordion.Item>
-                        </Accordion>
+                                                }
+                                                case ActionType.ASSIGN: {
+                                                    return(
+                                                        <Container className={"mb-3"} key={a.id}>
+                                                            <AssignActionForm action={a} setActions={setAssignAction} onSubmit={onAssignActionSubmit} noCategorySelect={true}/>
+                                                        </Container>
+                                                    )
+                                                }
+                                                case ActionType.RAISE_EVENT: {
+                                                    return (
+                                                        <Container className={"mb-3"} key={a.id}>
+                                                            <RaiseEventActionForm action={a} setActions={setRaiseEventAction} onSubmit={onRaiseEventActionSubmit} noCategorySelect={true}/>
+                                                        </Container>
+                                                    )
+                                                }
+                                                case ActionType.TIMEOUT: {
+                                                    return (
+                                                        <Container className={"mb-3"} key={a.id}>
+                                                            <TimeoutActionForm action={a} setActions={setTimeoutAction} onSubmit={onTimeoutActionSubmit} noCategorySelect={true} />
+                                                        </Container>
+                                                    )
+                                                }
 
-
+                                                case ActionType.TIMEOUT_RESET: {
+                                                    return(
+                                                        <Container className={"mb-3"} key={a.id}>
+                                                            <TimeoutResetActionForm action={a} setActions={setTimeoutResetAction} onSubmit={onTimeoutResetActionSubmit} noCategorySelect={true}/>
+                                                        </Container>
+                                                    )
+                                                }
+                                                case ActionType.INVOKE: {
+                                                    return (
+                                                        <Container className={"mb-3"} key={a.id}>
+                                                            <InvokeActionForm action={a} setActions={setInvokeAction} onSubmit={onInvokeActionSubmit} noCategorySelect={true}/>
+                                                        </Container>
+                                                    )
+                                                }
+                                                case ActionType.MATCH: {
+                                                    return (
+                                                        <Container className={"mb-3"} key={a.id}>
+                                                            <MatchActionForm action={a} setActions={setMatchAction} onSubmit={onMatchActionSubmit} noCategorySelect={true}/>
+                                                        </Container>
+                                                    )
+                                                }
+                                                default: {
+                                                    return <></>
+                                                }
+                                            }
+                                        })}
+                                    </Accordion.Body>
+                                </Accordion.Item>
+                            </Accordion>
+                        )}
                     </OffcanvasBody>
 
                 </Offcanvas>

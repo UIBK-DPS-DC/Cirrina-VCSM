@@ -31,6 +31,8 @@ export function StateMachineNode ({data, selected}: NodeProps<StateMachineNode>)
     }, [data,selected, nodes, setNodes]);
 
 
+
+
     return (
         <>
 

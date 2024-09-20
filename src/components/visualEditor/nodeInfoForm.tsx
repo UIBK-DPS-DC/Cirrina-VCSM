@@ -86,8 +86,8 @@ export default function NodeInfoForm() {
 
     return (
         selectedNode && (
-            <div>
-                <Offcanvas show={showSidebar} scroll={true} backdrop={false} placement={"end"} style={{ width: '30vw' }}>
+            <div >
+                <Offcanvas show={showSidebar} scroll={true} backdrop={false} placement={"end"} style={{ width: '30vw' }} data-bs-theme="dark">
                     <OffcanvasHeader closeButton={true} onClick={() => {setShowSidebar(false)}}>
                         <Offcanvas.Title>{stateOrStateMachineService.getName(selectedNode.data)}</Offcanvas.Title>
                     </OffcanvasHeader>

@@ -1,5 +1,5 @@
 import {Node} from "@xyflow/react";
-import {CsmNodeProps, OptionEnums, ReactFlowContextProps} from "./types.ts";
+import {CsmNodeProps, isStateMachine, OptionEnums, ReactFlowContextProps} from "./types.ts";
 import {createContext} from "react";
 import StateInfoForm from "./components/visualEditor/stateInfoForm.tsx";
 import StateMachineInfoForm from "./components/visualEditor/stateMachineInfoForm.tsx";
@@ -51,6 +51,38 @@ export function getNodeInfoForm(node: Node) {
 export const getParentNode = (node: Node<CsmNodeProps>, nodes: Node<CsmNodeProps>[]): Node<CsmNodeProps> | undefined => {
     return nodes.find((n) => n.id === node.parentId);
 };
+
+const getNodeDepth = (node: Node<CsmNodeProps>, nodes: Node<CsmNodeProps>[]): number => {
+    if(isStateMachine(node.data)){
+        const parentNode = getParentNode(node, nodes)
+        if(parentNode){
+            return 1 + getNodeDepth(parentNode, nodes)
+        }
+        return 0
+    }
+    return 0
+}
+
+// TODO: Maybe different background colors depending on depth.
+export const colorMap = (nodeDepth: number) => {
+    switch (nodeDepth) {
+        default: {
+            return "rgba(244, 2, 127, 0.11)"
+        }
+    }
+
+}
+
+export const recolorNode = (node: Node<CsmNodeProps>, nodes: Node<CsmNodeProps>[]) => {
+    if(isStateMachine(node.data)){
+        node.style = {
+            ...node.style,
+            backgroundColor: colorMap(getNodeDepth(node, nodes))
+        }
+
+    }
+    return
+}
 
 export const getMostDistantAncestorNode = (
     node: Node<CsmNodeProps>,

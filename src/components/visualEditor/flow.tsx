@@ -24,7 +24,7 @@ import {CsmEdgeProps, CsmNodeProps, isState, isStateMachine, ReactFlowContextPro
 import StateMachine from "../../classes/stateMachine.ts";
 import State from "../../classes/state.ts";
 import CsmEdge from "./csmEdgeComponent.tsx";
-import {getAllStateNamesInExtent, getParentNode, ReactFlowContext} from "../../utils.tsx";
+import {colorMap, getAllStateNamesInExtent, getParentNode, ReactFlowContext} from "../../utils.tsx";
 import {NO_PARENT} from "../../services/stateOrStateMachineService.tsx";
 
 const nodeTypes = {
@@ -96,6 +96,17 @@ export default function Flow() {
         return children;
     }, [nodes]);
 
+    const getNodeDepth = useCallback((node: Node<CsmNodeProps>): number => {
+        if(isStateMachine(node.data)){
+            const parentNode = getParentNode(node, nodes)
+            if(parentNode){
+                return 1 + getNodeDepth(parentNode)
+            }
+            return 0
+        }
+        return 0
+    },[nodes])
+
 
     const hideEdge = (edge: Edge<CsmEdgeProps>, hidden: boolean) =>  {
         return {
@@ -128,6 +139,7 @@ export default function Flow() {
 
             if (node.style) {
                 node.style.border = node.style.border === "hidden" ? defaultNodeBorder : "hidden";
+                node.style.backgroundColor = node.style.backgroundColor === "transparent" ? "rgba(244, 2, 127, 0.11)" : "transparent"
             }
 
             // SM has just been hidden. Backing up properties
@@ -186,7 +198,7 @@ export default function Flow() {
 
 
         },
-        [setEdges, transitionService, nodes]
+        [setEdges, transitionService, nodes, selectedEdge]
     );
 
     const onDragOver = useCallback((event: React.DragEvent<HTMLDivElement>) => {
@@ -223,6 +235,7 @@ export default function Flow() {
                     padding: 5,
                     borderRadius: 15,
                     height: 150,
+                    backgroundColor: colorMap(0)
                 };
 
                 newNode = {
@@ -325,7 +338,9 @@ export default function Flow() {
                         return n;
                     })
                 );
+
             }
+
         },
         [setNodes, getIntersectingNodes, nodes, stateOrStateMachineService]
     );
@@ -486,6 +501,8 @@ export default function Flow() {
         setEdges((prevEdges) =>  prevEdges.filter((e) => !ids.includes(e.source)));
     }, [edges, setEdges])
 
+
+
     useEffect(() => {
         // Get all statemachines
         const statemachines = nodes.filter((n) => n.type === "state-machine-node")
@@ -638,6 +655,7 @@ export default function Flow() {
                 onPaneClick={onPaneClick}
                 onNodeClick={onNodeClick}
                 onNodeContextMenu={onNodeContextMenu}
+                colorMode={"dark"}
                 onEdgeClick={onEdgeClick}
                 onNodesDelete={onNodesDelete}
                 onDragOver={onDragOver}
