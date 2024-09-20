@@ -15,6 +15,7 @@ import {ReactFlowContext} from './utils.tsx';
 import CsmlEditor from "./components/csmlEditor/csmlEditor.tsx";
 import Export from "./components/export.tsx";
 
+
 const initialNodes: Node<CsmNodeProps>[] = [];
 const initialEdges: Edge<CsmEdgeProps>[] = [];
 
@@ -35,6 +36,7 @@ export default function App() {
     const [showSidebar, setShowSidebar] = useState(false);
     const [nameInput, setNameInput] = useState<string>("");
     const [nodeHistory, setNodeHistory] = useState<Node<CsmNodeProps>[][]>([[]]);
+    const [recalculateTransitions, setRecalculateTransitions] = useState<boolean>(false)
 
     //TODO: split into multiple contexts or use prop drilling when applicable
     // big contexts might have huge performance impacts
@@ -60,7 +62,9 @@ export default function App() {
         eventService,
         contextService,
         guardService,
-        transitionService
+        transitionService,
+        recalculateTransitions,
+        setRecalculateTransitions
     };
 
 

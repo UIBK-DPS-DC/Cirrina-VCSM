@@ -1,4 +1,4 @@
-import React, {useCallback, useContext} from 'react';
+import React, {useCallback, useContext, useEffect} from 'react';
 import {
     addEdge,
     Background,
@@ -66,7 +66,11 @@ export default function Flow() {
         setShowSidebar,
         stateOrStateMachineService,
         contextService,
-        transitionService
+        transitionService,
+        actionService,
+        eventService,
+        recalculateTransitions,
+        setRecalculateTransitions
     } = context;
 
     const { getIntersectingNodes, screenToFlowPosition } = useReactFlow();
@@ -244,8 +248,11 @@ export default function Flow() {
             const parentId = newNode.parentId || NO_PARENT;
             stateOrStateMachineService.linkStateNameToStatemachine(new_name, parentId, true);
             stateOrStateMachineService.linkNode(newNode.id, newNode.data);
+
+            setRecalculateTransitions(!recalculateTransitions)
+
         },
-        [screenToFlowPosition, setNodes, stateOrStateMachineService, updateNodeHistory]
+        [screenToFlowPosition, setNodes, stateOrStateMachineService, updateNodeHistory,recalculateTransitions]
     );
 
     const onNodeDragStop = useCallback(
@@ -475,6 +482,45 @@ export default function Flow() {
     const onPaneClick = useCallback(() => {
         setShowSidebar(false);
     }, [setShowSidebar]);
+
+    const removeEdges = useCallback((nodes: Node<CsmNodeProps>[]) => {
+        const ids = nodes.map((n) => n.id);
+        setEdges((prevEdges) =>  prevEdges.filter((e) => !ids.includes(e.source)));
+    }, [edges, setEdges])
+
+    useEffect(() => {
+        // Get all statemachines
+        const statemachine = nodes.filter((n) => n.type === "state-machine-node")
+        // Remove all edges between statemachines.
+        removeEdges(nodes)
+
+        //Group nodes by their Parent
+        const parentMap: Map<string, Node[]> = new Map()
+        statemachine.forEach((node) => {
+            const parentId = node.parentId || "NO_PARENT"; // Replace with default if no parent
+            if (parentMap.has(parentId)) {
+                // If the parentId exists, push the node to the existing array
+                parentMap.get(parentId)?.push(node);
+            } else {
+                // If the parentId doesnt exist, create a new array with the node
+                parentMap.set(parentId, [node]);
+            }
+
+        });
+
+        // Get all parent groups
+        const groups = Array.from(parentMap.keys());
+
+        groups.forEach((group) => {
+            console.log(group)
+        })
+
+
+        console.log(parentMap); // To verify the result
+
+
+
+    }, [recalculateTransitions, setRecalculateTransitions]);
 
     return (
         <div className={"flow-container"}>

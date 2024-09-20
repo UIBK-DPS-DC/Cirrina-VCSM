@@ -25,6 +25,7 @@ import ContextVariable from "./classes/contextVariable.tsx";
 import MatchCase from "./classes/MatchCase.tsx";
 
 
+
 // One Type to avoid repeating ourselves. Can be expanded/unionized as needed.
 export type CsmNodeProps = {state: State, prevPosition?: {x: number, y: number}} |
     {stateMachine: StateMachine,
@@ -159,6 +160,8 @@ export type ReactFlowContextProps = {
     contextService: ContextVariableService;
     guardService: GuardService;
     transitionService: TransitionService;
+    recalculateTransitions: boolean;
+    setRecalculateTransitions: React.Dispatch<React.SetStateAction<boolean>>
 }
 
 
