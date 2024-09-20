@@ -26,6 +26,7 @@ import State from "../../classes/state.ts";
 import CsmEdge from "./csmEdgeComponent.tsx";
 import {getAllStateNamesInExtent, getParentNode, ReactFlowContext} from "../../utils.tsx";
 import {NO_PARENT} from "../../services/stateOrStateMachineService.tsx";
+import {s} from "vite/dist/node/types.d-aGj9QkWt";
 
 const nodeTypes = {
     'state-node': StateNode,
@@ -490,13 +491,13 @@ export default function Flow() {
 
     useEffect(() => {
         // Get all statemachines
-        const statemachine = nodes.filter((n) => n.type === "state-machine-node")
+        const statemachines = nodes.filter((n) => n.type === "state-machine-node")
         // Remove all edges between statemachines.
-        removeEdges(nodes)
+        removeEdges(statemachines)
 
         //Group nodes by their Parent
-        const parentMap: Map<string, Node[]> = new Map()
-        statemachine.forEach((node) => {
+        const parentMap: Map<string, Node<CsmNodeProps>[]> = new Map()
+        statemachines.forEach((node) => {
             const parentId = node.parentId || "NO_PARENT"; // Replace with default if no parent
             if (parentMap.has(parentId)) {
                 // If the parentId exists, push the node to the existing array
@@ -511,8 +512,56 @@ export default function Flow() {
         // Get all parent groups
         const groups = Array.from(parentMap.keys());
 
+
+
+        // for every group
         groups.forEach((group) => {
-            console.log(group)
+            const groupNodes = parentMap.get(group);
+            if(!groupNodes) {
+                return
+            }
+            // Group is parent node
+            // Get raised and consumed events of each group
+            // If other group consumes event that other group raises => create edge between their parents
+
+            // just for loggin delete later
+            let i = 0
+            // Map all events raised and consumed to the corresponding state machine nodes
+            const statemachineToRaisedEvents: Map<string,string[]> = new Map()
+            const statemachineConsumedEvents: Map<string,string[]> = new Map()
+
+            groupNodes.forEach((n) => {
+                // For ever sm get all state descendants (only they can raise and consume events)
+                const descendants = getAllDescendants(n).filter((n) => n.type === "state-node")
+                let raisedEvents: string[] = []
+                let consumedEvents: string[] = []
+
+                descendants.forEach((d) => {
+                    if(isState(d.data)){
+                        raisedEvents = raisedEvents.concat(d.data.state.getAllRaisedEvents().map((e) => e.name))
+                        consumedEvents = consumedEvents.concat(d.data.state.getAllConsumedEvents())
+                    }
+                })
+                // Add them to the Map
+                statemachineToRaisedEvents.set(n.id, raisedEvents)
+                statemachineConsumedEvents.set(n.id, consumedEvents)
+
+
+
+            })
+
+            console.log("Raise event map: ", statemachineToRaisedEvents)
+            console.log("consumedEvents map", statemachineConsumedEvents)
+
+            //Iterate over group nodes and if one group node consumes and event that another raises add edge
+
+
+
+
+
+
+
+
         })
 
 
