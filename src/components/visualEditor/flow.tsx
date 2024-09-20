@@ -554,7 +554,37 @@ export default function Flow() {
             console.log("consumedEvents map", statemachineConsumedEvents)
 
             //Iterate over group nodes and if one group node consumes and event that another raises add edge
+            groupNodes.forEach((n) => {
+                // Get events raised of a statemachine
+                const localRaisedEvents = statemachineToRaisedEvents.get(n.id)
+                // If it has raised events
+                if(localRaisedEvents){
+                    // Iterate over other Statemachines in the same group and check if they consume an event that is raised.
+                   groupNodes.forEach((otherNode) => {
+                       // Ignore self
+                       if(otherNode.id !== n.id){
+                           const localConsumedEvents = statemachineConsumedEvents.get(otherNode.id)
 
+                           if (localConsumedEvents) {
+                               // Check if any of the raised events are consumed
+                               const hasCommonEvent = localConsumedEvents.some(event =>
+                                   localRaisedEvents.includes(event)
+                               );
+
+                               // If there is at least one common event, perform the necessary action
+                               if (hasCommonEvent) {
+                                   console.log(`Node ${otherNode.id} consumes an event raised by Node ${n.id}`);
+                                   // Add your edge creation logic here
+                               }
+                           }
+                       }
+
+
+
+                   })
+                }
+
+            })
 
 
 
