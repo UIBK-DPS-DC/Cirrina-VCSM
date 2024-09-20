@@ -70,7 +70,6 @@ export default function NodeInfoForm() {
 
     const renderContexts = useCallback(() => {
         if(selectedNode && isState(selectedNode.data)){
-            console.log("Entering RC")
             return (
                 selectedNode.data.state.persistentContext.map((context) => {
                     return (

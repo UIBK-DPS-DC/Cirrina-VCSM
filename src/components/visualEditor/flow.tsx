@@ -495,6 +495,9 @@ export default function Flow() {
         // Remove all edges between statemachines.
         removeEdges(statemachines)
 
+        const edgesToAdd: Edge<CsmEdgeProps>[] = []
+
+
         //Group nodes by their Parent
         const parentMap: Map<string, Node<CsmNodeProps>[]> = new Map()
         statemachines.forEach((node) => {
@@ -531,7 +534,7 @@ export default function Flow() {
             const statemachineConsumedEvents: Map<string,string[]> = new Map()
 
             groupNodes.forEach((n) => {
-                // For ever sm get all state descendants (only they can raise and consume events)
+                // For every sm get all state descendants (only they can raise and consume events)
                 const descendants = getAllDescendants(n).filter((n) => n.type === "state-node")
                 let raisedEvents: string[] = []
                 let consumedEvents: string[] = []
@@ -574,12 +577,29 @@ export default function Flow() {
                                // If there is at least one common event, perform the necessary action
                                if (hasCommonEvent) {
                                    console.log(`Node ${otherNode.id} consumes an event raised by Node ${n.id}`);
-                                   // Add your edge creation logic here
+                                   const connection: Connection = {
+                                       source: n.id, sourceHandle: "a", target: otherNode.id, targetHandle: "d"
+
+                                   }
+                                   const newTransition = transitionService.connectionToTransition(connection)
+                                   if(newTransition){
+                                       const newEdge: Edge<CsmEdgeProps> = {
+                                           id: getNewEdgeId(),
+                                           ...connection,
+                                           type: 'csm-edge',
+                                           markerEnd: {type: MarkerType.Arrow},
+                                           markerStart:{type: MarkerType.Arrow},
+                                           data: {transition: newTransition},
+                                           animated: true,
+                                           zIndex: 1
+
+                                       }
+                                       edgesToAdd.push(newEdge)
+                                   }
+
                                }
                            }
                        }
-
-
 
                    })
                 }
@@ -594,12 +614,15 @@ export default function Flow() {
 
         })
 
+        // Here
+
+        setEdges((prev) => [...prev, ...edgesToAdd])
 
         console.log(parentMap); // To verify the result
 
 
 
-    }, [recalculateTransitions, setRecalculateTransitions]);
+    }, [recalculateTransitions, setRecalculateTransitions, setEdges]);
 
     return (
         <div className={"flow-container"}>
