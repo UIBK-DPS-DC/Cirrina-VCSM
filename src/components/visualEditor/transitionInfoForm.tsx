@@ -35,7 +35,7 @@ let idCounter = 0
 
 export default function TransitionInfoForm() {
     const context = useContext(ReactFlowContext) as ReactFlowContextProps;
-    const {selectedEdge, showSidebar, setShowSidebar} = context
+    const {selectedEdge, showSidebar, setShowSidebar, eventService} = context
 
     const instanceId = useRef(++idCounter).current;
     let formCount = 0
@@ -161,6 +161,21 @@ export default function TransitionInfoForm() {
             selectedEdge.data.transition.setEvent(onEvent.name)
         }
     }, [onEvent]);
+
+    useEffect(() => {
+        if(selectedEdge?.data){
+            const eventToBeSet = eventService.getEventByName(selectedEdge.data.transition.getEvent())
+            if(eventToBeSet){
+                setOnEvent(eventToBeSet)
+            }
+            else {
+                setOnEvent(undefined)
+            }
+
+            setGuards(selectedEdge.data.transition.getGuards())
+        }
+
+    }, [selectedEdge, selectedEdge?.data]);
 
 
     const onGuardInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {

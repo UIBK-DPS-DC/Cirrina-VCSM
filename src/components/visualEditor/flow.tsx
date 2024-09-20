@@ -186,7 +186,7 @@ export default function Flow() {
 
 
         },
-        [setEdges, transitionService, nodes]
+        [setEdges, transitionService, nodes, selectedEdge]
     );
 
     const onDragOver = useCallback((event: React.DragEvent<HTMLDivElement>) => {
