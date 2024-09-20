@@ -3,7 +3,10 @@ import Action from "./action.tsx";
 import ContextVariable from "./contextVariable.tsx";
 import Transition from "./transition.ts";
 import Guard from "./guard.tsx";
+import Event from "./event.ts";
 import {StateDescription} from "../pkl/bindings/collaborative_state_machine_description.pkl.ts";
+import {ActionType} from "../enums.ts";
+import {RaiseEventActionProps} from "../types.ts";
 
 
 
@@ -201,6 +204,19 @@ export default class State implements StateOrStateMachine {
         this._persistentContext = this._persistentContext.filter(existingContext => existingContext !== context);
 
         this._staticContext = this._staticContext.filter(existingContext => existingContext !== context);
+    }
+
+    public getAllRaisedEvents(): Event[] {
+        return this.getAllActions().filter((a) => a.type === ActionType.RAISE_EVENT)
+            .map((a) => {
+                const props = a.properties as RaiseEventActionProps
+                return props.event
+            })
+    }
+
+
+    public getAllConsumedEvents() {
+        return this.on.map((t) => t.getEvent()).filter((e) => !!e.trim())
     }
 
 

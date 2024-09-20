@@ -1,4 +1,4 @@
-import React, {useCallback, useContext} from 'react';
+import React, {useCallback, useContext, useEffect} from 'react';
 import {
     addEdge,
     Background,
@@ -66,7 +66,9 @@ export default function Flow() {
         setShowSidebar,
         stateOrStateMachineService,
         contextService,
-        transitionService
+        transitionService,
+        recalculateTransitions,
+        setRecalculateTransitions
     } = context;
 
     const { getIntersectingNodes, screenToFlowPosition } = useReactFlow();
@@ -244,8 +246,11 @@ export default function Flow() {
             const parentId = newNode.parentId || NO_PARENT;
             stateOrStateMachineService.linkStateNameToStatemachine(new_name, parentId, true);
             stateOrStateMachineService.linkNode(newNode.id, newNode.data);
+
+            setRecalculateTransitions(!recalculateTransitions)
+
         },
-        [screenToFlowPosition, setNodes, stateOrStateMachineService, updateNodeHistory]
+        [screenToFlowPosition, setNodes, stateOrStateMachineService, updateNodeHistory,recalculateTransitions]
     );
 
     const onNodeDragStop = useCallback(
@@ -475,6 +480,150 @@ export default function Flow() {
     const onPaneClick = useCallback(() => {
         setShowSidebar(false);
     }, [setShowSidebar]);
+
+    const removeEdges = useCallback((nodes: Node<CsmNodeProps>[]) => {
+        const ids = nodes.map((n) => n.id);
+        setEdges((prevEdges) =>  prevEdges.filter((e) => !ids.includes(e.source)));
+    }, [edges, setEdges])
+
+    useEffect(() => {
+        // Get all statemachines
+        const statemachines = nodes.filter((n) => n.type === "state-machine-node")
+        // Remove all edges between statemachines.
+        removeEdges(statemachines)
+
+        const edgesToAdd: Edge<CsmEdgeProps>[] = []
+
+
+        //Group nodes by their Parent
+        const parentMap: Map<string, Node<CsmNodeProps>[]> = new Map()
+        statemachines.forEach((node) => {
+            const parentId = node.parentId || "NO_PARENT"; // Replace with default if no parent
+            if (parentMap.has(parentId)) {
+                // If the parentId exists, push the node to the existing array
+                parentMap.get(parentId)?.push(node);
+            } else {
+                // If the parentId doesnt exist, create a new array with the node
+                parentMap.set(parentId, [node]);
+            }
+
+        });
+
+        // Get all parent groups
+        const groups = Array.from(parentMap.keys());
+
+
+
+        // for every group
+        groups.forEach((group) => {
+            const groupNodes = parentMap.get(group);
+            if(!groupNodes) {
+                return
+            }
+            // Group is parent node
+            // Get raised and consumed events of each group
+            // If other group consumes event that other group raises => create edge between their parents
+
+            // Map all events raised and consumed to the corresponding state machine nodes
+            const statemachineToRaisedEvents: Map<string,string[]> = new Map()
+            const statemachineConsumedEvents: Map<string,string[]> = new Map()
+
+            groupNodes.forEach((n) => {
+                // For every sm get all state descendants (only they can raise and consume events)
+                const descendants = getAllDescendants(n).filter((n) => n.type === "state-node")
+                let raisedEvents: string[] = []
+                let consumedEvents: string[] = []
+
+                descendants.forEach((d) => {
+                    if(isState(d.data)){
+                        raisedEvents = raisedEvents.concat(d.data.state.getAllRaisedEvents().map((e) => e.name))
+                        consumedEvents = consumedEvents.concat(d.data.state.getAllConsumedEvents())
+                    }
+                })
+                // Add them to the Map
+                statemachineToRaisedEvents.set(n.id, raisedEvents)
+                statemachineConsumedEvents.set(n.id, consumedEvents)
+
+
+
+            })
+
+            console.log("Raise event map: ", statemachineToRaisedEvents)
+            console.log("consumedEvents map", statemachineConsumedEvents)
+
+            //Iterate over group nodes and if one group node consumes and event that another raises add edge
+            groupNodes.forEach((n) => {
+                // Get events raised of a statemachine
+                const localRaisedEvents = statemachineToRaisedEvents.get(n.id)
+                // If it has raised events
+                if(localRaisedEvents){
+                    // Iterate over other Statemachines in the same group and check if they consume an event that is raised.
+                   groupNodes.forEach((otherNode) => {
+                       // Ignore self
+                       if(otherNode.id !== n.id){
+                           const localConsumedEvents = statemachineConsumedEvents.get(otherNode.id)
+
+                           if (localConsumedEvents) {
+                               // Check if any of the raised events are consumed
+                               const hasCommonEvent = localConsumedEvents.some(event =>
+                                   localRaisedEvents.includes(event)
+                               );
+
+                               // If there is at least one common event, perform the necessary action
+                               if (hasCommonEvent) {
+
+                                   // Dynamically set source and target handle depending on position
+                                   const sourceHandle:string = otherNode.position.x > n.position.x ? "c" : "a"
+                                   const targetHandle: string = otherNode.position.x > n.position.x ? "b" : "d"
+
+                                   console.log(`Node ${otherNode.id} consumes an event raised by Node ${n.id}`);
+                                   const connection: Connection = {
+                                       source: n.id, sourceHandle: sourceHandle, target: otherNode.id, targetHandle: targetHandle
+
+                                   }
+                                   const newTransition = transitionService.connectionToTransition(connection)
+                                   if(newTransition){
+                                       newTransition.isStatemachineEdge = true
+                                       const newEdge: Edge<CsmEdgeProps> = {
+                                           id: getNewEdgeId(),
+                                           ...connection,
+                                           type: 'csm-edge',
+                                           markerEnd: {type: MarkerType.Arrow},
+                                           markerStart:{type: MarkerType.Arrow},
+                                           data: {transition: newTransition},
+                                           animated: true,
+                                           zIndex: 1
+
+                                       }
+                                       edgesToAdd.push(newEdge)
+                                   }
+
+                               }
+                           }
+                       }
+
+                   })
+                }
+
+            })
+
+
+
+
+
+
+
+        })
+
+        // Here
+
+        setEdges((prev) => [...prev, ...edgesToAdd])
+
+        console.log(parentMap); // To verify the result
+
+
+
+    }, [recalculateTransitions, setRecalculateTransitions, setEdges]);
 
     return (
         <div className={"flow-container"}>
