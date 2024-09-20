@@ -282,7 +282,7 @@ export default function MatchActionForm(props: {
     };
 
     const validateExpressionInput = (expression: string) => {
-        return !!expression.trim() && expression.length > 1;
+        return !!expression.trim() && expression.length > 0;
     };
 
     const validateCaseActions = () => {
