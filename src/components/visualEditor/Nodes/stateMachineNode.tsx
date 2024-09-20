@@ -68,6 +68,7 @@ export function StateMachineNode ({data, selected}: NodeProps<StateMachineNode>)
                             right: "100%",
                             left: 0,
                             transform: "translateY(250%)",
+                            visibility: "hidden"
                         }}
                         id={"a"}
                     />
@@ -80,6 +81,7 @@ export function StateMachineNode ({data, selected}: NodeProps<StateMachineNode>)
                             right: "100%",
                             left: 0,
                             transform: "translateY(250%)",
+                            visibility: "hidden"
                         }}
                         id={"b"}
                     />
@@ -92,6 +94,7 @@ export function StateMachineNode ({data, selected}: NodeProps<StateMachineNode>)
                             right: "100%",
                             left: 0,
                             transform: "translateY(250%) translateX(2550%)",
+                            visibility: "hidden"
                         }}
                         id={"c"}
                     />
@@ -104,6 +107,7 @@ export function StateMachineNode ({data, selected}: NodeProps<StateMachineNode>)
                             right: "100%",
                             left: 0,
                             transform: "translateY(250%) translateX(2550%)",
+                            visibility: "hidden"
                         }}
                         id={"d"}
                     />

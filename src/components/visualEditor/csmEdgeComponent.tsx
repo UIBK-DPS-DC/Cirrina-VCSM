@@ -1,4 +1,4 @@
-import {BaseEdge, EdgeLabelRenderer, type EdgeProps, getBezierPath} from '@xyflow/react';
+import {BaseEdge, EdgeLabelRenderer, type EdgeProps, getBezierPath, getSmoothStepPath} from '@xyflow/react';
 
 import {ReactFlowContextProps, TransitionEdge} from "../../types.ts";
 import {useContext, useEffect, useState} from "react";
@@ -11,6 +11,8 @@ export default function CsmEdge({
                                     sourceY,
                                     targetX,
                                     targetY,
+                                    sourcePosition,
+                                    targetPosition,
                                     markerEnd,
                                     target,
                                     source,
@@ -21,7 +23,7 @@ export default function CsmEdge({
     const [infoString,setInfoString] = useState<string>("");
 
     const context = useContext(ReactFlowContext) as ReactFlowContextProps;
-    const {edges, setEdges,selectedEdge} = context;
+    const {edges, setEdges,selectedEdge, hideFlowEdges} = context;
 
     const generateInfoString = (transition: Transition | undefined) => {
         if(transition && transition.getEvent()){
@@ -50,6 +52,15 @@ export default function CsmEdge({
         targetX + 2
     } ${targetY}`;
 
+    const isStatemachineEdge = data?.transition.isStatemachineEdge
+    const [smEdgePath] = getSmoothStepPath({
+        sourceX,
+        sourceY,
+        sourcePosition,
+        targetX,
+        targetY,
+        targetPosition,
+    });
 
 
 
@@ -57,7 +68,7 @@ export default function CsmEdge({
 
     return (
         <>
-            {target !== source && (
+            {target !== source && !isStatemachineEdge && (
                 <>
                     <BaseEdge id={id} path={edgePath} markerEnd={markerEnd} />
                     <EdgeLabelRenderer>
@@ -80,14 +91,22 @@ export default function CsmEdge({
 
                     </EdgeLabelRenderer>
                 </>
-            ) || (
+            ) ||target == source && (
                 <path
                     id={id}
                     className="react-flow__edge-path"
                     d={internalPath}
                     markerEnd={markerEnd}
                 />
-            )}
+            ) || (
+                <>
+                    <BaseEdge id={id} path={smEdgePath} style={{opacity: hideFlowEdges ? 0 : 1}}/>
+                    <circle r="10" fill="#ff0073" opacity={hideFlowEdges ? 0 : 1}>
+                        <animateMotion dur="3s" repeatCount="indefinite" path={smEdgePath} />
+                    </circle>
+                </>
+            )// Add logic for sm edges here
+            }
 
         </>
     );

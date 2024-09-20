@@ -162,6 +162,7 @@ export type ReactFlowContextProps = {
     transitionService: TransitionService;
     recalculateTransitions: boolean;
     setRecalculateTransitions: React.Dispatch<React.SetStateAction<boolean>>
+    hideFlowEdges: boolean
 }
 
 

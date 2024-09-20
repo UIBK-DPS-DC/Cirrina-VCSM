@@ -4,7 +4,7 @@ import {Tab, TabList, TabPanel, Tabs} from "react-tabs";
 import "./css/react-tabs.css"
 import {CsmEdgeProps, CsmNodeProps, ReactFlowContextProps} from "./types.ts";
 import StateOrStateMachineService from "./services/stateOrStateMachineService.tsx";
-import {useMemo, useState} from "react";
+import React, {useCallback, useMemo, useState} from "react";
 import TransitionService from "./services/transitionService.tsx";
 import ActionService from "./services/actionService.tsx";
 import EventService from "./services/eventService.tsx";
@@ -38,6 +38,19 @@ export default function App() {
     const [nodeHistory, setNodeHistory] = useState<Node<CsmNodeProps>[][]>([[]]);
     const [recalculateTransitions, setRecalculateTransitions] = useState<boolean>(false)
 
+    const [hideFlowEdges, setHideFlowEdges] = useState<boolean>(false)
+
+    const hideButtonText = () => hideFlowEdges ? "Show Statemachine Edges" : "Hide Statemachine Edges";
+
+
+    const onHideButtonClick = useCallback((event: React.MouseEvent<HTMLButtonElement>) => {
+        event.preventDefault()
+        event.stopPropagation()
+
+        setHideFlowEdges(!hideFlowEdges)
+    },[hideFlowEdges, setHideFlowEdges])
+
+
     //TODO: split into multiple contexts or use prop drilling when applicable
     // big contexts might have huge performance impacts
     const contextValue: ReactFlowContextProps = {
@@ -64,7 +77,8 @@ export default function App() {
         guardService,
         transitionService,
         recalculateTransitions,
-        setRecalculateTransitions
+        setRecalculateTransitions,
+        hideFlowEdges
     };
 
 
@@ -75,7 +89,7 @@ export default function App() {
                     <h2> Project Name </h2>
                     <div className={"buttons"}>
                         <Export></Export>
-                        <button className={"button"}> Invoke</button>
+                        <button className={"button"} onClick={onHideButtonClick}>{hideButtonText()}</button>
                     </div>
                 </div>
                 <Tabs>
