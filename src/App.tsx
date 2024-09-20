@@ -86,14 +86,14 @@ export default function App() {
         <div className={"app-container"}>
             <ReactFlowContext.Provider value={contextValue}>
                 <div className={"topBar"}>
-                    <h2> Project Name </h2>
+                    <h2> VCSM Editor </h2>
                     <div className={"buttons"}>
                         <Export></Export>
                         <button className={"button"} onClick={onHideButtonClick}>{hideButtonText()}</button>
                     </div>
                 </div>
-                <Tabs>
-                    <TabList>
+                <Tabs >
+                    <TabList style={{backgroundColor: "grey"}}>
                         <Tab>Visual Editor</Tab>
                         <Tab>JSON Editor</Tab>
                     </TabList>
