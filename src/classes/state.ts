@@ -215,6 +215,11 @@ export default class State implements StateOrStateMachine {
     }
 
 
+    public getAllConsumedEvents() {
+        return this.on.map((t) => t.getEvent()).filter((e) => !!e.trim())
+    }
+
+
     /**
      * Adds a new transition to the state's "on" transitions if it doesn't already exist.
      *

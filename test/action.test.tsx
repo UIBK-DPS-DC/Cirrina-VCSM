@@ -4,6 +4,7 @@ import ContextVariable from "../src/classes/contextVariable";
 import {RaiseEventActionProps} from "../src/types";
 import Event from "../src/classes/event";
 import State from "../src/classes/state";
+import Transition from "../src/classes/transition";
 
 describe('Action class', () => {
     let action: Action;
@@ -203,5 +204,100 @@ describe("State.getAllRaisedEvents", () => {
         expect(state.exit).toHaveLength(1);
         expect((state.entry[0].properties as RaiseEventActionProps).event.name).toBe("Event1");
         expect((state.exit[0].properties as RaiseEventActionProps).event.name).toBe("Event2");
+    });
+});
+
+describe("State.getAllConsumedEvents", () => {
+    let state: State;
+
+    // Helper function to create a Transition with a specific event
+    const createTransitionWithEvent = (eventName: string) => {
+        const transition = new Transition("sourceState", "targetState");
+        transition.setEvent(eventName);
+        return transition;
+    };
+
+    beforeEach(() => {
+        // Initialize a new State before each test
+        state = new State("TestState");
+    });
+
+    it("should return an empty array if there are no transitions", () => {
+        expect(state.getAllConsumedEvents()).toEqual([]);
+    });
+
+
+    it("should return an array with the correct events when transitions have events", () => {
+        const transition1 = createTransitionWithEvent("Event1");
+        const transition2 = createTransitionWithEvent("Event2");
+
+        state.on = [transition1, transition2];
+
+        expect(state.getAllConsumedEvents()).toEqual(["Event1", "Event2"]);
+    });
+
+    it("should handle transitions with empty string events gracefully", () => {
+        const transition1 = createTransitionWithEvent("");
+        const transition2 = createTransitionWithEvent("Event2");
+
+        state.on = [transition1, transition2];
+
+        expect(state.getAllConsumedEvents()).toEqual(["Event2"]);
+    });
+
+    it("should handle mixed events correctly across multiple transitions", () => {
+        const transition1 = createTransitionWithEvent("Event1");
+        const transition2 = createTransitionWithEvent("");
+        const transition3 = createTransitionWithEvent("Event3");
+
+        state.on = [transition1, transition2, transition3];
+
+        expect(state.getAllConsumedEvents()).toEqual(["Event1", "Event3"]);
+    });
+
+    it("should not modify the transitions or their events when called", () => {
+        const transition1 = createTransitionWithEvent("Event1");
+        const transition2 = createTransitionWithEvent("Event2");
+
+        state.on = [transition1, transition2];
+
+        const result = state.getAllConsumedEvents();
+
+        expect(result).toEqual(["Event1", "Event2"]);
+
+        // Ensure the original transitions are not modified
+        expect(state.on[0].getEvent()).toBe("Event1");
+        expect(state.on[1].getEvent()).toBe("Event2");
+    });
+
+    it("should work with a large number of transitions", () => {
+        const transitions = Array.from({ length: 100 }, (_, i) =>
+            createTransitionWithEvent(`Event${i}`)
+        );
+
+        state.on = transitions;
+
+        const expectedEvents = transitions.map((t) => t.getEvent());
+        expect(state.getAllConsumedEvents()).toEqual(expectedEvents);
+    });
+
+    it("should handle transitions with duplicate events", () => {
+        const transition1 = createTransitionWithEvent("DuplicateEvent");
+        const transition2 = createTransitionWithEvent("DuplicateEvent");
+
+        state.on = [transition1, transition2];
+
+        expect(state.getAllConsumedEvents()).toEqual(["DuplicateEvent", "DuplicateEvent"]);
+    });
+
+    it("should handle transitions that have events modified after being added to the state", () => {
+        const transition1 = createTransitionWithEvent("InitialEvent");
+
+        state.on = [transition1];
+
+        // Modify the event after adding to the state
+        transition1.setEvent("ModifiedEvent");
+
+        expect(state.getAllConsumedEvents()).toEqual(["ModifiedEvent"]);
     });
 });
