@@ -26,7 +26,6 @@ import State from "../../classes/state.ts";
 import CsmEdge from "./csmEdgeComponent.tsx";
 import {getAllStateNamesInExtent, getParentNode, ReactFlowContext} from "../../utils.tsx";
 import {NO_PARENT} from "../../services/stateOrStateMachineService.tsx";
-import {s} from "vite/dist/node/types.d-aGj9QkWt";
 
 const nodeTypes = {
     'state-node': StateNode,
@@ -68,8 +67,6 @@ export default function Flow() {
         stateOrStateMachineService,
         contextService,
         transitionService,
-        actionService,
-        eventService,
         recalculateTransitions,
         setRecalculateTransitions
     } = context;
@@ -527,8 +524,6 @@ export default function Flow() {
             // Get raised and consumed events of each group
             // If other group consumes event that other group raises => create edge between their parents
 
-            // just for loggin delete later
-            let i = 0
             // Map all events raised and consumed to the corresponding state machine nodes
             const statemachineToRaisedEvents: Map<string,string[]> = new Map()
             const statemachineConsumedEvents: Map<string,string[]> = new Map()
