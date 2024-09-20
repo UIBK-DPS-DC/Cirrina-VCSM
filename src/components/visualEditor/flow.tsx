@@ -583,6 +583,7 @@ export default function Flow() {
                                    }
                                    const newTransition = transitionService.connectionToTransition(connection)
                                    if(newTransition){
+                                       newTransition.isStatemachineEdge = true
                                        const newEdge: Edge<CsmEdgeProps> = {
                                            id: getNewEdgeId(),
                                            ...connection,

@@ -43,11 +43,15 @@ export default function CsmEdge({
     }, [edges,setEdges]);
 
 
+    // For internal transitions
     const radiusX = (sourceX - targetX) * 0.8;
     const radiusY = 30;
     const internalPath = `M ${sourceX - 5} ${sourceY + 3} A ${radiusX} ${radiusY} 0 1 0 ${
         targetX + 2
     } ${targetY}`;
+
+
+
 
 
 

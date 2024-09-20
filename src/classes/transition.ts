@@ -12,14 +12,16 @@ export default class Transition {
     private _actions : Action[]
     private _else : string []
     private _event : string
+    private _isStatemachineEdge : boolean
 
-    public constructor (sourceState: string, targetState: string){
+    public constructor (sourceState: string, targetState: string, isStatemachineEdge: boolean = false) {
         this.source = sourceState
         this.target = targetState
         this._guards = []
         this._actions = []
         this._else = []
         this._event = ""
+        this._isStatemachineEdge = isStatemachineEdge
         this.ID = this.getNewId()
     }
 
@@ -40,6 +42,14 @@ export default class Transition {
         return this.target
     }
 
+
+    get isStatemachineEdge(): boolean {
+        return this._isStatemachineEdge;
+    }
+
+    set isStatemachineEdge(value: boolean) {
+        this._isStatemachineEdge = value;
+    }
 
     public getGuards(): Guard[] {
         return this._guards;
