@@ -1,11 +1,11 @@
-import React, {useCallback, useContext, useState} from "react";
+import React, {useCallback, useContext, useEffect, useState} from "react";
 import { isState, ReactFlowContextProps} from "../../types.ts";
 import Action from "../../classes/action.ts";
-import {ReactFlowContext} from "../../utils.tsx";
+import {ReactFlowContext, setInitialState, setStateAsTerminal} from "../../utils.tsx";
 import RenameNodeComponent from "./renameNodeComponent.tsx";
 import ActionDisplay from "../Action/actionDisplay.tsx";
 import Offcanvas from 'react-bootstrap/Offcanvas';
-import {Button, Container, OffcanvasBody, OffcanvasHeader} from "react-bootstrap";
+import {Button, Container, Form, OffcanvasBody, OffcanvasHeader} from "react-bootstrap";
 import CreateContextFormModal from "../Context/createContextFormModal.tsx";
 import ActionAccordion from "../Action/actionAccordion.tsx";
 
@@ -31,6 +31,9 @@ export default function NodeInfoForm() {
         stateOrStateMachineService,
         showSidebar,
         setShowSidebar,
+        nodes,
+        edges,
+
     } = context;
 
 
@@ -49,11 +52,62 @@ export default function NodeInfoForm() {
     const [_allAction,_setAllActions] = useState<Action[]>([]);
 
 
+    const [isInitial,setIsInitial] = useState<boolean>(false)
+    const [isTerminal, setIsTerminal] = useState<boolean>(false)
 
 
 
 
 
+
+    // Handle checkbox change
+    const handleInitialCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        if(!selectedNode){
+            return
+        }
+
+        const checked = (event.target.checked);
+        if(checked){
+            setInitialState(selectedNode, nodes, edges)
+            setIsTerminal(false)
+
+        }
+        else {
+            if(isState(selectedNode.data)){
+                selectedNode.data.state.initial = false
+
+            }
+        }
+        setIsInitial(checked)
+    };
+
+    const handleTerminalCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        if(!selectedNode){
+            return
+        }
+
+        const checked = event.target.checked
+        if(checked){
+            setStateAsTerminal(selectedNode, edges)
+            setIsInitial(false)
+        }
+        else{
+            if(isState(selectedNode.data)){
+                selectedNode.data.state.terminal = false
+            }
+
+        }
+        setIsTerminal(checked)
+    }
+
+
+    useEffect(() => {
+        if(selectedNode && isState(selectedNode.data)){
+            setIsInitial(selectedNode.data.state.initial)
+            setIsTerminal(selectedNode.data.state.terminal)
+        }
+
+    }, [selectedNode]);
 
 
     const onActionFormSubmit = () => {
@@ -96,6 +150,22 @@ export default function NodeInfoForm() {
                         <br/>
                         <Container>
                             <CreateContextFormModal variable={undefined} buttonName={undefined} onSubmit={undefined}></CreateContextFormModal>
+                        </Container>
+
+                        {/** Initial terminal checkboxes*/}
+
+                        <Container className={"mb-3"}>
+                            <Form id={"checkboxes"}>
+
+                                <Form.Group className={"mb-3"}>
+                                        <Form.Check type={"checkbox"} label={"Initial"} checked={isInitial} onChange={handleInitialCheckboxChange}/>
+                                </Form.Group>
+
+                                <Form.Group>
+                                    <Form.Check type={"checkbox"} label={"Terminal"} checked={isTerminal} onChange={handleTerminalCheckboxChange}/>
+                                </Form.Group>
+
+                            </Form>
                         </Container>
 
                         <br/>

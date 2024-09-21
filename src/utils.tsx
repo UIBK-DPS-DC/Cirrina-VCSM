@@ -42,6 +42,7 @@ export const setInitialState = (initialState: Node<CsmNodeProps>, nodes: Node<Cs
             }
         })
         initialState.data.state.initial = true
+        initialState.data.state.terminal = false
         console.log(`Set ${initialState.id} as initial state!`)
     }
     else {
@@ -59,6 +60,7 @@ export const setStateAsTerminal = (terminalNode: Node<CsmNodeProps>, edges: Edge
 
     if(isState(terminalNode.data)){
         terminalNode.data.state.terminal = true
+        terminalNode.data.state.initial = false
         console.log(`Set ${terminalNode.id} as a terminal state`)
     }
     else{
