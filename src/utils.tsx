@@ -1,5 +1,5 @@
-import {Node} from "@xyflow/react";
-import {CsmNodeProps, isStateMachine, OptionEnums, ReactFlowContextProps} from "./types.ts";
+import {Edge, Node} from "@xyflow/react";
+import {CsmEdgeProps, CsmNodeProps, isState, isStateMachine, OptionEnums, ReactFlowContextProps} from "./types.ts";
 import {createContext} from "react";
 import StateInfoForm from "./components/visualEditor/stateInfoForm.tsx";
 import StateMachineInfoForm from "./components/visualEditor/stateMachineInfoForm.tsx";
@@ -21,6 +21,55 @@ export const renderEnumAsOptions = (enumObject: OptionEnums) => {
     );
     
 }
+
+
+
+export const setInitialState = (initialState: Node<CsmNodeProps>, nodes: Node<CsmNodeProps>[], edges: Edge<CsmEdgeProps>[]) =>  {
+
+    edges.forEach(edge => {
+        if(edge.source === initialState.id && edge.target === initialState.id) {
+            console.error("Initial state cannot have internal transition");
+            return
+        }
+    })
+
+
+    if(isState(initialState.data)){
+        const siblings = nodes.filter((n) => n.parentId === initialState.parentId);
+        siblings.forEach(sibling => {
+            if(isState(sibling.data)){
+                sibling.data.state.initial = false
+            }
+        })
+        initialState.data.state.initial = true
+        initialState.data.state.terminal = false
+        console.log(`Set ${initialState.id} as initial state!`)
+    }
+    else {
+        console.error("Statemachine can not be initial state")
+    }
+}
+
+export const setStateAsTerminal = (terminalNode: Node<CsmNodeProps>, edges: Edge<CsmEdgeProps>[]) =>  {
+    edges.forEach((edge) => {
+        if(edge.source === terminalNode.id){
+            console.error("Terminal state cannot have outgoing transitions")
+            return
+        }
+    })
+
+    if(isState(terminalNode.data)){
+        terminalNode.data.state.terminal = true
+        terminalNode.data.state.initial = false
+        console.log(`Set ${terminalNode.id} as a terminal state`)
+    }
+    else{
+        console.error("Statemachine cannot be terminal states")
+    }
+
+}
+
+
 
 export const renderContextVariablesAsOptions = (vars: ContextVariable[]) => {
     return vars.map((variable) => {
