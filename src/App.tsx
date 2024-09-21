@@ -39,7 +39,7 @@ export default function App() {
     const [recalculateTransitions, setRecalculateTransitions] = useState<boolean>(false)
 
     const [hideFlowEdges, setHideFlowEdges] = useState<boolean>(false)
-
+    const [initialOrTerminalChange, setInitialOrTerminalChange] = useState<boolean>(false)
     const hideButtonText = () => hideFlowEdges ? "Show Statemachine Edges" : "Hide Statemachine Edges";
 
 
@@ -78,7 +78,9 @@ export default function App() {
         transitionService,
         recalculateTransitions,
         setRecalculateTransitions,
-        hideFlowEdges
+        hideFlowEdges,
+        initialOrTerminalChange,
+        setInitialOrTerminalChange
     };
 
 

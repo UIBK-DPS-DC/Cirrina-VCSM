@@ -163,6 +163,8 @@ export type ReactFlowContextProps = {
     recalculateTransitions: boolean;
     setRecalculateTransitions: React.Dispatch<React.SetStateAction<boolean>>
     hideFlowEdges: boolean
+    initialOrTerminalChange: boolean
+    setInitialOrTerminalChange: React.Dispatch<React.SetStateAction<boolean>>
 }
 
 

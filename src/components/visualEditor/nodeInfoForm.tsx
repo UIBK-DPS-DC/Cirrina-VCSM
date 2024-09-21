@@ -33,6 +33,8 @@ export default function NodeInfoForm() {
         setShowSidebar,
         nodes,
         edges,
+        initialOrTerminalChange,
+        setInitialOrTerminalChange
 
     } = context;
 
@@ -78,6 +80,7 @@ export default function NodeInfoForm() {
 
             }
         }
+        setInitialOrTerminalChange(!initialOrTerminalChange)
         setIsInitial(checked)
     };
 
@@ -98,6 +101,7 @@ export default function NodeInfoForm() {
 
         }
         setIsTerminal(checked)
+        setInitialOrTerminalChange(!initialOrTerminalChange)
     }
 
 
