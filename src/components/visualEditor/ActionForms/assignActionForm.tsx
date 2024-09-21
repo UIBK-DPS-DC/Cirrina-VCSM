@@ -183,7 +183,7 @@ export default function AssignActionForm(props: {action: Action | undefined,
 
             }
 
-            updatedAction = new Action("newAction", ActionType.ASSIGN);
+            updatedAction = new Action(actionNameInput, ActionType.ASSIGN);
             updatedAction.properties = assignActionsProps;
 
             onActionSubmit(updatedAction);
@@ -199,7 +199,6 @@ export default function AssignActionForm(props: {action: Action | undefined,
                 selectedEdge.data.transition.addAction(updatedAction)
             }
 
-            updatedAction.name = actionNameInput
 
 
         }
@@ -225,7 +224,7 @@ export default function AssignActionForm(props: {action: Action | undefined,
                 updatedAction.properties = assignActionsProps;
                 onActionSubmit(updatedAction);
             } else {
-                updatedAction = new Action("newAction", ActionType.ASSIGN);
+                updatedAction = new Action(actionNameInput, ActionType.ASSIGN);
                 updatedAction.properties = assignActionsProps;
                 if(!props.dontAddToState){
                     stateOrStateMachineService.addActionToState(selectedNode.data, updatedAction, selectedActionCategory as ActionCategory);
@@ -241,7 +240,6 @@ export default function AssignActionForm(props: {action: Action | undefined,
             actionService.deregisterAction(updatedAction);
             actionService.registerAction(updatedAction);
 
-            updatedAction.name = actionNameInput
 
             if(isState(selectedNode.data)){
                 const sm = selectedNode.data

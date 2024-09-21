@@ -194,7 +194,7 @@ export default function CreateActionForm(props: {action: Action | undefined,
             }
 
             else {
-                updatedAction = new Action("newAction", ActionType.CREATE);
+                updatedAction = new Action(actionNameInput, ActionType.CREATE);
 
                 // Set the properties of the new action with the createActionProps defined earlier.
                 updatedAction.properties = createActionProps;
@@ -202,7 +202,6 @@ export default function CreateActionForm(props: {action: Action | undefined,
                 onActionSubmit(updatedAction);
 
 
-                updatedAction.name = actionNameInput
                 actionService.deregisterAction(updatedAction);
                 actionService.registerAction(updatedAction);
 
@@ -270,7 +269,7 @@ export default function CreateActionForm(props: {action: Action | undefined,
                 }
             } else {
                 // If no existing action is provided, create a new action.
-                updatedAction = new Action("newAction", ActionType.CREATE);
+                updatedAction = new Action(actionNameInput, ActionType.CREATE);
 
                 // Set the properties of the new action with the createActionProps defined earlier.
                 updatedAction.properties = createActionProps;
@@ -295,7 +294,6 @@ export default function CreateActionForm(props: {action: Action | undefined,
                 props.onSubmit();
             }
 
-            updatedAction.name = actionNameInput
             actionService.deregisterAction(updatedAction);
             actionService.registerAction(updatedAction);
 
