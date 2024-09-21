@@ -437,9 +437,12 @@ export default function Flow() {
         }
 
 
-        const connectedEdges: Edge<CsmEdgeProps>[] = [];
+
+        const descendants = getAllDescendants(node);
+        const descendantIds = descendants.map(d => d.id);
+        const connectedEdges: Edge<CsmEdgeProps>[] = edges.filter(d => descendantIds.includes(d.source))
         setNodes((prevNodes) => {
-            const descendants = getAllDescendants(node);
+
             return prevNodes.map((n) => {
 
                 if (descendants.includes(n)) {
