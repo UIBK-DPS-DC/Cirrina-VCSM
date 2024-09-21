@@ -55,7 +55,7 @@
 }
 
 .neonBorderRed {
-    border: 0.2rem solid #ff073a; /* Bright red color */
+    border: 0.1rem solid #ff073a; /* Bright red color */
     border-radius: 0.5rem;
     box-shadow:
             0 0 2px #ff073a,

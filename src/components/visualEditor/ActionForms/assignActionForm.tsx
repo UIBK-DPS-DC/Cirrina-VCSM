@@ -26,7 +26,7 @@ export default function AssignActionForm(props: {action: Action | undefined,
     const [expressionInput, setExpressionInput] = useState<string>("");
     const [formIsValid, setFormIsValid] = useState<boolean>(false);
     const [selectedActionCategory, setSelectedActionCategory] = useState<string>(ActionCategory.ENTRY_ACTION)
-
+    const [actionNameInput, setActionNameInput] = useState<string>("");
 
     const headerText = () => props.action ? "Edit Assign Action" : "Create Assign Action"
     const invalidExpressionFeedbackText = () => expressionInput ? "Input must be an expression" : "Field cant be empty"
@@ -67,6 +67,7 @@ export default function AssignActionForm(props: {action: Action | undefined,
             const assignActionsProps = props.action.properties as AssignActionProps;
             setSelectedVar([assignActionsProps.variable]);
             setExpressionInput(assignActionsProps.expression);
+            setActionNameInput(props.action.name)
 
             if(selectedNode){
                 const actionCategory = actionService.getActionCategory(props.action,selectedNode.data)
@@ -110,6 +111,10 @@ export default function AssignActionForm(props: {action: Action | undefined,
         });
     }
 
+    const onActionNameInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setActionNameInput(event.target.value)
+    }
+
     const onDeleteButtonPress = () => {
 
         if(!selectedNode && !selectedEdge){
@@ -144,6 +149,8 @@ export default function AssignActionForm(props: {action: Action | undefined,
             return
         }
 
+
+
         const assignActionsProps: AssignActionProps = {
             expression: expressionInput,
             type: ActionType.ASSIGN,
@@ -153,11 +160,11 @@ export default function AssignActionForm(props: {action: Action | undefined,
         let updatedAction: Action
 
 
+
         // EDGE LOGIC
         if(selectedEdge){
 
             if(props.action){
-                console.log("I EXIST")
                 updatedAction = props.action;
                 updatedAction.properties = assignActionsProps;
                 onActionSubmit(updatedAction);
@@ -192,8 +199,7 @@ export default function AssignActionForm(props: {action: Action | undefined,
                 selectedEdge.data.transition.addAction(updatedAction)
             }
 
-
-
+            updatedAction.name = actionNameInput
 
 
         }
@@ -235,6 +241,8 @@ export default function AssignActionForm(props: {action: Action | undefined,
             actionService.deregisterAction(updatedAction);
             actionService.registerAction(updatedAction);
 
+            updatedAction.name = actionNameInput
+
             if(isState(selectedNode.data)){
                 const sm = selectedNode.data
                 sm.state.entry.forEach(entry => {
@@ -242,6 +250,7 @@ export default function AssignActionForm(props: {action: Action | undefined,
                 })
             }
         }
+
 
 
     }
@@ -259,6 +268,14 @@ export default function AssignActionForm(props: {action: Action | undefined,
                   Action Properties
               </Card.Title>
               <Form validated={formIsValid} onSubmit={onSubmit}>
+                  <Form.Group as={Row} className={"mb-3"}>
+                      <Form.Label column sm="3">
+                          Action Name:
+                      </Form.Label>
+                      <Col sm={"9"}>
+                          <Form.Control type={"text"} value={actionNameInput} onChange={onActionNameInputChange}/>
+                      </Col>
+                  </Form.Group>
                   {(!props.action || (props.action && selectedVar.length < 1)) &&  (
                       <Container>
                           <Form.Group as={Row} controlId={"formSelectAction"} className={"mb-3"}>
