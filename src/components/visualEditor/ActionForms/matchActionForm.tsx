@@ -31,6 +31,8 @@ function CaseForm(props: {
     useEffect(() => {
         console.log(`FORM ID : ${formId}`)
     }, []);
+
+
     const [action, setAction] = useState<Action | undefined>(undefined);
 
     const [invokeAction, setInvokeAction] = useState<Action[]>([]);
@@ -99,6 +101,7 @@ function CaseForm(props: {
     const onSelectedActionTypeChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
         setSelectedActionType(event.target.value);
     };
+
 
     useEffect(() => {
         setCaseIsValid(validateCase(caseInput));
@@ -250,7 +253,7 @@ export default function MatchActionForm(props: {
 
     const context = useContext(ReactFlowContext) as ReactFlowContextProps;
     const { selectedNode , actionService, stateOrStateMachineService, selectedEdge} = context;
-
+    const [actionNameInput, setActionNameInput] = useState<string>("");
     const [expressionInput, setExpressionInput] = useState<string>("");
     const [caseActions, setCaseActions] = useState<Action[]>([]);
     const [selectedActionCategory, setSelectedActionCategory] = useState<string>(ActionCategory.ENTRY_ACTION);
@@ -272,6 +275,10 @@ export default function MatchActionForm(props: {
     const handleClose = () => {
         setShow(false);
     };
+
+    const onActionNameInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setActionNameInput(event.target.value)
+    }
 
     const onExpressionInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setExpressionInput(event.currentTarget.value);
@@ -310,6 +317,7 @@ export default function MatchActionForm(props: {
                 setExpressionInput(matchActionProps.value)
                 const actions = matchActionProps.cases.map((mc) => mc.action)
                 setCaseActions(actions)
+                setActionNameInput(props.action.name)
 
                 if(selectedNode){
                     const actionCategory = actionService.getActionCategory(props.action,selectedNode.data)
@@ -319,7 +327,7 @@ export default function MatchActionForm(props: {
                 }
 
             }
-    }, [props.action, selectedActionCategory]);
+    }, [props.action]);
 
     const onActionSubmit = (newAction: Action) => {
         props.setActions((prevActions) => {
@@ -364,8 +372,8 @@ export default function MatchActionForm(props: {
         event.preventDefault();
         event.stopPropagation();
 
-        console.log("hi")
         console.log(selectedEdge)
+        console.log("I WAS CLICKED")
 
         //*
 
@@ -393,14 +401,12 @@ export default function MatchActionForm(props: {
 
         if(selectedEdge){
 
-            console.log("Mate")
 
             if (props.action && props.action.type === ActionType.MATCH) {
                 updatedAction = props.action;
                 updatedAction.properties = matchActionProps;
+                updatedAction.name = actionNameInput
                 onActionSubmit(updatedAction);
-
-                console.log("EXISTING")
 
                 actionService.deregisterAction(updatedAction);
                 actionService.registerAction(updatedAction);
@@ -418,8 +424,8 @@ export default function MatchActionForm(props: {
 
             }
             else {
-                console.log("NEW")
-                updatedAction = new Action("", ActionType.MATCH);
+
+                updatedAction = new Action(actionNameInput, ActionType.MATCH);
                 updatedAction.properties = matchActionProps;
 
 
@@ -443,7 +449,9 @@ export default function MatchActionForm(props: {
         }
 
         if(selectedNode) {
+            console.log("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAddddddddddddddddddddddA")
             if (props.action && props.action.type === ActionType.MATCH) {
+                console.log("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
 
                 const oldCategory = actionService.getActionCategory(props.action, selectedNode.data);
 
@@ -456,10 +464,13 @@ export default function MatchActionForm(props: {
                 }
 
                 updatedAction = props.action;
+                updatedAction.name = actionNameInput
+                console.log(`SETTING ${updatedAction.name}`)
                 updatedAction.properties = matchActionProps;
                 onActionSubmit(updatedAction);
             } else {
-                updatedAction = new Action("", ActionType.MATCH);
+                updatedAction = new Action(actionNameInput, ActionType.MATCH);
+                console.log(`SETTING ${updatedAction.name}`)
                 updatedAction.properties = matchActionProps;
                 if (!props.dontAddToState) {
                     stateOrStateMachineService.addActionToState(selectedNode.data, updatedAction, selectedActionCategory as ActionCategory);
@@ -491,8 +502,16 @@ export default function MatchActionForm(props: {
             <Card.Body>
                 <Card.Title className={"text-center"}>Action properties</Card.Title>
                 <Form className={"mb-3"} validated={formIsValid} id={formId} onSubmit={onSubmit}>
+                    <Form.Group as={Row} className={"mb-3"}>
+                        <Form.Label column sm="4">
+                            Action Name:
+                        </Form.Label>
+                        <Col sm={"8"}>
+                            <Form.Control type={"text"} value={actionNameInput} onChange={onActionNameInputChange}/>
+                        </Col>
+                    </Form.Group>
                     <Form.Group as={Row} controlId={"formExpression"} className={"mb-3"}>
-                        <Form.Label column sm={"3"}>Expression: </Form.Label>
+                        <Form.Label column sm={"4"}>Expression: </Form.Label>
                         <Col sm={8}>
                             <Form.Control type={"text"} value={expressionInput} onChange={onExpressionInputChange} isValid={expressionInputIsValid} isInvalid={!expressionInputIsValid} />
                             <Form.Control.Feedback type={"invalid"}>Please enter a valid expression</Form.Control.Feedback>
@@ -544,7 +563,7 @@ export default function MatchActionForm(props: {
                 {props.action && !props.dontShowDeleteButton && (
                     <Row className={"mb-3"}>
                         <Col sm={6}>
-                            <Button type={"submit"} disabled={!formIsValid}>{submitButtonText()}</Button>
+                            <Button type={"submit"} form={formId} disabled={!formIsValid}>{submitButtonText()}</Button>
                         </Col>
                         <Col sm={6}>
                             <Button variant={"danger"} onClick={onDeleteButtonPress}>Delete</Button>
