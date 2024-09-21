@@ -68,7 +68,9 @@ export default function Flow() {
         contextService,
         transitionService,
         recalculateTransitions,
-        setRecalculateTransitions
+        setRecalculateTransitions,
+        initialOrTerminalChange,
+        setInitialOrTerminalChange
     } = context;
 
     const { getIntersectingNodes, screenToFlowPosition } = useReactFlow();
@@ -260,6 +262,8 @@ export default function Flow() {
             stateOrStateMachineService.linkStateNameToStatemachine(new_name, parentId, true);
             stateOrStateMachineService.linkNode(newNode.id, newNode.data);
 
+
+
             setRecalculateTransitions(!recalculateTransitions)
 
         },
@@ -338,6 +342,21 @@ export default function Flow() {
                         return n;
                     })
                 );
+
+                // If there is already an existing initial node on the state remove initial flag from current state,
+                // otherwise make state initial
+                if(isState(node.data)){
+                    const initial = nodes.filter((n) => n.parentId === intersectedBlock.id &&
+                        isState(n.data) &&
+                        n.data.state.initial)
+
+                    node.data.state.initial = initial.length <= 0;
+
+                    setInitialOrTerminalChange(!initialOrTerminalChange)
+
+                }
+
+
 
             }
 
