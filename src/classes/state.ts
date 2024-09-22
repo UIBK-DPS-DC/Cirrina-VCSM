@@ -206,6 +206,8 @@ export default class State implements StateOrStateMachine {
         this._staticContext = this._staticContext.filter(existingContext => existingContext !== context);
     }
 
+
+    // TODO: Edges can also raise events.
     public getAllRaisedEvents(): Event[] {
         return this.getAllActions().filter((a) => a.type === ActionType.RAISE_EVENT)
             .map((a) => {

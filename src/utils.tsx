@@ -7,15 +7,22 @@ import ContextVariable from "./classes/contextVariable.tsx";
 import StateOrStateMachineService from "./services/stateOrStateMachineService.tsx";
 
 
+
+const DEBUG = false
+
 export const ReactFlowContext = createContext<ReactFlowContextProps | null>(null);
 
 function nodeIsEqual(node1: Node<CsmNodeProps>, node2: Node<CsmNodeProps>): boolean {
-    console.log(`NODE1: ${node1} , NODE2: ${node2}`);
+    if(DEBUG){
+        console.log(`NODE1: ${node1} , NODE2: ${node2}`);
+    }
     return node1.id === node2.id;
 }
 
 export const renderEnumAsOptions = (enumObject: OptionEnums) => {
-    console.log(Object.keys(enumObject));
+    if(DEBUG){
+        console.log(Object.keys(enumObject));
+    }
     return (
         // Don't render timeout as option since only timeout actions can have this category
         Object.values(enumObject).filter((o) => o !== "Timeout Action").map((value) => {
