@@ -26,12 +26,18 @@ export const renderEnumAsOptions = (enumObject: OptionEnums) => {
 
 export const setInitialState = (initialState: Node<CsmNodeProps>, nodes: Node<CsmNodeProps>[], edges: Edge<CsmEdgeProps>[]) =>  {
 
+    let internalEdge = false
     edges.forEach(edge => {
         if(edge.source === initialState.id && edge.target === initialState.id) {
             console.error("Initial state cannot have internal transition");
+            internalEdge = true
             return
         }
     })
+
+    if(internalEdge){
+        return
+    }
 
 
     if(isState(initialState.data)){
@@ -51,12 +57,18 @@ export const setInitialState = (initialState: Node<CsmNodeProps>, nodes: Node<Cs
 }
 
 export const setStateAsTerminal = (terminalNode: Node<CsmNodeProps>, edges: Edge<CsmEdgeProps>[]) =>  {
+    let outgoingEdge: boolean = false;
     edges.forEach((edge) => {
         if(edge.source === terminalNode.id){
             console.error("Terminal state cannot have outgoing transitions")
+            outgoingEdge = true
             return
         }
     })
+
+    if(outgoingEdge){
+        return
+    }
 
     if(isState(terminalNode.data)){
         terminalNode.data.state.terminal = true

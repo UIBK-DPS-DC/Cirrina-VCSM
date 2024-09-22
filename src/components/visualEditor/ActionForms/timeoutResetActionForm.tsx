@@ -19,6 +19,7 @@ export default function TimeoutResetActionForm(props: {action: Action | undefine
     const context = useContext(ReactFlowContext) as ReactFlowContextProps;
     const {selectedNode, actionService, stateOrStateMachineService, selectedEdge} = context;
 
+    const [actionNameInput, setActionNameInput] = useState<string>("");
     const [selectedAction, setSelectedAction] = useState<string>("");
     const [selectedActionCategory, setSelectedActionCategory] = useState<string>(ActionCategory.ENTRY_ACTION);
     const [selectedActionsIsValid, setSelectedActionIsValid] = useState<boolean>(true);
@@ -48,6 +49,10 @@ export default function TimeoutResetActionForm(props: {action: Action | undefine
         return !! selectedAction || !! props.action//availableActions.some((timeoutAction: Action) => timeoutAction.name === action) || !!props.action;
     };
 
+    const onActionNameInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setActionNameInput(event.target.value)
+    }
+
     const onSelectedActionChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
         setSelectedAction(event.currentTarget.value);
     };
@@ -73,6 +78,7 @@ export default function TimeoutResetActionForm(props: {action: Action | undefine
     useEffect(() => {
         if (props.action) {
             const timeoutResetActionProps = props.action.properties as TimeoutResetActionProps;
+            setActionNameInput(props.action.name)
             setSelectedAction(timeoutResetActionProps.action.name);
             setSelectedActionIsValid(validateSelectedAction(timeoutResetActionProps.action.name));
         }
@@ -143,6 +149,7 @@ export default function TimeoutResetActionForm(props: {action: Action | undefine
 
             if(props.action){
                 updatedAction = props.action;
+                updatedAction.name = actionNameInput
                 updatedAction.properties = timeoutResetActionsProps;
                 onActionSubmit(updatedAction);
 
@@ -160,7 +167,7 @@ export default function TimeoutResetActionForm(props: {action: Action | undefine
                 return
             }
             else {
-                updatedAction = new Action("", ActionType.TIMEOUT_RESET);
+                updatedAction = new Action(actionNameInput, ActionType.TIMEOUT_RESET);
                 updatedAction.properties = timeoutResetActionsProps;
 
                 onActionSubmit(updatedAction);
@@ -191,10 +198,11 @@ export default function TimeoutResetActionForm(props: {action: Action | undefine
                     stateOrStateMachineService.addActionToState(selectedNode.data, props.action, selectedActionCategory as ActionCategory);
                 }
                 updatedAction = props.action;
+                updatedAction.name = actionNameInput
                 updatedAction.properties = timeoutResetActionsProps;
                 onActionSubmit(updatedAction);
             } else {
-                updatedAction = new Action("", ActionType.TIMEOUT_RESET);
+                updatedAction = new Action(actionNameInput, ActionType.TIMEOUT_RESET);
                 updatedAction.properties = timeoutResetActionsProps;
                 if (!props.dontAddToState) {
                     stateOrStateMachineService.addActionToState(selectedNode.data, updatedAction, selectedActionCategory as ActionCategory);
@@ -217,6 +225,14 @@ export default function TimeoutResetActionForm(props: {action: Action | undefine
             <Card.Body>
                 <Card.Title className={"text-center"}>Action Properties</Card.Title>
                 <Form onSubmit={onSubmit}>
+                    <Form.Group as={Row} className={"mb-3"}>
+                        <Form.Label column sm="3">
+                            Action Name:
+                        </Form.Label>
+                        <Col sm={"9"}>
+                            <Form.Control type={"text"} value={actionNameInput} onChange={onActionNameInputChange}/>
+                        </Col>
+                    </Form.Group>
                     <Form.Group as={Row} className={"mb-3"}>
                         {actionService.getActionsByType(ActionType.TIMEOUT).length > 0 ? (
                             <Container>
