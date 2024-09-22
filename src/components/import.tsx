@@ -12,6 +12,10 @@ export default function Import() {
         }
     };
 
+    const loadCSM = (description: CollaborativeStateMachineDescription) => {
+        console.log(description)
+    }
+
     // Function to handle file selection
     const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
         if (event.target.files && event.target.files.length > 0) {
@@ -38,8 +42,8 @@ export default function Import() {
                 })
                 .then(data => {
                     // Access the returned object from the server here
-                    console.log('Response from server:', data as CollaborativeStateMachineDescription);
-                    alert('File saved successfully!');
+                    console.log('Response from server:', data);
+                    loadCSM(data as CollaborativeStateMachineDescription)
                     // You can use the returned data here
                 })
                 .catch(error => {
