@@ -134,7 +134,7 @@ export default function RaiseEventActionForm(props: {action: Action | undefined,
 
         eventService.unregisterEvent(raiseEventProps.event.name)
         props.setActions((prevActions) => prevActions.filter((a) => a !== props.action))
-
+        setRecalculateTransitions(!recalculateTransitions)
     }
 
 
