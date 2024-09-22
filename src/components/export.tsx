@@ -50,7 +50,7 @@ export default function Export () {
             localContext: {variables: []},
             name: "Collaborative StateMachine",
             persistentContext: {variables: []},
-            stateMachines: [topLevelSM.toDescription()],
+            stateMachines: topLevelSM.getAllStateMachines().map((sm) => sm.toDescription()),
             version: "2.0"
 
         }

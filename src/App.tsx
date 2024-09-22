@@ -14,6 +14,7 @@ import {Edge, Node, useEdgesState, useNodesState} from "@xyflow/react";
 import {ReactFlowContext} from './utils.tsx';
 import CsmlEditor from "./components/csmlEditor/csmlEditor.tsx";
 import Export from "./components/export.tsx";
+import Import from "./components/import.tsx";
 
 
 const initialNodes: Node<CsmNodeProps>[] = [];
@@ -91,6 +92,7 @@ export default function App() {
                     <h2> VCSM Editor </h2>
                     <div className={"buttons"}>
                         <Export></Export>
+                        <Import></Import>
                         <button className={"button"} onClick={onHideButtonClick}>{hideButtonText()}</button>
                     </div>
                 </div>
