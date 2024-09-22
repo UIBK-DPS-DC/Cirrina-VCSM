@@ -140,8 +140,8 @@ export default function CreateContextForm(props: {variable: ContextVariable | un
 
     return (
         <Form onSubmit={handleSubmit}>
-            <Form.Group controlId={"form-variable-name"}>
-                <Form.Label>Name</Form.Label>
+            <Form.Group controlId={"form-variable-name"} className={"mb-3"}>
+                <Form.Label style={{color: "#ffffff"}}>Name</Form.Label>
                 <Form.Control
                     type={"text"}
                     name={VARIABLE_NAME_FIELD_NAME}
@@ -160,8 +160,8 @@ export default function CreateContextForm(props: {variable: ContextVariable | un
                 </Form.Text>
             </Form.Group>
 
-            <Form.Group controlId={"form-variable-value"}>
-                <Form.Label>Value</Form.Label>
+            <Form.Group controlId={"form-variable-value"} className={"mb-3"}>
+                <Form.Label style={{color: "#ffffff"}}>Value</Form.Label>
                 <Form.Control
                     type={"text"}
                     name={EXPRESSION_FIELD_NAME}
@@ -180,8 +180,8 @@ export default function CreateContextForm(props: {variable: ContextVariable | un
                 </Form.Text>
             </Form.Group>
 
-            <Form.Group controlId={"form-variable-context"}>
-                <Form.Label>Context Type</Form.Label>
+            <Form.Group controlId={"form-variable-context"} className={"mb-3"}>
+                <Form.Label style={{color: "#ffffff"}}>Context Type</Form.Label>
                 <Form.Select
                     name={CONTEXT_TYPE_FIELD_NAME}
                     value={contextTypeValue}

@@ -2,7 +2,7 @@ import {Button, Container, Form, Row} from "react-bootstrap";
 import Event from "../../classes/event.ts";
 import Modal from "react-bootstrap/Modal";
 import React, {Dispatch, SetStateAction, useCallback, useContext, useEffect, useState} from "react";
-import {ReactFlowContext} from "../../utils.tsx";
+import {customSelectStyles, ReactFlowContext} from "../../utils.tsx";
 import {ReactFlowContextProps} from "../../types.ts";
 import {ActionMeta, OnChangeValue} from "react-select";
 import CreatableSelect from 'react-select/creatable';
@@ -227,9 +227,9 @@ export default function SelectEventsModal(props:{buttonName: string | undefined,
                 {buttonName}
             </Button>
             
-            <Modal show={show} onHide={handleClose}>
+            <Modal show={show} onHide={handleClose} data-bs-theme="dark">
                 <Modal.Header closeButton={true}>
-                        <Modal.Title>
+                        <Modal.Title style={{color: "#ffffff"}}>
                             {modalTitle()}
                         </Modal.Title>
                 </Modal.Header>
@@ -242,10 +242,10 @@ export default function SelectEventsModal(props:{buttonName: string | undefined,
                             </small>
                         </div>
                         
-                        <Form onSubmit={handleSubmit}>
+                        <Form onSubmit={handleSubmit} data-bs-theme="dark">
                             <Form.Group controlId={"formInternalEvents"}>
                                 <Row>
-                                    <Form.Label>Internal Events</Form.Label>
+                                    <Form.Label style={{color: "#ffffff"}}>Internal Events</Form.Label>
                                 </Row>
                                 <Row className={"mb-3"}>
                                         <CreatableSelect closeMenuOnSelect={false}
@@ -254,14 +254,15 @@ export default function SelectEventsModal(props:{buttonName: string | undefined,
                                                          options={renderEventsAsOptions(eventService.getAllInternalEvents())}
                                                          value={selectedInternalEvents}
                                                          onChange={onSelectedInternalEventsChange}
-                                                         onCreateOption={onInternalEventCreate}>
+                                                         onCreateOption={onInternalEventCreate}
+                                                         styles={customSelectStyles}>
                                         </CreatableSelect>
                                 </Row>
                             </Form.Group>
 
                             <Form.Group controlId={"formExternalEvents"}>
                                 <Row>
-                                    <Form.Label>External Events</Form.Label>
+                                    <Form.Label style={{color: "#ffffff"}}>External Events</Form.Label>
                                 </Row>
                                 <Row className={"mb-3"}>
                                         <CreatableSelect closeMenuOnSelect={false}
@@ -270,14 +271,15 @@ export default function SelectEventsModal(props:{buttonName: string | undefined,
                                                          options={renderEventsAsOptions(eventService.getAllExternalEvents())}
                                                          value={selectedExternalEvents}
                                                          onChange={onSelectedExternalEventsChange}
-                                                         onCreateOption={onExternalEventCreate}>
+                                                         onCreateOption={onExternalEventCreate}
+                                                         styles={customSelectStyles}>
                                         </CreatableSelect>
                                 </Row>
                             </Form.Group>
 
                             <Form.Group controlId={"formGlobalEvents"}>
                                 <Row>
-                                    <Form.Label>Global Events</Form.Label>
+                                    <Form.Label style={{color: "#ffffff"}}>Global Events</Form.Label>
                                 </Row>
                                 <Row className={"mb-3"}>
                                         <CreatableSelect closeMenuOnSelect={false}
@@ -286,14 +288,15 @@ export default function SelectEventsModal(props:{buttonName: string | undefined,
                                                          options={renderEventsAsOptions(eventService.getAllGlobalEvents())}
                                                          value={selectedGlobalEvents}
                                                          onChange={onSelectedGlobalEventsChange}
-                                                         onCreateOption={onGlobalEventCreate}>
+                                                         onCreateOption={onGlobalEventCreate}
+                                                         styles={customSelectStyles}>
                                         </CreatableSelect>
                                 </Row>
                             </Form.Group>
 
                             <Form.Group controlId={"formPeripheralEvents"}>
                                 <Row>
-                                    <Form.Label>Peripheral Events</Form.Label>
+                                    <Form.Label style={{color: "#ffffff"}}>Peripheral Events</Form.Label>
                                 </Row>
                                 <Row className={"mb-3"}>
 
@@ -303,7 +306,8 @@ export default function SelectEventsModal(props:{buttonName: string | undefined,
                                                          options={renderEventsAsOptions(eventService.getAllPeripheralEvents())}
                                                          value={selectedPeripheralEvents}
                                                          onChange={onSelectedPeripheralEventsChange}
-                                                         onCreateOption={onPeripheralEventCreate}>
+                                                         onCreateOption={onPeripheralEventCreate}
+                                                         styles={customSelectStyles}>
                                         </CreatableSelect>
                                 </Row>
                             </Form.Group>

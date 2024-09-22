@@ -223,5 +223,56 @@ export const getAllStateNamesInExtent = (node: Node<CsmNodeProps>, nodes: Node<C
 };
 
 
+// Custom styles for dark mode
+
+export const customSelectStyles = {
+    // @ts-ignore
+    control: (provided) => ({
+        ...provided,
+        backgroundColor: '#343a40', // Dark background
+        color: '#ffffff', // Text color
+        borderColor: '#495057', // Border color
+    }),
+    // @ts-ignore
+    menu: (provided) => ({
+        ...provided,
+        backgroundColor: '#343a40', // Dark background
+        color: '#ffffff', // Text color
+    }),
+    // @ts-ignore
+    option: (provided, state) => ({
+        ...provided,
+        backgroundColor: state.isFocused ? '#495057' : '#343a40', // Highlight on focus
+        color: '#ffffff', // Text color
+    }),
+    // @ts-ignore
+    singleValue: (provided) => ({
+        ...provided,
+        color: '#ffffff', // Text color
+    }),
+    // @ts-ignore
+    multiValue: (provided) => ({
+        ...provided,
+        backgroundColor: '#495057', // Background color for selected items
+        color: '#ffffff', // Text color
+    }),
+    // @ts-ignore
+    multiValueLabel: (provided) => ({
+        ...provided,
+        color: '#ffffff', // Text color of multi-value labels
+    }),
+    // @ts-ignore
+    multiValueRemove: (provided) => ({
+        ...provided,
+        color: '#ff6b6b', // Remove button color
+        ':hover': {
+            backgroundColor: '#e84118', // Hover background for remove button
+            color: '#ffffff', // Hover text color
+        },
+    }),
+};
+
+
+
 export {nodeIsEqual}
 

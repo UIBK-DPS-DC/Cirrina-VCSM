@@ -27,8 +27,8 @@ export default function CreateEventModal(props: {event: Event | undefined, onSub
     return(
         <Container>
             <Button onClick={handleShow}>{buttonText()}</Button>
-            <Modal show={show} onHide={handleClose} backdrop={"static"}>
-                <Modal.Header closeButton>
+            <Modal show={show} onHide={handleClose} backdrop={"static"} data-bs-theme="dark">
+                <Modal.Header closeButton style={{color: "#ffffff"}}>
                     <Modal.Title>{modalTitle()}</Modal.Title>
                 </Modal.Header
                 >
