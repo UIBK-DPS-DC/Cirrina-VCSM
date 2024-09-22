@@ -393,6 +393,7 @@ export default function Flow() {
                 }
             });
             updateNodeHistory(nodes.filter(n => !deletedNodes.some(d => d.id === n.id)));
+            setRecalculateTransitions(!recalculateTransitions)
         },
         [stateOrStateMachineService, updateNodeHistory, nodes, contextService]
     );
