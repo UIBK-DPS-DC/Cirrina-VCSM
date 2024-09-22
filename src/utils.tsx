@@ -6,6 +6,7 @@ import StateMachineInfoForm from "./components/visualEditor/stateMachineInfoForm
 import ContextVariable from "./classes/contextVariable.tsx";
 import StateOrStateMachineService from "./services/stateOrStateMachineService.tsx";
 
+
 export const ReactFlowContext = createContext<ReactFlowContextProps | null>(null);
 
 function nodeIsEqual(node1: Node<CsmNodeProps>, node2: Node<CsmNodeProps>): boolean {
@@ -14,8 +15,10 @@ function nodeIsEqual(node1: Node<CsmNodeProps>, node2: Node<CsmNodeProps>): bool
 }
 
 export const renderEnumAsOptions = (enumObject: OptionEnums) => {
+    console.log(Object.keys(enumObject));
     return (
-        Object.values(enumObject).map((value) => {
+        // Don't render timeout as option since only timeout actions can have this category
+        Object.values(enumObject).filter((o) => o !== "Timeout Action").map((value) => {
             return <option key={value} value={value}>{value.toUpperCase()}</option>
         })
     );
