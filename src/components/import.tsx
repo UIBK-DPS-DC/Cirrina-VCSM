@@ -1,8 +1,10 @@
 import { Button } from "react-bootstrap";
 import React, { useRef } from "react";
+import {CollaborativeStateMachineDescription} from "../pkl/bindings/collaborative_state_machine_description.pkl.ts";
 
 export default function Import() {
     const inputFile = useRef<HTMLInputElement | null>(null);
+
     // Function to handle the button click and trigger the file input click
     const handleButtonClick = () => {
         if (inputFile.current) {
@@ -29,11 +31,16 @@ export default function Import() {
                 }),
             })
                 .then(response => {
-                    if (response.ok) {
-                        alert('File saved successfully!');
-                    } else {
-                        alert('Failed to save file.');
+                    if (!response.ok) {
+                        throw new Error('Failed to save file.');
                     }
+                    return response.json(); // Parse the response as JSON
+                })
+                .then(data => {
+                    // Access the returned object from the server here
+                    console.log('Response from server:', data as CollaborativeStateMachineDescription);
+                    alert('File saved successfully!');
+                    // You can use the returned data here
                 })
                 .catch(error => {
                     console.error('Error saving file:', error);
