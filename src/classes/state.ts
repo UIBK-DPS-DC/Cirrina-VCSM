@@ -246,6 +246,12 @@ export default class State implements StateOrStateMachine {
 
     }
 
+    public removeTransition (transition: Transition): void {
+        this.on = this.on.filter((t) => t !== transition);
+        this.always = this.always.filter((t) => t !== transition)
+
+    }
+
 
     public toDescription(): StateDescription {
         const description: StateDescription = {

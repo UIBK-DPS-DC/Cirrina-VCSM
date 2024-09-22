@@ -203,6 +203,26 @@ export default function Flow() {
         [setEdges, transitionService, nodes, selectedEdge]
     );
 
+    const onEdgesDelete = useCallback((edges: Edge<CsmEdgeProps>[]) => {
+
+        const sources = edges.map((e) => e.source)
+            .map((s) => stateOrStateMachineService.getLinkedStateOrStatemachine(s))
+        const transitions = edges.map((e) => e.data?.transition)
+
+        if(sources.length > 0 && transitions.length > 0){
+            sources.forEach((s) => {
+                transitions.forEach((t) => {
+                    if(s instanceof State && t){
+                        s.removeTransition(t)
+                    }
+                })
+            })
+        }
+
+
+        setRecalculateTransitions(!recalculateTransitions);
+    },[setEdges, setRecalculateTransitions, nodes, edges]);
+
     const onDragOver = useCallback((event: React.DragEvent<HTMLDivElement>) => {
         event.preventDefault();
         event.dataTransfer.dropEffect = 'move';
@@ -680,6 +700,7 @@ export default function Flow() {
                 onNodeContextMenu={onNodeContextMenu}
                 colorMode={"dark"}
                 onEdgeClick={onEdgeClick}
+                onEdgesDelete={onEdgesDelete}
                 onNodesDelete={onNodesDelete}
                 onDragOver={onDragOver}
                 onDrop={onDrop}
