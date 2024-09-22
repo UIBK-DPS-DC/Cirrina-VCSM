@@ -21,7 +21,7 @@ export default function RaiseEventActionForm(props: {action: Action | undefined,
 
     const context = useContext(ReactFlowContext) as ReactFlowContextProps;
     const {selectedNode,
-    actionService, stateOrStateMachineService, eventService, selectedEdge} = context
+    actionService, stateOrStateMachineService, eventService, selectedEdge, setRecalculateTransitions, recalculateTransitions} = context
 
     const headerText = () => props.action ? "Edit Raise Event Action" : "Create Raise Event Action"
     const submitButtonText = () => props.action ? "Save Changes" : "Create"
@@ -134,7 +134,7 @@ export default function RaiseEventActionForm(props: {action: Action | undefined,
 
         eventService.unregisterEvent(raiseEventProps.event.name)
         props.setActions((prevActions) => prevActions.filter((a) => a !== props.action))
-
+        setRecalculateTransitions(!recalculateTransitions)
     }
 
 
@@ -175,6 +175,9 @@ export default function RaiseEventActionForm(props: {action: Action | undefined,
                 if (props.onSubmit) {
                     props.onSubmit();
                 }
+
+
+                setRecalculateTransitions(!recalculateTransitions)
                 return
 
             }
@@ -196,6 +199,7 @@ export default function RaiseEventActionForm(props: {action: Action | undefined,
                 if (props.onSubmit) {
                     props.onSubmit();
                 }
+                setRecalculateTransitions(!recalculateTransitions)
 
             }
 
@@ -239,6 +243,8 @@ export default function RaiseEventActionForm(props: {action: Action | undefined,
                     console.log(entry.properties)
                 })
             }
+
+            setRecalculateTransitions(!recalculateTransitions)
         }
 
 

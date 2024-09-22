@@ -206,6 +206,8 @@ export default class State implements StateOrStateMachine {
         this._staticContext = this._staticContext.filter(existingContext => existingContext !== context);
     }
 
+
+    // TODO: Edges can also raise events.
     public getAllRaisedEvents(): Event[] {
         return this.getAllActions().filter((a) => a.type === ActionType.RAISE_EVENT)
             .map((a) => {
@@ -243,6 +245,12 @@ export default class State implements StateOrStateMachine {
            // console.log(`Added Transition ${newTransition.getId()} to State ${this.name}`)
             this.on.push(newTransition);
         }
+
+    }
+
+    public removeTransition (transition: Transition): void {
+        this.on = this.on.filter((t) => t !== transition);
+        this.always = this.always.filter((t) => t !== transition)
 
     }
 
