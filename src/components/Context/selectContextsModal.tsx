@@ -1,7 +1,7 @@
 import {Button, Container, Form, ModalBody, Row} from "react-bootstrap";
 import React, {Dispatch, SetStateAction, useCallback, useContext, useEffect, useState} from "react";
 import Modal from "react-bootstrap/Modal";
-import {ReactFlowContext} from "../../utils.tsx";
+import {customSelectStyles, ReactFlowContext} from "../../utils.tsx";
 import {CsmNodeProps, ReactFlowContextProps} from "../../types.ts";
 import {Node} from "@xyflow/react";
 import ContextVariable from "../../classes/contextVariable.tsx";
@@ -294,9 +294,9 @@ export default function SelectContextsModal(props: {buttonName: string | undefin
             </Button>
 
             <Modal show={show}
-            onHide={handleClose}>
+            onHide={handleClose} data-bs-theme="dark">
 
-                <Modal.Header closeButton>
+                <Modal.Header closeButton style={{color: "#ffffff"}}>
                     <Modal.Title>Select Context</Modal.Title>
                 </Modal.Header>
 
@@ -312,13 +312,18 @@ export default function SelectContextsModal(props: {buttonName: string | undefin
 
                         <Form.Group controlId={"fromPersistentContext"}>
                             <Row>
-                                <Form.Label>Persistent Context</Form.Label>
+                                <Form.Label style={{color: "#ffffff"}}>Persistent Context</Form.Label>
                             </Row>
 
                             <Row className={"mb-3"}>
                                 {getPersistentContextVariables().length > 0 && (
-                                    <Select closeMenuOnSelect={false} isMulti={true} name={PERSISTENT_CONTEXT_MULTISELECT_NAME}
-                                            options={renderContextVariablesAsOptions(getPersistentContextVariables())} value={selectedPersistentVariables} onChange={onSelectedPersistentVariablesChange}>
+                                    <Select closeMenuOnSelect={false}
+                                            isMulti={true}
+                                            name={PERSISTENT_CONTEXT_MULTISELECT_NAME}
+                                            options={renderContextVariablesAsOptions(getPersistentContextVariables())}
+                                            value={selectedPersistentVariables}
+                                            onChange={onSelectedPersistentVariablesChange}
+                                            styles={customSelectStyles}>
                                     </Select>
                                 ) || (<Form.Text muted> No Persistent Context found</Form.Text>)}
                             </Row>
@@ -326,12 +331,12 @@ export default function SelectContextsModal(props: {buttonName: string | undefin
 
                         <Form.Group controlId={"fromLocalContext"}>
                             <Row>
-                                <Form.Label>Local Context</Form.Label>
+                                <Form.Label style={{color: "#ffffff"}}>Local Context</Form.Label>
                             </Row>
                             <Row className={"mb-3"}>
                                 {getKnownLocalContext().length > 0 && (
                                     <Select closeMenuOnSelect={false} isMulti={true} name={LOCAL_CONTEXT_MULTISELECT_NAME}
-                                            options={renderContextVariablesAsOptions(getKnownLocalContext())} value={selectedLocalVariables} onChange={onSelectedLocalVariablesChange}>
+                                            options={renderContextVariablesAsOptions(getKnownLocalContext())} value={selectedLocalVariables} onChange={onSelectedLocalVariablesChange} styles={customSelectStyles}>
                                     </Select>
                                 ) || (<Form.Text muted> No Local Context found</Form.Text>)}
                             </Row>
@@ -339,12 +344,12 @@ export default function SelectContextsModal(props: {buttonName: string | undefin
 
                             <Form.Group controlId={"fromStaticContext"}>
                                 <Row>
-                                    <Form.Label>Static Context</Form.Label>
+                                    <Form.Label style={{color: "#ffffff"}}>Static Context</Form.Label>
                                 </Row>
                                 <Row className={"mb-3"}>
                                     {getKnownStaticContext().length > 0 && (
                                         <Select closeMenuOnSelect={false} isMulti={true} name={STATIC_CONTEXT_MULTISELECT_NAME}
-                                                options={renderContextVariablesAsOptions(getKnownStaticContext())} value={selectedStaticVariables} onChange={onSelectedStaticVariablesChange}>
+                                                options={renderContextVariablesAsOptions(getKnownStaticContext())} value={selectedStaticVariables} onChange={onSelectedStaticVariablesChange} styles={customSelectStyles}>
                                         </Select>
                                     ) || (<Form.Text muted> No Static Context found</Form.Text>)}
                                 </Row>

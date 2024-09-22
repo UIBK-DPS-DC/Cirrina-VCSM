@@ -117,7 +117,7 @@ export default function CreateEventForm(props: { event: Event | undefined, onSub
         <Form onSubmit={onSubmit}>
 
             <Form.Group className="mb-3">
-                <Form.Label>Name</Form.Label>
+                <Form.Label style={{color: "#ffffff"}}>Name</Form.Label>
                 <Form.Control
                     type={"text"}
                     value={eventNameInput}
@@ -129,14 +129,14 @@ export default function CreateEventForm(props: { event: Event | undefined, onSub
             </Form.Group>
 
             <Form.Group className="mb-3">
-                <Form.Label>EventChannel</Form.Label>
+                <Form.Label style={{color: "#ffffff"}}>EventChannel</Form.Label>
                 <Form.Select value={selectedEventChannel} onChange={onSelectedEventChannelChange} isValid={eventChannelIsValid}>
                     {renderEnumAsOptions(EventChannel)}
                 </Form.Select>
             </Form.Group>
 
             <Form.Group className={"mb-3"}>
-                <Form.Label>Context Variables</Form.Label>
+                <Form.Label style={{color: "#ffffff"}}>Context Variables</Form.Label>
                 <Row className={"mb-3"}>
                     <Col sm={6}>
                         <SelectContextsModal buttonName={"Select Context"} vars={selectedContextVariables} setVars={setSelectedContextVariables} />
