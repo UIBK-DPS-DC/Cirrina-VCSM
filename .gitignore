@@ -11,7 +11,7 @@ lerna-debug.log*
 
 node_modules
 
-fileServer/saved_files/*
+src/server/saved_files/*
 fileServer/node_modules
 
 dist
