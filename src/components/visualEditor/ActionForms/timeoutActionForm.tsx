@@ -2,7 +2,7 @@ import Action from "../../../classes/action.ts";
 import {Button, Card, Col, Form, Row} from "react-bootstrap";
 import React, {Dispatch, SetStateAction, useContext, useEffect, useState} from "react";
 import RaiseEventActionForm from "./raiseEventActionForm.tsx";
-import {ReactFlowContext, renderEnumAsOptions} from "../../../utils.tsx";
+import {ReactFlowContext} from "../../../utils.tsx";
 import {isState, RaiseEventActionProps, ReactFlowContextProps, TimeoutActionProps} from "../../../types.ts";
 import {ActionCategory, ActionType} from "../../../enums.ts";
 
@@ -22,7 +22,7 @@ export default function TimeoutActionForm(props: {action: Action | undefined,
 
     const [actionNameInput, setActionNameInput] = useState<string>("");
     const [timeoutExpressionInput, setTimeoutExpressionInput] = useState<string>("");
-    const [selectedActionCategory, setSelectedActionCategory] = useState<string>(ActionCategory.ENTRY_ACTION)
+    const [selectedActionCategory, setSelectedActionCategory] = useState<string>(ActionCategory.TIMEOUT)
 
     const [actionNameInputIsValid, setActionNameInputIsValid] = useState<boolean>(false);
     const [timeOutExpressionInputIsValid, setTimeOutExpressionInputIsValid] = useState<boolean>(false);
@@ -53,11 +53,6 @@ export default function TimeoutActionForm(props: {action: Action | undefined,
     const onTimeoutExpressionInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setTimeoutExpressionInput(event.currentTarget.value);
     }
-
-    const onSelectedActionCategoryChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-        setSelectedActionCategory(event.target.value);
-    }
-
 
 
 
@@ -327,15 +322,6 @@ export default function TimeoutActionForm(props: {action: Action | undefined,
                            </Form.Control.Feedback>
                        </Col>
                    </Form.Group>
-
-                   {!props.noCategorySelect && (
-                       <Form.Group className={"mb-3"}>
-                           <Form.Label>Action Category</Form.Label>
-                           <Form.Select onChange={onSelectedActionCategoryChange} value={selectedActionCategory} className={"mb-3"}>
-                               {renderEnumAsOptions(ActionCategory)}
-                           </Form.Select>
-                       </Form.Group>
-                   )}
 
                </Form>
                {/* Conditionally render empty or full RaiseEventActionForm */}
