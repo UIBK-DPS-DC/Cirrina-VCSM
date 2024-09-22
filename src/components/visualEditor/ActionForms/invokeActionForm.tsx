@@ -30,6 +30,8 @@ export default function InvokeActionForm(props: {action: Action | undefined,
 
     const submitButtonText = () => props.action ? "Save Changes" : "Create Action"
 
+    const [actionNameInput, setActionNameInput] = useState<string>("");
+
     // Selected variables
     const [selectedInputContextVariables, setSelectedInputContextVariables] = useState<ContextVariable[]>([]);
     const [serviceIsLocalCheckbox, setServiceIsLocalCheckbox] = useState<boolean>(false);
@@ -63,6 +65,7 @@ export default function InvokeActionForm(props: {action: Action | undefined,
             setSelectedOutputContextVariables(invokeActionProps.output)
             setSelectedEventsWhenDone(invokeActionProps.done)
             setSelectedServiceType(invokeActionProps.serviceType)
+            setActionNameInput(props.action.name)
 
             if(selectedNode){
                 const actionCategory = actionService.getActionCategory(props.action,selectedNode.data)
@@ -78,6 +81,10 @@ export default function InvokeActionForm(props: {action: Action | undefined,
 
         }
     }, []);
+
+    const onActionNameInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setActionNameInput(event.target.value)
+    }
 
     const onServiceIsLocalCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>): void => {
         setServiceIsLocalCheckbox(event.currentTarget.checked);
@@ -209,6 +216,7 @@ export default function InvokeActionForm(props: {action: Action | undefined,
                 updatedAction.properties = invokeActionsProperties;
                 onActionSubmit(updatedAction);
 
+                updatedAction.name = actionNameInput
                 actionService.deregisterAction(updatedAction);
                 actionService.registerAction(updatedAction);
 
@@ -222,10 +230,11 @@ export default function InvokeActionForm(props: {action: Action | undefined,
                 }
             }
             else {
-                updatedAction = new Action("newAction", ActionType.INVOKE);
+                updatedAction = new Action(actionNameInput, ActionType.INVOKE);
                 updatedAction.properties = invokeActionsProperties;
 
 
+                updatedAction.name = actionNameInput
                 actionService.deregisterAction(updatedAction);
                 actionService.registerAction(updatedAction);
 
@@ -260,10 +269,11 @@ export default function InvokeActionForm(props: {action: Action | undefined,
                 }
 
                 updatedAction = props.action;
+                updatedAction.name = actionNameInput
                 updatedAction.properties = invokeActionsProperties;
                 onActionSubmit(updatedAction);
             } else {
-                updatedAction = new Action("newAction", ActionType.INVOKE);
+                updatedAction = new Action(actionNameInput, ActionType.INVOKE);
                 updatedAction.properties = invokeActionsProperties;
                 //TODO provide optional dont add action to state prop.
                 if (!props.dontAddToState) {
@@ -300,6 +310,14 @@ export default function InvokeActionForm(props: {action: Action | undefined,
             <Card.Body>
                 <Card.Title>Action Properties</Card.Title>
                 <Form onSubmit={onFormSubmit}>
+                    <Form.Group as={Row} className={"mb-3"}>
+                        <Form.Label column sm="3">
+                            Action Name:
+                        </Form.Label>
+                        <Col sm={"9"}>
+                            <Form.Control type={"text"} value={actionNameInput} onChange={onActionNameInputChange}/>
+                        </Col>
+                    </Form.Group>
                     <Form.Group as={Row} className="mb-3" controlId="formServiceType">
                         <Form.Label column sm="3" className="text-sm-end">
                             ServiceType

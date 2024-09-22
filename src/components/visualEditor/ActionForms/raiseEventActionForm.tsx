@@ -26,6 +26,7 @@ export default function RaiseEventActionForm(props: {action: Action | undefined,
     const headerText = () => props.action ? "Edit Raise Event Action" : "Create Raise Event Action"
     const submitButtonText = () => props.action ? "Save Changes" : "Create"
 
+    const [actionNameInput, setActionNameInput] = useState<string>("");
     const [eventToBeRaised, setEventToBeRaised] = React.useState<Event[]>([]);
     const [selectedActionCategory, setSelectedActionCategory] = useState<string>(ActionCategory.ENTRY_ACTION)
     const [eventVars, setSelectedEventVars] = useState<ContextVariable[]>([]);
@@ -81,6 +82,11 @@ export default function RaiseEventActionForm(props: {action: Action | undefined,
         setSelectedActionCategory(event.target.value);
     }
 
+    const onActionNameInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setActionNameInput(event.target.value)
+    }
+
+
     useEffect(() => {
         setFormIsValid(validateForm());
     }, [eventToBeRaised]);
@@ -91,6 +97,7 @@ export default function RaiseEventActionForm(props: {action: Action | undefined,
         if (props.action && props.action.type === ActionType.RAISE_EVENT) {
             const raiseEventProps = props.action.properties as RaiseEventActionProps;
 
+            setActionNameInput(props.action.name)
             // Ensure that eventToBeRaised is set correctly
             if (raiseEventProps && raiseEventProps.event) {
                 setEventToBeRaised([raiseEventProps.event]);
@@ -151,6 +158,7 @@ export default function RaiseEventActionForm(props: {action: Action | undefined,
         if(selectedEdge){
             if(props.action){
                 updatedAction = props.action;
+                updatedAction.name = actionNameInput
                 updatedAction.properties = raiseEventActionProps;
                 onActionSubmit(updatedAction);
 
@@ -171,7 +179,7 @@ export default function RaiseEventActionForm(props: {action: Action | undefined,
 
             }
             else {
-                updatedAction = new Action("newAction", ActionType.RAISE_EVENT);
+                updatedAction = new Action(actionNameInput, ActionType.RAISE_EVENT);
                 updatedAction.properties = raiseEventActionProps;
 
 
@@ -206,10 +214,11 @@ export default function RaiseEventActionForm(props: {action: Action | undefined,
                 }
 
                 updatedAction = props.action;
+                updatedAction.name = actionNameInput
                 updatedAction.properties = raiseEventActionProps;
                 onActionSubmit(updatedAction);
             } else {
-                updatedAction = new Action("newAction", ActionType.RAISE_EVENT);
+                updatedAction = new Action(actionNameInput, ActionType.RAISE_EVENT);
                 updatedAction.properties = raiseEventActionProps;
                 if (!props.noCategorySelect) {
                     stateOrStateMachineService.addActionToState(selectedNode.data, updatedAction, selectedActionCategory as ActionCategory);
@@ -252,6 +261,15 @@ export default function RaiseEventActionForm(props: {action: Action | undefined,
                 </Card.Title>
 
                 <Form onSubmit={onSubmit} validated={formIsValid}>
+                    <Form.Group as={Row} className={"mb-3"}>
+                        <Form.Label column sm="3">
+                            Action Name:
+                        </Form.Label>
+                        <Col sm={"9"}>
+                            <Form.Control type={"text"} value={actionNameInput} onChange={onActionNameInputChange}/>
+                        </Col>
+                    </Form.Group>
+
                     {(!props.action || (props.action && eventToBeRaised.length < 1)) && (
                         <Container>
                             <Form.Group as={Row} controlId={"formSelectEvent"} className={"mb-3"}>

@@ -27,10 +27,12 @@ export default function CreateActionForm(props: {action: Action | undefined,
     const submitButtonText = () => props.action ? "Update Action" : "Create Action"
 
 
+    const [actionNameInput, setActionNameInput] = useState<string>("")
     const [variableToBeCreated, setVariableToBeCreated] = useState<ContextVariable[]>([]);
     const [variableIsPersistent, setVariableIsPersistent] = useState<boolean>(false);
     const [formIsValid,setFormIsValid] = useState<boolean>(false);
     const [selectedActionCategory, setSelectedActionCategory] = useState<string>(ActionCategory.ENTRY_ACTION)
+
 
     const oldVariableName = props.action && props.action.type === ActionType.CREATE ? (props.action.properties as CreateActionProps).variable.name : undefined
 
@@ -74,6 +76,10 @@ export default function CreateActionForm(props: {action: Action | undefined,
 
     }
 
+    const onActionNameInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setActionNameInput(event.target.value)
+    }
+
     const onVariableIsPersistentChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setVariableIsPersistent(event.currentTarget.checked);
     }
@@ -90,6 +96,9 @@ export default function CreateActionForm(props: {action: Action | undefined,
         setFormIsValid(variableToBeCreated.length === 1);
     }
 
+
+
+
     useEffect(() => {
         console.log(props.action)
         if(!selectedNode && !selectedEdge){
@@ -99,6 +108,7 @@ export default function CreateActionForm(props: {action: Action | undefined,
             const createActionProps = props.action.properties as CreateActionProps
             setVariableToBeCreated([createActionProps.variable])
             setVariableIsPersistent(createActionProps.isPersistent)
+            setActionNameInput(props.action.name)
 
             if(selectedNode){
                 const actionCategory = actionService.getActionCategory(props.action,selectedNode.data)
@@ -167,8 +177,6 @@ export default function CreateActionForm(props: {action: Action | undefined,
                         }
                     }
 
-                // If there is a provided onSubmit callback, call it after the form has been submitted successfully.
-
 
                 actionService.deregisterAction(updatedAction);
                 actionService.registerAction(updatedAction);
@@ -177,6 +185,8 @@ export default function CreateActionForm(props: {action: Action | undefined,
                     selectedEdge.data.transition.addAction(updatedAction)
                 }
 
+                updatedAction.name = actionNameInput
+
                 if (props.onSubmit) {
                     props.onSubmit();
                 }
@@ -184,7 +194,7 @@ export default function CreateActionForm(props: {action: Action | undefined,
             }
 
             else {
-                updatedAction = new Action("newAction", ActionType.CREATE);
+                updatedAction = new Action(actionNameInput, ActionType.CREATE);
 
                 // Set the properties of the new action with the createActionProps defined earlier.
                 updatedAction.properties = createActionProps;
@@ -194,6 +204,7 @@ export default function CreateActionForm(props: {action: Action | undefined,
 
                 actionService.deregisterAction(updatedAction);
                 actionService.registerAction(updatedAction);
+
 
                 if(selectedEdge.data && !props.dontAddToState){
                     selectedEdge.data.transition.addAction(updatedAction)
@@ -232,6 +243,7 @@ export default function CreateActionForm(props: {action: Action | undefined,
 
                 // Update the existing action's properties with the newly created action properties.
                 updatedAction = props.action;
+                updatedAction.name = actionNameInput
                 updatedAction.properties = createActionProps;
 
                 // Call the onActionSubmit function to update the action in the parent component's state.
@@ -257,7 +269,7 @@ export default function CreateActionForm(props: {action: Action | undefined,
                 }
             } else {
                 // If no existing action is provided, create a new action.
-                updatedAction = new Action("newAction", ActionType.CREATE);
+                updatedAction = new Action(actionNameInput, ActionType.CREATE);
 
                 // Set the properties of the new action with the createActionProps defined earlier.
                 updatedAction.properties = createActionProps;
@@ -285,6 +297,7 @@ export default function CreateActionForm(props: {action: Action | undefined,
             actionService.deregisterAction(updatedAction);
             actionService.registerAction(updatedAction);
 
+
             if(isState(selectedNode.data)){
                 const sm = selectedNode.data
                 sm.state.entry.forEach(entry => {
@@ -310,6 +323,14 @@ export default function CreateActionForm(props: {action: Action | undefined,
             <Card.Body>
                 <Card.Title>Action Properties</Card.Title>
                 <Form validated={formIsValid} onSubmit={onFormSubmit}>
+                    <Form.Group as={Row} className={"mb-3"}>
+                        <Form.Label column sm="3">
+                            Action Name:
+                        </Form.Label>
+                        <Col sm={"9"}>
+                            <Form.Control type={"text"} value={actionNameInput} onChange={onActionNameInputChange}/>
+                        </Col>
+                    </Form.Group>
                     {variableToBeCreated.length < 1 && (
                         <Form.Group as={Row} className="mb-3" controlId={"formVariableNew"}>
                             <Form.Label column sm={"6"}>Variable  to be created:</Form.Label>

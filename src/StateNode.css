@@ -36,42 +36,42 @@
     border: 0.1rem solid #39ff14; /* Bright green color */
     border-radius: 0.5rem;
     box-shadow:
+            0 0 2px #39ff14,
             0 0 5px #39ff14,
+            0 0 7px #39ff14,
             0 0 10px #39ff14,
-            0 0 15px #39ff14,
-            0 0 20px #39ff14,
-            0 0 25px #39ff14,
-            0 0 30px #39ff14;
+            0 0 12px #39ff14,
+            0 0 15px #39ff14;
     transition: box-shadow 0.3s ease-in-out;
 }
 
 .neonBorder:hover {
     box-shadow:
+            0 0 5px #39ff14,
             0 0 10px #39ff14,
+            0 0 15px #39ff14,
             0 0 20px #39ff14,
-            0 0 30px #39ff14,
-            0 0 40px #39ff14,
-            0 0 50px #39ff14;
+            0 0 25px #39ff14;
 }
 
 .neonBorderRed {
-    border: 0.2rem solid #ff073a; /* Bright red color */
+    border: 0.1rem solid #ff073a; /* Bright red color */
     border-radius: 0.5rem;
     box-shadow:
+            0 0 2px #ff073a,
             0 0 5px #ff073a,
+            0 0 7px #ff073a,
             0 0 10px #ff073a,
-            0 0 15px #ff073a,
-            0 0 20px #ff073a,
-            0 0 25px #ff073a,
-            0 0 30px #ff073a;
+            0 0 12px #ff073a,
+            0 0 15px #ff073a;
     transition: box-shadow 0.3s ease-in-out;
 }
 
 .neonBorderRed:hover {
     box-shadow:
+            0 0 5px #ff073a,
             0 0 10px #ff073a,
+            0 0 15px #ff073a,
             0 0 20px #ff073a,
-            0 0 30px #ff073a,
-            0 0 40px #ff073a,
-            0 0 50px #ff073a;
+            0 0 25px #ff073a;
 }
