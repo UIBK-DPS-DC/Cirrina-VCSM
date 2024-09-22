@@ -294,9 +294,9 @@ export default function SelectContextsModal(props: {buttonName: string | undefin
             </Button>
 
             <Modal show={show}
-            onHide={handleClose}>
+            onHide={handleClose} data-bs-theme="dark">
 
-                <Modal.Header closeButton>
+                <Modal.Header closeButton style={{color: "#ffffff"}}>
                     <Modal.Title>Select Context</Modal.Title>
                 </Modal.Header>
 
@@ -312,7 +312,7 @@ export default function SelectContextsModal(props: {buttonName: string | undefin
 
                         <Form.Group controlId={"fromPersistentContext"}>
                             <Row>
-                                <Form.Label>Persistent Context</Form.Label>
+                                <Form.Label style={{color: "#ffffff"}}>Persistent Context</Form.Label>
                             </Row>
 
                             <Row className={"mb-3"}>
@@ -326,7 +326,7 @@ export default function SelectContextsModal(props: {buttonName: string | undefin
 
                         <Form.Group controlId={"fromLocalContext"}>
                             <Row>
-                                <Form.Label>Local Context</Form.Label>
+                                <Form.Label style={{color: "#ffffff"}}>Local Context</Form.Label>
                             </Row>
                             <Row className={"mb-3"}>
                                 {getKnownLocalContext().length > 0 && (
@@ -339,7 +339,7 @@ export default function SelectContextsModal(props: {buttonName: string | undefin
 
                             <Form.Group controlId={"fromStaticContext"}>
                                 <Row>
-                                    <Form.Label>Static Context</Form.Label>
+                                    <Form.Label style={{color: "#ffffff"}}>Static Context</Form.Label>
                                 </Row>
                                 <Row className={"mb-3"}>
                                     {getKnownStaticContext().length > 0 && (
