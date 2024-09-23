@@ -39,4 +39,9 @@ export default class Guard {
         };
     }
 
+
+    public static fromDescription(description: GuardDescription): Guard {
+        return new Guard(description.expression)
+    }
+
 }

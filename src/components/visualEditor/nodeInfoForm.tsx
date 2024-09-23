@@ -1,6 +1,6 @@
 import React, {useCallback, useContext, useEffect, useState} from "react";
 import { isState, ReactFlowContextProps} from "../../types.ts";
-import Action from "../../classes/action.ts";
+import Action from "../../classes/action.tsx";
 import {ReactFlowContext, setInitialState, setStateAsTerminal} from "../../utils.tsx";
 import RenameNodeComponent from "./renameNodeComponent.tsx";
 import ActionDisplay from "../Action/actionDisplay.tsx";

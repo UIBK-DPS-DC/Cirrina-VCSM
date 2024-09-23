@@ -1,4 +1,7 @@
-import {ContextVariableDescription} from "../pkl/bindings/collaborative_state_machine_description.pkl.ts";
+import {
+    ContextVariableDescription,
+    ContextVariableReferenceDescription
+} from "../pkl/bindings/collaborative_state_machine_description.pkl.ts";
 
 export default class ContextVariable {
     private _name: string
@@ -32,5 +35,16 @@ export default class ContextVariable {
             name: this.name,
             value: this.value
         }
+    }
+
+
+
+    public static fromDescription(description: ContextVariableDescription): ContextVariable {
+        return new ContextVariable(description.name, description.value);
+    }
+
+    public static fromReferenceDescription(description: ContextVariableReferenceDescription): ContextVariable {
+        return new ContextVariable(description.reference, "");
+
     }
 }

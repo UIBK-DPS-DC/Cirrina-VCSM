@@ -1,4 +1,4 @@
-import Action from "../../../classes/action.ts";
+import Action from "../../../classes/action.tsx";
 import {Button, Card, Col, Form, Row} from "react-bootstrap";
 import CreateContextFormModal from "../../Context/createContextFormModal.tsx";
 import React, {Dispatch, SetStateAction, useContext, useEffect, useState} from "react";

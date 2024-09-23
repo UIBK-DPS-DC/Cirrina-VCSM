@@ -1,4 +1,4 @@
-import Action from "../classes/action.ts";
+import Action from "../classes/action.tsx";
 import {CsmNodeProps, isState} from "../types.ts";
 import {ActionCategory, ActionType} from "../enums.ts";
 

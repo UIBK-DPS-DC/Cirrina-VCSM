@@ -1,7 +1,7 @@
 import React, { Dispatch, SetStateAction, useCallback, useEffect, useMemo } from "react";
 import { ActionType } from "../../enums.ts";
 import { renderEnumAsOptions } from "../../utils.tsx";
-import Action from "../../classes/action.ts";
+import Action from "../../classes/action.tsx";
 import RaiseEventActionForm from "../visualEditor/ActionForms/raiseEventActionForm.tsx";
 import InvokeActionForm from "../visualEditor/ActionForms/invokeActionForm.tsx";
 import CreateActionForm from "../visualEditor/ActionForms/createActionForm.tsx";

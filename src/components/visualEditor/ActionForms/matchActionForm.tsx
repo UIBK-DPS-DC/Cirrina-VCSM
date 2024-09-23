@@ -1,4 +1,4 @@
-import Action from "../../../classes/action.ts";
+import Action from "../../../classes/action.tsx";
 import React, {SetStateAction, useContext, useEffect, useRef, useState} from "react";
 import {Button, Card, Col, Container, Form, ModalBody, Row,} from "react-bootstrap";
 import {ActionCategory, ActionType} from "../../../enums.ts";

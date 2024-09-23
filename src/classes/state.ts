@@ -276,6 +276,26 @@ export default class State implements StateOrStateMachine {
 
     }
 
+    public static fromDescription(description: StateDescription): State {
+        const newState = new State(description.name)
+        newState.initial = description.initial
+        newState.terminal = description.terminal
+        newState.entry = description.entry.map((e) => Action.fromDescription(e))
+        newState.exit = description.exit.map((e) => Action.fromDescription(e))
+        newState.while = description.while.map((w) => Action.fromDescription(w))
+        newState.after = description.after.map((a) => Action.fromDescription(a))
+        newState.on = description.on.map((o) => Transition.fromOnTransitionDescription(o,description.name))
+        newState.always = description.always.map((a) => Transition.fromTransitionDescription(a, description.name))
+        newState.localContext = description.localContext.variables.map((v) => ContextVariable.fromDescription(v))
+        newState.persistentContext = description.persistentContext.variables.map((v) => ContextVariable.fromDescription(v))
+        newState.staticContext = description.staticContext.variables.map((v) => ContextVariable.fromDescription(v))
+
+        return newState
+
+    }
+
+
+
 
 
 

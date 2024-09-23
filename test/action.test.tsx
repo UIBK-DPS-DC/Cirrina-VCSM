@@ -5,6 +5,11 @@ import {RaiseEventActionProps} from "../src/types";
 import Event from "../src/classes/event";
 import State from "../src/classes/state";
 import Transition from "../src/classes/transition";
+import {
+    AssignActionDescription, CreateActionDescription, EventDescription, InvokeActionDescription, MatchActionDescription,
+    RaiseActionDescription, TimeoutActionDescription, TimeoutResetActionDescription
+} from "../src/pkl/bindings/collaborative_state_machine_description.pkl";
+import MatchCase from "../src/classes/MatchCase";
 
 describe('Action class', () => {
     let action: Action;
@@ -299,5 +304,140 @@ describe("State.getAllConsumedEvents", () => {
         transition1.setEvent("ModifiedEvent");
 
         expect(state.getAllConsumedEvents()).toEqual(["ModifiedEvent"]);
+    });
+});
+
+describe('fromDescription Method', () => {
+
+    it('should create a Raise Event Action from RaiseActionDescription', () => {
+        const eventDescription: EventDescription = {
+            name: 'TestEvent',
+            channel: 'internal',
+            data: [],
+        };
+        const description: RaiseActionDescription = {
+            type: ActionType.RAISE_EVENT,
+            event: eventDescription,
+        };
+
+        const action = Action.fromDescription(description);
+
+        expect(action).toBeInstanceOf(Action);
+        expect(action.type).toBe(ActionType.RAISE_EVENT);
+        expect(action.properties).toHaveProperty('event');
+        expect((action.properties as any).event.name).toBe('TestEvent');
+    });
+
+    it('should create an Assign Action from AssignActionDescription', () => {
+        const variableDescription = { name: 'var1', value: '5' };
+        const description: AssignActionDescription = {
+            type: ActionType.ASSIGN,
+            variable: variableDescription,
+        };
+
+        const action = Action.fromDescription(description);
+
+        expect(action).toBeInstanceOf(Action);
+        expect(action.type).toBe(ActionType.ASSIGN);
+        expect(action.properties).toHaveProperty('variable');
+        expect((action.properties as any).variable.name).toBe('var1');
+    });
+
+    it('should create a Create Action from CreateActionDescription', () => {
+        const variableDescription = { name: 'var2', value: '10' };
+        const description: CreateActionDescription = {
+            type: ActionType.CREATE,
+            variable: variableDescription,
+            isPersistent: true,
+        };
+
+        const action = Action.fromDescription(description);
+
+        expect(action).toBeInstanceOf(Action);
+        expect(action.type).toBe(ActionType.CREATE);
+        expect(action.properties).toHaveProperty('variable');
+        expect((action.properties as any).variable.name).toBe('var2');
+        expect((action.properties as any).isPersistent).toBe(true);
+    });
+
+    it('should create an Invoke Action from InvokeActionDescription', () => {
+        const description: InvokeActionDescription = {
+            type: ActionType.INVOKE,
+            serviceType: 'ServiceA',
+            isLocal: true,
+            input: [{ name: 'input1', value: '100' }],
+            done: [{ name: 'doneEvent', channel: 'external', data: [] }],
+            output: [{ reference: 'output1' }],
+        };
+
+        const action = Action.fromDescription(description);
+
+        expect(action).toBeInstanceOf(Action);
+        expect(action.type).toBe(ActionType.INVOKE);
+        expect(action.properties).toHaveProperty('serviceType', 'ServiceA');
+        expect((action.properties as any).isLocal).toBe(true);
+        expect((action.properties as any).input[0].name).toBe('input1');
+        expect((action.properties as any).done[0].name).toBe('doneEvent');
+    });
+
+    it('should create a Timeout Action from TimeoutActionDescription', () => {
+        const eventDescription: EventDescription = {
+            name: 'timeoutEvent', channel: 'global', data: []
+        }
+
+        const raiseActionDescription: RaiseActionDescription = {
+            event: eventDescription, type: ActionType.RAISE_EVENT
+
+        }
+        const timeoutDescription: TimeoutActionDescription = {
+            type: ActionType.TIMEOUT,
+            name: 'TimeoutAction',
+            delay: '5000',
+            action: raiseActionDescription,
+        };
+
+        const action = Action.fromDescription(timeoutDescription);
+
+        expect(action).toBeInstanceOf(Action);
+        expect(action.type).toBe(ActionType.TIMEOUT);
+        expect((action.properties as any).name).toBe('TimeoutAction');
+        expect((action.properties as any).delay).toBe('5000');
+        expect((action.properties as any).action.type).toBe(ActionType.RAISE_EVENT);
+    });
+
+    it('should create a Timeout Reset Action from TimeoutResetActionDescription', () => {
+        const timeoutResetDescription: TimeoutResetActionDescription = {
+            type: ActionType.TIMEOUT_RESET,
+            action: 'ResetAction',
+        };
+
+        const action = Action.fromDescription(timeoutResetDescription);
+
+        expect(action).toBeInstanceOf(Action);
+        expect(action.type).toBe(ActionType.TIMEOUT_RESET);
+        expect((action.properties as any).action.name).toBe('ResetAction');
+    });
+
+    it('should create a Match Action from MatchActionDescription', () => {
+        const eventDescription: EventDescription = {
+            name: 'caseEvent', channel: 'peripheral', data: []
+        }
+
+        const raiseEventDescription: RaiseActionDescription = {
+            event: eventDescription, type: ActionType.RAISE_EVENT
+
+        }
+        const matchDescription: MatchActionDescription = {
+            type: ActionType.MATCH,
+            value: 'matchValue',
+            cases: [{ case: 'case1', action: raiseEventDescription}],
+        };
+
+        const action = Action.fromDescription(matchDescription);
+
+        expect(action).toBeInstanceOf(Action);
+        expect(action.type).toBe(ActionType.MATCH);
+        expect((action.properties as any).value).toBe('matchValue');
+        expect((action.properties as any).cases[0]).toBeInstanceOf(MatchCase);
     });
 });

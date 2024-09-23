@@ -1,4 +1,4 @@
-import Action from "./action.ts";
+import Action from "./action.tsx";
 import {MatchCaseDescription} from "../pkl/bindings/collaborative_state_machine_description.pkl.ts";
 
 export default class MatchCase {
@@ -39,6 +39,10 @@ export default class MatchCase {
         return description
 
 
+    }
+
+    public static fromDescription(description: MatchCaseDescription): MatchCase {
+        return new MatchCase(description.case, Action.fromDescription(description.action))
     }
 
 

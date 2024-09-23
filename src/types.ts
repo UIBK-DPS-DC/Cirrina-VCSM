@@ -5,7 +5,7 @@ import State from "./classes/state.ts";
 import React from "react";
 import Event from "./classes/event.ts";
 import StateOrStateMachineService from "./services/stateOrStateMachineService.tsx";
-import Action from "./classes/action.ts";
+import Action from "./classes/action.tsx";
 import ActionService from "./services/actionService.tsx";
 import EventService from "./services/eventService.tsx";
 import ContextVariableService from "./services/contextVariableService.tsx";
@@ -55,7 +55,7 @@ export type Transitionn = {
 
 export type InvokeActionProps = {
     type: ActionType.INVOKE,
-    serviceType: ServiceType,
+    serviceType: string,
     isLocal: boolean,
     input: ContextVariable[],
     done: Event[],
