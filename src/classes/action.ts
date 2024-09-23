@@ -21,6 +21,7 @@ import {
     TimeoutActionProps,
     TimeoutResetActionProps
 } from "../types.ts";
+import MatchCase from "./MatchCase.tsx";
 
 ;
 
@@ -285,13 +286,54 @@ export default class Action {
             }
 
             case ActionType.TIMEOUT: {
-                // Todo
+                const timeOutActionDescription = description as TimeoutActionDescription
+                const timeOutActionProps: TimeoutActionProps = {
+                    action: Action.fromDescription(timeOutActionDescription.action),
+                    delay: timeOutActionDescription.delay,
+                    name: timeOutActionDescription.name,
+                    type: ActionType.TIMEOUT
+
+                }
+
+                const newTimeOutAction = new Action("", ActionType.TIMEOUT)
+                newTimeOutAction.properties = timeOutActionProps
+                return newTimeOutAction;
+
+
             }
+
+            // TODO: Needs a second pass to fill timeoutresetactions
+            case ActionType.TIMEOUT_RESET: {
+                const timeOutResetActionDescription = description as TimeoutResetActionDescription
+                const timeOutResetActionProps: TimeoutResetActionProps = {action: new Action(timeOutResetActionDescription.action, ActionType.TIMEOUT_RESET),
+                    type: ActionType.TIMEOUT_RESET}
+
+                const newTimeoutResetAction = new Action("", ActionType.TIMEOUT_RESET)
+                newTimeoutResetAction.properties = timeOutResetActionProps
+                return newTimeoutResetAction;
+
+
+            }
+
+            case ActionType.MATCH: {
+                const matchActionDescription = description as MatchActionDescription
+                const matchActionProps: MatchActionProps = {
+                    cases: matchActionDescription.cases.map((c) => MatchCase.fromDescription(c)),
+                    type: ActionType.MATCH,
+                    value: matchActionDescription.value
+
+                }
+
+                const newMatchAction = new Action("", ActionType.MATCH)
+                newMatchAction.properties = matchActionProps
+                return newMatchAction;
+            }
+
 
 
         }
 
-        return new Action("", ActionType.RAISE_EVENT)
+        return new Action("DEFAULT", ActionType.RAISE_EVENT)
 
     }
 
