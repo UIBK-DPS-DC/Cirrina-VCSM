@@ -1,4 +1,4 @@
-import Action from "../../../classes/action.ts";
+import Action from "../../../classes/action.tsx";
 import {Button, Card, Col, Container, Form, Row} from "react-bootstrap";
 import React, {Dispatch, SetStateAction, useCallback, useContext, useEffect, useState} from "react";
 import {ReactFlowContext, renderEnumAsOptions} from "../../../utils.tsx";

@@ -1,5 +1,5 @@
 import {CsmNodeProps, isState, isStateMachine} from "../types.ts";
-import Action from "../classes/action.ts";
+import Action from "../classes/action.tsx";
 import Event from "../classes/event.ts";
 import {ActionType, EventChannel} from "../enums.ts";
 

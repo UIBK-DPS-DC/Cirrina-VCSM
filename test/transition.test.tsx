@@ -1,7 +1,17 @@
 import Transition from "../src/classes/transition";
 import Guard from "../src/classes/guard";
 import Action from "../src/classes/action";
-import { ActionType } from "../src/enums";
+import {ActionType, EventChannel} from "../src/enums";
+import {
+    AssignActionDescription,
+    ContextVariableDescription,
+    CreateActionDescription,
+    EventDescription,
+    InvokeActionDescription,
+    OnTransitionDescription,
+    RaiseActionDescription,
+    TransitionDescription
+} from "../src/pkl/bindings/collaborative_state_machine_description.pkl";
 
 describe('Transition', () => {
     let transition: Transition;
@@ -91,7 +101,7 @@ describe('Transition class', () => {
     it('should initialize with empty guards, actions, else, and event', () => {
         expect(transition.getGuards()).toEqual([]);
         expect(transition.getActions()).toEqual([]);
-        expect(transition.getElse()).toEqual([]);
+        expect(transition.getElse()).toEqual("");
         expect(transition.getEvent()).toBe('');
     });
 
@@ -126,7 +136,7 @@ describe('Transition class', () => {
     });
 
     it('should set and get else actions', () => {
-        const elseActions = ['else1', 'else2'];
+        const elseActions = "else";
 
         transition.setElse(elseActions);
         expect(transition.getElse()).toEqual(elseActions);
@@ -312,6 +322,161 @@ describe('Transition Class - addAction and removeAction Methods', () => {
             expect(transition.getActions()).toContain(action3);
             expect(transition.getActions()).not.toContain(action1);
         });
+    });
+});
+
+describe('fromOnTransitionDescription Method', () => {
+
+    it('should correctly convert OnTransitionDescription to Transition', () => {
+
+        const contextVariableDescription: ContextVariableDescription = {
+            name: "name", value: "val"
+
+        }
+
+        const assignActionDescription: AssignActionDescription = {
+            type: ActionType.ASSIGN, variable: contextVariableDescription
+
+        }
+
+        const description: OnTransitionDescription = {
+            target: "TargetState",
+            event: "SampleEvent",
+            guards: [{ expression: "x > 5" }],
+            actions: [assignActionDescription],
+            else: "ElseState",
+        };
+
+        const transition = Transition.fromOnTransitionDescription(description, "SourceState");
+
+        expect(transition).toBeInstanceOf(Transition);
+        expect(transition.getSource()).toBe("SourceState");
+        expect(transition.getTarget()).toBe("TargetState");
+        expect(transition.getEvent()).toBe("SampleEvent");
+        expect(transition.getGuards()).toHaveLength(1);
+        expect(transition.getGuards()[0]).toBeInstanceOf(Guard);
+        expect(transition.getGuards()[0].expression).toBe("x > 5");
+        expect(transition.getActions()).toHaveLength(1);
+        expect(transition.getActions()[0]).toBeInstanceOf(Action);
+        expect(transition.getElse()).toBe("ElseState");
+    });
+
+    it('should handle empty guards and actions', () => {
+        const description: OnTransitionDescription = {
+            target: "TargetState",
+            event: "SampleEvent",
+            guards: [],
+            actions: [],
+            else: null,
+        };
+
+        const transition = Transition.fromOnTransitionDescription(description, "SourceState");
+
+        expect(transition).toBeInstanceOf(Transition);
+        expect(transition.getGuards()).toHaveLength(0);
+        expect(transition.getActions()).toHaveLength(0);
+        expect(transition.getElse()).toBe("");
+    });
+
+    it('should handle missing else and target properties', () => {
+
+        const invokeActionDescription: InvokeActionDescription = {
+            done: [],
+            input: [],
+            isLocal: false,
+            output: [],
+            serviceType: "",
+            type: ActionType.INVOKE
+
+        }
+
+        const description: OnTransitionDescription = {
+            target: null,
+            event: "SampleEvent",
+            guards: [{ expression: "x > 5" }],
+            actions: [invokeActionDescription],
+            else: null,
+        };
+
+        const transition = Transition.fromOnTransitionDescription(description, "SourceState");
+
+        expect(transition.getTarget()).toBe("");
+        expect(transition.getElse()).toBe("");
+    });
+});
+
+describe('fromTransitionDescription Method', () => {
+
+    it('should correctly convert TransitionDescription to Transition', () => {
+
+        const contextVariableDescription: ContextVariableDescription = {
+            name: "", value: ""
+
+        }
+
+        const createActionDescription: CreateActionDescription = {
+            isPersistent: false, type: ActionType.CREATE, variable: contextVariableDescription
+
+        }
+
+        const description: TransitionDescription = {
+            target: "TargetState",
+            guards: [{ expression: "a == b" }],
+            actions: [createActionDescription],
+            else: "FallbackState",
+        };
+
+        const transition = Transition.fromTransitionDescription(description, "SourceState");
+
+        expect(transition).toBeInstanceOf(Transition);
+        expect(transition.getSource()).toBe("SourceState");
+        expect(transition.getTarget()).toBe("TargetState");
+        expect(transition.getGuards()).toHaveLength(1);
+        expect(transition.getGuards()[0]).toBeInstanceOf(Guard);
+        expect(transition.getGuards()[0].expression).toBe("a == b");
+        expect(transition.getActions()).toHaveLength(1);
+        expect(transition.getActions()[0]).toBeInstanceOf(Action);
+        expect(transition.getElse()).toBe("FallbackState");
+    });
+
+    it('should handle empty guards and actions in TransitionDescription', () => {
+        const description: TransitionDescription = {
+            target: "TargetState",
+            guards: [],
+            actions: [],
+            else: null,
+        };
+
+        const transition = Transition.fromTransitionDescription(description, "SourceState");
+
+        expect(transition.getGuards()).toHaveLength(0);
+        expect(transition.getActions()).toHaveLength(0);
+        expect(transition.getElse()).toBe("");
+    });
+
+    it('should handle missing else and target properties in TransitionDescription', () => {
+
+        const eventDescription: EventDescription = {
+            channel: EventChannel.GLOBAL, data: [], name: "event"
+
+        }
+
+        const raiseEventDescription: RaiseActionDescription = {
+            event: eventDescription,
+            type: ActionType.RAISE_EVENT
+
+        }
+        const description: TransitionDescription = {
+            target: null,
+            guards: [{ expression: "guard_expression" }],
+            actions: [raiseEventDescription],
+            else: null,
+        };
+
+        const transition = Transition.fromTransitionDescription(description, "SourceState");
+
+        expect(transition.getTarget()).toBe("");
+        expect(transition.getElse()).toBe("");
     });
 });
 

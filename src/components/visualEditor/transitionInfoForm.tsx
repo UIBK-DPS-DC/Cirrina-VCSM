@@ -16,7 +16,7 @@ import {
 } from "react-bootstrap";
 import Guard from "../../classes/guard.tsx";
 import GuardDisplay from "../Guard/guardDisplay.tsx";
-import Action from "../../classes/action.ts";
+import Action from "../../classes/action.tsx";
 import Event from "../../classes/event.ts";
 import SelectSingleEventModal from "../Event/selectSingleEventModal.tsx";
 import {ActionType} from "../../enums.ts";

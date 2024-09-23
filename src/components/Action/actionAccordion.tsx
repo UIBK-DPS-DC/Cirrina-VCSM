@@ -1,5 +1,5 @@
 import {Accordion, AccordionBody, AccordionHeader, AccordionItem} from "react-bootstrap";
-import Action from "../../classes/action.ts";
+import Action from "../../classes/action.tsx";
 import {Dispatch, SetStateAction} from "react";
 import ActionDisplay from "./actionDisplay.tsx";
 

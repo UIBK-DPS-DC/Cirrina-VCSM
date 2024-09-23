@@ -1,4 +1,4 @@
-import Action from "./action.ts";
+import Action from "./action.tsx";
 import Guard from "./guard.tsx";
 import ContextVariable from "./contextVariable.tsx";
 

@@ -1,4 +1,4 @@
-import Action from "../../../classes/action.ts";
+import Action from "../../../classes/action.tsx";
 
 export default function UnlockActionForm(_props: {action: Action | undefined}) {
     return(

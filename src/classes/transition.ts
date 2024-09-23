@@ -1,6 +1,9 @@
 import Action from "./action.tsx";
 import Guard from "./guard.tsx";
-import {OnTransitionDescription} from "../pkl/bindings/collaborative_state_machine_description.pkl.ts";
+import {
+    OnTransitionDescription,
+    TransitionDescription
+} from "../pkl/bindings/collaborative_state_machine_description.pkl.ts";
 
 export default class Transition {
     private static _TRANSITION_ID_COUNT = 0;
@@ -10,7 +13,7 @@ export default class Transition {
     private target : string
     private _guards : Guard[]
     private _actions : Action[]
-    private _else : string []
+    private _else : string
     private _event : string
     private _isStatemachineEdge : boolean
 
@@ -19,7 +22,7 @@ export default class Transition {
         this.target = targetState
         this._guards = []
         this._actions = []
-        this._else = []
+        this._else = ""
         this._event = ""
         this._isStatemachineEdge = isStatemachineEdge
         this.ID = this.getNewId()
@@ -67,11 +70,11 @@ export default class Transition {
         this._actions = value;
     }
 
-    public getElse(): string[] {
+    public getElse(): string {
         return this._else;
     }
 
-    public setElse(value: string[]) {
+    public setElse(value: string) {
         this._else = value;
     }
 
@@ -149,6 +152,25 @@ export default class Transition {
 
         }
         return description;
+    }
+
+
+    public static fromOnTransitionDescription(description: OnTransitionDescription, sourceState: string): Transition {
+
+        const newTransition = new Transition(sourceState, description.target || "")
+        newTransition._guards = description.guards.map((g) => Guard.fromDescription(g));
+        newTransition._actions = description.actions.map((a) => Action.fromDescription(a))
+        newTransition._else = description.else || ""
+        newTransition._event = description.event
+        return newTransition;
+    }
+
+    public static fromTransitionDescription(description: TransitionDescription, sourceState: string): Transition {
+        const newTransition = new Transition(sourceState, description.target || "")
+        newTransition._guards = description.guards.map((g) => Guard.fromDescription(g));
+        newTransition._actions = description.actions.map((a) => Action.fromDescription(a))
+        newTransition._else = description.else || ""
+        return newTransition;
     }
 
 

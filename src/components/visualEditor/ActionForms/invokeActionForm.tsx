@@ -1,4 +1,4 @@
-import Action from "../../../classes/action.ts";
+import Action from "../../../classes/action.tsx";
 import Event from "../../../classes/event.ts";
 import {Button, Card, Col, Form, Row} from "react-bootstrap";
 import {ActionCategory, ActionType, ServiceType} from "../../../enums.ts";
