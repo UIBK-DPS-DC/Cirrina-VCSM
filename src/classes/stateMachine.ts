@@ -164,5 +164,20 @@ export default class StateMachine implements StateOrStateMachine {
     }
 
 
+    public static fromDescription(description: StateMachineDescription): StateMachine {
+        const newStatemachine = new StateMachine(description.name)
+        newStatemachine._states = description.states.map((s) => State.fromDescription(s))
+
+        const statemachines = description.stateMachines.map((s) => StateMachine.fromDescription(s))
+        newStatemachine._states = newStatemachine._states.concat(statemachines)
+
+        newStatemachine._localContext = description.localContext?.variables.map((v) => ContextVariable.fromDescription(v)) || []
+        newStatemachine._persistentContext = description.persistentContext?.variables.map((v) => ContextVariable.fromDescription(v)) || []
+
+        return newStatemachine
+
+    }
+
+
 
 }
