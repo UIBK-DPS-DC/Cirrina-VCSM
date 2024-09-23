@@ -286,6 +286,10 @@ export default class State implements StateOrStateMachine {
         newState.after = description.after.map((a) => Action.fromDescription(a))
         newState.on = description.on.map((o) => Transition.fromOnTransitionDescription(o,description.name))
         newState.always = description.always.map((a) => Transition.fromTransitionDescription(a, description.name))
+        newState.localContext = description.localContext.variables.map((v) => ContextVariable.fromDescription(v))
+        newState.persistentContext = description.persistentContext.variables.map((v) => ContextVariable.fromDescription(v))
+        newState.staticContext = description.staticContext.variables.map((v) => ContextVariable.fromDescription(v))
+
         return newState
 
     }

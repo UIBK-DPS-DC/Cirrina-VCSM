@@ -1,9 +1,17 @@
 import State from "../src/classes/state";
 import Action from "../src/classes/action";
 import ContextVariable from "../src/classes/contextVariable";
-import { ActionType } from "../src/enums";
+import {ActionType, EventChannel} from "../src/enums";
 import Transition from "../src/classes/transition";
 import Guard from "../src/classes/guard";
+import {
+    ContextVariableDescription,
+    CreateActionDescription,
+    EventDescription,
+    OnTransitionDescription, RaiseActionDescription,
+    StateDescription,
+    TransitionDescription
+} from "../src/pkl/bindings/collaborative_state_machine_description.pkl";
 
 describe('State Class', () => {
     let state: State;
@@ -298,5 +306,156 @@ describe('State Class', () => {
         expect(state.localContext).toEqual([contextVar1, contextVar2]);
         expect(state.persistentContext).toEqual([contextVar1, contextVar2]);
         expect(state.staticContext).toEqual([contextVar1, contextVar2]);
+    });
+});
+
+describe('fromDescription Method', () => {
+
+    it('should correctly convert StateDescription to State', () => {
+        // Creating ContextVariableDescription object
+        const contextVariableDescription: ContextVariableDescription = {
+            name: "var1",
+            value: "value1"
+        };
+
+        // Creating ActionDescription object
+        const createActionDescription: CreateActionDescription = {
+            type: ActionType.CREATE,
+            variable: contextVariableDescription,
+            isPersistent: true,
+        };
+
+        // Creating EventDescription object
+        const eventDescription: EventDescription = {
+            name: "event1",
+            channel: EventChannel.INTERNAL,
+            data: [contextVariableDescription]
+        };
+
+        // Creating RaiseEventActionDescription object
+        const raiseEventActionDescription: RaiseActionDescription = {
+            type: ActionType.RAISE_EVENT,
+            event: eventDescription
+        };
+
+        // Creating OnTransitionDescription object
+        const onTransitionDescription: OnTransitionDescription = {
+            target: "TargetState",
+            event: "SampleEvent",
+            guards: [{ expression: "x > 5" }],
+            actions: [createActionDescription],
+            else: null,
+        };
+
+        // Creating TransitionDescription object
+        const transitionDescription: TransitionDescription = {
+            target: "AnotherState",
+            guards: [{ expression: "a == b" }],
+            actions: [raiseEventActionDescription],
+            else: "ElseState",
+        };
+
+        // Creating StateDescription object
+        const stateDescription: StateDescription = {
+            name: "TestState",
+            initial: true,
+            terminal: false,
+            entry: [createActionDescription],
+            exit: [raiseEventActionDescription],
+            while: [createActionDescription],
+            after: [raiseEventActionDescription],
+            on: [onTransitionDescription],
+            always: [transitionDescription],
+            localContext: { variables: [contextVariableDescription] },
+            persistentContext: { variables: [contextVariableDescription] },
+            staticContext: { variables: [contextVariableDescription] }
+        };
+
+        // Converting description to State
+        const state = State.fromDescription(stateDescription);
+
+        // Assertions
+        expect(state).toBeInstanceOf(State);
+        expect(state.name).toBe("TestState");
+        expect(state.initial).toBe(true);
+        expect(state.terminal).toBe(false);
+        expect(state.entry).toHaveLength(1);
+        expect(state.entry[0]).toBeInstanceOf(Action);
+        expect(state.exit).toHaveLength(1);
+        expect(state.exit[0]).toBeInstanceOf(Action);
+        expect(state.while).toHaveLength(1);
+        expect(state.while[0]).toBeInstanceOf(Action);
+        expect(state.after).toHaveLength(1);
+        expect(state.after[0]).toBeInstanceOf(Action);
+        expect(state.on).toHaveLength(1);
+        expect(state.on[0]).toBeInstanceOf(Transition);
+        expect(state.always).toHaveLength(1);
+        expect(state.always[0]).toBeInstanceOf(Transition);
+        expect(state.localContext).toHaveLength(1);
+        expect(state.persistentContext).toHaveLength(1);
+        expect(state.staticContext).toHaveLength(1);
+    });
+
+    it('should handle empty transitions and actions', () => {
+        // Creating StateDescription object with empty actions and transitions
+        const stateDescription: StateDescription = {
+            name: "EmptyState",
+            initial: false,
+            terminal: false,
+            entry: [],
+            exit: [],
+            while: [],
+            after: [],
+            on: [],
+            always: [],
+            localContext: { variables: [] },
+            persistentContext: { variables: [] },
+            staticContext: { variables: [] }
+        };
+
+        // Converting description to State
+        const state = State.fromDescription(stateDescription);
+
+        // Assertions
+        expect(state).toBeInstanceOf(State);
+        expect(state.name).toBe("EmptyState");
+        expect(state.initial).toBe(false);
+        expect(state.terminal).toBe(false);
+        expect(state.entry).toHaveLength(0);
+        expect(state.exit).toHaveLength(0);
+        expect(state.while).toHaveLength(0);
+        expect(state.after).toHaveLength(0);
+        expect(state.on).toHaveLength(0);
+        expect(state.always).toHaveLength(0);
+        expect(state.localContext).toHaveLength(0);
+        expect(state.persistentContext).toHaveLength(0);
+        expect(state.staticContext).toHaveLength(0);
+    });
+
+    it('should correctly handle missing optional fields', () => {
+        // Creating minimal StateDescription object without optional fields
+        const stateDescription: StateDescription = {
+            name: "MinimalState",
+            initial: false,
+            terminal: true,
+            entry: [],
+            exit: [],
+            while: [],
+            after: [],
+            on: [],
+            always: [],
+            localContext: { variables: [] },
+            persistentContext: { variables: [] },
+            staticContext: { variables: [] }
+        };
+
+        // Converting description to State
+        const state = State.fromDescription(stateDescription);
+
+        // Assertions
+        expect(state).toBeInstanceOf(State);
+        expect(state.name).toBe("MinimalState");
+        expect(state.initial).toBe(false);
+        expect(state.terminal).toBe(true);
     });
 });
