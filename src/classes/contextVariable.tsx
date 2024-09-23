@@ -33,4 +33,10 @@ export default class ContextVariable {
             value: this.value
         }
     }
+
+
+
+    public static fromDescription(description: ContextVariableDescription): ContextVariable {
+        return new ContextVariable(description.name, description.value);
+    }
 }
