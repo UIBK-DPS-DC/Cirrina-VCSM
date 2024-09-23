@@ -1,12 +1,15 @@
 import {ActionType} from "../enums.ts";
 import ContextVariable from "./contextVariable.tsx";
+import Event from "./event.ts";
 import {
     ActionDescription,
     AssignActionDescription,
     CreateActionDescription,
     InvokeActionDescription,
     MatchActionDescription,
-    RaiseActionDescription, TimeoutActionDescription, TimeoutResetActionDescription
+    RaiseActionDescription,
+    TimeoutActionDescription,
+    TimeoutResetActionDescription
 } from "../pkl/bindings/collaborative_state_machine_description.pkl.ts";
 import {
     ActionProps,
@@ -14,7 +17,9 @@ import {
     CreateActionProps,
     InvokeActionProps,
     MatchActionProps,
-    RaiseEventActionProps, TimeoutActionProps, TimeoutResetActionProps
+    RaiseEventActionProps,
+    TimeoutActionProps,
+    TimeoutResetActionProps
 } from "../types.ts";
 
 ;
@@ -215,6 +220,78 @@ export default class Action {
             }
 
         }
+
+    }
+
+    public static fromDescription(description: ActionDescription): Action {
+        switch (description.type) {
+
+            case ActionType.RAISE_EVENT: {
+                const raiseEventDescription = description as RaiseActionDescription
+                const raiseEventActionProps: RaiseEventActionProps = {
+                    event: Event.fromDescription(raiseEventDescription.event), type: ActionType.RAISE_EVENT
+
+                }
+                const raiseEventAction = new Action("", ActionType.RAISE_EVENT)
+                raiseEventAction.properties = raiseEventActionProps
+                return raiseEventAction;
+            }
+
+            case ActionType.CREATE: {
+                const createActionDescription = description as CreateActionDescription
+                const createActionProps: CreateActionProps = {
+                    isPersistent: createActionDescription.isPersistent,
+                    type: ActionType.CREATE,
+                    variable: ContextVariable.fromDescription(createActionDescription.variable)
+
+                }
+                const newCreateAction = new Action("",ActionType.CREATE)
+                newCreateAction.properties = createActionProps
+                return newCreateAction;
+            }
+
+            case ActionType.ASSIGN: {
+                const assignActionDescription = description as AssignActionDescription
+                const assignActionProps: AssignActionProps = {
+                    expression:"" ,
+                    type: ActionType.ASSIGN,
+                    variable: ContextVariable.fromDescription(assignActionDescription.variable)
+
+
+                }
+                // TODO ask what is upt with missing expression in assign action description
+                const newAssignAction = new Action("",ActionType.ASSIGN)
+                newAssignAction.properties = assignActionProps
+                return newAssignAction
+            }
+
+            case ActionType.INVOKE: {
+                const invokeActionDescription = description as InvokeActionDescription
+                const invokeActionProps: InvokeActionProps = {
+                    done: invokeActionDescription.done.map((e) => Event.fromDescription(e)),
+                    input: invokeActionDescription.input.map((i) => ContextVariable.fromDescription(i)),
+                    isLocal: invokeActionDescription.isLocal,
+                    output: invokeActionDescription.output.map((o) => ContextVariable.fromReferenceDescription(o)),
+                    serviceType: invokeActionDescription.serviceType,
+                    type: ActionType.INVOKE
+
+                }
+
+                const newInvokeAction = new Action("", ActionType.INVOKE)
+                newInvokeAction.properties = invokeActionProps
+                return newInvokeAction
+
+
+            }
+
+            case ActionType.TIMEOUT: {
+                // Todo
+            }
+
+
+        }
+
+        return new Action("", ActionType.RAISE_EVENT)
 
     }
 

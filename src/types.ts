@@ -55,7 +55,7 @@ export type Transitionn = {
 
 export type InvokeActionProps = {
     type: ActionType.INVOKE,
-    serviceType: ServiceType,
+    serviceType: string,
     isLocal: boolean,
     input: ContextVariable[],
     done: Event[],

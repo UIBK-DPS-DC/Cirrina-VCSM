@@ -52,9 +52,16 @@ export default class Event {
         console.log(this.name);
         return {
             channel: this.channel,
-            data: this._data,
+            data: this._data.map((c) => c.toDescription()),
             name: this._name
         }
+    }
+
+    public static fromDescription(description: EventDescription): Event {
+        const event = new Event(description.name, description.channel as EventChannel)
+        event.data = description.data.map((c) => ContextVariable.fromDescription(c));
+        return event;
+
     }
 
 
