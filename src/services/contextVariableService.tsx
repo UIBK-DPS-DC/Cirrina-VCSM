@@ -25,6 +25,9 @@ export default class ContextVariableService {
 
     }
 
+
+
+
     /**
      * Registers a new context.
      *
@@ -510,6 +513,14 @@ export default class ContextVariableService {
         console.error("Unknown data type")
         return [];
     }
+
+    public resetService():void {
+        this._nameToContextMap = new Map();
+        this._contextToSateOrStateMachineMap = new Map();
+        this._contextCreatedByStateMap = new Map();
+    }
+
+
 
 
 
