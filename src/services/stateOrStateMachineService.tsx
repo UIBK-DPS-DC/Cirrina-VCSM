@@ -30,6 +30,7 @@ export default class StateOrStateMachineService {
     }
 
 
+
     /**
      * Links a state name to a state machine in the internal mapping.
      *
@@ -506,6 +507,13 @@ export default class StateOrStateMachineService {
                 };
 
         }
+    }
+
+    public resetService():void {
+        this.stateOrStatemachineNames = new Set();
+        this.nodeIdToStateOrStatemachineMap = new Map();
+        this.statemachineIDToStateNamesMap = new Map();
+        this.statemachineIDToStateNamesMap.set(NO_PARENT, new Set<string>());
     }
 
 }
