@@ -13,7 +13,7 @@ const getNewEdgeId = () => `edge_${edgeId++}`;
 export default function Import() {
     const inputFile = useRef<HTMLInputElement | null>(null);
     const context = useContext(ReactFlowContext) as ReactFlowContextProps;
-    const {contextService, transitionService, eventService, stateOrStateMachineService, actionService ,guardService} = context
+    const {contextService,, eventService, stateOrStateMachineService, actionService ,guardService} = context
 
     // Function to handle the button click and trigger the file input click
     const handleButtonClick = () => {
@@ -23,6 +23,11 @@ export default function Import() {
     };
 
     const resetServices = () => {
+        contextService.resetService()
+        eventService.resetService()
+        stateOrStateMachineService.resetService()
+        actionService.resetService()
+        guardService.resetService()
     }
 
     const loadCSM = (description: CollaborativeStateMachineDescription) => {
@@ -30,6 +35,8 @@ export default function Import() {
         const topLevelStatemachines = fromCollaborativeStatemachineDescription(description)
         console.log("NUM TOP STATEMACHINES:" , topLevelStatemachines.length)
         // Get all state and statemachines
+
+        resetServices()
 
 
     }
