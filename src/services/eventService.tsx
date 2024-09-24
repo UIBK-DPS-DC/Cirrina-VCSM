@@ -10,6 +10,8 @@ export default class EventService {
         this.nameToEventMap = new Map<string,Event>();
     }
 
+
+
     /**
      * Registers a new event in the system.
      *
@@ -210,6 +212,11 @@ export default class EventService {
         return []
 
     }
+
+    public resetService():void {
+        this.nameToEventMap = new Map<string,Event>();
+    }
+
 
 
 
