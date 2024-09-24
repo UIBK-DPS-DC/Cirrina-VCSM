@@ -5,7 +5,8 @@ import StateInfoForm from "./components/visualEditor/stateInfoForm.tsx";
 import StateMachineInfoForm from "./components/visualEditor/stateMachineInfoForm.tsx";
 import ContextVariable from "./classes/contextVariable.tsx";
 import StateOrStateMachineService from "./services/stateOrStateMachineService.tsx";
-
+import {CollaborativeStateMachineDescription} from "./pkl/bindings/collaborative_state_machine_description.pkl.ts";
+import StateMachine from "./classes/stateMachine.ts";
 
 
 const DEBUG = false
@@ -221,6 +222,11 @@ export const getAllStateNamesInExtent = (node: Node<CsmNodeProps>, nodes: Node<C
     return stateNames
 
 };
+
+export const fromCollaborativeStatemachineDescription = (description: CollaborativeStateMachineDescription): StateMachine[] => {
+    // Get all statemachines
+    return description.stateMachines.map((sm) => StateMachine.fromDescription(sm))
+}
 
 
 // Custom styles for dark mode

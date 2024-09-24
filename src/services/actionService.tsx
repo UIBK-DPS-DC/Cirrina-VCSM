@@ -253,5 +253,10 @@ export default class ActionService {
         return res;
     }
 
+    public resetService():void {
+        this.nameToActionMap = new Map();
+        this.typeToActionsMap = new Map()
+    }
+
 
 }

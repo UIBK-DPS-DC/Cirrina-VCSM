@@ -145,6 +145,8 @@ export default class StateMachine implements StateOrStateMachine {
         });
     }
 
+
+
     public getAllStates(): State[] {
         return this.states.filter((stateOrStatemachine): stateOrStatemachine is State => {
             return stateOrStatemachine instanceof State;

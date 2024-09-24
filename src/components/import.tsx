@@ -1,9 +1,19 @@
 import { Button } from "react-bootstrap";
-import React, { useRef } from "react";
+import React, {useContext, useRef} from "react";
 import {CollaborativeStateMachineDescription} from "../pkl/bindings/collaborative_state_machine_description.pkl.ts";
+import {fromCollaborativeStatemachineDescription, ReactFlowContext} from "../utils.tsx";
+import {ReactFlowContextProps} from "../types.ts";
+
+
+let nodeId = 0;
+let edgeId = 0;
+const getNewNodeId = () => `node_${nodeId++}`;
+const getNewEdgeId = () => `edge_${edgeId++}`;
 
 export default function Import() {
     const inputFile = useRef<HTMLInputElement | null>(null);
+    const context = useContext(ReactFlowContext) as ReactFlowContextProps;
+    const {contextService, transitionService, eventService, stateOrStateMachineService, actionService ,guardService} = context
 
     // Function to handle the button click and trigger the file input click
     const handleButtonClick = () => {
@@ -12,8 +22,16 @@ export default function Import() {
         }
     };
 
+    const resetServices = () => {
+    }
+
     const loadCSM = (description: CollaborativeStateMachineDescription) => {
-        console.log(description)
+        // Get top level statemachines
+        const topLevelStatemachines = fromCollaborativeStatemachineDescription(description)
+        console.log("NUM TOP STATEMACHINES:" , topLevelStatemachines.length)
+        // Get all state and statemachines
+
+
     }
 
     // Function to handle file selection
