@@ -1,8 +1,12 @@
-import { Button } from "react-bootstrap";
+import {Button} from "react-bootstrap";
 import React, {useContext, useRef} from "react";
 import {CollaborativeStateMachineDescription} from "../pkl/bindings/collaborative_state_machine_description.pkl.ts";
 import {fromCollaborativeStatemachineDescription, ReactFlowContext} from "../utils.tsx";
-import {ReactFlowContextProps} from "../types.ts";
+import {CsmNodeProps, ReactFlowContextProps} from "../types.ts";
+import State from "../classes/state.ts";
+import {Node} from "@xyflow/react";
+import StateMachine from "../classes/stateMachine.ts";
+import {NO_PARENT} from "../services/stateOrStateMachineService.tsx";
 
 
 let nodeId = 0;
@@ -30,11 +34,66 @@ export default function Import() {
         guardService.resetService()
     }
 
+
+
+
+    const generateNodes = (statemachines: StateMachine[], parentId: string | NO_PARENT): Node<CsmNodeProps>[] => {
+        let nodes: Node<CsmNodeProps>[] = []
+
+        statemachines.forEach(machine => {
+            nodes.push(statemachineToNode(machine, parentId))
+            const states = machine.getAllStates()
+            states.forEach(state => {
+                nodes.push(stateToNode(state, machine.nodeId))
+            })
+            const nestedStatemachines = machine.getAllStateMachines()
+            nodes = nodes.concat(generateNodes(nestedStatemachines, machine.nodeId))
+        })
+
+        return nodes
+    }
+
+
+    const statemachineToNode = (statemachine: StateMachine, parentId: string | NO_PARENT): Node<CsmNodeProps> => {
+        const id = getNewNodeId()
+        statemachine.nodeId = id
+        if(parentId === NO_PARENT){
+            return {
+                position: {x: 0, y: 0},
+                data: statemachine, id: id, type: "state-machine-node"
+
+            }
+        }
+        // TODO: Probably add calls to action service here?
+        else {
+            return {
+                position: {x: 0, y: 0},
+                data: statemachine, extent: "parent", id: id, parentId: parentId, type: "state-machine-node"
+
+            }
+        }
+    }
+
+    const stateToNode = (state: State, parentId: string): Node<CsmNodeProps> => {
+        const id = getNewNodeId()
+        state.nodeId = id
+        return {
+            position: {x: 0, y: 0},
+            data: state, extent: "parent", id: id, parentId: parentId, type: "state-node"
+
+        }
+    }
+
+
     const loadCSM = (description: CollaborativeStateMachineDescription) => {
         // Get top level statemachines
         const topLevelStatemachines = fromCollaborativeStatemachineDescription(description)
         console.log("NUM TOP STATEMACHINES:" , topLevelStatemachines.length)
         // Get all state and statemachines
+
+
+
+
 
         resetServices()
 

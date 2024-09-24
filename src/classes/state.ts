@@ -7,12 +7,13 @@ import Event from "./event.ts";
 import {StateDescription} from "../pkl/bindings/collaborative_state_machine_description.pkl.ts";
 import {ActionType} from "../enums.ts";
 import {RaiseEventActionProps} from "../types.ts";
+import {NO_PARENT} from "../services/stateOrStateMachineService.tsx";
 
 
 
 export default class State implements StateOrStateMachine {
 
-    private _nodeId: string | undefined
+    private _nodeId: string | NO_PARENT
     private _name: string
     private _initial = false;
     private _terminal = false;
@@ -30,14 +31,15 @@ export default class State implements StateOrStateMachine {
 
     public constructor(name: string) {
         this._name = name
+        this._nodeId = NO_PARENT
     }
 
 
-    get nodeId(): string | undefined {
+    get nodeId(): string  {
         return this._nodeId;
     }
 
-    set nodeId(value: string | undefined) {
+    set nodeId(value: string) {
         this._nodeId = value;
     }
 
