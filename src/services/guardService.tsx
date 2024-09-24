@@ -17,6 +17,7 @@ export default class GuardService {
         this.nameToGuardMap = new Map();
     }
 
+
     /**
      * Checks if a guard name is unique.
      *
@@ -105,6 +106,11 @@ export default class GuardService {
 
     public getGuardByName(name: string): Guard | undefined {
         return this.nameToGuardMap.get(name);
+    }
+
+
+    public resetService():void {
+        this.nameToGuardMap = new Map();
     }
 
 
