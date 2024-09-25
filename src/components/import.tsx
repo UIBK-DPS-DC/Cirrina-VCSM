@@ -58,7 +58,7 @@ export default function Import() {
         return nodes
     }
 
-
+    // TODO: Add background, default size etc
     const statemachineToNode = (statemachine: StateMachine, parentId: string | NO_PARENT): Node<CsmNodeProps> => {
         const id = getNewNodeId()
         statemachine.nodeId = id
