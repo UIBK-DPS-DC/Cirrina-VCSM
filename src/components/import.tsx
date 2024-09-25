@@ -1,121 +1,47 @@
-// Make sure all required imports are correct and in place
+// Ensure all required imports are correct and in place
 import { Button } from "react-bootstrap";
-import React, { useContext, useRef } from "react";
+import React, { useRef, useCallback, useContext } from "react";
 import { CollaborativeStateMachineDescription } from "../pkl/bindings/collaborative_state_machine_description.pkl.ts";
 import { fromCollaborativeStatemachineDescription, ReactFlowContext } from "../utils.tsx";
-import { CsmEdgeProps, CsmNodeProps, isState, isStateMachine, ReactFlowContextProps } from "../types.ts";
+import { CsmEdgeProps, CsmNodeProps, isState, ReactFlowContextProps } from "../types.ts";
 import State from "../classes/state.ts";
-import { Edge, Node } from "@xyflow/react";
+import { Edge, MarkerType } from "@xyflow/react";
 import StateMachine from "../classes/stateMachine.ts";
-import { NO_PARENT } from "../services/stateOrStateMachineService.tsx";
-import ELK, { ElkNode } from 'elkjs/lib/elk.bundled.js';
-import { PortSide } from "../enums.ts";
-
+import ELK from 'elkjs/lib/elk.bundled.js';
+import Transition from "../classes/transition.ts";
+import StateOrStateMachine from "../classes/stateOrStateMachine.ts";
+import {Node} from "@xyflow/react";
 // Define the layout options for ELK
-const layoutOptions = {
+const defaultOptions = {
     'elk.algorithm': 'layered',
     'elk.direction': 'RIGHT',
-    'elk.layered.spacing.edgeNodeBetweenLayers': '40',
-    'elk.spacing.nodeNode': '40',
+    'elk.layered.spacing.edgeNodeBetweenLayers': '100',
+    'elk.layered.spacing.nodeNodeBetweenLayers': '100',
+    'elk.edgeRouting': 'ORTHOGONAL', // Enable orthogonal edge routing
+    'elk.allowEdgeNodeOverlap': 'false',
+    'elk.spacing.nodeNode': '100',
+    'elk.spacing.edgeEdge': '250',
+    'elk.spacing.edgeNode': '300',
     'elk.layered.nodePlacement.strategy': 'SIMPLE',
+    "elk.padding" : "100"
 };
 
 // Create an ELK instance
 const elk = new ELK();
 
-// Utility functions to generate unique IDs for nodes and edges
-let nodeId = 0;
-let edgeId = 0;
-const getNewNodeId = () => `node_${nodeId++}`;
-const getNewEdgeId = () => `edge_${edgeId++}`;
-
-// Import component definition
 export default function Import() {
-    // Set up ref and context
+    // Set up ref
     const inputFile = useRef<HTMLInputElement | null>(null);
+
+    // Use React Flow context to get setNodes and setEdges
     const context = useContext(ReactFlowContext) as ReactFlowContextProps;
-    const { contextService, eventService, stateOrStateMachineService, actionService, guardService, nodes, setNodes } = context;
+    const { setNodes, setEdges } = context;
 
-    // Helper functions to map target and source sides for ports
-    const getTargetSide = (t: { id: "t-t" } | { id: "r-t" } | { id: "l-t" } | { id: "b-t" }) => {
-        switch (t.id) {
-            case "t-t": return PortSide.NORTH;
-            case "r-t": return PortSide.EAST;
-            case "b-t": return PortSide.SOUTH;
-            case "l-t": return PortSide.WEST;
-            default: return PortSide.NORTH;
-        }
-    };
-
-    const getSourceSide = (s: { id: "t-s" } | { id: "r-s" } | { id: "l-s" } | { id: "b-s" }) => {
-        switch (s.id) {
-            case "t-s": return PortSide.NORTH;
-            case "r-s": return PortSide.EAST;
-            case "b-s": return PortSide.SOUTH;
-            case "l-s": return PortSide.WEST;
-            default: return PortSide.NORTH;
-        }
-    };
-
-    // Correctly typed and defined getLayoutedNodes function
-    const getLayoutedNodes = async (
-        nodes: Node<CsmNodeProps>[],
-        edges: Edge<CsmEdgeProps>[]
-    ): Promise<Node<CsmNodeProps>[]> => {
-        const graph = {
-            id: 'root',
-            layoutOptions,
-            children: nodes.map((n) => {
-                const targetHandles = isState(n.data) ? State.TARGET_HANDLES : StateMachine.TARGET_HANDLES;
-                const targetPorts = targetHandles.map((t) => ({
-                    id: t.id,
-                    properties: {
-                        side: getTargetSide(t),
-                    },
-                }));
-
-                const sourceHandles = isState(n.data) ? State.SOURCE_HANDLES : StateMachine.SOURCE_HANDLES;
-                const sourcePorts = sourceHandles.map((s) => ({
-                    id: s.id,
-                    properties: {
-                        side: getSourceSide(s),
-                    },
-                }));
-
-                return {
-                    id: n.id,
-                    width: n.width ?? 150,
-                    height: n.height ?? 50,
-                    properties: {
-                        'org.eclipse.elk.portConstraints': 'FIXED_ORDER',
-                    },
-                    ports: [{ id: n.id }, ...targetPorts, ...sourcePorts],
-                };
-            }),
-            edges: edges.map((e) => ({
-                id: e.id,
-                sources: [e.sourceHandle || e.source],
-                targets: [e.targetHandle || e.target],
-            })),
-        };
-
-        // Await the ELK layout result
-        const layoutedGraph = await elk.layout(graph);
-
-        // Map the result to return updated nodes with positions
-        const layoutedNodes = nodes.map((node) => {
-            const layoutedNode = layoutedGraph.children?.find((lgNode: ElkNode) => lgNode.id === node.id);
-            return {
-                ...node,
-                position: {
-                    x: layoutedNode?.x ?? 0,
-                    y: layoutedNode?.y ?? 0,
-                },
-            };
-        });
-
-        return layoutedNodes;
-    };
+    // Utility functions to generate unique IDs for nodes and edges
+    let nodeId = 0;
+    let edgeId = 0;
+    const getNewNodeId = () => `node_${nodeId++}`;
+    const getNewEdgeId = () => `edge_${edgeId++}`;
 
     // Function to handle file input button click
     const handleButtonClick = () => {
@@ -124,17 +50,8 @@ export default function Import() {
         }
     };
 
-    // Function to reset services in the context
-    const resetServices = () => {
-        contextService.resetService();
-        eventService.resetService();
-        stateOrStateMachineService.resetService();
-        actionService.resetService();
-        guardService.resetService();
-    };
-
     // Function to generate nodes recursively
-    const generateNodes = (statemachines: StateMachine[], parentId: string | NO_PARENT): Node<CsmNodeProps>[] => {
+    const generateNodes = (statemachines: StateMachine[], parentId?: string): Node<CsmNodeProps>[] => {
         let nodes: Node<CsmNodeProps>[] = [];
         statemachines.forEach((machine) => {
             nodes.push(statemachineToNode(machine, parentId));
@@ -149,28 +66,17 @@ export default function Import() {
     };
 
     // Convert statemachine to node
-    const statemachineToNode = (statemachine: StateMachine, parentId: string | NO_PARENT): Node<CsmNodeProps> => {
+    const statemachineToNode = (statemachine: StateMachine, parentId?: string): Node<CsmNodeProps> => {
         const id = getNewNodeId();
         statemachine.nodeId = id;
-        if (parentId === NO_PARENT) {
-            return {
-                position: { x: 0, y: 0 },
-                data: { stateMachine: statemachine },
-                id: id,
-                type: "state-machine-node",
-                expandParent: true
-            };
-        } else {
-            return {
-                position: { x: 0, y: 0 },
-                data: { stateMachine: statemachine },
-                extent: "parent",
-                id: id,
-                parentId: parentId,
-                type: "state-machine-node",
-                expandParent: true
-            };
-        }
+        return {
+            position: { x: 0, y: 0 },
+            data: { stateMachine: statemachine },
+            id: id,
+            type: "state-machine-node",
+            expandParent: true,
+            ...(parentId ? { parentId, extent: 'parent' } : {}),
+        };
     };
 
     // Convert state to node
@@ -180,28 +86,198 @@ export default function Import() {
         return {
             position: { x: 0, y: 0 },
             data: { state: state },
-            extent: "parent",
             id: id,
-            parentId: parentId,
             type: "state-node",
-            expandParent: true
+            expandParent: true,
+            parentId: parentId,
+            extent: 'parent',
         };
     };
 
-    // Load the Collaborative State Machine description and generate nodes
+    // Function to convert transitions to edges
+    const transitionToEdge = (sourceState: StateOrStateMachine, transition: Transition, nodes: Node<CsmNodeProps>[]) => {
+        const target = nodes.find((n) => {
+            if (isState(n.data)) {
+                return n.data.state.name === transition.getTarget();
+            }
+            return false;
+        });
+
+        if (!target) {
+            return;
+        }
+
+        const edgeId = getNewEdgeId();
+
+        const edge: Edge<CsmEdgeProps> = {
+            id: edgeId,
+            source: sourceState.nodeId,
+            target: target.id,
+            // Optionally specify sourceHandle and targetHandle here if known
+            // sourceHandle: 'r-s',
+            // targetHandle: 'l-t',
+            type: 'csm-edge',
+            data: { transition: transition },
+            zIndex: 1,
+            markerEnd: { type: MarkerType.ArrowClosed }
+        };
+
+        return edge;
+    };
+
+    // Function to load the CSM and generate nodes and edges
     const loadCSM = async (description: CollaborativeStateMachineDescription) => {
         const topLevelStatemachines = fromCollaborativeStatemachineDescription(description);
-        resetServices();
-        const nodes = generateNodes(topLevelStatemachines, NO_PARENT);
+
+        // Generate nodes and edges
+        const nodes = generateNodes(topLevelStatemachines);
+        let edges: Edge<CsmEdgeProps>[] = [];
+
+        nodes.forEach(node => {
+            if (isState(node.data)) {
+                const sourceState = node.data.state;
+                sourceState.on.forEach((transition) => {
+                    const edge = transitionToEdge(sourceState, transition, nodes);
+                    if (edge) {
+                        edges.push(edge);
+                    }
+                });
+            }
+        });
 
         try {
-            // Await the layouted nodes
-            const layoutedNodes = await getLayoutedNodes(nodes, []);
-            setNodes(layoutedNodes);
+            // Set nodes and edges
+            setNodes(nodes);
+            setEdges(edges);
+
+            // Perform layout
+            getLayoutedElements(nodes, edges);
         } catch (error) {
             console.error("Error in laying out nodes:", error);
         }
     };
+
+    // Function to perform layout using ELK
+    const getLayoutedElements = useCallback((nodes: Node<CsmNodeProps>[], edges: Edge<CsmEdgeProps>[]) => {
+        const nodeMap = new Map<string, Node<CsmNodeProps>>();
+        nodes.forEach((node) => nodeMap.set(node.id, node));
+
+        // Organize nodes by their parentId
+        const rootNodes: Node<CsmNodeProps>[] = [];
+        const nodeChildrenMap = new Map<string, Node<CsmNodeProps>[]>();
+
+        nodes.forEach((node) => {
+            const parentId = node.parentId;
+            if (parentId) {
+                if (!nodeChildrenMap.has(parentId)) {
+                    nodeChildrenMap.set(parentId, []);
+                }
+                nodeChildrenMap.get(parentId)!.push(node);
+            } else {
+                rootNodes.push(node);
+            }
+        });
+
+        // Recursive function to build ELK nodes with hierarchy
+        const buildELKNode = (node: Node<CsmNodeProps>): any => {
+            const elkNode: any = {
+                id: node.id,
+                width: node.width ?? 150,
+                height: node.height ?? 50,
+                // If node has children, set layout options for it
+                ...(nodeChildrenMap.has(node.id) ? {
+                    layoutOptions: {
+                        ...defaultOptions, // Include all default options
+                    },
+                    children: nodeChildrenMap.get(node.id)!.map(buildELKNode),
+                } : {}),
+            };
+            return elkNode;
+        };
+
+        const elkNodes = rootNodes.map(buildELKNode);
+
+        // Build ELK edges
+        const elkEdges = edges.map((edge) => ({
+            id: edge.id,
+            sources: [edge.source],
+            targets: [edge.target],
+        }));
+
+        const graph = {
+            id: 'root',
+            layoutOptions: defaultOptions,
+            children: elkNodes,
+            edges: elkEdges,
+        };
+
+        elk.layout(graph).then((layoutedGraph) => {
+            // Function to update node positions recursively
+            const updateNodePositions = (elkNode: any, parentX = 0, parentY = 0) => {
+                const node = nodeMap.get(elkNode.id);
+
+                if (node) {
+                    node.position = {
+                        x: (elkNode.x ?? 0) + parentX,
+                        y: (elkNode.y ?? 0) + parentY,
+                    };
+                }
+                if (elkNode.children) {
+                    elkNode.children.forEach((childElkNode: any) => {
+                        updateNodePositions(childElkNode, node?.position.x || 0, node?.position.y || 0);
+                    });
+                }
+            };
+
+            layoutedGraph.children?.forEach((elkNode: any) => {
+                updateNodePositions(elkNode);
+            });
+
+            const layoutedNodes = Array.from(nodeMap.values());
+
+            setNodes(layoutedNodes);
+
+            // Adjust edges to specify handles based on node positions
+            const layoutedEdges = edges.map((edge) => {
+                const sourceNode = nodeMap.get(edge.source);
+                const targetNode = nodeMap.get(edge.target);
+
+                if (sourceNode && targetNode) {
+                    const sourcePosition = sourceNode.position;
+                    const targetPosition = targetNode.position;
+
+                    // Determine handle IDs based on relative positions
+                    let sourceHandleId = 'r-s';
+                    let targetHandleId = 'l-t';
+
+                    if (targetPosition.x < sourcePosition.x) {
+                        // Target is to the left of source
+                        sourceHandleId = 'l-s';
+                        targetHandleId = 'r-t';
+                    } else if (targetPosition.y < sourcePosition.y) {
+                        // Target is above source
+                        sourceHandleId = 't-s';
+                        targetHandleId = 'b-t';
+                    } else if (targetPosition.y > sourcePosition.y) {
+                        // Target is below source
+                        sourceHandleId = 'b-s';
+                        targetHandleId = 't-t';
+                    }
+
+                    return {
+                        ...edge,
+                        sourceHandle: sourceHandleId,
+                        targetHandle: targetHandleId,
+                    };
+                }
+
+                return edge;
+            });
+
+            setEdges(layoutedEdges);
+
+        });
+    }, [setNodes, setEdges]);
 
     // Function to handle file selection and load the CSM
     const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
