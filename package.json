@@ -21,6 +21,7 @@
     "bootstrap": "^5.3.3",
     "bootstrap-icons": "^1.11.3",
     "cors": "^2.8.5",
+    "elkjs": "^0.9.3",
     "express": "^4.21.0",
     "jest-environment-jsdom": "^29.7.0",
     "lodash": "^4.17.21",

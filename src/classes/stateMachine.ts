@@ -10,7 +10,10 @@ import {NO_PARENT} from "../services/stateOrStateMachineService.tsx";
 
 
 
+
 export default class StateMachine implements StateOrStateMachine {
+    static SOURCE_HANDLES: [] = []
+    static TARGET_HANDLES: [] = []
 
     private _nodeId: string | NO_PARENT
     private _name: string

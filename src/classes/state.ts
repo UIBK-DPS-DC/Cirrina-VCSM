@@ -13,6 +13,10 @@ import {NO_PARENT} from "../services/stateOrStateMachineService.tsx";
 
 export default class State implements StateOrStateMachine {
 
+    static TARGET_HANDLES: [{ id: "t-t"; }, { id: "r-t"; }, {id: "l-t"; }, {id: "b-t"; }] = [{id: "t-t"}, {id: "r-t"}, {id: "l-t"}, {id: "b-t"}]
+    static SOURCE_HANDLES: [{ id: "t-s"; }, { id: "r-s"; }, { id: "l-s"; }, { id: "b-s"; }] =  [{id: "t-s"}, {id: "r-s"}, {id: "l-s"}, {id: "b-s"}]
+
+
     private _nodeId: string | NO_PARENT
     private _name: string
     private _initial = false;
