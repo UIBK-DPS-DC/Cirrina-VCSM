@@ -2,7 +2,7 @@ import {Button} from "react-bootstrap";
 import React, {useContext, useRef} from "react";
 import {CollaborativeStateMachineDescription} from "../pkl/bindings/collaborative_state_machine_description.pkl.ts";
 import {fromCollaborativeStatemachineDescription, ReactFlowContext} from "../utils.tsx";
-import {CsmNodeProps, ReactFlowContextProps} from "../types.ts";
+import {CsmNodeProps, isStateMachine, ReactFlowContextProps} from "../types.ts";
 import State from "../classes/state.ts";
 import {Node} from "@xyflow/react";
 import StateMachine from "../classes/stateMachine.ts";
@@ -17,7 +17,12 @@ const getNewEdgeId = () => `edge_${edgeId++}`;
 export default function Import() {
     const inputFile = useRef<HTMLInputElement | null>(null);
     const context = useContext(ReactFlowContext) as ReactFlowContextProps;
-    const {contextService,, eventService, stateOrStateMachineService, actionService ,guardService} = context
+    const {contextService,
+        eventService,
+        stateOrStateMachineService,
+        actionService ,
+        guardService,
+        nodes, setNodes} = context
 
     // Function to handle the button click and trigger the file input click
     const handleButtonClick = () => {
@@ -60,7 +65,7 @@ export default function Import() {
         if(parentId === NO_PARENT){
             return {
                 position: {x: 0, y: 0},
-                data: statemachine, id: id, type: "state-machine-node"
+                data: {stateMachine: statemachine}, id: id, type: "state-machine-node"
 
             }
         }
@@ -68,7 +73,7 @@ export default function Import() {
         else {
             return {
                 position: {x: 0, y: 0},
-                data: statemachine, extent: "parent", id: id, parentId: parentId, type: "state-machine-node"
+                data: {stateMachine: statemachine}, extent: "parent", id: id, parentId: parentId, type: "state-machine-node"
 
             }
         }
@@ -79,7 +84,7 @@ export default function Import() {
         state.nodeId = id
         return {
             position: {x: 0, y: 0},
-            data: state, extent: "parent", id: id, parentId: parentId, type: "state-node"
+            data: {state: state}, extent: "parent", id: id, parentId: parentId, type: "state-node"
 
         }
     }
@@ -92,10 +97,16 @@ export default function Import() {
         // Get all state and statemachines
 
 
-
-
-
         resetServices()
+        const nodes = generateNodes(topLevelStatemachines, NO_PARENT)
+
+        nodes.forEach((n) => {
+            if(isStateMachine(n.data)){
+                console.log(n.data.stateMachine.name)
+            }
+        })
+        setNodes(nodes)
+
 
 
     }
