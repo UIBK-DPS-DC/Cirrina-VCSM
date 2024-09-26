@@ -24,6 +24,7 @@ export default class TransitionService {
         const sourceName = connection.source
         const targetName = connection.target
 
+
         const sourceState = this._stateOrStatemachineService.getLinkedStateOrStatemachine(sourceName)
         const targetState = this._stateOrStatemachineService.getLinkedStateOrStatemachine(targetName)
 

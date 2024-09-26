@@ -252,6 +252,18 @@ export default function Import() {
         });
     };
 
+    const adjustInternalTransitionHandles = (edges: Edge<CsmEdgeProps>[]) => {
+        edges.forEach((e) => {
+            if(e.source === e.target){
+                e.sourceHandle = "s"
+                e.targetHandle = "t"
+            }
+        })
+
+    }
+
+
+
     // Function to generate nodes recursively
     const generateNodes = (
         statemachines: StateMachine[],
@@ -390,10 +402,17 @@ export default function Import() {
             setupEventService(eventService, nodes);
             setupGuardService(guardService, edges);
 
+
+
+
             // Perform layout
             getLayoutedElements(nodes, edges);
 
+
+
             stateOrStateMachineService.showStatemachineStateNames();
+
+
         } catch (error) {
             console.error("Error in laying out nodes:", error);
         }
@@ -528,7 +547,7 @@ export default function Import() {
 
                     return edge;
                 });
-
+                adjustInternalTransitionHandles(layoutedEdges)
                 setEdges(layoutedEdges);
             });
         },
