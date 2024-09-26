@@ -1,7 +1,7 @@
-import { Handle, NodeProps, Position } from "@xyflow/react";
-import { ReactFlowContextProps, type StateNode } from "../../../types.ts";
-import { useContext, useEffect, useMemo } from "react";
-import { ReactFlowContext } from "../../../utils.tsx";
+import {Handle, NodeProps, Position} from "@xyflow/react";
+import {ReactFlowContextProps, type StateNode} from "../../../types.ts";
+import {useContext, useEffect, useMemo} from "react";
+import {ReactFlowContext} from "../../../utils.tsx";
 import "../../../StateNode.css";
 
 export function StateNode({ data }: NodeProps<StateNode>) {
@@ -25,12 +25,18 @@ export function StateNode({ data }: NodeProps<StateNode>) {
     }, [data.state.initial, data.state.terminal, selectedNode]);
 
     return (
-        <div className={`react-flow__node-default ${border}`}>
-            <Handle type={"target"} position={Position.Top} id={"a"} />
+        <div className={`react-flow__node-default  ${border}`}>
+            <Handle className={"source-handle source-handle-top"}  type={"source"} position={Position.Top} id={"t-s"} isConnectableStart={true}/>
+            <Handle className={"target-handle target-handle-top"} type={"target"} position={Position.Top} id={"t-t"} isConnectableStart={false}/>
+
+            <Handle className={"source-handle source-handle-left"} type={"source"} position={Position.Left} id={"l-s"}/>
+            <Handle className={"target-handle target-handle-left"} type={"target"} position={Position.Left} id={"l-t"} isConnectableStart={false}/>
+
             <Handle
                 type={"source"}
                 position={Position.Top}
                 id={"s"}
+                isConnectable={false}
                 style={{ visibility: "hidden", left: "30%" }}
             />
             {data.state.name && <div>{data.state.name}</div>}
@@ -38,9 +44,15 @@ export function StateNode({ data }: NodeProps<StateNode>) {
                 type={"target"}
                 position={Position.Left}
                 id={"t"}
+                isConnectable={false}
                 style={{ visibility: "hidden", top: "50%" }}
             />
-            <Handle type={"source"} position={Position.Bottom} id={"b"} />
+
+            <Handle className={"source-handle source-handle-right"} type={"source"} position={Position.Right} id={"r-s"}/>
+            <Handle className={"target-handle target-handle-right"} type={"target"} position={Position.Right} id={"r-t"} isConnectableStart={false}/>
+
+            <Handle className={"source-handle source-handle-bottom"} type={"source"} position={Position.Bottom} id={"b-s"}/>
+            <Handle className={"target-handle target-handle-bottom"} type={"target"} position={Position.Bottom} id={"b-t"} isConnectableStart={false}/>
         </div>
     );
 }

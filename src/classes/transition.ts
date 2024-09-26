@@ -6,9 +6,11 @@ import {
 } from "../pkl/bindings/collaborative_state_machine_description.pkl.ts";
 
 export default class Transition {
+
     private static _TRANSITION_ID_COUNT = 0;
 
     private readonly ID: number
+    private _edgeId: string
     private source : string
     private target : string
     private _guards : Guard[]
@@ -26,8 +28,15 @@ export default class Transition {
         this._event = ""
         this._isStatemachineEdge = isStatemachineEdge
         this.ID = this.getNewId()
+        this._edgeId = ""
     }
 
+    get edgeId(): string {
+        return this._edgeId;
+    }
+    set edgeId(value: string) {
+        this._edgeId = value;
+    }
 
     public setSource(sourceState: string): void{
         this.source = sourceState

@@ -1,6 +1,6 @@
 .state-node {
-    width: 150px; /* Set the width of the node */
-    height: 100px; /* Set the height of the node */
+    width: 250px; /* Set the width of the node */
+    height: 150px; /* Set the height of the node */
     background-color: #f0f0f0; /* Set the background color */
     border: 2px solid #ccc; /* Set the border */
     border-radius: 8px; /* Add rounded corners */
@@ -75,3 +75,44 @@
             0 0 20px #ff073a,
             0 0 25px #ff073a;
 }
+
+.target-handle{
+    background: #fd7e14
+}
+
+.target-handle-top {
+    left: 30%
+}
+
+.target-handle-bottom {
+    left: 70%
+}
+
+.target-handle-left {
+    top: 90%
+}
+
+.target-handle-right {
+    top: 10%
+}
+
+.source-handle {
+    background: #007bff;
+}
+
+.source-handle-top {
+    left: 70%
+}
+
+.source-handle-bottom {
+    left: 30%
+}
+
+.source-handle-left {
+    top: 10%
+}
+
+.source-handle-right {
+    top: 90%
+}
+

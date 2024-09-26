@@ -70,6 +70,13 @@ export enum MemoryUnit {
     "GIGABYTES" = "GB"
  }
 
+ export enum PortSide {
+     NORTH = "NORTH",
+     EAST = "EAST",
+     SOUTH = "SOUTH",
+     WEST = "WEST"
+ }
+
 
 
 

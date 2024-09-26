@@ -253,5 +253,14 @@ export default class ActionService {
         return res;
     }
 
+    public resetService():void {
+        this.nameToActionMap = new Map();
+        this.typeToActionsMap = new Map();
+
+        Object.values(ActionType).forEach(type => {
+            this.typeToActionsMap.set(type as ActionType, []); // Initialize each ActionType with an empty array.
+        });
+    }
+
 
 }
