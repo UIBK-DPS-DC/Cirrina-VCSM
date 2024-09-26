@@ -108,6 +108,7 @@ export default function Import() {
         contextService,
         guardService,
         eventService,
+        setHideFlowEdges
     } = context;
 
     // Function to handle file input button click
@@ -419,6 +420,7 @@ export default function Import() {
 
 
             stateOrStateMachineService.showStatemachineStateNames();
+            setHideFlowEdges(true)
 
 
         } catch (error) {
@@ -594,6 +596,7 @@ export default function Import() {
                     console.error("Error saving file:", error);
                 });
         }
+
     };
 
     return (

@@ -49,6 +49,7 @@ export default function App() {
         event.stopPropagation()
 
         setHideFlowEdges(!hideFlowEdges)
+        setRecalculateTransitions(!recalculateTransitions)
     },[hideFlowEdges, setHideFlowEdges])
 
 
@@ -81,7 +82,8 @@ export default function App() {
         setRecalculateTransitions,
         hideFlowEdges,
         initialOrTerminalChange,
-        setInitialOrTerminalChange
+        setInitialOrTerminalChange,
+        setHideFlowEdges
     };
 
 
