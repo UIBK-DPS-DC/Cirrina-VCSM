@@ -383,6 +383,14 @@ export default function Import() {
                         edges.push(edge);
                     }
                 });
+
+                sourceState.always.forEach((transition) => {
+                    const edge = transitionToEdge(sourceState, transition, nodes);
+                    if (edge) {
+                        edges.push(edge);
+                    }
+                });
+
             }
         });
 
