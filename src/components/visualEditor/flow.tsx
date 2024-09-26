@@ -40,8 +40,11 @@ const NODE_HISTORY_LENGTH = 10;
 
 let nodeId = 0;
 let edgeId = 0;
-const getNewNodeId = () => `node_${nodeId++}`;
-const getNewEdgeId = () => `edge_${edgeId++}`;
+let guardId = 0
+
+export const getNewNodeId = () => `node_${nodeId++}`;
+export const getNewEdgeId = () => `edge_${edgeId++}`;
+export const getNewGuardId = () => `guard_${guardId++}`
 
 const defaultNodeBorder = '1px solid black';
 

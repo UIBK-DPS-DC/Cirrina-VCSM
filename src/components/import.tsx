@@ -1,16 +1,30 @@
 // Ensure all required imports are correct and in place
-import { Button } from "react-bootstrap";
-import React, { useRef, useCallback, useContext } from "react";
-import { CollaborativeStateMachineDescription } from "../pkl/bindings/collaborative_state_machine_description.pkl.ts";
-import { fromCollaborativeStatemachineDescription, ReactFlowContext } from "../utils.tsx";
-import { CsmEdgeProps, CsmNodeProps, isState, ReactFlowContextProps } from "../types.ts";
+import {Button} from "react-bootstrap";
+import React, {useCallback, useContext, useRef} from "react";
+import {CollaborativeStateMachineDescription} from "../pkl/bindings/collaborative_state_machine_description.pkl.ts";
+import {colorMap, fromCollaborativeStatemachineDescription, ReactFlowContext} from "../utils.tsx";
+import {
+    CreateActionProps,
+    CsmEdgeProps,
+    CsmNodeProps,
+    isState,
+    isStateMachine, RaiseEventActionProps,
+    ReactFlowContextProps, TimeoutActionProps
+} from "../types.ts";
 import State from "../classes/state.ts";
-import { Edge, MarkerType } from "@xyflow/react";
+import {Edge, MarkerType, Node} from "@xyflow/react";
 import StateMachine from "../classes/stateMachine.ts";
 import ELK from 'elkjs/lib/elk.bundled.js';
 import Transition from "../classes/transition.ts";
 import StateOrStateMachine from "../classes/stateOrStateMachine.ts";
-import {Node} from "@xyflow/react";
+import StateOrStateMachineService, {NO_PARENT} from "../services/stateOrStateMachineService.tsx";
+import ActionService from "../services/actionService.tsx";
+import Action from "../classes/action.tsx";
+import ContextVariableService from "../services/contextVariableService.tsx";
+import {ActionType} from "../enums.ts";
+import EventService from "../services/eventService.tsx";
+import GuardService from "../services/guardService.tsx";
+import {getNewEdgeId, getNewGuardId, getNewNodeId} from "./visualEditor/flow.tsx";
 // Define the layout options for ELK
 const defaultOptions = {
     'elk.algorithm': 'layered',
@@ -35,13 +49,14 @@ export default function Import() {
 
     // Use React Flow context to get setNodes and setEdges
     const context = useContext(ReactFlowContext) as ReactFlowContextProps;
-    const { setNodes, setEdges } = context;
+    const { setNodes,
+        setEdges,
+        actionService,stateOrStateMachineService,
+        contextService,
+        guardService,
+        eventService } = context;
 
-    // Utility functions to generate unique IDs for nodes and edges
-    let nodeId = 0;
-    let edgeId = 0;
-    const getNewNodeId = () => `node_${nodeId++}`;
-    const getNewEdgeId = () => `edge_${edgeId++}`;
+
 
     // Function to handle file input button click
     const handleButtonClick = () => {
@@ -49,6 +64,134 @@ export default function Import() {
             inputFile.current.click();
         }
     };
+
+    const resetReactFlow = () => {
+        setNodes([])
+        setEdges([])
+    }
+    const resetServices = () => {
+        actionService.resetService()
+        stateOrStateMachineService.resetService()
+        contextService.resetService()
+        guardService.resetService()
+        eventService.resetService()
+    }
+
+    const setupStateOrStatemachineService = (service: StateOrStateMachineService, nodes: Node<CsmNodeProps>[]) => {
+
+        nodes.forEach(node => {
+            const parentId = node.parentId || NO_PARENT
+
+            if(isState(node.data)){
+                const state = node.data.state
+                service.registerName(state.name)
+                service.linkStateNameToStatemachine(state.name, parentId, true)
+
+            }
+            if(isStateMachine(node.data)){
+                const statemachine = node.data.stateMachine
+                service.registerName(statemachine.name)
+                service.linkStateNameToStatemachine(statemachine.name, parentId, true)
+            }
+
+            //Node id to state/statemachine map
+            service.linkNode(node.id, node.data)
+
+
+        })
+    }
+
+
+    const setupActionService = (service: ActionService, nodes: Node<CsmNodeProps>[], edges: Edge<CsmEdgeProps>[]) => {
+        // Collect all actions
+        let actions: Action[] = []
+        nodes.forEach((n) => {
+            if(isState(n.data)){
+                actions = actions.concat(n.data.state.getAllActions())
+            }
+        })
+
+        edges.forEach(e => {
+            actions = actions.concat(e.data?.transition.getActions() || [])
+        })
+
+        actions.forEach((a) => {
+            service.registerAction(a)
+        })
+
+    }
+
+    const setupContextVariableService = (service: ContextVariableService, nodes: Node<CsmNodeProps>[]) => {
+        // Create actions filter
+        // Name to context
+        nodes.forEach(node => {
+            if(isState(node.data)){
+                const state = node.data.state
+                const stateContext = state.getAllContextVariables()
+                const stateCreateActions = state.getAllActions().filter((a) => a.type === ActionType.CREATE)
+
+                stateContext.forEach((c) => {
+                    service.registerContext(c)
+                    service.linkContextToState(c, state)
+                })
+
+                stateCreateActions.forEach((a) => {
+                    const createActionsProps = a.properties as CreateActionProps
+                    service.setContextCreatedBy(createActionsProps.variable, state)
+                })
+
+            }
+            if(isStateMachine(node.data)){
+                const statemachineContext = node.data.stateMachine.getAllContextVariables()
+                statemachineContext.forEach((c) => {
+                    service.registerContext(c)
+                })
+            }
+        })
+    }
+
+    const setupEventService = (service: EventService, nodes: Node<CsmNodeProps>[]) => {
+        // Get raise event actions
+        // Get timeout actions that are raise event actions
+
+        let raiseActions: Action[] = []
+
+        nodes.forEach(node => {
+            if(isState(node.data)){
+                raiseActions = raiseActions.concat(node.data.state.getAllActions().filter((a) => a.type === ActionType.RAISE_EVENT))
+
+                const timeOutActions = node.data.state.getAllActions().filter((a) => a.type == ActionType.TIMEOUT)
+                timeOutActions.forEach((a) => {
+                    const timeoutProps = a.properties as TimeoutActionProps
+                    if(timeoutProps.action.type === ActionType.RAISE_EVENT){
+                        raiseActions.push(timeoutProps.action)
+                    }
+                })
+
+            }
+        })
+
+        raiseActions.forEach((a) => {
+            const raiseEventProps = a.properties as RaiseEventActionProps
+            service.registerEvent(raiseEventProps.event)
+        })
+
+    }
+
+    const setupGuardService = (service: GuardService, edges: Edge<CsmEdgeProps>[]) => {
+        edges.forEach((e) => {
+            if(e.data){
+                e.data.transition.getGuards().forEach((g) => {
+                    g.name = getNewGuardId()
+                    service.registerGuard(g)
+                })
+            }
+        })
+    }
+
+
+
+
 
     // Function to generate nodes recursively
     const generateNodes = (statemachines: StateMachine[], parentId?: string): Node<CsmNodeProps>[] => {
@@ -71,10 +214,21 @@ export default function Import() {
         statemachine.nodeId = id;
         return {
             position: { x: 0, y: 0 },
-            data: { stateMachine: statemachine },
+            data: { stateMachine: statemachine, prevSize: { height: 150, width: undefined }, visibleResize: true, draggable: true },
             id: id,
             type: "state-machine-node",
             expandParent: true,
+            style: {
+                background: 'transparent',
+                fontSize: 12,
+                border: '1px solid black',
+                padding: 5,
+                borderRadius: 15,
+                height: 150,
+                backgroundColor: colorMap(0)
+            },
+            dragHandle: '.custom-drag-handle',
+
             ...(parentId ? { parentId, extent: 'parent' } : {}),
         };
     };
@@ -146,12 +300,25 @@ export default function Import() {
         });
 
         try {
+            // Reset services
+            resetReactFlow()
+            resetServices()
+
             // Set nodes and edges
             setNodes(nodes);
             setEdges(edges);
 
+            // Set up services.
+            setupStateOrStatemachineService(stateOrStateMachineService, nodes)
+            setupContextVariableService(contextService,nodes)
+            setupActionService(actionService,nodes,edges)
+            setupEventService(eventService,nodes)
+            setupGuardService(guardService,edges)
+
             // Perform layout
             getLayoutedElements(nodes, edges);
+
+            stateOrStateMachineService.showStatemachineStateNames()
         } catch (error) {
             console.error("Error in laying out nodes:", error);
         }
@@ -206,7 +373,7 @@ export default function Import() {
 
         const graph = {
             id: 'root',
-            layoutOptions: defaultOptions,
+            layoutOptions: {...defaultOptions},
             children: elkNodes,
             edges: elkEdges,
         };
@@ -278,6 +445,8 @@ export default function Import() {
 
         });
     }, [setNodes, setEdges]);
+
+
 
     // Function to handle file selection and load the CSM
     const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {

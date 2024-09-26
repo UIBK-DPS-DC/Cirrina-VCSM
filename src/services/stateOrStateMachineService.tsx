@@ -509,6 +509,10 @@ export default class StateOrStateMachineService {
         }
     }
 
+    public showStatemachineStateNames() {
+        console.log(this.statemachineIDToStateNamesMap)
+    }
+
     public resetService():void {
         this.stateOrStatemachineNames = new Set();
         this.nodeIdToStateOrStatemachineMap = new Map();
