@@ -455,6 +455,9 @@ export default function Flow() {
 
             }
 
+            node.data.state.addOnTransition(newTransition)
+
+
             setEdges(eds => addEdge(newEdge, eds));
             return
 
