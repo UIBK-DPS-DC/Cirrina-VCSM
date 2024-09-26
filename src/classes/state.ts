@@ -10,7 +10,6 @@ import {RaiseEventActionProps} from "../types.ts";
 import {NO_PARENT} from "../services/stateOrStateMachineService.tsx";
 
 
-
 export default class State implements StateOrStateMachine {
 
     static TARGET_HANDLES: [{ id: "t-t"; }, { id: "r-t"; }, {id: "l-t"; }, {id: "b-t"; }] = [{id: "t-t"}, {id: "r-t"}, {id: "l-t"}, {id: "b-t"}]
@@ -297,6 +296,12 @@ export default class State implements StateOrStateMachine {
         newState.staticContext = description.staticContext.variables.map((v) => ContextVariable.fromDescription(v))
 
         return newState
+
+    }
+
+    public rearrangeTransitions() {
+        this._always = this._on.filter((t) => t.getEvent().trim() === "")
+        this._on = this._on.filter((t) => ! this._always.includes(t))
 
     }
 

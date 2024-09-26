@@ -1,5 +1,5 @@
 import {useCallback, useContext} from "react";
-import {isStateMachine, ReactFlowContextProps} from "../types.ts";
+import {isState, isStateMachine, ReactFlowContextProps} from "../types.ts";
 import {ReactFlowContext} from "../utils.tsx";
 import StateMachine from "../classes/stateMachine.ts";
 import {CollaborativeStateMachineDescription} from "../pkl/bindings/collaborative_state_machine_description.pkl.ts";
@@ -38,9 +38,18 @@ export default function Export () {
         })
     },[nodes])
 
+    const rearrangeTransitions = useCallback(() => {
+        nodes.forEach((node) => {
+            if(isState(node.data)){
+                node.data.state.rearrangeTransitions()
+            }
+        })
+    },[nodes])
+
 
     const onButtonClick = useCallback(() => {
         clearAllStatemachines()
+        rearrangeTransitions()
         addStatesToStatemachines();
         const topLevelSM = createTopLevelStatemachine();
         console.log(topLevelSM.toDescription())
