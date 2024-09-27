@@ -253,37 +253,46 @@ export default function TransitionInfoForm() {
                                 </Col>
                             </Form.Group>
 
-                            <Form.Group as={Row} className="mb-3">
-                                <Form.Label column sm={"2"}>
-                                    Add Guard:
-                                </Form.Label>
-                                <Col sm={10}>
-                                    <InputGroup>
-                                        <Form.Control type={"text"} value={guardInput} onChange={onGuardInputChange} isValid={guardInputIsValid} isInvalid={!guardInputIsValid && guardInput !== ""}/>
-                                        <Button disabled={!guardInputIsValid} onClick={onAddGuardClick}>
-                                            Add
-                                            <i className={"bi bi-plus-circle"}></i>
-                                        </Button>
-                                        <Form.Control.Feedback type={"invalid"}>
-                                            {invalidGuardInputText()}
-                                        </Form.Control.Feedback>
-                                    </InputGroup>
-                                </Col>
-                            </Form.Group>
+                            {selectedEdge.data.transition.isStatemachineEdge && (
+                                // TODO: EXTEND HERE
+                                <h2>Hi i am a statemachine edge</h2>
+                            )}
 
-                            <Form.Group as={Row} className={"mb-3"}>
-                                <Form.Label column sm={"2"}>
-                                    On:
-                                </Form.Label>
-                                {onEvent && (
-                                    <Col sm={5}>
-                                        <Form.Control type={"text"} value={onEvent.name} disabled={true}/>
-                                    </Col>
-                                )}
-                                <Col sm={onEvent ? 5 : 10}>
-                                    <SelectSingleEventModal event={onEvent} setEvent={setOnEvent}></SelectSingleEventModal>
-                                </Col>
-                            </Form.Group>
+                            {! selectedEdge.data.transition.isStatemachineEdge && (
+                                <Container>
+                                    <Form.Group as={Row} className="mb-3">
+                                        <Form.Label column sm={"2"}>
+                                            Add Guard:
+                                        </Form.Label>
+                                        <Col sm={10}>
+                                            <InputGroup>
+                                                <Form.Control type={"text"} value={guardInput} onChange={onGuardInputChange} isValid={guardInputIsValid} isInvalid={!guardInputIsValid && guardInput !== ""}/>
+                                                <Button disabled={!guardInputIsValid} onClick={onAddGuardClick}>
+                                                    Add
+                                                    <i className={"bi bi-plus-circle"}></i>
+                                                </Button>
+                                                <Form.Control.Feedback type={"invalid"}>
+                                                    {invalidGuardInputText()}
+                                                </Form.Control.Feedback>
+                                            </InputGroup>
+                                        </Col>
+                                    </Form.Group>
+
+                                    <Form.Group as={Row} className={"mb-3"}>
+                                        <Form.Label column sm={"2"}>
+                                            On:
+                                        </Form.Label>
+                                        {onEvent && (
+                                            <Col sm={5}>
+                                                <Form.Control type={"text"} value={onEvent.name} disabled={true}/>
+                                            </Col>
+                                        )}
+                                        <Col sm={onEvent ? 5 : 10}>
+                                            <SelectSingleEventModal event={onEvent} setEvent={setOnEvent}></SelectSingleEventModal>
+                                        </Col>
+                                    </Form.Group>
+                                </Container>
+                            )}
 
                         </Form>
                         {guards.length > 0 && (
@@ -292,36 +301,37 @@ export default function TransitionInfoForm() {
                             </Container>
                         )}
 
-                        <Container className={"mb-3"}>
-                            <Button onClick={handleShow}>
-                                Add Action
-                                <i className="bi bi-plus-circle"></i>
-                            </Button>
+                        {! selectedEdge.data.transition.isStatemachineEdge && (
+                            <Container className={"mb-3"}>
+                                <Button onClick={handleShow}>
+                                    Add Action
+                                    <i className="bi bi-plus-circle"></i>
+                                </Button>
 
-                            <Modal show={showActionModal} size={"lg"} onHide={handleClose}>
-                                <Modal.Header closeButton>
-                                    <Modal.Title>Add Action</Modal.Title>
-                                </Modal.Header>
+                                <Modal show={showActionModal} size={"lg"} onHide={handleClose}>
+                                    <Modal.Header closeButton>
+                                        <Modal.Title>Add Action</Modal.Title>
+                                    </Modal.Header>
 
-                                <ModalBody>
-                                    <Row className={"mb-3"}>
-                                        <Form.Label column sm={"4"}>Action type:</Form.Label>
-                                        <Col sm={8}>
-                                            <Form.Select value={selectedActionType} onChange={onSelectedActionTypeChange}>
-                                                {renderEnumAsOptions(ActionType)}
-                                            </Form.Select>
-                                        </Col>
-                                    </Row>
-                                    {renderActionForm()}
-                                </ModalBody>
+                                    <ModalBody>
+                                        <Row className={"mb-3"}>
+                                            <Form.Label column sm={"4"}>Action type:</Form.Label>
+                                            <Col sm={8}>
+                                                <Form.Select value={selectedActionType} onChange={onSelectedActionTypeChange}>
+                                                    {renderEnumAsOptions(ActionType)}
+                                                </Form.Select>
+                                            </Col>
+                                        </Row>
+                                        {renderActionForm()}
+                                    </ModalBody>
 
-                                <Modal.Footer>
-                                    <Button variant="secondary" onClick={handleClose}>Close</Button>
-                                </Modal.Footer>
+                                    <Modal.Footer>
+                                        <Button variant="secondary" onClick={handleClose}>Close</Button>
+                                    </Modal.Footer>
 
-                            </Modal>
-                        </Container>
-
+                                </Modal>
+                            </Container>
+                        )}
                         {actions.length > 0 && (
                             <Accordion>
                                 <Accordion.Item eventKey={"0"}>

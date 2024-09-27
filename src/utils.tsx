@@ -7,6 +7,8 @@ import ContextVariable from "./classes/contextVariable.tsx";
 import StateOrStateMachineService from "./services/stateOrStateMachineService.tsx";
 import {CollaborativeStateMachineDescription} from "./pkl/bindings/collaborative_state_machine_description.pkl.ts";
 import StateMachine from "./classes/stateMachine.ts";
+import State from "./classes/state.ts";
+import Event from "./classes/event.ts";
 
 
 const DEBUG = false
@@ -202,6 +204,31 @@ export const getAllStatemachineDescendants = (root: Node<CsmNodeProps>,
 
     return statemachineNodes;
 };
+
+
+export const getRaisedEventsToStateMap = (nodes: Node<CsmNodeProps>[]) => {
+    const stateToRaisedEventsMap: Map<State,Event[]> = new Map();
+    nodes.forEach((node: Node<CsmNodeProps>) => {
+        if(isState(node.data)){
+            stateToRaisedEventsMap.set(node.data.state, node.data.state.getAllRaisedEvents())
+        }
+    })
+    return stateToRaisedEventsMap
+}
+
+export const getConsumedEventsToStateMap = (nodes: Node<CsmNodeProps>[]) => {
+    const stateToConsumedEventsMap: Map<State,string[]> = new Map();
+    nodes.forEach((node: Node<CsmNodeProps>) => {
+        if(isState(node.data)){
+            stateToConsumedEventsMap.set(node.data.state, node.data.state.getAllConsumedEvents())
+        }
+    })
+
+    return stateToConsumedEventsMap
+
+}
+
+
 
 
 
