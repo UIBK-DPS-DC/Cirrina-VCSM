@@ -166,6 +166,8 @@ export type ReactFlowContextProps = {
     initialOrTerminalChange: boolean
     setInitialOrTerminalChange: React.Dispatch<React.SetStateAction<boolean>>
     setHideFlowEdges: React.Dispatch<React.SetStateAction<boolean>>
+    showEdgeLabels: boolean
+    setShowEdgeLabels: React.Dispatch<React.SetStateAction<boolean>>
 }
 
 

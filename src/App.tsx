@@ -42,6 +42,9 @@ export default function App() {
     const [hideFlowEdges, setHideFlowEdges] = useState<boolean>(false)
     const [initialOrTerminalChange, setInitialOrTerminalChange] = useState<boolean>(false)
     const hideButtonText = () => hideFlowEdges ? "Show Statemachine Edges" : "Hide Statemachine Edges";
+    const [showEdgeLabels, setShowEdgeLabels] = useState<boolean>(true)
+
+
 
 
     const onHideButtonClick = useCallback((event: React.MouseEvent<HTMLButtonElement>) => {
@@ -83,7 +86,9 @@ export default function App() {
         hideFlowEdges,
         initialOrTerminalChange,
         setInitialOrTerminalChange,
-        setHideFlowEdges
+        setHideFlowEdges,
+        showEdgeLabels,
+        setShowEdgeLabels
     };
 
 

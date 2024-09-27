@@ -31,6 +31,7 @@ export default function CsmEdge({
     const context = useContext(ReactFlowContext) as ReactFlowContextProps;
     const {edges, setEdges,selectedEdge, hideFlowEdges} = context;
 
+    // Event [guards] / actions
     const generateInfoString = (transition: Transition | undefined) => {
         if(transition && transition.getEvent()){
             if(transition.getGuards().length >= 1) {
