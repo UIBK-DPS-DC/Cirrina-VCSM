@@ -242,7 +242,7 @@ export const generateRaisedToConsumedInfoStrings = (nodes: Node<CsmNodeProps>[])
 
                 if(consumedEvents){
                     consumedEvents.forEach((e) => {
-                        const infoString = `Event ${e} raised by state ${rk.name} is consumed by state ${ck.name}`
+                        const infoString = `Event ${e} raised by state ${rk.name} is consumed by a transition out of state ${ck.name}`
                         infoStrings.push(infoString)
                     })
                 }

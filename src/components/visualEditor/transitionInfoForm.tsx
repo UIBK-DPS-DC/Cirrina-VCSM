@@ -1,6 +1,6 @@
-import React, {useContext, useEffect, useRef, useState} from "react";
-import {ReactFlowContext, renderEnumAsOptions} from "../../utils.tsx";
-import {ReactFlowContextProps} from "../../types.ts";
+import React, {useCallback, useContext, useEffect, useRef, useState} from "react";
+import {generateRaisedToConsumedInfoStrings, ReactFlowContext, renderEnumAsOptions} from "../../utils.tsx";
+import {CsmNodeProps, isStateMachine, ReactFlowContextProps} from "../../types.ts";
 import Offcanvas from "react-bootstrap/Offcanvas";
 import {
     Accordion, AccordionHeader,
@@ -28,6 +28,7 @@ import TimeoutActionForm from "./ActionForms/timeoutActionForm.tsx";
 import TimeoutResetActionForm from "./ActionForms/timeoutResetActionForm.tsx";
 import MatchActionForm from "./ActionForms/matchActionForm.tsx";
 import Modal from "react-bootstrap/Modal";
+import {Node} from "@xyflow/react";
 
 
 let idCounter = 0
@@ -38,7 +39,7 @@ export default function TransitionInfoForm() {
     const {selectedEdge,
         showSidebar,
         setShowSidebar,
-        eventService, setRecalculateTransitions, recalculateTransitions} = context
+        eventService, setRecalculateTransitions, recalculateTransitions, nodes} = context
 
     const instanceId = useRef(++idCounter).current;
     let formCount = 0
@@ -111,6 +112,42 @@ export default function TransitionInfoForm() {
         setMatchAction([])
         handleClose()
     }
+
+    const getAllDescendants = (node: Node<CsmNodeProps>, nodes: Node<CsmNodeProps>[]) => {
+        const children = nodes.filter((n: Node<CsmNodeProps>) => n.parentId === node.id);
+
+        children.forEach((n: Node<CsmNodeProps>) => {
+            if (isStateMachine(n.data)) {
+                const descendants = getAllDescendants(n, nodes);
+                children.push(...descendants);
+            }
+        });
+
+        return children;
+    }
+
+    const generateInfoStrings = useCallback((nodes: Node<CsmNodeProps>[]) => {
+        if(!selectedEdge?.data){
+            return []
+        }
+        if(!selectedEdge.data.transition.isStatemachineEdge){
+            return []
+        }
+
+        const sourceNode = nodes.find((n) => n.id === selectedEdge.source)
+        const targetNode = nodes.find((n) => n.id === selectedEdge.target)
+
+        if(!sourceNode || !targetNode){
+            return []
+        }
+
+        const localNodes = getAllDescendants(sourceNode, nodes).concat(getAllDescendants(targetNode,nodes))
+
+        return generateRaisedToConsumedInfoStrings(localNodes)
+
+
+
+    },[recalculateTransitions, setRecalculateTransitions])
 
 
 
@@ -258,7 +295,13 @@ export default function TransitionInfoForm() {
 
                             {selectedEdge.data.transition.isStatemachineEdge && (
                                 // TODO: EXTEND HERE
-                                <h2>Hi i am a statemachine edge</h2>
+                                <Container>
+                                    {generateInfoStrings(nodes).map((s) => {
+                                        return (
+                                            <p>{s}</p>
+                                        )
+                                    })}
+                                </Container>
                             )}
 
                             {! selectedEdge.data.transition.isStatemachineEdge && (
