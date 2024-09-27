@@ -228,6 +228,32 @@ export const getConsumedEventsToStateMap = (nodes: Node<CsmNodeProps>[]) => {
 
 }
 
+export const generateRaisedToConsumedInfoStrings = (nodes: Node<CsmNodeProps>[]) => {
+    const infoStrings: string[] = []
+    const stateToRaisedEventsMap: Map<State,Event[]> = getRaisedEventsToStateMap(nodes)
+    const stateToConsumedEventsMap: Map<State,string[]> = getConsumedEventsToStateMap(nodes)
+
+    Array.from(stateToRaisedEventsMap.keys()).forEach((rk) => {
+        const raisedEvents = stateToRaisedEventsMap.get(rk)?.map((e) => e.name)
+
+        if(raisedEvents){
+            Array.from(stateToConsumedEventsMap.keys()).forEach((ck) => {
+                const consumedEvents = stateToConsumedEventsMap.get(ck)?.filter((e) => raisedEvents.includes(e))
+
+                if(consumedEvents){
+                    consumedEvents.forEach((e) => {
+                        const infoString = `Event ${e} raised by state ${rk.name} is consumed by state ${ck.name}`
+                        infoStrings.push(infoString)
+                    })
+                }
+            })
+        }
+    })
+
+    return infoStrings
+
+}
+
 
 
 
