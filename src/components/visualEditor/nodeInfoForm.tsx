@@ -152,109 +152,113 @@ export default function NodeInfoForm() {
                     <OffcanvasBody>
                         <RenameNodeComponent/>
                         <br/>
-                        <Container>
-                            <CreateContextFormModal variable={undefined} buttonName={undefined} onSubmit={undefined}></CreateContextFormModal>
-                        </Container>
+                        {isState(selectedNode.data) && (
+                            <Container>
+                                <Container>
+                                    <CreateContextFormModal variable={undefined} buttonName={undefined} onSubmit={undefined}></CreateContextFormModal>
+                                </Container>
 
-                        {/** Initial terminal checkboxes*/}
+                                {/** Initial terminal checkboxes*/}
 
-                        <Container className={"mb-3"}>
-                            <Form id={"checkboxes"}>
+                                <Container className={"mb-3"}>
+                                    <Form id={"checkboxes"}>
 
-                                <Form.Group className={"mb-3"}>
-                                        <Form.Check type={"checkbox"} label={"Initial"} checked={isInitial} onChange={handleInitialCheckboxChange}/>
-                                </Form.Group>
+                                        <Form.Group className={"mb-3"}>
+                                            <Form.Check type={"checkbox"} label={"Initial"} checked={isInitial} onChange={handleInitialCheckboxChange}/>
+                                        </Form.Group>
 
-                                <Form.Group>
-                                    <Form.Check type={"checkbox"} label={"Terminal"} checked={isTerminal} onChange={handleTerminalCheckboxChange}/>
-                                </Form.Group>
+                                        <Form.Group>
+                                            <Form.Check type={"checkbox"} label={"Terminal"} checked={isTerminal} onChange={handleTerminalCheckboxChange}/>
+                                        </Form.Group>
 
-                            </Form>
-                        </Container>
+                                    </Form>
+                                </Container>
 
-                        <br/>
-                        <div className="d-grid gap-2">
-                            <Button variant="primary" size="lg" onClick={onNewActionFormButtonClick}>
-                                New Action
-                            </Button>
-                        </div>
-                        {showNewActionForm && (
-                            <div className={"action-form-container"}>
-                                <ActionDisplay action={undefined}
-                                               setInvokeActions={setInvokeActions}
-                                               onSubmit={onActionFormSubmit}
-                                               setCreateActions={setCreateActions}
-                                               setAssignActions={setAssignActions}
-                                               setRaiseEventActions={setRaiseEventActions}
-                                               setTimeoutActions={setTimeoutActions}
-                                               setTimeoutResetActions={setTimeoutResetActions}
-                                               setMatchActions={setMatchActions}
-                                ></ActionDisplay>
-                            </div>
+                                <br/>
+                                <div className="d-grid gap-2">
+                                    <Button variant="primary" size="lg" onClick={onNewActionFormButtonClick}>
+                                        New Action
+                                    </Button>
+                                </div>
+                                {showNewActionForm && (
+                                    <div className={"action-form-container"}>
+                                        <ActionDisplay action={undefined}
+                                                       setInvokeActions={setInvokeActions}
+                                                       onSubmit={onActionFormSubmit}
+                                                       setCreateActions={setCreateActions}
+                                                       setAssignActions={setAssignActions}
+                                                       setRaiseEventActions={setRaiseEventActions}
+                                                       setTimeoutActions={setTimeoutActions}
+                                                       setTimeoutResetActions={setTimeoutResetActions}
+                                                       setMatchActions={setMatchActions}
+                                        ></ActionDisplay>
+                                    </div>
+                                )}
+                                <div>
+                                    <h2>Context Test</h2>
+                                    {renderContexts()}
+                                </div>
+
+                                <div>
+                                    {isState(selectedNode.data) && selectedNode.data.state.entry && (
+                                        <ActionAccordion headerText={"Entry Actions"}
+                                                         actions={selectedNode.data.state.entry}
+                                                         setInvokeActions={setInvokeActions}
+                                                         setCreateActions={setCreateActions}
+                                                         setAssignActions={setAssignActions}
+                                                         setRaiseEventActions={setRaiseEventActions}
+                                                         setTimeoutActions={setTimeoutActions}
+                                                         setTimeoutResetActions={setTimeoutResetActions}
+                                                         setMatchActions={setMatchActions}
+                                        />
+                                    )
+                                    }
+
+                                    {isState(selectedNode.data) && selectedNode.data.state.exit && (
+                                        <ActionAccordion headerText={"Exit Actions"}
+                                                         actions={selectedNode.data.state.exit}
+                                                         setInvokeActions={setInvokeActions}
+                                                         setCreateActions={setCreateActions}
+                                                         setAssignActions={setAssignActions}
+                                                         setRaiseEventActions={setRaiseEventActions}
+                                                         setTimeoutActions={setTimeoutActions}
+                                                         setTimeoutResetActions={setTimeoutResetActions}
+                                                         setMatchActions={setMatchActions}
+                                        />
+                                    )
+                                    }
+
+                                    {isState(selectedNode.data) && selectedNode.data.state.while && (
+                                        <ActionAccordion headerText={"While Actions"}
+                                                         actions={selectedNode.data.state.while}
+                                                         setInvokeActions={setInvokeActions}
+                                                         setCreateActions={setCreateActions}
+                                                         setAssignActions={setAssignActions}
+                                                         setRaiseEventActions={setRaiseEventActions}
+                                                         setTimeoutActions={setTimeoutActions}
+                                                         setTimeoutResetActions={setTimeoutResetActions}
+                                                         setMatchActions={setMatchActions}
+                                        />
+                                    )
+                                    }
+
+                                    {isState(selectedNode.data) && selectedNode.data.state.after && (
+                                        <ActionAccordion headerText={"Timeout Actions"}
+                                                         actions={selectedNode.data.state.after}
+                                                         setInvokeActions={setInvokeActions}
+                                                         setCreateActions={setCreateActions}
+                                                         setAssignActions={setAssignActions}
+                                                         setRaiseEventActions={setRaiseEventActions}
+                                                         setTimeoutActions={setTimeoutActions}
+                                                         setTimeoutResetActions={setTimeoutResetActions}
+                                                         setMatchActions={setMatchActions}
+                                        />
+                                    )
+                                    }
+
+                                </div>
+                            </Container>
                         )}
-                        <div>
-                            <h2>Context Test</h2>
-                            {renderContexts()}
-                        </div>
-
-                        <div>
-                            {isState(selectedNode.data) && selectedNode.data.state.entry && (
-                                <ActionAccordion headerText={"Entry Actions"}
-                                                 actions={selectedNode.data.state.entry}
-                                                 setInvokeActions={setInvokeActions}
-                                                 setCreateActions={setCreateActions}
-                                                 setAssignActions={setAssignActions}
-                                                 setRaiseEventActions={setRaiseEventActions}
-                                                 setTimeoutActions={setTimeoutActions}
-                                                 setTimeoutResetActions={setTimeoutResetActions}
-                                                 setMatchActions={setMatchActions}
-                                />
-                            )
-                            }
-
-                            {isState(selectedNode.data) && selectedNode.data.state.exit && (
-                                <ActionAccordion headerText={"Exit Actions"}
-                                                 actions={selectedNode.data.state.exit}
-                                                 setInvokeActions={setInvokeActions}
-                                                 setCreateActions={setCreateActions}
-                                                 setAssignActions={setAssignActions}
-                                                 setRaiseEventActions={setRaiseEventActions}
-                                                 setTimeoutActions={setTimeoutActions}
-                                                 setTimeoutResetActions={setTimeoutResetActions}
-                                                 setMatchActions={setMatchActions}
-                                />
-                            )
-                            }
-
-                            {isState(selectedNode.data) && selectedNode.data.state.while && (
-                                <ActionAccordion headerText={"While Actions"}
-                                                 actions={selectedNode.data.state.while}
-                                                 setInvokeActions={setInvokeActions}
-                                                 setCreateActions={setCreateActions}
-                                                 setAssignActions={setAssignActions}
-                                                 setRaiseEventActions={setRaiseEventActions}
-                                                 setTimeoutActions={setTimeoutActions}
-                                                 setTimeoutResetActions={setTimeoutResetActions}
-                                                 setMatchActions={setMatchActions}
-                                />
-                            )
-                            }
-
-                            {isState(selectedNode.data) && selectedNode.data.state.after && (
-                                <ActionAccordion headerText={"Timeout Actions"}
-                                                 actions={selectedNode.data.state.after}
-                                                 setInvokeActions={setInvokeActions}
-                                                 setCreateActions={setCreateActions}
-                                                 setAssignActions={setAssignActions}
-                                                 setRaiseEventActions={setRaiseEventActions}
-                                                 setTimeoutActions={setTimeoutActions}
-                                                 setTimeoutResetActions={setTimeoutResetActions}
-                                                 setMatchActions={setMatchActions}
-                                />
-                            )
-                            }
-
-                        </div>
                     </OffcanvasBody>
                 </Offcanvas>
             </div>
