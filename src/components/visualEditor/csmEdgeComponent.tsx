@@ -40,7 +40,7 @@ export default function CsmEdge({
     const [infoString, setInfoString] = useState<string>('');
 
     const context = useContext(ReactFlowContext) as ReactFlowContextProps;
-    const { edges, setEdges, selectedEdge, hideFlowEdges } = context;
+    const { edges, setEdges, hideFlowEdges, showEdgeLabels } = context;
 
     // Event [guards] / actions
     const generateInfoString = (transition: Transition | undefined) => {
@@ -54,22 +54,35 @@ export default function CsmEdge({
 
         let guardString = '';
 
-        guards.forEach((guard, i) => {
-            guardString += guard.expression;
-            if (i !== guards.length - 1) {
-                guardString += ', ';
-            }
-        });
+        if(guards.length > 0){
+
+            guardString+= "["
+            guards.forEach((guard, i) => {
+                guardString += guard.expression;
+                if (i !== guards.length - 1) {
+                    guardString += ', ';
+                }
+            });
+            guardString+= "]"
+        }
+
+
+
+
 
         let actionString = '';
-        actions.forEach((action, i) => {
-            actionString += action.name;
-            if (i !== actions.length - 1) {
-                actionString += ', ';
-            }
-        });
+        if(actions.length > 0){
+            actionString+= "/ "
+            actions.forEach((action, i) => {
+                actionString += action.name;
+                if (i !== actions.length - 1) {
+                    actionString += ', ';
+                }
+            });
+        }
 
-        return `${event} [${guardString}] / ${actionString}`;
+
+        return `${event} ${guardString} ${actionString}`;
     };
 
     useEffect(() => {
@@ -99,7 +112,7 @@ export default function CsmEdge({
 
 
     // Adjust label position based on the condition
-    const labelOffsetX = topToBottom ? (sourceHandleId=== "t-s" ? 60 : -60) : 0                            //topToBottom ? 15: -130; // Adjust the value as needed
+    const labelOffsetX = topToBottom ? (sourceHandleId=== "t-s" ? 75 : -75) : 0                            //topToBottom ? 15: -130; // Adjust the value as needed
     const labelOffsetY = leftToRight ? (sourceHandleId === "r-s" ? 15: -15) : 0 // You can also adjust Y offset if needed
 
     return (
@@ -108,7 +121,7 @@ export default function CsmEdge({
                 <>
                     <BaseEdge id={id} path={edgePath} markerEnd={markerEnd} />
                     <EdgeLabelRenderer>
-                        {infoString && (
+                        {infoString.trim() && showEdgeLabels && (
                             <div
                                 style={{
                                     position: 'absolute',
