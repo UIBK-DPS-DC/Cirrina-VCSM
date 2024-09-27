@@ -1,6 +1,6 @@
-import React, {useContext, useEffect, useRef, useState} from "react";
-import {ReactFlowContext, renderEnumAsOptions} from "../../utils.tsx";
-import {ReactFlowContextProps} from "../../types.ts";
+import React, {useCallback, useContext, useEffect, useRef, useState} from "react";
+import {generateRaisedToConsumedInfoStrings, ReactFlowContext, renderEnumAsOptions} from "../../utils.tsx";
+import {CsmNodeProps, isStateMachine, ReactFlowContextProps} from "../../types.ts";
 import Offcanvas from "react-bootstrap/Offcanvas";
 import {
     Accordion, AccordionHeader,
@@ -28,6 +28,7 @@ import TimeoutActionForm from "./ActionForms/timeoutActionForm.tsx";
 import TimeoutResetActionForm from "./ActionForms/timeoutResetActionForm.tsx";
 import MatchActionForm from "./ActionForms/matchActionForm.tsx";
 import Modal from "react-bootstrap/Modal";
+import {Node} from "@xyflow/react";
 
 
 let idCounter = 0
@@ -38,7 +39,7 @@ export default function TransitionInfoForm() {
     const {selectedEdge,
         showSidebar,
         setShowSidebar,
-        eventService, setRecalculateTransitions, recalculateTransitions} = context
+        eventService, setRecalculateTransitions, recalculateTransitions, nodes} = context
 
     const instanceId = useRef(++idCounter).current;
     let formCount = 0
@@ -111,6 +112,45 @@ export default function TransitionInfoForm() {
         setMatchAction([])
         handleClose()
     }
+
+    const getAllDescendants = (node: Node<CsmNodeProps>, nodes: Node<CsmNodeProps>[]) => {
+        const children = nodes.filter((n: Node<CsmNodeProps>) => n.parentId === node.id);
+
+        children.forEach((n: Node<CsmNodeProps>) => {
+            if (isStateMachine(n.data)) {
+                const descendants = getAllDescendants(n, nodes);
+                children.push(...descendants);
+            }
+        });
+
+        return children;
+    }
+
+    const generateInfoStrings = useCallback((nodes: Node<CsmNodeProps>[]) => {
+        if(!selectedEdge?.data){
+            return []
+        }
+        if(!selectedEdge.data.transition.isStatemachineEdge){
+            return []
+        }
+
+        const sourceNode = nodes.find((n) => n.id === selectedEdge.source)
+        const targetNode = nodes.find((n) => n.id === selectedEdge.target)
+
+        if(!sourceNode || !targetNode){
+            return []
+        }
+
+        const localNodes = getAllDescendants(sourceNode, nodes).concat(getAllDescendants(targetNode,nodes))
+
+        return generateRaisedToConsumedInfoStrings(localNodes)
+
+
+
+    },[recalculateTransitions, setRecalculateTransitions])
+
+
+
 
 
 
@@ -253,37 +293,52 @@ export default function TransitionInfoForm() {
                                 </Col>
                             </Form.Group>
 
-                            <Form.Group as={Row} className="mb-3">
-                                <Form.Label column sm={"2"}>
-                                    Add Guard:
-                                </Form.Label>
-                                <Col sm={10}>
-                                    <InputGroup>
-                                        <Form.Control type={"text"} value={guardInput} onChange={onGuardInputChange} isValid={guardInputIsValid} isInvalid={!guardInputIsValid && guardInput !== ""}/>
-                                        <Button disabled={!guardInputIsValid} onClick={onAddGuardClick}>
-                                            Add
-                                            <i className={"bi bi-plus-circle"}></i>
-                                        </Button>
-                                        <Form.Control.Feedback type={"invalid"}>
-                                            {invalidGuardInputText()}
-                                        </Form.Control.Feedback>
-                                    </InputGroup>
-                                </Col>
-                            </Form.Group>
+                            {selectedEdge.data.transition.isStatemachineEdge && (
+                                // TODO: EXTEND HERE
+                                <Container>
+                                    {generateInfoStrings(nodes).map((s) => {
+                                        return (
+                                            <p>{s}</p>
+                                        )
+                                    })}
+                                </Container>
+                            )}
 
-                            <Form.Group as={Row} className={"mb-3"}>
-                                <Form.Label column sm={"2"}>
-                                    On:
-                                </Form.Label>
-                                {onEvent && (
-                                    <Col sm={5}>
-                                        <Form.Control type={"text"} value={onEvent.name} disabled={true}/>
-                                    </Col>
-                                )}
-                                <Col sm={onEvent ? 5 : 10}>
-                                    <SelectSingleEventModal event={onEvent} setEvent={setOnEvent}></SelectSingleEventModal>
-                                </Col>
-                            </Form.Group>
+                            {! selectedEdge.data.transition.isStatemachineEdge && (
+                                <Container>
+                                    <Form.Group as={Row} className="mb-3">
+                                        <Form.Label column sm={"2"}>
+                                            Add Guard:
+                                        </Form.Label>
+                                        <Col sm={10}>
+                                            <InputGroup>
+                                                <Form.Control type={"text"} value={guardInput} onChange={onGuardInputChange} isValid={guardInputIsValid} isInvalid={!guardInputIsValid && guardInput !== ""}/>
+                                                <Button disabled={!guardInputIsValid} onClick={onAddGuardClick}>
+                                                    Add
+                                                    <i className={"bi bi-plus-circle"}></i>
+                                                </Button>
+                                                <Form.Control.Feedback type={"invalid"}>
+                                                    {invalidGuardInputText()}
+                                                </Form.Control.Feedback>
+                                            </InputGroup>
+                                        </Col>
+                                    </Form.Group>
+
+                                    <Form.Group as={Row} className={"mb-3"}>
+                                        <Form.Label column sm={"2"}>
+                                            On:
+                                        </Form.Label>
+                                        {onEvent && (
+                                            <Col sm={5}>
+                                                <Form.Control type={"text"} value={onEvent.name} disabled={true}/>
+                                            </Col>
+                                        )}
+                                        <Col sm={onEvent ? 5 : 10}>
+                                            <SelectSingleEventModal event={onEvent} setEvent={setOnEvent}></SelectSingleEventModal>
+                                        </Col>
+                                    </Form.Group>
+                                </Container>
+                            )}
 
                         </Form>
                         {guards.length > 0 && (
@@ -292,36 +347,37 @@ export default function TransitionInfoForm() {
                             </Container>
                         )}
 
-                        <Container className={"mb-3"}>
-                            <Button onClick={handleShow}>
-                                Add Action
-                                <i className="bi bi-plus-circle"></i>
-                            </Button>
+                        {! selectedEdge.data.transition.isStatemachineEdge && (
+                            <Container className={"mb-3"}>
+                                <Button onClick={handleShow}>
+                                    Add Action
+                                    <i className="bi bi-plus-circle"></i>
+                                </Button>
 
-                            <Modal show={showActionModal} size={"lg"} onHide={handleClose}>
-                                <Modal.Header closeButton>
-                                    <Modal.Title>Add Action</Modal.Title>
-                                </Modal.Header>
+                                <Modal show={showActionModal} size={"lg"} onHide={handleClose}>
+                                    <Modal.Header closeButton>
+                                        <Modal.Title>Add Action</Modal.Title>
+                                    </Modal.Header>
 
-                                <ModalBody>
-                                    <Row className={"mb-3"}>
-                                        <Form.Label column sm={"4"}>Action type:</Form.Label>
-                                        <Col sm={8}>
-                                            <Form.Select value={selectedActionType} onChange={onSelectedActionTypeChange}>
-                                                {renderEnumAsOptions(ActionType)}
-                                            </Form.Select>
-                                        </Col>
-                                    </Row>
-                                    {renderActionForm()}
-                                </ModalBody>
+                                    <ModalBody>
+                                        <Row className={"mb-3"}>
+                                            <Form.Label column sm={"4"}>Action type:</Form.Label>
+                                            <Col sm={8}>
+                                                <Form.Select value={selectedActionType} onChange={onSelectedActionTypeChange}>
+                                                    {renderEnumAsOptions(ActionType)}
+                                                </Form.Select>
+                                            </Col>
+                                        </Row>
+                                        {renderActionForm()}
+                                    </ModalBody>
 
-                                <Modal.Footer>
-                                    <Button variant="secondary" onClick={handleClose}>Close</Button>
-                                </Modal.Footer>
+                                    <Modal.Footer>
+                                        <Button variant="secondary" onClick={handleClose}>Close</Button>
+                                    </Modal.Footer>
 
-                            </Modal>
-                        </Container>
-
+                                </Modal>
+                            </Container>
+                        )}
                         {actions.length > 0 && (
                             <Accordion>
                                 <Accordion.Item eventKey={"0"}>

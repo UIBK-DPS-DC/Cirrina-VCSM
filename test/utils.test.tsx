@@ -1,8 +1,19 @@
-import {CsmNodeProps} from "../src/types";
+import {CsmNodeProps, RaiseEventActionProps} from "../src/types";
 import {Node} from "@xyflow/react";
-import {getAllStatemachineDescendants, getMostDistantAncestorNode, getParentNode} from "../src/utils";
+import {
+    generateRaisedToConsumedInfoStrings,
+    getAllStatemachineDescendants,
+    getConsumedEventsToStateMap,
+    getMostDistantAncestorNode,
+    getParentNode,
+    getRaisedEventsToStateMap
+} from "../src/utils";
 import StateMachine from "../src/classes/stateMachine";
 import State from "../src/classes/state";
+import {ActionType, EventChannel} from "../src/enums";
+import Event from "../src/classes/event"
+import Transition from "../src/classes/transition";
+import Action from "../src/classes/action";
 
 describe('getParentNode', () => {
 
@@ -270,6 +281,185 @@ describe('getAllStatemachineDescendants', () => {
         const root = nodesWithMultipleStateMachines[0]; // RootStateMachine
         const result = getAllStatemachineDescendants(root, nodesWithMultipleStateMachines);
         expect(result).toEqual([nodesWithMultipleStateMachines[1], nodesWithMultipleStateMachines[6], nodesWithMultipleStateMachines[3], nodesWithMultipleStateMachines[5]]);
+    });
+});
+
+describe('Utils - Event Maps', () => {
+    describe('getRaisedEventsToStateMap', () => {
+        it('should return an empty map when no nodes are provided', () => {
+            const nodes: Node<CsmNodeProps>[] = [];
+            const raisedEventsMap = getRaisedEventsToStateMap(nodes);
+
+            expect(raisedEventsMap.size).toBe(0);
+        });
+
+        it('should correctly map raised events to their respective states', () => {
+            // Mock Events
+            const event1 = new Event('Event1', EventChannel.INTERNAL);
+            const event2 = new Event('Event2', EventChannel.GLOBAL);
+
+            // Mock States
+            const state1 = new State('State1');
+            jest.spyOn(state1, 'getAllRaisedEvents').mockReturnValue([event1]);
+
+            const state2 = new State('State2');
+            jest.spyOn(state2, 'getAllRaisedEvents').mockReturnValue([event2]);
+
+            // Mock Nodes
+            const nodes: Node<CsmNodeProps>[] = [
+                { id: '1', data: { state: state1 }, position: { x: 0, y: 0 }, type: 'state-node' },
+                { id: '2', data: { state: state2 }, position: { x: 0, y: 0 }, type: 'state-node' },
+            ];
+
+            const raisedEventsMap = getRaisedEventsToStateMap(nodes);
+
+            expect(raisedEventsMap.size).toBe(2);
+            expect(raisedEventsMap.get(state1)).toEqual([event1]);
+            expect(raisedEventsMap.get(state2)).toEqual([event2]);
+        });
+
+        it('should not include nodes that are not states', () => {
+            // Mock States
+            const state = new State('State');
+            jest.spyOn(state, 'getAllRaisedEvents').mockReturnValue([]);
+
+            // Mock Nodes (include a non-state node)
+            const nodes: Node<CsmNodeProps>[] = [
+                { id: '1', data: { state: state }, position: { x: 0, y: 0 }, type: 'state-node' },
+                // @ts-ignore
+                { id: '2', data: { nonStateData: {} }, position: { x: 0, y: 0 }, type: 'non-state-node' },
+            ];
+
+            const raisedEventsMap = getRaisedEventsToStateMap(nodes);
+
+            expect(raisedEventsMap.size).toBe(1);
+            expect(raisedEventsMap.get(state)).toEqual([]);
+        });
+    });
+
+    describe('getConsumedEventsToStateMap', () => {
+        it('should return an empty map when no nodes are provided', () => {
+            const nodes: Node<CsmNodeProps>[] = [];
+            const consumedEventsMap = getConsumedEventsToStateMap(nodes);
+
+            expect(consumedEventsMap.size).toBe(0);
+        });
+
+        it('should correctly map consumed events to their respective states', () => {
+            // Mock States with consumed events
+            const state1 = new State('State1');
+            jest.spyOn(state1, 'getAllConsumedEvents').mockReturnValue(['Event1', 'Event2']);
+
+            const state2 = new State('State2');
+            jest.spyOn(state2, 'getAllConsumedEvents').mockReturnValue(['Event3']);
+
+            // Mock Nodes
+            const nodes: Node<CsmNodeProps>[] = [
+                { id: '1', data: { state: state1 }, position: { x: 0, y: 0 }, type: 'state-node' },
+                { id: '2', data: { state: state2 }, position: { x: 0, y: 0 }, type: 'state-node' },
+            ];
+
+            const consumedEventsMap = getConsumedEventsToStateMap(nodes);
+
+            expect(consumedEventsMap.size).toBe(2);
+            expect(consumedEventsMap.get(state1)).toEqual(['Event1', 'Event2']);
+            expect(consumedEventsMap.get(state2)).toEqual(['Event3']);
+        });
+
+        it('should not include nodes that are not states', () => {
+            // Mock States with consumed events
+            const state = new State('State');
+            jest.spyOn(state, 'getAllConsumedEvents').mockReturnValue(['Event1']);
+
+            // Mock Nodes (include a non-state node)
+
+            const nodes: Node<CsmNodeProps>[] = [
+                { id: '1', data: { state: state }, position: { x: 0, y: 0 }, type: 'state-node' },
+                // @ts-ignore
+                { id: '2', data: { nonStateData: {} }, position: { x: 0, y: 0 }, type: 'non-state-node' },
+            ];
+
+            const consumedEventsMap = getConsumedEventsToStateMap(nodes);
+
+            expect(consumedEventsMap.size).toBe(1);
+            expect(consumedEventsMap.get(state)).toEqual(['Event1']);
+        });
+    });
+});
+
+// Define test cases
+describe('generateRaisedToConsumedInfoStrings', () => {
+    // Helper function to create a state node
+    const createStateNode = (name: string, raisedEvents: string[], consumedEvents: string[]): Node<CsmNodeProps> => {
+        const state = new State(name);
+
+        // Set raised events for the state
+        const events = raisedEvents.map(eventName => new Event(eventName, EventChannel.INTERNAL)); // Adjust the channel as needed
+        state.entry = events.map(event => {
+            const newAction = new Action("",ActionType.RAISE_EVENT)
+            const raiseActionProps: RaiseEventActionProps = {
+                event: event, type: ActionType.RAISE_EVENT
+
+            }
+            newAction.properties = raiseActionProps
+            return newAction
+        });
+
+        // Set consumed events for the state
+        state.on = consumedEvents.map(eventName => {
+            const transition = new Transition(name, 'nextState');
+            transition.setEvent(eventName);
+            return transition;
+        });
+
+        return {
+            id: `node-${name}`,
+            type: 'default',
+            position: { x: 0, y: 0 },
+            data: { state },
+        };
+    };
+
+    it('should return the correct info strings when events are raised and consumed', () => {
+        // Create nodes with raised and consumed events
+        const nodeA = createStateNode('A', ['event1', 'event2'], ['event3']);
+        const nodeB = createStateNode('B', ['event3'], ['event1', 'event4']);
+        const nodeC = createStateNode('C', ['event4'], ['event2', 'event5']);
+
+        // Pass nodes to the function
+        const result = generateRaisedToConsumedInfoStrings([nodeA, nodeB, nodeC]);
+
+        // Expected output based on the raised and consumed events
+        expect(result).toEqual([
+            'Event event1 raised by state A is consumed by state B',
+            'Event event2 raised by state A is consumed by state C',
+            'Event event3 raised by state B is consumed by state A',
+            'Event event4 raised by state C is consumed by state B',
+        ]);
+    });
+
+    it('should return an empty array when no events are raised and consumed', () => {
+        // Create nodes with no matching raised and consumed events
+        const nodeA = createStateNode('A', ['eventX'], ['eventY']);
+        const nodeB = createStateNode('B', ['eventZ'], ['eventW']);
+
+        // Pass nodes to the function
+        const result = generateRaisedToConsumedInfoStrings([nodeA, nodeB]);
+
+        // Expected output is empty since no events match
+        expect(result).toEqual([]);
+    });
+
+    it('should handle nodes with empty event lists', () => {
+        // Create nodes with empty raised and consumed events
+        const nodeA = createStateNode('A', [], []);
+        const nodeB = createStateNode('B', ['event1'], []);
+
+        // Pass nodes to the function
+        const result = generateRaisedToConsumedInfoStrings([nodeA, nodeB]);
+
+        // Expected output is empty since no events are consumed
+        expect(result).toEqual([]);
     });
 });
 

@@ -7,6 +7,8 @@ import ContextVariable from "./classes/contextVariable.tsx";
 import StateOrStateMachineService from "./services/stateOrStateMachineService.tsx";
 import {CollaborativeStateMachineDescription} from "./pkl/bindings/collaborative_state_machine_description.pkl.ts";
 import StateMachine from "./classes/stateMachine.ts";
+import State from "./classes/state.ts";
+import Event from "./classes/event.ts";
 
 
 const DEBUG = false
@@ -202,6 +204,57 @@ export const getAllStatemachineDescendants = (root: Node<CsmNodeProps>,
 
     return statemachineNodes;
 };
+
+
+export const getRaisedEventsToStateMap = (nodes: Node<CsmNodeProps>[]) => {
+    const stateToRaisedEventsMap: Map<State,Event[]> = new Map();
+    nodes.forEach((node: Node<CsmNodeProps>) => {
+        if(isState(node.data)){
+            stateToRaisedEventsMap.set(node.data.state, node.data.state.getAllRaisedEvents())
+        }
+    })
+    return stateToRaisedEventsMap
+}
+
+export const getConsumedEventsToStateMap = (nodes: Node<CsmNodeProps>[]) => {
+    const stateToConsumedEventsMap: Map<State,string[]> = new Map();
+    nodes.forEach((node: Node<CsmNodeProps>) => {
+        if(isState(node.data)){
+            stateToConsumedEventsMap.set(node.data.state, node.data.state.getAllConsumedEvents())
+        }
+    })
+
+    return stateToConsumedEventsMap
+
+}
+
+export const generateRaisedToConsumedInfoStrings = (nodes: Node<CsmNodeProps>[]) => {
+    const infoStrings: string[] = []
+    const stateToRaisedEventsMap: Map<State,Event[]> = getRaisedEventsToStateMap(nodes)
+    const stateToConsumedEventsMap: Map<State,string[]> = getConsumedEventsToStateMap(nodes)
+
+    Array.from(stateToRaisedEventsMap.keys()).forEach((rk) => {
+        const raisedEvents = stateToRaisedEventsMap.get(rk)?.map((e) => e.name)
+
+        if(raisedEvents){
+            Array.from(stateToConsumedEventsMap.keys()).forEach((ck) => {
+                const consumedEvents = stateToConsumedEventsMap.get(ck)?.filter((e) => raisedEvents.includes(e))
+
+                if(consumedEvents){
+                    consumedEvents.forEach((e) => {
+                        const infoString = `Event ${e} raised by state ${rk.name} is consumed by a transition out of state ${ck.name}`
+                        infoStrings.push(infoString)
+                    })
+                }
+            })
+        }
+    })
+
+    return infoStrings
+
+}
+
+
 
 
 
