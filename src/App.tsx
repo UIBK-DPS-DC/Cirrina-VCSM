@@ -41,7 +41,11 @@ export default function App() {
 
     const [hideFlowEdges, setHideFlowEdges] = useState<boolean>(false)
     const [initialOrTerminalChange, setInitialOrTerminalChange] = useState<boolean>(false)
-    const hideButtonText = () => hideFlowEdges ? "Show Statemachine Edges" : "Hide Statemachine Edges";
+    const hideStatemachineEdgesButtonText = () => hideFlowEdges ? "Show Statemachine Edges" : "Hide Statemachine Edges";
+
+    const [showEdgeLabels, setShowEdgeLabels] = useState<boolean>(true)
+    const hideEdgeLabelsButtonText = () => showEdgeLabels ? "Hide Edge Labels" : "Show Edge Labels"
+
 
 
     const onHideButtonClick = useCallback((event: React.MouseEvent<HTMLButtonElement>) => {
@@ -51,6 +55,14 @@ export default function App() {
         setHideFlowEdges(!hideFlowEdges)
         setRecalculateTransitions(!recalculateTransitions)
     },[hideFlowEdges, setHideFlowEdges])
+
+    const onHideEdgeLabelsButtonClick = useCallback((event: React.MouseEvent<HTMLButtonElement>) => {
+        event.preventDefault()
+        event.stopPropagation()
+
+        setShowEdgeLabels(!showEdgeLabels)
+
+    },[setShowEdgeLabels, showEdgeLabels])
 
 
     //TODO: split into multiple contexts or use prop drilling when applicable
@@ -83,7 +95,9 @@ export default function App() {
         hideFlowEdges,
         initialOrTerminalChange,
         setInitialOrTerminalChange,
-        setHideFlowEdges
+        setHideFlowEdges,
+        showEdgeLabels,
+        setShowEdgeLabels
     };
 
 
@@ -95,7 +109,8 @@ export default function App() {
                     <div className={"buttons"}>
                         <Export></Export>
                         <Import></Import>
-                        <button className={"button"} onClick={onHideButtonClick}>{hideButtonText()}</button>
+                        <button className={"button"} onClick={onHideEdgeLabelsButtonClick}>{hideEdgeLabelsButtonText()}</button>
+                        <button className={"button"} onClick={onHideButtonClick}>{hideStatemachineEdgesButtonText()}</button>
                     </div>
                 </div>
                 <Tabs >

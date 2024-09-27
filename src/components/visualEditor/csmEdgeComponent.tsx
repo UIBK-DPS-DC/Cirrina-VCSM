@@ -2,14 +2,18 @@ import {
     BaseEdge,
     EdgeLabelRenderer,
     type EdgeProps,
-    getSimpleBezierPath,
     getSmoothStepPath,
+    getSimpleBezierPath,
 } from '@xyflow/react';
 
-import {ReactFlowContextProps, TransitionEdge} from "../../types.ts";
-import {useContext, useEffect, useState} from "react";
-import {ReactFlowContext} from "../../utils.tsx";
-import Transition from "../../classes/transition.ts";
+import {
+    ReactFlowContextProps,
+    TransitionEdge,
+} from '../../types.ts';
+import { useContext, useEffect, useState } from 'react';
+import { ReactFlowContext } from '../../utils.tsx';
+import Transition from '../../classes/transition.ts';
+import '../../css/edges.css';
 
 export default function CsmEdge({
                                     id,
@@ -23,33 +27,67 @@ export default function CsmEdge({
                                     target,
                                     source,
                                     data,
-
+                                    sourceHandleId
                                 }: EdgeProps<TransitionEdge>) {
-    const [edgePath] = getSmoothStepPath({ sourceX, sourceY, targetX, targetY, targetPosition, sourcePosition,});
-    const [infoString,setInfoString] = useState<string>("");
+    const [edgePath, labelX, labelY] = getSmoothStepPath({
+        sourceX,
+        sourceY,
+        targetX,
+        targetY,
+        targetPosition,
+        sourcePosition,
+    });
+    const [infoString, setInfoString] = useState<string>('');
 
     const context = useContext(ReactFlowContext) as ReactFlowContextProps;
-    const {edges, setEdges,selectedEdge, hideFlowEdges} = context;
+    const { edges, setEdges, hideFlowEdges, showEdgeLabels } = context;
 
+    // Event [guards] / actions
     const generateInfoString = (transition: Transition | undefined) => {
-        if(transition && transition.getEvent()){
-            if(transition.getGuards().length >= 1) {
-                return transition.getEvent() + " / " + transition.getGuards().map((guard => {
-                    return guard.name ? guard.name : guard.expression
-                })).toString();
-            }
-            else {
-                return transition.getEvent();
-            }
-
+        if (!transition) {
+            return '';
         }
-        return ""
-    }
+
+        const event = transition.getEvent();
+        const guards = transition.getGuards();
+        const actions = transition.getActions();
+
+        let guardString = '';
+
+        if(guards.length > 0){
+
+            guardString+= "["
+            guards.forEach((guard, i) => {
+                guardString += guard.expression;
+                if (i !== guards.length - 1) {
+                    guardString += ', ';
+                }
+            });
+            guardString+= "]"
+        }
+
+
+
+
+
+        let actionString = '';
+        if(actions.length > 0){
+            actionString+= "/ "
+            actions.forEach((action, i) => {
+                actionString += action.name;
+                if (i !== actions.length - 1) {
+                    actionString += ', ';
+                }
+            });
+        }
+
+
+        return `${event} ${guardString} ${actionString}`;
+    };
 
     useEffect(() => {
-        setInfoString(generateInfoString(data?.transition))
-    }, [edges,setEdges]);
-
+        setInfoString(generateInfoString(data?.transition));
+    }, [edges, setEdges]);
 
     // For internal transitions
     const radiusX = (sourceX - targetX) * 0.8;
@@ -58,7 +96,7 @@ export default function CsmEdge({
         targetX + 2
     } ${targetY}`;
 
-    const isStatemachineEdge = data?.transition.isStatemachineEdge
+    const isStatemachineEdge = data?.transition.isStatemachineEdge;
     const [smEdgePath] = getSimpleBezierPath({
         sourceX,
         sourceY,
@@ -68,60 +106,60 @@ export default function CsmEdge({
         targetPosition,
     });
 
+    // Determine the condition for label positioning
+    const topToBottom = sourceHandleId === "t-s" || sourceHandleId === "b-s"
+    const leftToRight = sourceHandleId === "r-s" || sourceHandleId === "l-s"
 
 
-
+    // Adjust label position based on the condition
+    const labelOffsetX = topToBottom ? (sourceHandleId=== "t-s" ? 75 : -75) : 0                            //topToBottom ? 15: -130; // Adjust the value as needed
+    const labelOffsetY = leftToRight ? (sourceHandleId === "r-s" ? 15: -15) : 0 // You can also adjust Y offset if needed
 
     return (
         <>
-            {target !== source && !isStatemachineEdge && (
+            {target !== source && !isStatemachineEdge ? (
                 <>
                     <BaseEdge id={id} path={edgePath} markerEnd={markerEnd} />
                     <EdgeLabelRenderer>
-                        {selectedEdge?.id === id && infoString && (
+                        {infoString.trim() && showEdgeLabels && (
                             <div
                                 style={{
                                     position: 'absolute',
-                                    transform: `translate(-50%, -100%) translate(${targetX}px,${targetY}px)`,
-                                    background: '#34c9eb',
-                                    padding: 10,
-                                    borderRadius: 5,
-                                    fontSize: 12,
-                                    fontWeight: 500,
+                                    transform: `
+                                    translate(-50%, -50%)
+                                    translate(${labelX}px, ${labelY}px)
+                                    translate(${labelOffsetX}px, ${labelOffsetY}px)`
                                 }}
-                                className="nodrag nopan"
+                                className="nodrag nopan fixed-label"
                             >
                                 {infoString}
                             </div>
                         )}
-
                     </EdgeLabelRenderer>
                 </>
-            ) ||target == source && (
+            ) : target === source ? (
                 <path
                     id={id}
                     className="react-flow__edge-path"
                     d={internalPath}
                     markerEnd={markerEnd}
                 />
-            ) || (
+            ) : (
                 <>
-                    <BaseEdge id={id} path={smEdgePath} style={{opacity: hideFlowEdges ? 0 : 1}}/>
+                    <BaseEdge
+                        id={id}
+                        path={smEdgePath}
+                        style={{ opacity: hideFlowEdges ? 0 : 1 }}
+                    />
                     <circle r="10" fill="#ff0073" opacity={hideFlowEdges ? 0 : 1}>
-                        <animateMotion dur="3s" repeatCount="indefinite" path={smEdgePath} />
+                        <animateMotion
+                            dur="3s"
+                            repeatCount="indefinite"
+                            path={smEdgePath}
+                        />
                     </circle>
                 </>
-            )// Add logic for sm edges here
-            }
-
+            )}
         </>
     );
-
-
 }
-
-
-
-
-
-
