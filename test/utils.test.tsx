@@ -431,10 +431,10 @@ describe('generateRaisedToConsumedInfoStrings', () => {
 
         // Expected output based on the raised and consumed events
         expect(result).toEqual([
-            'Event event1 raised by state A is consumed by state B',
-            'Event event2 raised by state A is consumed by state C',
-            'Event event3 raised by state B is consumed by state A',
-            'Event event4 raised by state C is consumed by state B',
+            'Event event1 raised by state A is consumed by a transition out of state B',
+            'Event event2 raised by state A is consumed by a transition out of state C',
+            'Event event3 raised by state B is consumed by a transition out of state A',
+            'Event event4 raised by state C is consumed by a transition out of state B',
         ]);
     });
 
