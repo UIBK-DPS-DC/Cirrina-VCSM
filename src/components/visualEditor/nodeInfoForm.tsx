@@ -156,12 +156,11 @@ export default function NodeInfoForm() {
 
     const renderContexts = useCallback(() => {
         if(selectedNode && isState(selectedNode.data)){
-           return(
-            <Container className={"mb-3"}>
-                    <ContextCardDisplay vars={localContext} headerText={"Local Context"} setVars={setLocalContext} deregisterOnRemove={true} onRemove={onContextRemove} />
-                    <ContextCardDisplay vars={staticContext} headerText={"Static Context"} setVars={setStaticContext} deregisterOnRemove={true} onRemove={onContextRemove} />
-                    <ContextCardDisplay vars={staticContext} headerText={"Persistent Context"} setVars={setPersistentContext} deregisterOnRemove={true} onRemove={onContextRemove} />
-            </Container>
+           return(<div className={"mb-3"}>
+                   <ContextCardDisplay vars={localContext} headerText={"Local Context"} setVars={setLocalContext} deregisterOnRemove={true} onRemove={onContextRemove} />
+                   <ContextCardDisplay vars={staticContext} headerText={"Static Context"} setVars={setStaticContext} deregisterOnRemove={true} onRemove={onContextRemove} />
+                   <ContextCardDisplay vars={staticContext} headerText={"Persistent Context"} setVars={setPersistentContext} deregisterOnRemove={true} onRemove={onContextRemove} />
+           </div>
            )
         }
     },[selectedNode, localContext, persistentContext, staticContext, setLocalContext, setStaticContext, setPersistentContext, selectedNode?.data])
@@ -182,14 +181,11 @@ export default function NodeInfoForm() {
                         <br/>
                         {isState(selectedNode.data) && (
                             <Container>
-                                <Container className={"mb-3"}>
-                                    <CreateContextFormModal variable={undefined} buttonName={undefined}
-                                                            onSubmit={undefined}></CreateContextFormModal>
-                                </Container>
+
 
                                 {/** Initial terminal checkboxes*/}
 
-                                <Container className={"mb-3"}>
+                                <div className={"mb-5"}>
                                     <Form id={"checkboxes"}>
 
                                         <Form.Group className={"mb-3"}>
@@ -203,47 +199,48 @@ export default function NodeInfoForm() {
                                         </Form.Group>
 
                                     </Form>
-                                </Container>
-
-                                <div className="d-grid gap-2 mb-3">
-                                    <Button variant="primary" size="lg" onClick={onNewActionFormButtonClick}>
-                                        New Action
-                                    </Button>
-                                </div>
-                                <br/>
-                                <Container>
-                                    <Modal show={show} onHide={handleClose} backdrop={"static"} size="lg" centered data-bs-theme="dark">
-                                        <Modal.Header closeButton={true}>
-                                            <Modal.Title style={{color: "#ffffff"}}>Create Action</Modal.Title>
-                                        </Modal.Header>
-
-                                        <ModalBody>
-                                                    <ActionDisplay action={undefined}
-                                                                   setInvokeActions={setInvokeActions}
-                                                                   onSubmit={onActionFormSubmit}
-                                                                   setCreateActions={setCreateActions}
-                                                                   setAssignActions={setAssignActions}
-                                                                   setRaiseEventActions={setRaiseEventActions}
-                                                                   setTimeoutActions={setTimeoutActions}
-                                                                   setTimeoutResetActions={setTimeoutResetActions}
-                                                                   setMatchActions={setMatchActions}
-                                                    ></ActionDisplay>
-                                        </ModalBody>
-
-                                        <Modal.Footer>
-                                            <Button variant="secondary" onClick={handleClose}>
-                                                Close
-                                            </Button>
-                                        </Modal.Footer>
-
-                                    </Modal>
-                                </Container>
-
-                                <div>
-                                    {renderContexts()}
                                 </div>
 
-                                <div>
+
+
+
+
+                                <div className={"mb-5"}>
+
+                                    <div>
+                                        <Button variant="primary" onClick={onNewActionFormButtonClick}>
+                                            Add Action to State
+                                        </Button>
+                                    </div>
+                                    <br/>
+                                    <Container>
+                                        <Modal show={show} onHide={handleClose} backdrop={"static"} size="lg" centered
+                                               data-bs-theme="dark">
+                                            <Modal.Header closeButton={true}>
+                                                <Modal.Title style={{color: "#ffffff"}}>Create Action</Modal.Title>
+                                            </Modal.Header>
+
+                                            <ModalBody>
+                                                <ActionDisplay action={undefined}
+                                                               setInvokeActions={setInvokeActions}
+                                                               onSubmit={onActionFormSubmit}
+                                                               setCreateActions={setCreateActions}
+                                                               setAssignActions={setAssignActions}
+                                                               setRaiseEventActions={setRaiseEventActions}
+                                                               setTimeoutActions={setTimeoutActions}
+                                                               setTimeoutResetActions={setTimeoutResetActions}
+                                                               setMatchActions={setMatchActions}
+                                                ></ActionDisplay>
+                                            </ModalBody>
+
+                                            <Modal.Footer>
+                                                <Button variant="secondary" onClick={handleClose}>
+                                                    Close
+                                                </Button>
+                                            </Modal.Footer>
+
+                                        </Modal>
+                                    </Container>
 
 
                                     {isState(selectedNode.data) && selectedNode.data.state.entry && (
@@ -303,6 +300,14 @@ export default function NodeInfoForm() {
                                     }
 
                                 </div>
+
+                                <div className={"mb-3"}>
+                                    <CreateContextFormModal variable={undefined} buttonName={"Add Context Variable to State"}
+                                                            onSubmit={undefined}></CreateContextFormModal>
+                                </div>
+
+                                {renderContexts()}
+
                             </Container>
                         )}
                     </OffcanvasBody>

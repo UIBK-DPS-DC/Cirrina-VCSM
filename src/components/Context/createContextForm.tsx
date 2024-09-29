@@ -8,7 +8,7 @@ import {ContextType} from "../../enums.ts";
 export default function CreateContextForm(props: {variable: ContextVariable | undefined, onClose: () => void, onSubmit: (updatedVariable: ContextVariable) => void, noRegister?:boolean}) {
 
     const context = useContext(ReactFlowContext) as ReactFlowContextProps;
-    const {contextService, selectedNode, selectedEdge} = context;
+    const {contextService, selectedNode} = context;
 
     const VARIABLE_NAME_FIELD_NAME = "variable-name";
     const EXPRESSION_FIELD_NAME = "expression";
@@ -90,9 +90,7 @@ export default function CreateContextForm(props: {variable: ContextVariable | un
     const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         event.stopPropagation()
-        if (!selectedNode?.data && !selectedEdge) {
-            return;
-        }
+
 
         const variableName = variableNameInput;
         const expression = variableValueInput;
