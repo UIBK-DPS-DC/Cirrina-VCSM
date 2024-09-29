@@ -300,8 +300,11 @@ export default class State implements StateOrStateMachine {
     }
 
     public rearrangeTransitions() {
-        this._always = this._on.filter((t) => t.getEvent().trim() === "")
-        this._on = this._on.filter((t) => ! this._always.includes(t))
+        this._on = this._on.concat(this._always.filter((t) => t.getEvent().trim() !== ""))
+        this._always = this._on.filter((t) => t.getEvent().trim() === "").concat(this._always.filter((t) => t.getEvent().trim() === ""))
+        this.on = this.on.filter((t) => t.getEvent().trim() !== "")
+
+
 
     }
 

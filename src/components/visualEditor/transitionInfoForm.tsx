@@ -1,6 +1,6 @@
 import React, {useCallback, useContext, useEffect, useRef, useState} from "react";
 import {generateRaisedToConsumedInfoStrings, ReactFlowContext, renderEnumAsOptions} from "../../utils.tsx";
-import {CsmNodeProps, isStateMachine, ReactFlowContextProps} from "../../types.ts";
+import {CsmNodeProps, isState, isStateMachine, ReactFlowContextProps} from "../../types.ts";
 import Offcanvas from "react-bootstrap/Offcanvas";
 import {
     Accordion, AccordionHeader,
@@ -31,7 +31,9 @@ import Modal from "react-bootstrap/Modal";
 import {Node} from "@xyflow/react";
 
 
+
 let idCounter = 0
+const NO_ELSE = "NO_ELSE";
 
 
 export default function TransitionInfoForm() {
@@ -39,7 +41,7 @@ export default function TransitionInfoForm() {
     const {selectedEdge,
         showSidebar,
         setShowSidebar,
-        eventService, setRecalculateTransitions, recalculateTransitions, nodes} = context
+        eventService, setRecalculateTransitions, recalculateTransitions, nodes , setEdges} = context
 
     const instanceId = useRef(++idCounter).current;
     let formCount = 0
@@ -52,6 +54,7 @@ export default function TransitionInfoForm() {
     const [guards, setGuards] = useState<Guard[]>(selectedEdge?.data?.transition.getGuards || []);
     const [actions, setActions] = useState<Action[]>(selectedEdge?.data?.transition.getActions || [])
     const [onEvent, setOnEvent] = useState<Event | undefined>()
+    const [selectedElse, setSelectedElse] = useState<string>(selectedEdge?.data?.transition.getElse() || NO_ELSE)
 
 
 
@@ -69,6 +72,20 @@ export default function TransitionInfoForm() {
 
     const handleShow = () => setShowActionModal(true)
     const handleClose = () => setShowActionModal(false)
+
+    const siblings = useCallback(() => {
+        if(!selectedEdge?.data){
+            return
+        }
+
+        const source = nodes.find((n) => n.id === selectedEdge.source)
+        if(!source){
+            return
+        }
+
+        return nodes.filter((n) => n.parentId === source.parentId && isState(n.data))
+
+    },[nodes, selectedEdge])
 
     const onInvokeActionSubmit = () => {
         setActions((prev) => [...prev, invokeAction[0]])
@@ -199,6 +216,7 @@ export default function TransitionInfoForm() {
     }
 
 
+
     useEffect(() => {
         if(selectedEdge?.data && onEvent){
             selectedEdge.data.transition.setEvent(onEvent.name)
@@ -217,6 +235,16 @@ export default function TransitionInfoForm() {
             }
 
             setGuards(selectedEdge.data.transition.getGuards())
+            console.log(`YOU ARE  HERE ${selectedEdge.data.transition.getElse()}`)
+
+            if(!selectedEdge.data.transition.getElse().trim()){
+                setSelectedElse(NO_ELSE)
+            }
+            else {
+                setSelectedElse(selectedEdge.data.transition.getElse())
+            }
+
+            console.log(`SELECTED ELSE ${selectedElse}`)
         }
         setRecalculateTransitions(!recalculateTransitions)
 
@@ -230,6 +258,19 @@ export default function TransitionInfoForm() {
     const onSelectedActionTypeChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
         setSelectedActionType(event.target.value);
     };
+
+    const onSelectedElseChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+        setSelectedElse(event.target.value);
+        if(!selectedEdge?.data){
+            return
+        }
+        if(event.target.value === NO_ELSE){
+            selectedEdge.data.transition.setElse("")
+        }
+        else{
+            selectedEdge.data.transition.setElse(event.target.value)
+        }
+    }
 
     const onAddGuardClick = (event: React.MouseEvent<HTMLButtonElement>) => {
         event.preventDefault()
@@ -294,7 +335,6 @@ export default function TransitionInfoForm() {
                             </Form.Group>
 
                             {selectedEdge.data.transition.isStatemachineEdge && (
-                                // TODO: EXTEND HERE
                                 <Container>
                                     {generateInfoStrings(nodes).map((s) => {
                                         return (
@@ -335,6 +375,22 @@ export default function TransitionInfoForm() {
                                         )}
                                         <Col sm={onEvent ? 5 : 10}>
                                             <SelectSingleEventModal event={onEvent} setEvent={setOnEvent}></SelectSingleEventModal>
+                                        </Col>
+                                    </Form.Group>
+
+                                    <Form.Group as={Row} className={"mb-3"}>
+                                        <Form.Label column sm={"2"}>
+                                            Else:
+                                        </Form.Label>
+                                        <Col sm={10}>
+                                            <Form.Select value={selectedElse} onChange={onSelectedElseChange}>
+                                                <option value={NO_ELSE}>None</option>
+                                                {siblings()?.map((s) => {
+                                                    return (
+                                                        <option value={isState(s.data) ? s.data.state.name : s.id} key={`o-${s.id}`}>{isState(s.data) ? s.data.state.name : s.id}</option>
+                                                    )
+                                                })}
+                                            </Form.Select>
                                         </Col>
                                     </Form.Group>
                                 </Container>

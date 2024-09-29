@@ -154,7 +154,7 @@ export default class Transition {
     public toDescription(): OnTransitionDescription {
         const description: OnTransitionDescription = {
             actions: this.getActions().map((a) => a.toDescription()) ,
-            else: null,
+            else: this.getElse(),
             event: this.getEvent(),
             guards: this.getGuards().map((guard)=> {return guard.toDescription()}),
             target: this.target
@@ -170,7 +170,9 @@ export default class Transition {
         newTransition._guards = description.guards.map((g) => Guard.fromDescription(g));
         newTransition._actions = description.actions.map((a) => Action.fromDescription(a))
         newTransition._else = description.else || ""
+        console.log(`AAAAAAAAAAAAAAAAAAAAAAAA ${description.else}`)
         newTransition._event = description.event
+        console.log(`NEW TRANSITION ${newTransition.getElse()}`)
         return newTransition;
     }
 
@@ -179,6 +181,7 @@ export default class Transition {
         newTransition._guards = description.guards.map((g) => Guard.fromDescription(g));
         newTransition._actions = description.actions.map((a) => Action.fromDescription(a))
         newTransition._else = description.else || ""
+        console.log(`AAAAAAAAAAAAAAAAAAAAAAAA ${description.else}`)
         return newTransition;
     }
 
