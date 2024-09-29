@@ -5,9 +5,20 @@ import {ReactFlowContext, setInitialState, setStateAsTerminal} from "../../utils
 import RenameNodeComponent from "./renameNodeComponent.tsx";
 import ActionDisplay from "../Action/actionDisplay.tsx";
 import Offcanvas from 'react-bootstrap/Offcanvas';
-import {Button, Container, Form, OffcanvasBody, OffcanvasHeader} from "react-bootstrap";
+import {
+    Accordion, AccordionBody,
+    AccordionHeader,
+    AccordionItem,
+    Button,
+    Container,
+    Form,
+    OffcanvasBody,
+    OffcanvasHeader
+} from "react-bootstrap";
 import CreateContextFormModal from "../Context/createContextFormModal.tsx";
 import ActionAccordion from "../Action/actionAccordion.tsx";
+import ContextVariable from "../../classes/contextVariable.tsx";
+import ContextCardDisplay from "../Context/contextCardDisplay.tsx";
 
 /**
  * NodeInfoForm Component
@@ -52,6 +63,12 @@ export default function NodeInfoForm() {
     const [_timeoutResetActions, setTimeoutResetActions] = useState<Action[]>([]);
     const [_MatchActions, setMatchActions] = useState<Action[]>([]);
     const [_allAction,_setAllActions] = useState<Action[]>([]);
+
+
+    const [localContext, setLocalContext] = useState<ContextVariable[]>([])
+    const [staticContext, setStaticContext] = useState<ContextVariable[]>([])
+    const [persistentContext, setPersistentContext] = useState<ContextVariable[]>([])
+
 
 
     const [isInitial,setIsInitial] = useState<boolean>(false)
@@ -109,6 +126,10 @@ export default function NodeInfoForm() {
         if(selectedNode && isState(selectedNode.data)){
             setIsInitial(selectedNode.data.state.initial)
             setIsTerminal(selectedNode.data.state.terminal)
+            setLocalContext(selectedNode.data.state.localContext)
+            setPersistentContext(selectedNode.data.state.persistentContext)
+            setStaticContext(selectedNode.data.state.staticContext)
+
         }
 
     }, [selectedNode]);
@@ -124,19 +145,24 @@ export default function NodeInfoForm() {
     },[])
 
 
+    const onContextRemove = (variable: ContextVariable) => {
+        if(selectedNode?.data && isState(selectedNode.data)) {
+            selectedNode.data.state.removeContext(variable)
+        }
+    }
 
 
     const renderContexts = useCallback(() => {
         if(selectedNode && isState(selectedNode.data)){
-            return (
-                selectedNode.data.state.persistentContext.map((context) => {
-                    return (
-                        <h2 key={context.name}>{context.name}</h2>
-                    )
-                })
-            )
+           return(
+            <Container className={"mb-3"}>
+                    <ContextCardDisplay vars={localContext} headerText={"Local Context"} setVars={setLocalContext} deregisterOnRemove={true} onRemove={onContextRemove} />
+                    <ContextCardDisplay vars={staticContext} headerText={"Static Context"} setVars={setStaticContext} deregisterOnRemove={true} onRemove={onContextRemove} />
+                    <ContextCardDisplay vars={staticContext} headerText={"Persistent Context"} setVars={setPersistentContext} deregisterOnRemove={true} onRemove={onContextRemove} />
+            </Container>
+           )
         }
-    },[selectedNode])
+    },[selectedNode, localContext, persistentContext, staticContext, setLocalContext, setStaticContext, setPersistentContext, selectedNode?.data])
 
 
 
@@ -154,7 +180,7 @@ export default function NodeInfoForm() {
                         <br/>
                         {isState(selectedNode.data) && (
                             <Container>
-                                <Container>
+                                <Container className={"mb-3"}>
                                     <CreateContextFormModal variable={undefined} buttonName={undefined} onSubmit={undefined}></CreateContextFormModal>
                                 </Container>
 
@@ -175,31 +201,37 @@ export default function NodeInfoForm() {
                                 </Container>
 
                                 <br/>
-                                <div className="d-grid gap-2">
-                                    <Button variant="primary" size="lg" onClick={onNewActionFormButtonClick}>
-                                        New Action
-                                    </Button>
-                                </div>
-                                {showNewActionForm && (
-                                    <div className={"action-form-container"}>
-                                        <ActionDisplay action={undefined}
-                                                       setInvokeActions={setInvokeActions}
-                                                       onSubmit={onActionFormSubmit}
-                                                       setCreateActions={setCreateActions}
-                                                       setAssignActions={setAssignActions}
-                                                       setRaiseEventActions={setRaiseEventActions}
-                                                       setTimeoutActions={setTimeoutActions}
-                                                       setTimeoutResetActions={setTimeoutResetActions}
-                                                       setMatchActions={setMatchActions}
-                                        ></ActionDisplay>
+                                <Container>
+                                    <div className="d-grid gap-2 mb-3">
+                                        <Button variant="primary" size="lg" onClick={onNewActionFormButtonClick}>
+                                            New Action
+                                        </Button>
                                     </div>
-                                )}
+                                    {showNewActionForm && (
+                                        <div className={"action-form-container"}>
+                                            <ActionDisplay action={undefined}
+                                                           setInvokeActions={setInvokeActions}
+                                                           onSubmit={onActionFormSubmit}
+                                                           setCreateActions={setCreateActions}
+                                                           setAssignActions={setAssignActions}
+                                                           setRaiseEventActions={setRaiseEventActions}
+                                                           setTimeoutActions={setTimeoutActions}
+                                                           setTimeoutResetActions={setTimeoutResetActions}
+                                                           setMatchActions={setMatchActions}
+                                            ></ActionDisplay>
+                                        </div>
+                                    )}
+                                </Container>
+
                                 <div>
-                                    <h2>Context Test</h2>
                                     {renderContexts()}
                                 </div>
 
                                 <div>
+
+
+
+
                                     {isState(selectedNode.data) && selectedNode.data.state.entry && (
                                         <ActionAccordion headerText={"Entry Actions"}
                                                          actions={selectedNode.data.state.entry}

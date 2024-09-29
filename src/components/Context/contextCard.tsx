@@ -13,7 +13,7 @@ export default function ContextCard(props: {contextVariable: ContextVariable,
     deregisterOnRemove?: boolean,
     event?: Event,
     onEventEdit?: (event: Event) => void,
-    onRemove?: () => void}) {
+    onRemove?: (variable: ContextVariable) => void}) {
     const context = useContext(ReactFlowContext) as ReactFlowContextProps;
     const {contextService} = context;
 
@@ -28,11 +28,13 @@ export default function ContextCard(props: {contextVariable: ContextVariable,
 
 
         }
-        if(props.onRemove){
-            props.onRemove();
-        }
+
         if(props.deregisterOnRemove){
             contextService.deregisterContextByName(props.contextVariable.name)
+        }
+
+        if(props.onRemove){
+            props.onRemove(props.contextVariable);
         }
     };
 

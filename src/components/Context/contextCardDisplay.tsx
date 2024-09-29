@@ -9,7 +9,9 @@ export default function ContextCardDisplay(props: {vars: ContextVariable[],
     headerText: string | undefined,
     setVars: Dispatch<SetStateAction<ContextVariable[]>>,
     event?: Event,
-    onEventEdit?: (event: Event) => void}) {
+    onEventEdit?: (event: Event) => void,
+    onRemove? : (variable: ContextVariable) => void,
+    deregisterOnRemove?: boolean,}) {
 
     const headerText = () => props.headerText || "Display Context Variables";
 
@@ -44,7 +46,7 @@ export default function ContextCardDisplay(props: {vars: ContextVariable[],
                     ) || props.vars.length > 0 && (
                         <CardGroup>
                             {props.vars.map((v) => (
-                                <ContextCard key={`${v.name}-card`} contextVariable={v} setVars={props.setVars} />
+                                <ContextCard key={`${v.name}-card`} contextVariable={v} setVars={props.setVars} onRemove={props.onRemove} deregisterOnRemove={props.deregisterOnRemove}/>
                             ))}
                         </CardGroup>
                     )  ||(<h3 className={"text-muted"}>No Variables Selected</h3>)}
