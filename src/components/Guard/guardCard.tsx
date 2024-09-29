@@ -71,10 +71,10 @@ export default function GuardCard(props: {guard: Guard,
             <Card.Body>
                 <Form onSubmit={onSubmit}>
                     <Form.Group as={Row} className={"mb-3"}>
-                        <Form.Label column sm={"3"}>
+                        <Form.Label column sm={"4"}>
                             Expression:
                         </Form.Label>
-                        <Col sm={9}>
+                        <Col sm={8}>
                             <Form.Control type={"text"}
                                           value={currentGuardExpression}
                                           onChange={onCurrentGuardExpressionChange}
@@ -89,12 +89,12 @@ export default function GuardCard(props: {guard: Guard,
 
                     <Form.Group className={"mb-3"}>
                         <Row>
-                            <Col sm={4}>
+                            <Col sm={6}>
                                 <Button type={"submit"} disabled={submitButtonIsDisabled()}>
                                     Save Changes
                                 </Button>
                             </Col>
-                            <Col sm={4}>
+                            <Col sm={6}>
                                 <Button variant={"danger"} onClick={onDelete}>
                                     Delete Guard
                                 </Button>

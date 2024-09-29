@@ -349,19 +349,26 @@ export default function TransitionInfoForm() {
 
                         {! selectedEdge.data.transition.isStatemachineEdge && (
                             <Container className={"mb-3"}>
-                                <Button onClick={handleShow}>
-                                    Add Action
-                                    <i className="bi bi-plus-circle"></i>
-                                </Button>
+                                <Row>
+                                    <Col sm={6}>
+                                        Transition Actions:
+                                    </Col>
+                                    <Col sm={6}>
+                                        <Button onClick={handleShow}>
+                                            Add Action
+                                            <i className="bi bi-plus-circle"></i>
+                                        </Button>
+                                    </Col>
+                                </Row>
 
-                                <Modal show={showActionModal} size={"lg"} onHide={handleClose}>
+                                <Modal show={showActionModal} size={"lg"} onHide={handleClose} data-bs-theme="dark" >
                                     <Modal.Header closeButton>
-                                        <Modal.Title>Add Action</Modal.Title>
+                                        <Modal.Title style={{color: "#ffffff"}}>Add Action</Modal.Title>
                                     </Modal.Header>
 
                                     <ModalBody>
                                         <Row className={"mb-3"}>
-                                            <Form.Label column sm={"4"}>Action type:</Form.Label>
+                                            <Form.Label column sm={"4"} style={{color: "#ffffff"}} >Action type:</Form.Label>
                                             <Col sm={8}>
                                                 <Form.Select value={selectedActionType} onChange={onSelectedActionTypeChange}>
                                                     {renderEnumAsOptions(ActionType)}
