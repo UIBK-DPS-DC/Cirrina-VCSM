@@ -6,12 +6,9 @@ import RenameNodeComponent from "./renameNodeComponent.tsx";
 import ActionDisplay from "../Action/actionDisplay.tsx";
 import Offcanvas from 'react-bootstrap/Offcanvas';
 import {
-    Accordion, AccordionBody,
-    AccordionHeader,
-    AccordionItem,
     Button,
     Container,
-    Form,
+    Form, ModalBody,
     OffcanvasBody,
     OffcanvasHeader
 } from "react-bootstrap";
@@ -19,6 +16,7 @@ import CreateContextFormModal from "../Context/createContextFormModal.tsx";
 import ActionAccordion from "../Action/actionAccordion.tsx";
 import ContextVariable from "../../classes/contextVariable.tsx";
 import ContextCardDisplay from "../Context/contextCardDisplay.tsx";
+import Modal from "react-bootstrap/Modal";
 
 /**
  * NodeInfoForm Component
@@ -53,7 +51,6 @@ export default function NodeInfoForm() {
 
     //######################################################################################################################################################################################################
     // TODO: Remove underscores once variables are used.
-    const[showNewActionForm, setShowNewActionForm] = useState(false);
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const [_invokeActions,setInvokeActions] = useState<Action[]>([]);
     const [_createActions, setCreateActions] = useState<Action[]>([]);
@@ -74,6 +71,11 @@ export default function NodeInfoForm() {
     const [isInitial,setIsInitial] = useState<boolean>(false)
     const [isTerminal, setIsTerminal] = useState<boolean>(false)
 
+
+    const [show, setShow] = useState(false);
+
+    const handleClose = () => setShow(false);
+    const handleShow = () => setShow(true);
 
 
 
@@ -136,11 +138,11 @@ export default function NodeInfoForm() {
 
 
     const onActionFormSubmit = () => {
-        setShowNewActionForm(false)
+        handleClose()
     }
 
     const onNewActionFormButtonClick = useCallback((_: React.MouseEvent<HTMLButtonElement>) => {
-        setShowNewActionForm(true)
+        handleShow()
         console.log("new action button clicked at", new Date().toISOString());
     },[])
 
@@ -181,7 +183,8 @@ export default function NodeInfoForm() {
                         {isState(selectedNode.data) && (
                             <Container>
                                 <Container className={"mb-3"}>
-                                    <CreateContextFormModal variable={undefined} buttonName={undefined} onSubmit={undefined}></CreateContextFormModal>
+                                    <CreateContextFormModal variable={undefined} buttonName={undefined}
+                                                            onSubmit={undefined}></CreateContextFormModal>
                                 </Container>
 
                                 {/** Initial terminal checkboxes*/}
@@ -190,37 +193,50 @@ export default function NodeInfoForm() {
                                     <Form id={"checkboxes"}>
 
                                         <Form.Group className={"mb-3"}>
-                                            <Form.Check type={"checkbox"} label={"Initial"} checked={isInitial} onChange={handleInitialCheckboxChange}/>
+                                            <Form.Check type={"checkbox"} label={"Initial"} checked={isInitial}
+                                                        onChange={handleInitialCheckboxChange}/>
                                         </Form.Group>
 
                                         <Form.Group>
-                                            <Form.Check type={"checkbox"} label={"Terminal"} checked={isTerminal} onChange={handleTerminalCheckboxChange}/>
+                                            <Form.Check type={"checkbox"} label={"Terminal"} checked={isTerminal}
+                                                        onChange={handleTerminalCheckboxChange}/>
                                         </Form.Group>
 
                                     </Form>
                                 </Container>
 
+                                <div className="d-grid gap-2 mb-3">
+                                    <Button variant="primary" size="lg" onClick={onNewActionFormButtonClick}>
+                                        New Action
+                                    </Button>
+                                </div>
                                 <br/>
                                 <Container>
-                                    <div className="d-grid gap-2 mb-3">
-                                        <Button variant="primary" size="lg" onClick={onNewActionFormButtonClick}>
-                                            New Action
-                                        </Button>
-                                    </div>
-                                    {showNewActionForm && (
-                                        <div className={"action-form-container"}>
-                                            <ActionDisplay action={undefined}
-                                                           setInvokeActions={setInvokeActions}
-                                                           onSubmit={onActionFormSubmit}
-                                                           setCreateActions={setCreateActions}
-                                                           setAssignActions={setAssignActions}
-                                                           setRaiseEventActions={setRaiseEventActions}
-                                                           setTimeoutActions={setTimeoutActions}
-                                                           setTimeoutResetActions={setTimeoutResetActions}
-                                                           setMatchActions={setMatchActions}
-                                            ></ActionDisplay>
-                                        </div>
-                                    )}
+                                    <Modal show={show} onHide={handleClose} backdrop={"static"} size="lg" centered data-bs-theme="dark">
+                                        <Modal.Header closeButton={true}>
+                                            <Modal.Title style={{color: "#ffffff"}}>Create Action</Modal.Title>
+                                        </Modal.Header>
+
+                                        <ModalBody>
+                                                    <ActionDisplay action={undefined}
+                                                                   setInvokeActions={setInvokeActions}
+                                                                   onSubmit={onActionFormSubmit}
+                                                                   setCreateActions={setCreateActions}
+                                                                   setAssignActions={setAssignActions}
+                                                                   setRaiseEventActions={setRaiseEventActions}
+                                                                   setTimeoutActions={setTimeoutActions}
+                                                                   setTimeoutResetActions={setTimeoutResetActions}
+                                                                   setMatchActions={setMatchActions}
+                                                    ></ActionDisplay>
+                                        </ModalBody>
+
+                                        <Modal.Footer>
+                                            <Button variant="secondary" onClick={handleClose}>
+                                                Close
+                                            </Button>
+                                        </Modal.Footer>
+
+                                    </Modal>
                                 </Container>
 
                                 <div>
@@ -228,8 +244,6 @@ export default function NodeInfoForm() {
                                 </div>
 
                                 <div>
-
-
 
 
                                     {isState(selectedNode.data) && selectedNode.data.state.entry && (

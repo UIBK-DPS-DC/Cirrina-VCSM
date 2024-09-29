@@ -71,7 +71,7 @@ export default function ActionDisplay(props: {
     return (
         <div>
             <Form.Group className={"mb-3 mt-3"}>
-                <Form.Label>Action Type</Form.Label>
+                <Form.Label style={{color: "#ffffff", textAlign: "center"}}>Action Type</Form.Label>
                 <Form.Select
                     disabled={isDisabled}
                     onChange={onSelectedActionTypeChange}

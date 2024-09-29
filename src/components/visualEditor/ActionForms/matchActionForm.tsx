@@ -449,9 +449,7 @@ export default function MatchActionForm(props: {
         }
 
         if(selectedNode) {
-            console.log("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAddddddddddddddddddddddA")
             if (props.action && props.action.type === ActionType.MATCH) {
-                console.log("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
 
                 const oldCategory = actionService.getActionCategory(props.action, selectedNode.data);
 
@@ -498,7 +496,7 @@ export default function MatchActionForm(props: {
 
     return (
         <Card>
-            <Card.Header>{props.action ? "Edit Match Action" : "Create new Match Action"}</Card.Header>
+            <Card.Header data-bs-theme="dark">{props.action ? "Edit Match Action" : "Create new Match Action"}</Card.Header>
             <Card.Body>
                 <Card.Title className={"text-center"}>Action properties</Card.Title>
                 <Form className={"mb-3"} validated={formIsValid} id={formId} onSubmit={onSubmit}>
@@ -529,17 +527,21 @@ export default function MatchActionForm(props: {
                         )}
                     </Form.Group>
                 </Form>
+                <br/>
                 <Container className={"mb-3"}>
                     <Row>
                         <Col sm={6}>
+                            New Match Action:
+                        </Col>
+                        <Col sm={6} className={"mb-5 ms-0"}>
                             <Button onClick={handleShow}>
                                 Add Match Action
                                 <i className="bi bi-plus-circle"></i>
                             </Button>
                         </Col>
-                        <Modal show={show} onHide={handleClose}>
+                        <Modal show={show} onHide={handleClose} data-bs-theme="dark">
                             <Modal.Header closeButton>
-                                <Modal.Title>Add Match Action</Modal.Title>
+                                <Modal.Title style={{color: "#ffffff"}}>Add Match Action</Modal.Title>
                             </Modal.Header>
                             <ModalBody>
                                 <CaseForm action={undefined} setActions={setCaseActions} clearAfterSubmit={true} onSubmit={handleClose} />
