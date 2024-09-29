@@ -119,7 +119,10 @@ export default function CsmEdge({
         <>
             {target !== source && !isStatemachineEdge ? (
                 <>
-                    <BaseEdge id={id} path={edgePath} markerEnd={markerEnd} />
+                    <BaseEdge id={id} path={edgePath} markerEnd={markerEnd} style={{
+                        stroke: data?.transition.isElseEdge ? 'purple' : undefined,            // Set the edge color to purple
+                        strokeDasharray: data?.transition.isElseEdge ? '5,5' : undefined,
+                    }} />
                     <EdgeLabelRenderer>
                         {infoString.trim() && showEdgeLabels && (
                             <div

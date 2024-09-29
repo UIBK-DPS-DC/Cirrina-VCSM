@@ -5,9 +5,18 @@ import {ReactFlowContext, setInitialState, setStateAsTerminal} from "../../utils
 import RenameNodeComponent from "./renameNodeComponent.tsx";
 import ActionDisplay from "../Action/actionDisplay.tsx";
 import Offcanvas from 'react-bootstrap/Offcanvas';
-import {Button, Container, Form, OffcanvasBody, OffcanvasHeader} from "react-bootstrap";
+import {
+    Button,
+    Container,
+    Form, ModalBody,
+    OffcanvasBody,
+    OffcanvasHeader
+} from "react-bootstrap";
 import CreateContextFormModal from "../Context/createContextFormModal.tsx";
 import ActionAccordion from "../Action/actionAccordion.tsx";
+import ContextVariable from "../../classes/contextVariable.tsx";
+import ContextCardDisplay from "../Context/contextCardDisplay.tsx";
+import Modal from "react-bootstrap/Modal";
 
 /**
  * NodeInfoForm Component
@@ -42,7 +51,6 @@ export default function NodeInfoForm() {
 
     //######################################################################################################################################################################################################
     // TODO: Remove underscores once variables are used.
-    const[showNewActionForm, setShowNewActionForm] = useState(false);
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const [_invokeActions,setInvokeActions] = useState<Action[]>([]);
     const [_createActions, setCreateActions] = useState<Action[]>([]);
@@ -54,9 +62,20 @@ export default function NodeInfoForm() {
     const [_allAction,_setAllActions] = useState<Action[]>([]);
 
 
+    const [localContext, setLocalContext] = useState<ContextVariable[]>([])
+    const [staticContext, setStaticContext] = useState<ContextVariable[]>([])
+    const [persistentContext, setPersistentContext] = useState<ContextVariable[]>([])
+
+
+
     const [isInitial,setIsInitial] = useState<boolean>(false)
     const [isTerminal, setIsTerminal] = useState<boolean>(false)
 
+
+    const [show, setShow] = useState(false);
+
+    const handleClose = () => setShow(false);
+    const handleShow = () => setShow(true);
 
 
 
@@ -109,34 +128,43 @@ export default function NodeInfoForm() {
         if(selectedNode && isState(selectedNode.data)){
             setIsInitial(selectedNode.data.state.initial)
             setIsTerminal(selectedNode.data.state.terminal)
+            setLocalContext(selectedNode.data.state.localContext)
+            setPersistentContext(selectedNode.data.state.persistentContext)
+            setStaticContext(selectedNode.data.state.staticContext)
+
         }
 
     }, [selectedNode]);
 
 
     const onActionFormSubmit = () => {
-        setShowNewActionForm(false)
+        handleClose()
     }
 
     const onNewActionFormButtonClick = useCallback((_: React.MouseEvent<HTMLButtonElement>) => {
-        setShowNewActionForm(true)
+        handleShow()
         console.log("new action button clicked at", new Date().toISOString());
     },[])
 
 
+    const onContextRemove = (variable: ContextVariable) => {
+        if(selectedNode?.data && isState(selectedNode.data)) {
+            selectedNode.data.state.removeContext(variable)
+        }
+    }
 
 
     const renderContexts = useCallback(() => {
         if(selectedNode && isState(selectedNode.data)){
-            return (
-                selectedNode.data.state.persistentContext.map((context) => {
-                    return (
-                        <h2 key={context.name}>{context.name}</h2>
-                    )
-                })
-            )
+           return(
+            <Container className={"mb-3"}>
+                    <ContextCardDisplay vars={localContext} headerText={"Local Context"} setVars={setLocalContext} deregisterOnRemove={true} onRemove={onContextRemove} />
+                    <ContextCardDisplay vars={staticContext} headerText={"Static Context"} setVars={setStaticContext} deregisterOnRemove={true} onRemove={onContextRemove} />
+                    <ContextCardDisplay vars={staticContext} headerText={"Persistent Context"} setVars={setPersistentContext} deregisterOnRemove={true} onRemove={onContextRemove} />
+            </Container>
+           )
         }
-    },[selectedNode])
+    },[selectedNode, localContext, persistentContext, staticContext, setLocalContext, setStaticContext, setPersistentContext, selectedNode?.data])
 
 
 
@@ -154,8 +182,9 @@ export default function NodeInfoForm() {
                         <br/>
                         {isState(selectedNode.data) && (
                             <Container>
-                                <Container>
-                                    <CreateContextFormModal variable={undefined} buttonName={undefined} onSubmit={undefined}></CreateContextFormModal>
+                                <Container className={"mb-3"}>
+                                    <CreateContextFormModal variable={undefined} buttonName={undefined}
+                                                            onSubmit={undefined}></CreateContextFormModal>
                                 </Container>
 
                                 {/** Initial terminal checkboxes*/}
@@ -164,42 +193,59 @@ export default function NodeInfoForm() {
                                     <Form id={"checkboxes"}>
 
                                         <Form.Group className={"mb-3"}>
-                                            <Form.Check type={"checkbox"} label={"Initial"} checked={isInitial} onChange={handleInitialCheckboxChange}/>
+                                            <Form.Check type={"checkbox"} label={"Initial"} checked={isInitial}
+                                                        onChange={handleInitialCheckboxChange}/>
                                         </Form.Group>
 
                                         <Form.Group>
-                                            <Form.Check type={"checkbox"} label={"Terminal"} checked={isTerminal} onChange={handleTerminalCheckboxChange}/>
+                                            <Form.Check type={"checkbox"} label={"Terminal"} checked={isTerminal}
+                                                        onChange={handleTerminalCheckboxChange}/>
                                         </Form.Group>
 
                                     </Form>
                                 </Container>
 
-                                <br/>
-                                <div className="d-grid gap-2">
+                                <div className="d-grid gap-2 mb-3">
                                     <Button variant="primary" size="lg" onClick={onNewActionFormButtonClick}>
                                         New Action
                                     </Button>
                                 </div>
-                                {showNewActionForm && (
-                                    <div className={"action-form-container"}>
-                                        <ActionDisplay action={undefined}
-                                                       setInvokeActions={setInvokeActions}
-                                                       onSubmit={onActionFormSubmit}
-                                                       setCreateActions={setCreateActions}
-                                                       setAssignActions={setAssignActions}
-                                                       setRaiseEventActions={setRaiseEventActions}
-                                                       setTimeoutActions={setTimeoutActions}
-                                                       setTimeoutResetActions={setTimeoutResetActions}
-                                                       setMatchActions={setMatchActions}
-                                        ></ActionDisplay>
-                                    </div>
-                                )}
+                                <br/>
+                                <Container>
+                                    <Modal show={show} onHide={handleClose} backdrop={"static"} size="lg" centered data-bs-theme="dark">
+                                        <Modal.Header closeButton={true}>
+                                            <Modal.Title style={{color: "#ffffff"}}>Create Action</Modal.Title>
+                                        </Modal.Header>
+
+                                        <ModalBody>
+                                                    <ActionDisplay action={undefined}
+                                                                   setInvokeActions={setInvokeActions}
+                                                                   onSubmit={onActionFormSubmit}
+                                                                   setCreateActions={setCreateActions}
+                                                                   setAssignActions={setAssignActions}
+                                                                   setRaiseEventActions={setRaiseEventActions}
+                                                                   setTimeoutActions={setTimeoutActions}
+                                                                   setTimeoutResetActions={setTimeoutResetActions}
+                                                                   setMatchActions={setMatchActions}
+                                                    ></ActionDisplay>
+                                        </ModalBody>
+
+                                        <Modal.Footer>
+                                            <Button variant="secondary" onClick={handleClose}>
+                                                Close
+                                            </Button>
+                                        </Modal.Footer>
+
+                                    </Modal>
+                                </Container>
+
                                 <div>
-                                    <h2>Context Test</h2>
                                     {renderContexts()}
                                 </div>
 
                                 <div>
+
+
                                     {isState(selectedNode.data) && selectedNode.data.state.entry && (
                                         <ActionAccordion headerText={"Entry Actions"}
                                                          actions={selectedNode.data.state.entry}

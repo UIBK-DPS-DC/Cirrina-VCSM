@@ -1,6 +1,6 @@
 import React, {useCallback, useContext, useEffect, useRef, useState} from "react";
 import {generateRaisedToConsumedInfoStrings, ReactFlowContext, renderEnumAsOptions} from "../../utils.tsx";
-import {CsmNodeProps, isStateMachine, ReactFlowContextProps} from "../../types.ts";
+import {CsmEdgeProps, CsmNodeProps, isState, isStateMachine, ReactFlowContextProps} from "../../types.ts";
 import Offcanvas from "react-bootstrap/Offcanvas";
 import {
     Accordion, AccordionHeader,
@@ -28,10 +28,13 @@ import TimeoutActionForm from "./ActionForms/timeoutActionForm.tsx";
 import TimeoutResetActionForm from "./ActionForms/timeoutResetActionForm.tsx";
 import MatchActionForm from "./ActionForms/matchActionForm.tsx";
 import Modal from "react-bootstrap/Modal";
-import {Node} from "@xyflow/react";
+import {addEdge, Connection, Edge, MarkerType, Node} from "@xyflow/react";
+import {getNewEdgeId} from "./flow.tsx";
+
 
 
 let idCounter = 0
+const NO_ELSE = "NO_ELSE";
 
 
 export default function TransitionInfoForm() {
@@ -39,7 +42,7 @@ export default function TransitionInfoForm() {
     const {selectedEdge,
         showSidebar,
         setShowSidebar,
-        eventService, setRecalculateTransitions, recalculateTransitions, nodes} = context
+        eventService, setRecalculateTransitions, recalculateTransitions, nodes , setEdges, edges, transitionService} = context
 
     const instanceId = useRef(++idCounter).current;
     let formCount = 0
@@ -52,6 +55,7 @@ export default function TransitionInfoForm() {
     const [guards, setGuards] = useState<Guard[]>(selectedEdge?.data?.transition.getGuards || []);
     const [actions, setActions] = useState<Action[]>(selectedEdge?.data?.transition.getActions || [])
     const [onEvent, setOnEvent] = useState<Event | undefined>()
+    const [selectedElse, setSelectedElse] = useState<string>(selectedEdge?.data?.transition.getElse() || NO_ELSE)
 
 
 
@@ -69,6 +73,20 @@ export default function TransitionInfoForm() {
 
     const handleShow = () => setShowActionModal(true)
     const handleClose = () => setShowActionModal(false)
+
+    const siblings = useCallback(() => {
+        if(!selectedEdge?.data){
+            return
+        }
+
+        const source = nodes.find((n) => n.id === selectedEdge.source)
+        if(!source){
+            return
+        }
+
+        return nodes.filter((n) => n.parentId === source.parentId && isState(n.data))
+
+    },[nodes, selectedEdge])
 
     const onInvokeActionSubmit = () => {
         setActions((prev) => [...prev, invokeAction[0]])
@@ -199,6 +217,7 @@ export default function TransitionInfoForm() {
     }
 
 
+
     useEffect(() => {
         if(selectedEdge?.data && onEvent){
             selectedEdge.data.transition.setEvent(onEvent.name)
@@ -217,6 +236,14 @@ export default function TransitionInfoForm() {
             }
 
             setGuards(selectedEdge.data.transition.getGuards())
+
+            if(!selectedEdge.data.transition.getElse().trim()){
+                setSelectedElse(NO_ELSE)
+            }
+            else {
+                setSelectedElse(selectedEdge.data.transition.getElse())
+            }
+
         }
         setRecalculateTransitions(!recalculateTransitions)
 
@@ -230,6 +257,53 @@ export default function TransitionInfoForm() {
     const onSelectedActionTypeChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
         setSelectedActionType(event.target.value);
     };
+
+    const onSelectedElseChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+        setSelectedElse(event.target.value);
+        if(!selectedEdge?.data){
+            return
+        }
+        if(event.target.value === NO_ELSE){
+            selectedEdge.data.transition.setElse("")
+        }
+        else{
+            selectedEdge.data.transition.setElse(event.target.value)
+        }
+
+        const prevEdge = edges.find((e) => e.data?.elseEdge && e.source ===  selectedEdge.source)
+        setEdges((prev) => prev.filter(e => e !== prevEdge))
+
+        const sourceNode = nodes.find((n) => n.id === selectedEdge.source)
+        if(!sourceNode){
+            return
+        }
+
+        const targetNode = nodes.find((n) => n.parentId === sourceNode.parentId && isState(n.data) && n.data.state.name === event.target.value)
+        if(!targetNode){
+            return
+        }
+
+
+        if(event.target.value !== NO_ELSE){
+            const connection: Connection = {
+                source: selectedEdge.source, sourceHandle: selectedEdge.sourceHandle || "t-s", target: targetNode.id, targetHandle: "b-t"
+
+            }
+            const newTransition = transitionService.connectionToTransition(connection);
+            if (newTransition) {
+                newTransition.isElseEdge = true
+                const edge: Edge<CsmEdgeProps> = { id: getNewEdgeId(),
+                    ...connection,
+                    type: 'csm-edge',
+                    data: { transition: newTransition, elseEdge: true }, zIndex: 1, markerEnd: {type: MarkerType.ArrowClosed}, selectable: false
+                };
+
+                setEdges(eds => addEdge(edge, eds));
+            }
+        }
+
+
+    }
 
     const onAddGuardClick = (event: React.MouseEvent<HTMLButtonElement>) => {
         event.preventDefault()
@@ -257,7 +331,7 @@ export default function TransitionInfoForm() {
 
     return (
         <>
-            {showSidebar && selectedEdge && selectedEdge.data && (
+            {showSidebar && selectedEdge && selectedEdge.data && !selectedEdge.data.transition.isElseEdge && (
                 <Offcanvas show={showSidebar}
                            scroll={true} backdrop={false}
                            placement={"end"}
@@ -294,7 +368,6 @@ export default function TransitionInfoForm() {
                             </Form.Group>
 
                             {selectedEdge.data.transition.isStatemachineEdge && (
-                                // TODO: EXTEND HERE
                                 <Container>
                                     {generateInfoStrings(nodes).map((s) => {
                                         return (
@@ -337,6 +410,22 @@ export default function TransitionInfoForm() {
                                             <SelectSingleEventModal event={onEvent} setEvent={setOnEvent}></SelectSingleEventModal>
                                         </Col>
                                     </Form.Group>
+
+                                    <Form.Group as={Row} className={"mb-3"}>
+                                        <Form.Label column sm={"2"}>
+                                            Else:
+                                        </Form.Label>
+                                        <Col sm={10}>
+                                            <Form.Select value={selectedElse} onChange={onSelectedElseChange}>
+                                                <option value={NO_ELSE}>None</option>
+                                                {siblings()?.map((s) => {
+                                                    return (
+                                                        <option value={isState(s.data) ? s.data.state.name : s.id} key={`o-${s.id}`}>{isState(s.data) ? s.data.state.name : s.id}</option>
+                                                    )
+                                                })}
+                                            </Form.Select>
+                                        </Col>
+                                    </Form.Group>
                                 </Container>
                             )}
 
@@ -349,19 +438,26 @@ export default function TransitionInfoForm() {
 
                         {! selectedEdge.data.transition.isStatemachineEdge && (
                             <Container className={"mb-3"}>
-                                <Button onClick={handleShow}>
-                                    Add Action
-                                    <i className="bi bi-plus-circle"></i>
-                                </Button>
+                                <Row>
+                                    <Col sm={6}>
+                                        Transition Actions:
+                                    </Col>
+                                    <Col sm={6}>
+                                        <Button onClick={handleShow}>
+                                            Add Action
+                                            <i className="bi bi-plus-circle"></i>
+                                        </Button>
+                                    </Col>
+                                </Row>
 
-                                <Modal show={showActionModal} size={"lg"} onHide={handleClose}>
+                                <Modal show={showActionModal} size={"lg"} onHide={handleClose} data-bs-theme="dark" >
                                     <Modal.Header closeButton>
-                                        <Modal.Title>Add Action</Modal.Title>
+                                        <Modal.Title style={{color: "#ffffff"}}>Add Action</Modal.Title>
                                     </Modal.Header>
 
                                     <ModalBody>
                                         <Row className={"mb-3"}>
-                                            <Form.Label column sm={"4"}>Action type:</Form.Label>
+                                            <Form.Label column sm={"4"} style={{color: "#ffffff"}} >Action type:</Form.Label>
                                             <Col sm={8}>
                                                 <Form.Select value={selectedActionType} onChange={onSelectedActionTypeChange}>
                                                     {renderEnumAsOptions(ActionType)}

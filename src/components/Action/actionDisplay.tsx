@@ -6,8 +6,6 @@ import RaiseEventActionForm from "../visualEditor/ActionForms/raiseEventActionFo
 import InvokeActionForm from "../visualEditor/ActionForms/invokeActionForm.tsx";
 import CreateActionForm from "../visualEditor/ActionForms/createActionForm.tsx";
 import AssignActionForm from "../visualEditor/ActionForms/assignActionForm.tsx";
-import LockActionForm from "../visualEditor/ActionForms/lockActionForm.tsx";
-import UnlockActionForm from "../visualEditor/ActionForms/unlockActionForm.tsx";
 import TimeoutActionForm from "../visualEditor/ActionForms/timeoutActionForm.tsx";
 import TimeoutResetActionForm from "../visualEditor/ActionForms/timeoutResetActionForm.tsx";
 import { Form } from "react-bootstrap";
@@ -51,10 +49,6 @@ export default function ActionDisplay(props: {
                 return <CreateActionForm action={props.action} setActions={props.setCreateActions} onSubmit={props.onSubmit} />;
             case ActionType.ASSIGN:
                 return <AssignActionForm action={props.action} setActions={props.setAssignActions} onSubmit={props.onSubmit} />;
-            case ActionType.LOCK:
-                return <LockActionForm action={props.action} />;
-            case ActionType.UNLOCK:
-                return <UnlockActionForm action={props.action} />;
             case ActionType.RAISE_EVENT:
                 return <RaiseEventActionForm action={props.action} setActions={props.setRaiseEventActions} onSubmit={props.onSubmit} />;
             case ActionType.TIMEOUT:
@@ -71,7 +65,7 @@ export default function ActionDisplay(props: {
     return (
         <div>
             <Form.Group className={"mb-3 mt-3"}>
-                <Form.Label>Action Type</Form.Label>
+                <Form.Label style={{color: "#ffffff", textAlign: "center"}}>Action Type</Form.Label>
                 <Form.Select
                     disabled={isDisabled}
                     onChange={onSelectedActionTypeChange}

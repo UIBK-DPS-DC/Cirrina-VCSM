@@ -238,7 +238,7 @@ export default function SelectEventsModal(props:{buttonName: string | undefined,
 
                         <div className={"mb-3"}>
                             <small className="text-decoration-underline text-muted">
-                                You can select multiple events by holding CTRL
+                                You can create a new Event by typing in the select field!
                             </small>
                         </div>
                         

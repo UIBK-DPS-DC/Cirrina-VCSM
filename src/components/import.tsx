@@ -1,7 +1,9 @@
 // Ensure all required imports are correct and in place
 import { Button } from "react-bootstrap";
 import React, { useCallback, useContext, useRef } from "react";
-import { CollaborativeStateMachineDescription } from "../pkl/bindings/collaborative_state_machine_description.pkl.ts";
+import {
+    CollaborativeStateMachineDescription,
+} from "../pkl/bindings/collaborative_state_machine_description.pkl.ts";
 import {
     colorMap,
     fromCollaborativeStatemachineDescription,
@@ -18,7 +20,7 @@ import {
     TimeoutActionProps,
 } from "../types.ts";
 import State from "../classes/state.ts";
-import { Edge, MarkerType, Node } from "@xyflow/react";
+import {Edge, MarkerType, Node} from "@xyflow/react";
 import StateMachine from "../classes/stateMachine.ts";
 import ELK from "elkjs/lib/elk.bundled.js";
 import Transition from "../classes/transition.ts";
@@ -44,11 +46,11 @@ const rootLayoutOptions = {
     "elk.direction": "RIGHT",
     "elk.edgeRouting": "ORTHOGONAL", // Enable orthogonal edge routing
     "elk.allowEdgeNodeOverlap": "false",
-    "elk.layered.spacing.nodeNodeBetweenLayers": "300", // Increased spacing between layers
-    "elk.layered.spacing.edgeNodeBetweenLayers": "300", // Increased spacing between layers
-    "elk.spacing.nodeNode": "500", // Increased spacing between nodes in the same layer
-    "elk.spacing.edgeEdge": "250",
-    "elk.spacing.edgeNode": "300",
+    "elk.layered.spacing.nodeNodeBetweenLayers": "200", // Increased spacing between layers
+    "elk.layered.spacing.edgeNodeBetweenLayers": "200", // Increased spacing between layers
+    "elk.spacing.nodeNode": "400", // Increased spacing between nodes in the same layer
+    "elk.spacing.edgeEdge": "150",
+    "elk.spacing.edgeNode": "200",
 
     "portConstraints": "FIXED_ORDER",
     "elk.margins": "200",
@@ -64,7 +66,7 @@ const parentLayoutOptions = {
     "elk.allowEdgeNodeOverlap": "false",
     "elk.layered.spacing.nodeNodeBetweenLayers": "200", // Increased spacing between layers
     "elk.layered.spacing.edgeNodeBetweenLayers": "200", // Increased spacing between layers
-    "elk.spacing.nodeNode": "1200", // Increased spacing between nodes in the same layer
+    "elk.spacing.nodeNode": "500", // Increased spacing between nodes in the same layer
     "elk.spacing.edgeEdge": "250",
     "elk.spacing.edgeNode": "300",
     "portConstraints": "FIXED_ORDER",
@@ -82,7 +84,7 @@ const childLayoutOptions = {
     "portConstraints": "FIXED_ORDER",
     "elk.layered.spacing.nodeNodeBetweenLayers": "200", // Increased spacing between layers
     "elk.layered.spacing.edgeNodeBetweenLayers": "200", // Increased spacing between layers
-    "elk.spacing.nodeNode": "1000", // Increased spacing between nodes in the same layer
+    "elk.spacing.nodeNode": "500", // Increased spacing between nodes in the same layer
     "elk.spacing.edgeEdge": "250",
     "elk.spacing.edgeNode": "300",
     "elk.partitioning.activate": "true",
@@ -259,6 +261,16 @@ export default function Import() {
                 e.sourceHandle = "s"
                 e.targetHandle = "t"
             }
+            // Adjust else edges to have same source handle as edge with else.
+            if(e.data?.transition.isElseEdge){
+                console.log("ELSE EDGE FOUND")
+                const newSource = edges.find((edge) => edge.data?.transition.getId() === e.data?.transition.elseSourceId)
+                console.log(`NEW SOURCE ${newSource}`)
+                if(newSource){
+                    e.sourceHandle = newSource.sourceHandle
+                }
+            }
+
         })
 
     }
@@ -343,6 +355,8 @@ export default function Import() {
             return false;
         });
 
+
+
         if (!target) {
             return;
         }
@@ -361,6 +375,8 @@ export default function Import() {
             zIndex: 1,
             markerEnd: { type: MarkerType.ArrowClosed },
         };
+
+        console.log(`ELSE ${transition.isElseEdge}`)
 
         return edge;
     };
@@ -391,6 +407,25 @@ export default function Import() {
                         edges.push(edge);
                     }
                 });
+
+                const elseTransitions = edges.filter((e) => e.data?.transition.getElse().trim() !== "")
+                elseTransitions.forEach((edge) => {
+                    const targetNode: Node<CsmNodeProps> | undefined = nodes.find((n) => isState(n.data) && n.data.state.name === edge.data?.transition.getElse() && n.parentId === node.parentId)
+
+
+                    if (targetNode && isState(node.data) && isState(targetNode.data)) {
+                        console.log(`${edge.source}  - ${edge.target}`);
+                        const newTransition = new Transition(node.data.state.name,targetNode.data.state.name, false, true, edge.data?.transition.getId())
+                        const newEdge = transitionToEdge(sourceState, newTransition, nodes);
+                        if (newEdge) {
+                            edges.push(newEdge);
+                        }
+
+
+                    }
+
+                })
+
 
             }
         });
@@ -558,6 +593,7 @@ export default function Import() {
                     return edge;
                 });
                 adjustInternalTransitionHandles(layoutedEdges)
+                console.log(`NUM EDGES ${layoutedEdges.length}`)
                 setEdges(layoutedEdges);
             });
         },

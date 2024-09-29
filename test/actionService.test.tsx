@@ -333,8 +333,8 @@ describe("ActionService - getActionsByType", () => {
     });
 
     test("should not return actions of unrelated types", () => {
-        const action1 = new Action("Action1", ActionType.LOCK);
-        const action2 = new Action("Action2", ActionType.UNLOCK);
+        const action1 = new Action("Action1", ActionType.ASSIGN);
+        const action2 = new Action("Action2", ActionType.TIMEOUT_RESET);
 
         actionService.registerAction(action1);
         actionService.registerAction(action2);

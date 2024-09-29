@@ -2,8 +2,6 @@ export enum ActionType {
     "INVOKE" = "invoke",
     "CREATE" = "create",
     "ASSIGN" = "assign",
-    "LOCK" = "lock",
-    "UNLOCK" = "unlock",
     "RAISE_EVENT" = "raise",
     "TIMEOUT" = "timeout",
     "TIMEOUT_RESET" = "timeoutReset",

@@ -39,9 +39,9 @@ export default function RenameNodeComponent() {
      * @param {string} oldName - The old name of the node before renaming.
      * @param {string} newName - The new name of the node after renaming.
      */
-    const updateTransitionsOnRename = useCallback((oldName: string, newName: string) => {
+    const updateTransitionsOnRename = useCallback((oldName: string, newName: string, nodeId: string) => {
         setEdges(edges => edges.map(edge => {
-            if (edge.data?.transition) {
+            if (edge.data?.transition && (edge.source === nodeId || edge.target === nodeId)) {
                 const transition = edge.data.transition;
                 let updated = false;
                 if (transition.getSource() === oldName) {
@@ -51,6 +51,9 @@ export default function RenameNodeComponent() {
                 if (transition.getTarget() === oldName) {
                     transition.setTarget(newName);
                     updated = true;
+                }
+                if(transition.getElse() === oldName) {
+                    transition.setElse(newName);
                 }
                 if (updated) {
                     return { ...edge, data: { ...edge.data, transition } };
@@ -119,7 +122,7 @@ export default function RenameNodeComponent() {
             stateOrStateMachineService.unlinkStateNameFromStatemachine(oldName, parentID);
             stateOrStateMachineService.linkStateNameToStatemachine(newName, parentID, true);
             setNodes(newNodes);
-            updateTransitionsOnRename(oldName, newName);
+            updateTransitionsOnRename(oldName, newName, selectedNode.id);
         }
 
     },[nodes, selectedNode, setNodes, stateOrStateMachineService, updateTransitionsOnRename])
