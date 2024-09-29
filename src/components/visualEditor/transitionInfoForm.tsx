@@ -1,6 +1,6 @@
 import React, {useCallback, useContext, useEffect, useRef, useState} from "react";
 import {generateRaisedToConsumedInfoStrings, ReactFlowContext, renderEnumAsOptions} from "../../utils.tsx";
-import {CsmNodeProps, isState, isStateMachine, ReactFlowContextProps} from "../../types.ts";
+import {CsmEdgeProps, CsmNodeProps, isState, isStateMachine, ReactFlowContextProps} from "../../types.ts";
 import Offcanvas from "react-bootstrap/Offcanvas";
 import {
     Accordion, AccordionHeader,
@@ -28,7 +28,8 @@ import TimeoutActionForm from "./ActionForms/timeoutActionForm.tsx";
 import TimeoutResetActionForm from "./ActionForms/timeoutResetActionForm.tsx";
 import MatchActionForm from "./ActionForms/matchActionForm.tsx";
 import Modal from "react-bootstrap/Modal";
-import {Node} from "@xyflow/react";
+import {addEdge, Connection, Edge, MarkerType, Node} from "@xyflow/react";
+import {getNewEdgeId} from "./flow.tsx";
 
 
 
@@ -41,7 +42,7 @@ export default function TransitionInfoForm() {
     const {selectedEdge,
         showSidebar,
         setShowSidebar,
-        eventService, setRecalculateTransitions, recalculateTransitions, nodes , setEdges} = context
+        eventService, setRecalculateTransitions, recalculateTransitions, nodes , setEdges, edges, transitionService} = context
 
     const instanceId = useRef(++idCounter).current;
     let formCount = 0
@@ -235,7 +236,6 @@ export default function TransitionInfoForm() {
             }
 
             setGuards(selectedEdge.data.transition.getGuards())
-            console.log(`YOU ARE  HERE ${selectedEdge.data.transition.getElse()}`)
 
             if(!selectedEdge.data.transition.getElse().trim()){
                 setSelectedElse(NO_ELSE)
@@ -244,7 +244,6 @@ export default function TransitionInfoForm() {
                 setSelectedElse(selectedEdge.data.transition.getElse())
             }
 
-            console.log(`SELECTED ELSE ${selectedElse}`)
         }
         setRecalculateTransitions(!recalculateTransitions)
 
@@ -270,6 +269,40 @@ export default function TransitionInfoForm() {
         else{
             selectedEdge.data.transition.setElse(event.target.value)
         }
+
+        const prevEdge = edges.find((e) => e.data?.elseEdge && e.source ===  selectedEdge.source)
+        setEdges((prev) => prev.filter(e => e !== prevEdge))
+
+        const sourceNode = nodes.find((n) => n.id === selectedEdge.source)
+        if(!sourceNode){
+            return
+        }
+
+        const targetNode = nodes.find((n) => n.parentId === sourceNode.parentId && isState(n.data) && n.data.state.name === event.target.value)
+        if(!targetNode){
+            return
+        }
+
+
+        if(event.target.value !== NO_ELSE){
+            const connection: Connection = {
+                source: selectedEdge.source, sourceHandle: selectedEdge.sourceHandle || "t-s", target: targetNode.id, targetHandle: "b-t"
+
+            }
+            const newTransition = transitionService.connectionToTransition(connection);
+            if (newTransition) {
+                newTransition.isElseEdge = true
+                const edge: Edge<CsmEdgeProps> = { id: getNewEdgeId(),
+                    ...connection,
+                    type: 'csm-edge',
+                    data: { transition: newTransition, elseEdge: true }, zIndex: 1, markerEnd: {type: MarkerType.ArrowClosed}, selectable: false
+                };
+
+                setEdges(eds => addEdge(edge, eds));
+            }
+        }
+
+
     }
 
     const onAddGuardClick = (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -298,7 +331,7 @@ export default function TransitionInfoForm() {
 
     return (
         <>
-            {showSidebar && selectedEdge && selectedEdge.data && (
+            {showSidebar && selectedEdge && selectedEdge.data && !selectedEdge.data.transition.isElseEdge && (
                 <Offcanvas show={showSidebar}
                            scroll={true} backdrop={false}
                            placement={"end"}

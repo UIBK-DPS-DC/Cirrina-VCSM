@@ -367,7 +367,7 @@ export default class PklService {
         }
 
         if(description.else) {
-            pkl += `${this.getIndent(indentLevel + 1)}else = "${description.else}"\n`
+            pkl += `${this.getIndent(indentLevel + 1)}\`else\` = "${description.else}"\n`
         }
 
 

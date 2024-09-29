@@ -18,8 +18,10 @@ export default class Transition {
     private _else : string
     private _event : string
     private _isStatemachineEdge : boolean
+    private _isElseEdge: boolean
+    private _elseSourceId: number | undefined // To link else edges to edges with corresponding else statement
 
-    public constructor (sourceState: string, targetState: string, isStatemachineEdge: boolean = false) {
+    public constructor (sourceState: string, targetState: string, isStatemachineEdge: boolean = false, isElseEdge: boolean = false, elseSourceId: number | undefined = undefined) {
         this.source = sourceState
         this.target = targetState
         this._guards = []
@@ -29,6 +31,8 @@ export default class Transition {
         this._isStatemachineEdge = isStatemachineEdge
         this.ID = this.getNewId()
         this._edgeId = ""
+        this._isElseEdge = isElseEdge
+        this._elseSourceId = elseSourceId
     }
 
     get edgeId(): string {
@@ -36,6 +40,23 @@ export default class Transition {
     }
     set edgeId(value: string) {
         this._edgeId = value;
+    }
+
+
+    get elseSourceId(): number | undefined {
+        return this._elseSourceId;
+    }
+
+    set elseSourceId(value: number | undefined) {
+        this._elseSourceId = value;
+    }
+
+    get isElseEdge(): boolean {
+        return this._isElseEdge;
+    }
+
+    set isElseEdge(value: boolean) {
+        this._isElseEdge = value;
     }
 
     public setSource(sourceState: string): void{

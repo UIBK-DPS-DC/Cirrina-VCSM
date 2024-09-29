@@ -34,7 +34,7 @@ export type CsmNodeProps = {state: State, prevPosition?: {x: number, y: number}}
         prevSize? : {height?:  number, width?:  number},
         prevPosition?: {x: number, y: number},prevParentId?: string}
     | {name: string};
-export type CsmEdgeProps = {transition: Transition}
+export type CsmEdgeProps = {transition: Transition, elseEdge?: boolean}
 
 export type NodeType =
     | 'state-node'
