@@ -46,11 +46,11 @@ const rootLayoutOptions = {
     "elk.direction": "RIGHT",
     "elk.edgeRouting": "ORTHOGONAL", // Enable orthogonal edge routing
     "elk.allowEdgeNodeOverlap": "false",
-    "elk.layered.spacing.nodeNodeBetweenLayers": "300", // Increased spacing between layers
-    "elk.layered.spacing.edgeNodeBetweenLayers": "300", // Increased spacing between layers
-    "elk.spacing.nodeNode": "500", // Increased spacing between nodes in the same layer
-    "elk.spacing.edgeEdge": "250",
-    "elk.spacing.edgeNode": "300",
+    "elk.layered.spacing.nodeNodeBetweenLayers": "200", // Increased spacing between layers
+    "elk.layered.spacing.edgeNodeBetweenLayers": "200", // Increased spacing between layers
+    "elk.spacing.nodeNode": "400", // Increased spacing between nodes in the same layer
+    "elk.spacing.edgeEdge": "150",
+    "elk.spacing.edgeNode": "200",
 
     "portConstraints": "FIXED_ORDER",
     "elk.margins": "200",
@@ -66,7 +66,7 @@ const parentLayoutOptions = {
     "elk.allowEdgeNodeOverlap": "false",
     "elk.layered.spacing.nodeNodeBetweenLayers": "200", // Increased spacing between layers
     "elk.layered.spacing.edgeNodeBetweenLayers": "200", // Increased spacing between layers
-    "elk.spacing.nodeNode": "1200", // Increased spacing between nodes in the same layer
+    "elk.spacing.nodeNode": "500", // Increased spacing between nodes in the same layer
     "elk.spacing.edgeEdge": "250",
     "elk.spacing.edgeNode": "300",
     "portConstraints": "FIXED_ORDER",
@@ -84,7 +84,7 @@ const childLayoutOptions = {
     "portConstraints": "FIXED_ORDER",
     "elk.layered.spacing.nodeNodeBetweenLayers": "200", // Increased spacing between layers
     "elk.layered.spacing.edgeNodeBetweenLayers": "200", // Increased spacing between layers
-    "elk.spacing.nodeNode": "1000", // Increased spacing between nodes in the same layer
+    "elk.spacing.nodeNode": "500", // Increased spacing between nodes in the same layer
     "elk.spacing.edgeEdge": "250",
     "elk.spacing.edgeNode": "300",
     "elk.partitioning.activate": "true",
@@ -412,7 +412,9 @@ export default function Import() {
                 elseTransitions.forEach((edge) => {
                     const targetNode: Node<CsmNodeProps> | undefined = nodes.find((n) => isState(n.data) && n.data.state.name === edge.data?.transition.getElse() && n.parentId === node.parentId)
 
+
                     if (targetNode && isState(node.data) && isState(targetNode.data)) {
+                        console.log(`${edge.source}  - ${edge.target}`);
                         const newTransition = new Transition(node.data.state.name,targetNode.data.state.name, false, true, edge.data?.transition.getId())
                         const newEdge = transitionToEdge(sourceState, newTransition, nodes);
                         if (newEdge) {
