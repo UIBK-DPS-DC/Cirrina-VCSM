@@ -706,9 +706,19 @@ export default function Flow() {
                                // If there is at least one common event, perform the necessary action
                                if (hasCommonEvent) {
 
+
+
                                    // Dynamically set source and target handle depending on position
-                                   const sourceHandle:string = otherNode.position.x > n.position.x ? "c" : "a"
-                                   const targetHandle: string = otherNode.position.x > n.position.x ? "b" : "d"
+                                   let sourceHandle:string = otherNode.position.x > n.position.x ? "c" : "a"
+                                   let targetHandle: string = otherNode.position.x > n.position.x ? "b" : "d"
+
+                                   edgesToAdd.forEach((e)  => {
+                                       if(e.source === otherNode.id && e.target === n.id){
+                                           sourceHandle = e.sourceHandle || sourceHandle
+                                           targetHandle = e.targetHandle || targetHandle
+
+                                       }
+                                   })
 
                                    console.log(`Node ${otherNode.id} consumes an event raised by Node ${n.id}`);
                                    const connection: Connection = {
@@ -750,6 +760,10 @@ export default function Flow() {
         })
 
         // Here
+
+        edgesToAdd.forEach((e) => {
+            console.log(e.sourceHandle)
+        })
 
         setEdges((prev) => [...prev, ...edgesToAdd])
 
