@@ -211,6 +211,8 @@ export default function Import() {
         });
     };
 
+
+    // TODO get events raised by a transition
     const setupEventService = (
         service: EventService,
         nodes: Node<CsmNodeProps>[]
@@ -219,6 +221,7 @@ export default function Import() {
         // Get timeout actions that are raise event actions
 
         let raiseActions: Action[] = [];
+
 
         nodes.forEach((node) => {
             if (isState(node.data)) {
@@ -255,11 +258,64 @@ export default function Import() {
         });
     };
 
-    const adjustInternalTransitionHandles = (edges: Edge<CsmEdgeProps>[]) => {
+    const adjustInternalTransitionHandles = (edges: Edge<CsmEdgeProps>[], nodes: Node<CsmNodeProps>[]) => {
         edges.forEach((e) => {
             if(e.source === e.target){
-                e.sourceHandle = "s"
-                e.targetHandle = "t"
+                const sourceNode = nodes.find((n) => n.id === e.source)
+                if(sourceNode && isState(sourceNode.data)) {
+
+                    let sourceHandle = ""
+                    let targetHandle: string
+
+                    State.INTERNAL_SOURCE_HANDLES.every((handle) => {
+                        if(isState(sourceNode.data)){
+
+                            if(!sourceNode.data.state.isSourceHandleUsed(handle)){
+                                sourceHandle = handle
+                                return false
+                            }
+                        }
+
+                        return true
+
+                    })
+
+
+                    switch (sourceHandle) {
+                        case "s" : {
+                            targetHandle = "t"
+                            break
+                        }
+
+                        case "s-1" : {
+                            targetHandle = "t-1"
+                            break
+                        }
+
+                        case "s-2" : {
+                            targetHandle = "t-2"
+                            break
+                        }
+
+                        case "s-3" : {
+                            targetHandle = "t-3"
+                            break
+                        }
+
+                        default: {
+                            targetHandle = ""
+                        }
+
+
+                    }
+
+                    e.sourceHandle = sourceHandle
+                    e.targetHandle = targetHandle
+                    sourceNode.data.state.addSourceHandle(sourceHandle)
+                }
+
+
+
             }
             // Adjust else edges to have same source handle as edge with else.
             if(e.data?.transition.isElseEdge){
@@ -621,7 +677,7 @@ export default function Import() {
 
                     return edge;
                 });
-                adjustInternalTransitionHandles(layoutedEdges)
+                adjustInternalTransitionHandles(layoutedEdges, layoutedNodes )
                 console.log(`NUM EDGES ${layoutedEdges.length}`)
                 setEdges(layoutedEdges);
             });

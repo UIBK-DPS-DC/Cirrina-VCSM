@@ -222,6 +222,16 @@ export default function Flow() {
             })
         }
 
+        edges.forEach((e) => {
+            if(e.target === e.source){
+                const sourceNode = nodes.find((n) => n.id === e.source)
+                if(sourceNode && isState(sourceNode.data)){
+                    sourceNode.data.state.removeSourceHandle(e.sourceHandle || "")
+                    console.log(`Removed source handle ${e.sourceHandle}`)
+                }
+            }
+        })
+
 
         setRecalculateTransitions(!recalculateTransitions);
     },[setEdges, setRecalculateTransitions, nodes, edges]);

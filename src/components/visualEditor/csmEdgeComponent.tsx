@@ -27,7 +27,7 @@ export default function CsmEdge({
                                     target,
                                     source,
                                     data,
-                                    sourceHandleId
+                                    sourceHandleId,
                                 }: EdgeProps<TransitionEdge>) {
     const [edgePath, labelX, labelY] = getSmoothStepPath({
         sourceX,
@@ -42,6 +42,9 @@ export default function CsmEdge({
     const context = useContext(ReactFlowContext) as ReactFlowContextProps;
     const { edges, setEdges, hideFlowEdges, showEdgeLabels } = context;
 
+
+
+
     // Event [guards] / actions
     const generateInfoString = (transition: Transition | undefined) => {
         if (!transition) {
@@ -54,25 +57,20 @@ export default function CsmEdge({
 
         let guardString = '';
 
-        if(guards.length > 0){
-
-            guardString+= "["
+        if (guards.length > 0) {
+            guardString += '[';
             guards.forEach((guard, i) => {
                 guardString += guard.expression;
                 if (i !== guards.length - 1) {
                     guardString += ', ';
                 }
             });
-            guardString+= "]"
+            guardString += ']';
         }
 
-
-
-
-
         let actionString = '';
-        if(actions.length > 0){
-            actionString+= "/ "
+        if (actions.length > 0) {
+            actionString += '/ ';
             actions.forEach((action, i) => {
                 actionString += action.name;
                 if (i !== actions.length - 1) {
@@ -80,7 +78,6 @@ export default function CsmEdge({
                 }
             });
         }
-
 
         return `${event} ${guardString} ${actionString}`;
     };
@@ -107,22 +104,73 @@ export default function CsmEdge({
     });
 
     // Determine the condition for label positioning
-    const topToBottom = sourceHandleId === "t-s" || sourceHandleId === "b-s"
-    const leftToRight = sourceHandleId === "r-s" || sourceHandleId === "l-s"
+    const topToBottom = sourceHandleId === 't-s' || sourceHandleId === 'b-s';
+    const leftToRight = sourceHandleId === 'r-s' || sourceHandleId === 'l-s';
+
+    let internalTransitionXOffset: number
+    let internalTransitionYOffset: number
+
+
+    switch (sourceHandleId){
+        case "s": {
+            internalTransitionXOffset = -120
+            internalTransitionYOffset = 0;
+            break
+        }
+        case "s-1": {
+            internalTransitionXOffset = 110
+            internalTransitionYOffset = -15
+            break
+        }
+        case "s-2": {
+            internalTransitionXOffset = 110
+            internalTransitionYOffset = 45
+            break
+        }
+        case "s-3": {
+            internalTransitionXOffset = -90
+            internalTransitionYOffset = 60
+            break
+        }
+        default: {
+            internalTransitionXOffset = 0
+            internalTransitionYOffset = 0
+        }
+    }
+
 
 
     // Adjust label position based on the condition
-    const labelOffsetX = topToBottom ? (sourceHandleId=== "t-s" ? 75 : -75) : 0                            //topToBottom ? 15: -130; // Adjust the value as needed
-    const labelOffsetY = leftToRight ? (sourceHandleId === "r-s" ? 15: -15) : 0 // You can also adjust Y offset if needed
+    const labelOffsetX = topToBottom
+        ? sourceHandleId === 't-s'
+            ? 75
+            : -75
+        : 0;
+    const labelOffsetY = leftToRight
+        ? sourceHandleId === 'r-s'
+            ? 15
+            : -15
+        : 0;
+
+    // Calculate the midpoint for internal transitions
+    const midPoint = {
+        x: sourceX,
+        y: sourceY - radiusY, // Adjust radiusY as needed
+    };
 
     return (
         <>
             {target !== source && !isStatemachineEdge ? (
                 <>
-                    <BaseEdge id={id} path={edgePath} markerEnd={markerEnd} style={{
-                        stroke: data?.transition.isElseEdge ? 'purple' : undefined,            // Set the edge color to purple
-                        strokeDasharray: data?.transition.isElseEdge ? '5,5' : undefined,
-                    }} />
+                    <BaseEdge
+                        id={id}
+                        path={edgePath}
+                        markerEnd={markerEnd}
+                        style={{
+                            stroke: data?.transition.isElseEdge ? 'purple' : undefined,
+                            strokeDasharray: data?.transition.isElseEdge ? '5,5' : undefined,
+                        }}
+                    />
                     <EdgeLabelRenderer>
                         {infoString.trim() && showEdgeLabels && (
                             <div
@@ -131,7 +179,8 @@ export default function CsmEdge({
                                     transform: `
                                     translate(-50%, -50%)
                                     translate(${labelX}px, ${labelY}px)
-                                    translate(${labelOffsetX}px, ${labelOffsetY}px)`
+                                    translate(${labelOffsetX}px, ${labelOffsetY}px)`,
+                                    zIndex: 2,
                                 }}
                                 className="nodrag nopan fixed-label"
                             >
@@ -141,12 +190,30 @@ export default function CsmEdge({
                     </EdgeLabelRenderer>
                 </>
             ) : target === source ? (
-                <path
-                    id={id}
-                    className="react-flow__edge-path"
-                    d={internalPath}
-                    markerEnd={markerEnd}
-                />
+                <>
+                    <path
+                        id={id}
+                        className="react-flow__edge-path"
+                        d={internalPath}
+                        markerEnd={markerEnd}
+                    />
+                    {infoString.trim() && showEdgeLabels && (
+                        <EdgeLabelRenderer>
+                            <div
+                                style={{
+                                    position: 'absolute',
+                                    transform: `
+                                    translate(-50%, -50%)
+                                    translate(${midPoint.x + internalTransitionXOffset}px, ${midPoint.y + internalTransitionYOffset}px)`,
+                                    zIndex: 2
+                                }}
+                                className="nodrag nopan fixed-label"
+                            >
+                                {infoString}
+                            </div>
+                        </EdgeLabelRenderer>
+                    )}
+                </>
             ) : (
                 <>
                     <BaseEdge

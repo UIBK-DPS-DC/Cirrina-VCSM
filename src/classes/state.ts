@@ -6,7 +6,7 @@ import Guard from "./guard.tsx";
 import Event from "./event.ts";
 import {StateDescription} from "../pkl/bindings/collaborative_state_machine_description.pkl.ts";
 import {ActionType} from "../enums.ts";
-import {RaiseEventActionProps} from "../types.ts";
+import {RaiseEventActionProps, TimeoutActionProps} from "../types.ts";
 import {NO_PARENT} from "../services/stateOrStateMachineService.tsx";
 
 
@@ -234,11 +234,31 @@ export default class State implements StateOrStateMachine {
 
     // TODO: Edges can also raise events.
     public getAllRaisedEvents(): Event[] {
-        return this.getAllActions().filter((a) => a.type === ActionType.RAISE_EVENT)
+        let raiseEventEvents =  this.getAllActions().filter((a) => a.type === ActionType.RAISE_EVENT)
             .map((a) => {
                 const props = a.properties as RaiseEventActionProps
                 return props.event
             })
+
+        const timeoutActions = this.getAllActions().filter((a) => a.type === ActionType.TIMEOUT)
+        timeoutActions.forEach((a) => {
+            const timeoutProps = a.properties as TimeoutActionProps
+            if( timeoutProps.action && timeoutProps.action.type === ActionType.RAISE_EVENT){
+                const raiseProps = timeoutProps.action.properties as RaiseEventActionProps
+                raiseEventEvents.push(raiseProps.event)
+            }
+        })
+
+        this.getAllTransitions().forEach((t) => {
+            t.getActions().forEach((a) => {
+                if(a.type === ActionType.RAISE_EVENT) {
+                    const raiseProps = a.properties as RaiseEventActionProps
+                    raiseEventEvents.push(raiseProps.event)
+                }
+            })
+        })
+
+        return raiseEventEvents
     }
 
 

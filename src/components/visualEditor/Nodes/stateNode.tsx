@@ -37,7 +37,7 @@ export function StateNode({ data }: NodeProps<StateNode>) {
                 position={Position.Top}
                 id={"s"}
                 isConnectable={false}
-                style={{ visibility: "visible", left: "30%" }}
+                style={{ visibility: "hidden", left: "30%" }}
             />
 
             <Handle
@@ -45,7 +45,7 @@ export function StateNode({ data }: NodeProps<StateNode>) {
                 position={Position.Bottom}
                 id={"t-3"}
                 isConnectable={false}
-                style={{left: "30%" }}
+                style={{visibility: "hidden", left: "30%" }}
             />
 
 
@@ -54,7 +54,7 @@ export function StateNode({ data }: NodeProps<StateNode>) {
                 position={Position.Right}
                 id={"t-2"}
                 isConnectable={false}
-                style={{top: "50%" }}
+                style={{visibility: "hidden",top: "50%" }}
             />
 
             <Handle
@@ -62,7 +62,7 @@ export function StateNode({ data }: NodeProps<StateNode>) {
                 position={Position.Top}
                 id={"t-1"}
                 isConnectable={false}
-                style={{left: "70%" }}
+                style={{visibility: "hidden",left: "70%" }}
             />
 
             {data.state.name && <div>{data.state.name}</div>}
@@ -72,7 +72,7 @@ export function StateNode({ data }: NodeProps<StateNode>) {
                 position={Position.Left}
                 id={"t"}
                 isConnectable={false}
-                style={{ visibility: "visible", top: "50%" }}
+                style={{ visibility: "hidden", top: "50%" }}
             />
 
             <Handle
@@ -80,7 +80,7 @@ export function StateNode({ data }: NodeProps<StateNode>) {
                 position={Position.Right}
                 id={"s-1"}
                 isConnectable={false}
-                style={{top: "50%" }}
+                style={{visibility: "hidden",top: "50%" }}
             />
 
             <Handle
@@ -88,7 +88,7 @@ export function StateNode({ data }: NodeProps<StateNode>) {
                 position={Position.Bottom}
                 id={"s-2"}
                 isConnectable={false}
-                style={{left: "70%" }}
+                style={{visibility: "hidden",left: "70%" }}
             />
 
             <Handle
@@ -96,7 +96,7 @@ export function StateNode({ data }: NodeProps<StateNode>) {
                 position={Position.Left}
                 id={"s-3"}
                 isConnectable={false}
-                style={{top: "50%" }}
+                style={{visibility: "hidden",top: "50%" }}
             />
 
 
