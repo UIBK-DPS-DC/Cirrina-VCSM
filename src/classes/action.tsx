@@ -235,6 +235,7 @@ export default class Action {
                 }
                 const raiseEventAction = new Action("", ActionType.RAISE_EVENT)
                 raiseEventAction.properties = raiseEventActionProps
+                console.log(`RAISE EVENT PROPS : ${raiseEventActionProps.event.toDescription().name}`)
                 return raiseEventAction;
             }
 

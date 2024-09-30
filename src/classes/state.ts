@@ -14,6 +14,8 @@ export default class State implements StateOrStateMachine {
 
     static TARGET_HANDLES: [{ id: "t-t"; }, { id: "r-t"; }, {id: "l-t"; }, {id: "b-t"; }] = [{id: "t-t"}, {id: "r-t"}, {id: "l-t"}, {id: "b-t"}]
     static SOURCE_HANDLES: [{ id: "t-s"; }, { id: "r-s"; }, { id: "l-s"; }, { id: "b-s"; }] =  [{id: "t-s"}, {id: "r-s"}, {id: "l-s"}, {id: "b-s"}]
+    static INTERNAL_SOURCE_HANDLES =  ["s","s-1","s-2","s-3"]
+
 
 
     private _nodeId: string | NO_PARENT
@@ -31,10 +33,14 @@ export default class State implements StateOrStateMachine {
     private _localContext: ContextVariable[] = [];
     private _persistentContext: ContextVariable[] = [];
     private _staticContext: ContextVariable[] = [];
+    private _usedInternalSourceHandles: Set<string>
+
 
     public constructor(name: string) {
         this._name = name
         this._nodeId = NO_PARENT
+        this._usedInternalSourceHandles = new Set<string>();
+
     }
 
 
@@ -45,6 +51,20 @@ export default class State implements StateOrStateMachine {
     set nodeId(value: string) {
         this._nodeId = value;
     }
+
+    public addSourceHandle(handle: string){
+        this._usedInternalSourceHandles.add(handle);
+    }
+
+    public removeSourceHandle(handle: string){
+        this._usedInternalSourceHandles.delete(handle);
+    }
+
+    public isSourceHandleUsed (handle: string): boolean {
+        return this._usedInternalSourceHandles.has(handle)
+    }
+
+
 
     public get name(): string {
         return this._name

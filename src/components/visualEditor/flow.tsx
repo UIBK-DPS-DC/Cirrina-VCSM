@@ -433,8 +433,65 @@ export default function Flow() {
         event.preventDefault();
 
         if(isState(node.data)){
+
+            let sourceHandle = ""
+            let targetHandle: string
+
+            State.INTERNAL_SOURCE_HANDLES.every((handle) => {
+                if(isState(node.data)){
+
+                    if(!node.data.state.isSourceHandleUsed(handle)){
+                        sourceHandle = handle
+                        return false
+                    }
+                }
+
+                return true
+
+            })
+
+
+            switch (sourceHandle) {
+                case "s" : {
+                    targetHandle = "t"
+                    break
+                }
+
+                case "s-1" : {
+                    targetHandle = "t-1"
+                    break
+                }
+
+                case "s-2" : {
+                    targetHandle = "t-2"
+                    break
+                }
+
+                case "s-3" : {
+                    targetHandle = "t-3"
+                    break
+                }
+
+                default: {
+                    targetHandle = ""
+                }
+
+
+            }
+
+            if(!targetHandle || !sourceHandle){
+                return
+            }
+
+
+
+
+
+
+
+
             const connection: Connection = {
-                source: node.id, sourceHandle: "s", target: node.id, targetHandle: "t"
+                source: node.id, sourceHandle: sourceHandle, target: node.id, targetHandle: targetHandle
 
             }
             const newTransition = transitionService.connectionToTransition(connection);
@@ -456,6 +513,7 @@ export default function Flow() {
             }
 
             node.data.state.addOnTransition(newTransition)
+            node.data.state.addSourceHandle(sourceHandle)
 
 
             setEdges(eds => addEdge(newEdge, eds));

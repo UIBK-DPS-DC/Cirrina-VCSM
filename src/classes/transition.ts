@@ -187,6 +187,11 @@ export default class Transition {
 
     public static fromOnTransitionDescription(description: OnTransitionDescription, sourceState: string): Transition {
 
+        console.log("ENTERING FROM ON")
+        if(!description.target){
+            console.log("INTERNAL FOUND")
+            console.log(description)
+        }
         const newTransition = new Transition(sourceState, description.target || "")
         newTransition._guards = description.guards.map((g) => Guard.fromDescription(g));
         newTransition._actions = description.actions.map((a) => Action.fromDescription(a))

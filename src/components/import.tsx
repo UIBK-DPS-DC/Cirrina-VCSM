@@ -349,13 +349,25 @@ export default function Import() {
         nodes: Node<CsmNodeProps>[],
         parentId: string | undefined
     ) => {
-        const target = nodes.find((n) => {
-            if (isState(n.data)) {
-                return n.data.state.name === transition.getTarget() && n.parentId === parentId;
-            }
-            return false;
-        });
+        // Handle internal
+        let target: Node<CsmNodeProps> | undefined
 
+        if(transition.getTarget().trim() === ""){
+            target = nodes.find((n) => {
+                if(isState(n.data)){
+                    return n.data.state.name === sourceState.name && n.parentId === parentId
+                }
+                return false
+            })
+        }
+        else {
+            target = nodes.find((n) => {
+                if (isState(n.data)) {
+                    return n.data.state.name === transition.getTarget() && n.parentId === parentId;
+                }
+                return false;
+            });
+        }
 
 
         if (!target) {

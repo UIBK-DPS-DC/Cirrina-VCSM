@@ -37,16 +37,68 @@ export function StateNode({ data }: NodeProps<StateNode>) {
                 position={Position.Top}
                 id={"s"}
                 isConnectable={false}
-                style={{ visibility: "hidden", left: "30%" }}
+                style={{ visibility: "visible", left: "30%" }}
             />
+
+            <Handle
+                type={"target"}
+                position={Position.Bottom}
+                id={"t-3"}
+                isConnectable={false}
+                style={{left: "30%" }}
+            />
+
+
+            <Handle
+                type={"target"}
+                position={Position.Right}
+                id={"t-2"}
+                isConnectable={false}
+                style={{top: "50%" }}
+            />
+
+            <Handle
+                type={"target"}
+                position={Position.Top}
+                id={"t-1"}
+                isConnectable={false}
+                style={{left: "70%" }}
+            />
+
             {data.state.name && <div>{data.state.name}</div>}
+
             <Handle
                 type={"target"}
                 position={Position.Left}
                 id={"t"}
                 isConnectable={false}
-                style={{ visibility: "hidden", top: "50%" }}
+                style={{ visibility: "visible", top: "50%" }}
             />
+
+            <Handle
+                type={"source"}
+                position={Position.Right}
+                id={"s-1"}
+                isConnectable={false}
+                style={{top: "50%" }}
+            />
+
+            <Handle
+                type={"source"}
+                position={Position.Bottom}
+                id={"s-2"}
+                isConnectable={false}
+                style={{left: "70%" }}
+            />
+
+            <Handle
+                type={"source"}
+                position={Position.Left}
+                id={"s-3"}
+                isConnectable={false}
+                style={{top: "50%" }}
+            />
+
 
             <Handle className={"source-handle source-handle-right"} type={"source"} position={Position.Right} id={"r-s"}/>
             <Handle className={"target-handle target-handle-right"} type={"target"} position={Position.Right} id={"r-t"} isConnectableStart={false}/>
