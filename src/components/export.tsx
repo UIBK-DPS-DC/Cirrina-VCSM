@@ -80,7 +80,7 @@ export default function Export () {
 
 
 
-    },[addStatesToStatemachines, clearAllStatemachines, createTopLevelStatemachine])
+    },[addStatesToStatemachines, clearAllStatemachines, createTopLevelStatemachine, rearrangeTransitions])
 
 
 
