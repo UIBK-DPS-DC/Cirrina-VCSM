@@ -373,7 +373,7 @@ export default function Import() {
             // targetHandle: 'l-t',
             type: "csm-edge",
             data: { transition: transition },
-            zIndex: 1,
+            zIndex: transition.isElseEdge ? 0 : 1,
             markerEnd: { type: MarkerType.ArrowClosed },
         };
 
@@ -412,27 +412,40 @@ export default function Import() {
                     }
                 });
 
-                const elseTransitions = edges.filter((e) => e.data?.transition.getElse().trim() !== "")
-                elseTransitions.forEach((edge) => {
-                    const targetNode: Node<CsmNodeProps> | undefined = nodes.find((n) => isState(n.data) && n.data.state.name === edge.data?.transition.getElse() && n.parentId === node.parentId)
-
-
-                    if (targetNode && isState(node.data) && isState(targetNode.data)) {
-                        console.log(`${edge.source}  - ${edge.target}`);
-                        const newTransition = new Transition(node.data.state.name,targetNode.data.state.name, false, true, edge.data?.transition.getId())
-                        const newEdge = transitionToEdge(sourceState, newTransition, nodes, node.parentId);
-                        if (newEdge) {
-                            edges.push(newEdge);
-                        }
-
-
-                    }
-
-                })
-
 
             }
-        });
+        })
+
+        const elseTransitions = edges.filter((e) => e.data?.transition.getElse().trim() !== "")
+        console.log(`ELSE LENGTH ${elseTransitions.length}`);
+
+
+        console.log("AAAAAAAAAAAAAAAAAEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE")
+        elseTransitions.forEach((e) => console.log(e.data?.transition.getSource() + "=>" + e.data?.transition.getElse()))
+
+        elseTransitions.forEach((edge) => {
+            const sourceNode = nodes.find((n) => n.id === edge.source)
+            if(sourceNode){
+                const targetNode: Node<CsmNodeProps> | undefined = nodes.find((n) => isState(n.data) && n.data.state.name === edge.data?.transition.getElse() && n.parentId === sourceNode.parentId)
+                if (targetNode && isState(sourceNode.data) && isState(targetNode.data)) {
+                    console.log(`${edge.source}  - ${edge.target}`);
+                    const newTransition = new Transition(sourceNode.data.state.name,targetNode.data.state.name, false, true, edge.data?.transition.getId())
+                    const newEdge = transitionToEdge(sourceNode.data.state, newTransition, nodes, sourceNode.parentId);
+                    if (newEdge) {
+                        edges.push(newEdge);
+                    }
+
+
+                }
+            }
+
+
+
+
+
+        })
+
+        ;
 
         try {
             // Reset services
