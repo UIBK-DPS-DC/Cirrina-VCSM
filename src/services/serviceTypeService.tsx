@@ -8,10 +8,14 @@ export default class ServiceTypeService {
 
 
     public isServiceTypeNameUnique(serviceTypeName: string): boolean {
-        return this._serviceTypes.has(serviceTypeName);
+        return ! this._serviceTypes.has(serviceTypeName);
     }
 
     public registerServiceType(serviceTypeName: string): void {
+        if(!serviceTypeName || ! serviceTypeName.trim()){
+            console.error(`Service type cant be empty`);
+            return
+        }
         if(this.isServiceTypeNameUnique(serviceTypeName)){
             this._serviceTypes.add(serviceTypeName);
             return

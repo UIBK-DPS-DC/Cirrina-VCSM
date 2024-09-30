@@ -346,11 +346,12 @@ export default function Import() {
     const transitionToEdge = (
         sourceState: StateOrStateMachine,
         transition: Transition,
-        nodes: Node<CsmNodeProps>[]
+        nodes: Node<CsmNodeProps>[],
+        parentId: string | undefined
     ) => {
         const target = nodes.find((n) => {
             if (isState(n.data)) {
-                return n.data.state.name === transition.getTarget();
+                return n.data.state.name === transition.getTarget() && n.parentId === parentId;
             }
             return false;
         });
@@ -387,6 +388,9 @@ export default function Import() {
             description
         );
 
+        console.log(`DESCIRPTION : 
+            ${description.stateMachines}`)
+
         // Generate nodes and edges
         const nodes = generateNodes(topLevelStatemachines);
         let edges: Edge<CsmEdgeProps>[] = [];
@@ -395,14 +399,14 @@ export default function Import() {
             if (isState(node.data)) {
                 const sourceState = node.data.state;
                 sourceState.on.forEach((transition) => {
-                    const edge = transitionToEdge(sourceState, transition, nodes);
+                    const edge = transitionToEdge(sourceState, transition, nodes, node.parentId);
                     if (edge) {
                         edges.push(edge);
                     }
                 });
 
                 sourceState.always.forEach((transition) => {
-                    const edge = transitionToEdge(sourceState, transition, nodes);
+                    const edge = transitionToEdge(sourceState, transition, nodes, node.parentId);
                     if (edge) {
                         edges.push(edge);
                     }
@@ -416,7 +420,7 @@ export default function Import() {
                     if (targetNode && isState(node.data) && isState(targetNode.data)) {
                         console.log(`${edge.source}  - ${edge.target}`);
                         const newTransition = new Transition(node.data.state.name,targetNode.data.state.name, false, true, edge.data?.transition.getId())
-                        const newEdge = transitionToEdge(sourceState, newTransition, nodes);
+                        const newEdge = transitionToEdge(sourceState, newTransition, nodes, node.parentId);
                         if (newEdge) {
                             edges.push(newEdge);
                         }

@@ -295,7 +295,7 @@ export default class Action {
 
                 }
 
-                const newTimeOutAction = new Action("", ActionType.TIMEOUT)
+                const newTimeOutAction = new Action(timeOutActionDescription.name, ActionType.TIMEOUT)
                 newTimeOutAction.properties = timeOutActionProps
                 return newTimeOutAction;
 
