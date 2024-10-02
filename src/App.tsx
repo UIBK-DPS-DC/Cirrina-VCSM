@@ -118,7 +118,6 @@ export default function App() {
                 <Tabs >
                     <TabList style={{backgroundColor: "grey"}}>
                         <Tab>Visual Editor</Tab>
-                        <Tab>JSON Editor</Tab>
                     </TabList>
 
                     <TabPanel>

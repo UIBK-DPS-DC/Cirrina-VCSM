@@ -56,6 +56,12 @@ export default function CsmEdge({
         const actions = transition.getActions();
 
         let guardString = '';
+        let eventString = ""
+
+        if(event){
+            eventString+= `${event}:`
+        }
+
 
         if (guards.length > 0) {
             guardString += '[';
@@ -70,7 +76,7 @@ export default function CsmEdge({
 
         let actionString = '';
         if (actions.length > 0) {
-            actionString += '/ ';
+            actionString += '\u2192 '; // u2192 is the unicode for a right facing arrow
             actions.forEach((action, i) => {
                 actionString += action.name;
                 if (i !== actions.length - 1) {
@@ -79,7 +85,7 @@ export default function CsmEdge({
             });
         }
 
-        return `${event} ${guardString} ${actionString}`;
+        return `${eventString} ${guardString} ${actionString}`;
     };
 
     useEffect(() => {
