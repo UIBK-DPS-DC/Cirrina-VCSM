@@ -66,7 +66,7 @@ export default function AssignActionForm(props: {action: Action | undefined,
         if(props.action){
             const assignActionsProps = props.action.properties as AssignActionProps;
             setSelectedVar([assignActionsProps.variable]);
-            setExpressionInput(assignActionsProps.expression);
+            setExpressionInput(assignActionsProps.expression ? assignActionsProps.expression : assignActionsProps.variable.value);
             setActionNameInput(props.action.name)
 
             if(selectedNode){
