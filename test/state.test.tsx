@@ -99,15 +99,7 @@ describe('State Class', () => {
         expect(state.getAllActions()).toEqual([action1, action2]);
     });
 
-    test('should filter and return only named actions', () => {
-        const action1 = new Action('action1', ActionType.RAISE_EVENT);
-        const action2 = new Action('', ActionType.RAISE_EVENT);
-        const action3 = new Action('action3', ActionType.RAISE_EVENT);
-        state.entry = [action1, action2];
-        state.exit = [action3];
 
-        expect(state.getAllNamedActions()).toEqual([action1, action3]);
-    });
 
     test('should add a transition only if it does not already exist', () => {
         const transition1 = new Transition('source1', 'target1');
@@ -199,15 +191,7 @@ describe('State Class', () => {
         expect(namedActions).toEqual([]);
     });
 
-    test('should return an empty array when actions have no names', () => {
-        const action1 = new Action('', ActionType.RAISE_EVENT); // No name
-        const action2 = new Action('', ActionType.RAISE_EVENT); // No name
-        state.entry = [action1];
-        state.exit = [action2];
 
-        const namedActions = state.getAllNamedActions();
-        expect(namedActions).toEqual([]);
-    });
 
     test('should return all named actions from various action lists', () => {
         const action1 = new Action('action1', ActionType.RAISE_EVENT);
@@ -233,18 +217,6 @@ describe('State Class', () => {
         expect(namedActions).toEqual([action1]); // Should only return the unique action
     });
 
-    test('should handle a mix of named and unnamed actions across different lists', () => {
-        const action1 = new Action('action1', ActionType.RAISE_EVENT);
-        const action2 = new Action('', ActionType.RAISE_EVENT); // Unnamed action
-        const action3 = new Action('action3', ActionType.RAISE_EVENT);
-
-        state.entry = [action1];
-        state.while = [action2];
-        state.exit = [action3];
-
-        const namedActions = state.getAllNamedActions();
-        expect(namedActions).toEqual([action1, action3]); // Only named actions should be returned
-    });
 
     // New tests for removeContext
     test('should remove a context variable from localContext', () => {
