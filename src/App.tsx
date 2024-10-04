@@ -42,6 +42,7 @@ export default function App() {
     const [hideFlowEdges, setHideFlowEdges] = useState<boolean>(false)
     const [initialOrTerminalChange, setInitialOrTerminalChange] = useState<boolean>(false)
     const hideStatemachineEdgesButtonText = () => hideFlowEdges ? "Show Statemachine Edges" : "Hide Statemachine Edges";
+    const [darkMode,setDarkMode] = useState<boolean>(true)
 
     const [showEdgeLabels, setShowEdgeLabels] = useState<boolean>(true)
     const hideEdgeLabelsButtonText = () => showEdgeLabels ? "Hide Edge Labels" : "Show Edge Labels"
@@ -99,7 +100,8 @@ export default function App() {
         setInitialOrTerminalChange,
         setHideFlowEdges,
         showEdgeLabels,
-        setShowEdgeLabels
+        setShowEdgeLabels,
+        darkMode,
     };
 
 
