@@ -24,7 +24,6 @@ function CaseForm(props: {
 
 }) {
 
-    const context = useContext(ReactFlowContext) as ReactFlowContextProps
 
 
     const formId = useRef(`form-${Math.random().toString(36).substring(2, 15)}`).current;
