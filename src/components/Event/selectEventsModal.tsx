@@ -15,7 +15,7 @@ export default function SelectEventsModal(props:{buttonName: string | undefined,
     setEvents: Dispatch<SetStateAction<Event[]>>, multiple?: boolean} ) {
 
     const context = useContext(ReactFlowContext) as ReactFlowContextProps
-    const {eventService, selectedNode,selectedEdge} = context;
+    const {eventService, selectedNode,selectedEdge, darkMode} = context;
 
     const INTERNAL_EVENTS_SELECT_NAME = "internal-event-select";
     const EXTERNAL_EVENTS_SELECT_NAME  = "external-event-select";
@@ -227,7 +227,7 @@ export default function SelectEventsModal(props:{buttonName: string | undefined,
                 {buttonName}
             </Button>
             
-            <Modal show={show} onHide={handleClose} data-bs-theme="dark">
+            <Modal show={show} onHide={handleClose} data-bs-theme={darkMode ? "dark" : "light"}>
                 <Modal.Header closeButton={true}>
                         <Modal.Title style={{color: "#ffffff"}}>
                             {modalTitle()}
@@ -242,7 +242,7 @@ export default function SelectEventsModal(props:{buttonName: string | undefined,
                             </small>
                         </div>
                         
-                        <Form onSubmit={handleSubmit} data-bs-theme="dark">
+                        <Form onSubmit={handleSubmit} data-bs-theme={darkMode ? "dark" : "light"}>
                             <Form.Group controlId={"formInternalEvents"}>
                                 <Row>
                                     <Form.Label style={{color: "#ffffff"}}>Internal Events</Form.Label>
