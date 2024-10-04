@@ -16,6 +16,7 @@ import CsmlEditor from "./components/csmlEditor/csmlEditor.tsx";
 import Export from "./components/export.tsx";
 import Import from "./components/import.tsx";
 import {Button} from "react-bootstrap";
+import ServiceTypeService from "./services/serviceTypeService.tsx";
 
 
 const initialNodes: Node<CsmNodeProps>[] = [];
@@ -29,6 +30,8 @@ export default function App() {
     const eventService: EventService = useMemo(() => new EventService(), []);
     const contextService: ContextVariableService = useMemo(() => new ContextVariableService(), []);
     const guardService: GuardService = useMemo(() => new GuardService(), [])
+    const serviceTypeService: ServiceTypeService = useMemo(() => new ServiceTypeService(),[])
+
 
 
     const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
@@ -107,6 +110,7 @@ export default function App() {
         showEdgeLabels,
         setShowEdgeLabels,
         darkMode,
+        serviceTypeService
     };
 
 

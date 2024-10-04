@@ -23,6 +23,7 @@ import {
 } from "./enums.ts";
 import ContextVariable from "./classes/contextVariable.tsx";
 import MatchCase from "./classes/MatchCase.tsx";
+import ServiceTypeService from "./services/serviceTypeService.tsx";
 
 
 
@@ -169,6 +170,7 @@ export type ReactFlowContextProps = {
     showEdgeLabels: boolean
     setShowEdgeLabels: React.Dispatch<React.SetStateAction<boolean>>
     darkMode: boolean
+    serviceTypeService: ServiceTypeService
 }
 
 
