@@ -6,7 +6,7 @@ import Guard from "./guard.tsx";
 import Event from "./event.ts";
 import {StateDescription} from "../pkl/bindings/collaborative_state_machine_description.pkl.ts";
 import {ActionType} from "../enums.ts";
-import {RaiseEventActionProps} from "../types.ts";
+import {InvokeActionProps, RaiseEventActionProps, TimeoutActionProps} from "../types.ts";
 import {NO_PARENT} from "../services/stateOrStateMachineService.tsx";
 
 
@@ -14,6 +14,8 @@ export default class State implements StateOrStateMachine {
 
     static TARGET_HANDLES: [{ id: "t-t"; }, { id: "r-t"; }, {id: "l-t"; }, {id: "b-t"; }] = [{id: "t-t"}, {id: "r-t"}, {id: "l-t"}, {id: "b-t"}]
     static SOURCE_HANDLES: [{ id: "t-s"; }, { id: "r-s"; }, { id: "l-s"; }, { id: "b-s"; }] =  [{id: "t-s"}, {id: "r-s"}, {id: "l-s"}, {id: "b-s"}]
+    static INTERNAL_SOURCE_HANDLES =  ["s","s-1","s-2","s-3"]
+
 
 
     private _nodeId: string | NO_PARENT
@@ -31,10 +33,14 @@ export default class State implements StateOrStateMachine {
     private _localContext: ContextVariable[] = [];
     private _persistentContext: ContextVariable[] = [];
     private _staticContext: ContextVariable[] = [];
+    private _usedInternalSourceHandles: Set<string>
+
 
     public constructor(name: string) {
         this._name = name
         this._nodeId = NO_PARENT
+        this._usedInternalSourceHandles = new Set<string>();
+
     }
 
 
@@ -45,6 +51,20 @@ export default class State implements StateOrStateMachine {
     set nodeId(value: string) {
         this._nodeId = value;
     }
+
+    public addSourceHandle(handle: string){
+        this._usedInternalSourceHandles.add(handle);
+    }
+
+    public removeSourceHandle(handle: string){
+        this._usedInternalSourceHandles.delete(handle);
+    }
+
+    public isSourceHandleUsed (handle: string): boolean {
+        return this._usedInternalSourceHandles.has(handle)
+    }
+
+
 
     public get name(): string {
         return this._name
@@ -214,11 +234,50 @@ export default class State implements StateOrStateMachine {
 
     // TODO: Edges can also raise events.
     public getAllRaisedEvents(): Event[] {
-        return this.getAllActions().filter((a) => a.type === ActionType.RAISE_EVENT)
+
+
+        let raiseEventEvents =  this.getAllActions().filter((a) => a.type === ActionType.RAISE_EVENT)
             .map((a) => {
                 const props = a.properties as RaiseEventActionProps
                 return props.event
             })
+
+        const timeoutActions = this.getAllActions().filter((a) => a.type === ActionType.TIMEOUT)
+        timeoutActions.forEach((a) => {
+            const timeoutProps = a.properties as TimeoutActionProps
+            if( timeoutProps.action && timeoutProps.action.type === ActionType.RAISE_EVENT){
+                const raiseProps = timeoutProps.action.properties as RaiseEventActionProps
+                raiseEventEvents.push(raiseProps.event)
+            }
+        })
+
+
+
+
+        let invokeActions = this.getAllActions().filter((a) => a.type === ActionType.INVOKE)
+        this.getAllTransitions().forEach((t) => {
+            t.getActions().forEach((a) => {
+                if(a.type === ActionType.RAISE_EVENT) {
+                    const raiseProps = a.properties as RaiseEventActionProps
+                    raiseEventEvents.push(raiseProps.event)
+                }
+                if(a.type === ActionType.INVOKE) {
+                    invokeActions.push(a)
+
+                }
+            })
+        })
+
+
+        invokeActions.forEach((a) => {
+            const invokeProps = a.properties as InvokeActionProps
+            invokeProps.done.forEach((e) => {
+                raiseEventEvents.push(e)
+            })
+
+        })
+
+        return raiseEventEvents
     }
 
 

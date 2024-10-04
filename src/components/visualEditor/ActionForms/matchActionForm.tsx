@@ -25,6 +25,7 @@ function CaseForm(props: {
 }) {
 
 
+
     const formId = useRef(`form-${Math.random().toString(36).substring(2, 15)}`).current;
 
 
@@ -252,7 +253,7 @@ export default function MatchActionForm(props: {
 
 
     const context = useContext(ReactFlowContext) as ReactFlowContextProps;
-    const { selectedNode , actionService, stateOrStateMachineService, selectedEdge} = context;
+    const { selectedNode , actionService, stateOrStateMachineService, selectedEdge, darkMode} = context;
     const [actionNameInput, setActionNameInput] = useState<string>("");
     const [expressionInput, setExpressionInput] = useState<string>("");
     const [caseActions, setCaseActions] = useState<Action[]>([]);
@@ -496,7 +497,7 @@ export default function MatchActionForm(props: {
 
     return (
         <Card>
-            <Card.Header data-bs-theme="dark">{props.action ? "Edit Match Action" : "Create new Match Action"}</Card.Header>
+            <Card.Header data-bs-theme={darkMode ? "dark" : "light"}>{props.action ? "Edit Match Action" : "Create new Match Action"}</Card.Header>
             <Card.Body>
                 <Card.Title className={"text-center"}>Action properties</Card.Title>
                 <Form className={"mb-3"} validated={formIsValid} id={formId} onSubmit={onSubmit}>
@@ -539,7 +540,7 @@ export default function MatchActionForm(props: {
                                 <i className="bi bi-plus-circle"></i>
                             </Button>
                         </Col>
-                        <Modal show={show} onHide={handleClose} data-bs-theme="dark">
+                        <Modal show={show} onHide={handleClose} data-bs-theme={darkMode ? "dark" : "light"}>
                             <Modal.Header closeButton>
                                 <Modal.Title style={{color: "#ffffff"}}>Add Match Action</Modal.Title>
                             </Modal.Header>

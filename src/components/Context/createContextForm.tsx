@@ -8,7 +8,7 @@ import {ContextType} from "../../enums.ts";
 export default function CreateContextForm(props: {variable: ContextVariable | undefined, onClose: () => void, onSubmit: (updatedVariable: ContextVariable) => void, noRegister?:boolean}) {
 
     const context = useContext(ReactFlowContext) as ReactFlowContextProps;
-    const {contextService, selectedNode} = context;
+    const {contextService, selectedNode, darkMode} = context;
 
     const VARIABLE_NAME_FIELD_NAME = "variable-name";
     const EXPRESSION_FIELD_NAME = "expression";
@@ -139,7 +139,7 @@ export default function CreateContextForm(props: {variable: ContextVariable | un
     return (
         <Form onSubmit={handleSubmit}>
             <Form.Group controlId={"form-variable-name"} className={"mb-3"}>
-                <Form.Label style={{color: "#ffffff"}}>Name</Form.Label>
+                <Form.Label style={{color: darkMode ? "#ffffff" : "#000000"}}>Name</Form.Label>
                 <Form.Control
                     type={"text"}
                     name={VARIABLE_NAME_FIELD_NAME}
@@ -159,7 +159,7 @@ export default function CreateContextForm(props: {variable: ContextVariable | un
             </Form.Group>
 
             <Form.Group controlId={"form-variable-value"} className={"mb-3"}>
-                <Form.Label style={{color: "#ffffff"}}>Value</Form.Label>
+                <Form.Label style={{color: darkMode ? "#ffffff" : "#000000"}}>Value</Form.Label>
                 <Form.Control
                     type={"text"}
                     name={EXPRESSION_FIELD_NAME}
@@ -179,7 +179,7 @@ export default function CreateContextForm(props: {variable: ContextVariable | un
             </Form.Group>
 
             <Form.Group controlId={"form-variable-context"} className={"mb-3"}>
-                <Form.Label style={{color: "#ffffff"}}>Context Type</Form.Label>
+                <Form.Label style={{color: darkMode ? "#ffffff" : "#000000"}}>Context Type</Form.Label>
                 <Form.Select
                     name={CONTEXT_TYPE_FIELD_NAME}
                     value={contextTypeValue}

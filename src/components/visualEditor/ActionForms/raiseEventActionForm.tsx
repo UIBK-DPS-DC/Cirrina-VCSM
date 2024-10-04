@@ -92,7 +92,7 @@ export default function RaiseEventActionForm(props: {action: Action | undefined,
     }, [eventToBeRaised]);
 
     useEffect(() => {
-        if (!selectedNode) return;
+        if (!selectedNode && !selectedEdge) return;
 
         if (props.action && props.action.type === ActionType.RAISE_EVENT) {
             const raiseEventProps = props.action.properties as RaiseEventActionProps;
@@ -100,14 +100,20 @@ export default function RaiseEventActionForm(props: {action: Action | undefined,
             setActionNameInput(props.action.name)
             // Ensure that eventToBeRaised is set correctly
             if (raiseEventProps && raiseEventProps.event) {
+                console.log("BROBRO")
                 setEventToBeRaised([raiseEventProps.event]);
                 setSelectedEventVars(raiseEventProps.event.data || []);
             }
 
-            const actionCategory = actionService.getActionCategory(props.action, selectedNode.data);
-            if (actionCategory) {
-                setSelectedActionCategory(actionCategory);
+            if(selectedNode) {
+                const actionCategory = actionService.getActionCategory(props.action, selectedNode.data);
+                if (actionCategory) {
+                    setSelectedActionCategory(actionCategory);
+                }
             }
+
+
+
         }
     }, [props.action, selectedNode, actionService]);
 

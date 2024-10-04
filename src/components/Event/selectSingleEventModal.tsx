@@ -11,7 +11,7 @@ import {EventChannel} from "../../enums.ts";
 export default function SelectSingleEventModal(props: {event: Event | undefined, setEvent: React.Dispatch<SetStateAction<Event | undefined>>, buttonText?: string, modalTitle?: string}) {
 
     const context = useContext(ReactFlowContext) as ReactFlowContextProps
-    const {eventService} = context
+    const {eventService, darkMode} = context
 
     const buttonText = () => props.buttonText ? props.buttonText : "Select Event"
     const modalTitle = () => props.modalTitle ? props.modalTitle : buttonText()
@@ -184,9 +184,9 @@ export default function SelectSingleEventModal(props: {event: Event | undefined,
                 {buttonText()}
             </Button>
 
-            <Modal show={show} onHide={handleClose} data-bs-theme="dark">
+            <Modal show={show} onHide={handleClose} data-bs-theme={darkMode ? "dark" : "light"}>
                 <Modal.Header closeButton={true}>
-                    <Modal.Title style={{color: "#ffffff"}}>
+                    <Modal.Title style={{color: darkMode ? "#ffffff" : "#000000"}}>
                         {modalTitle()}
                     </Modal.Title>
                 </Modal.Header>
@@ -197,7 +197,7 @@ export default function SelectSingleEventModal(props: {event: Event | undefined,
                     <Form onSubmit={handleSubmit}>
                         <Form.Group controlId={"formInternalEvents"}>
                             <Row>
-                                <Form.Label  style={{color: "#ffffff"}}>Internal Events</Form.Label>
+                                <Form.Label  style={{color: darkMode ? "#ffffff" : "#000000"}}>Internal Events</Form.Label>
                             </Row>
                             <Row className={"mb-3"}>
                                 <CreatableSelect closeMenuOnSelect={false}
@@ -214,7 +214,7 @@ export default function SelectSingleEventModal(props: {event: Event | undefined,
 
                         <Form.Group controlId={"formExternalEvents"}>
                             <Row>
-                                <Form.Label  style={{color: "#ffffff"}}>External Events</Form.Label>
+                                <Form.Label  style={{color: darkMode ? "#ffffff" : "#000000"}}>External Events</Form.Label>
                             </Row>
                             <Row className={"mb-3"}>
                                 <CreatableSelect closeMenuOnSelect={false}
@@ -231,7 +231,7 @@ export default function SelectSingleEventModal(props: {event: Event | undefined,
 
                         <Form.Group controlId={"formGlobalEvents"}>
                             <Row>
-                                <Form.Label  style={{color: "#ffffff"}}>Global Events</Form.Label>
+                                <Form.Label  style={{color: darkMode ? "#ffffff" : "#000000"}}>Global Events</Form.Label>
                             </Row>
                             <Row className={"mb-3"}>
                                 <CreatableSelect closeMenuOnSelect={false}
@@ -248,7 +248,7 @@ export default function SelectSingleEventModal(props: {event: Event | undefined,
 
                         <Form.Group controlId={"formPeripheralEvents"}>
                             <Row>
-                                <Form.Label  style={{color: "#ffffff"}}>Peripheral Events</Form.Label>
+                                <Form.Label  style={{color: darkMode ? "#ffffff" : "#000000"}}>Peripheral Events</Form.Label>
                             </Row>
                             <Row className={"mb-3"}>
 

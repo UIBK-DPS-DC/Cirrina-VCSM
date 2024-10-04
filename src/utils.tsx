@@ -229,30 +229,33 @@ export const getConsumedEventsToStateMap = (nodes: Node<CsmNodeProps>[]) => {
 }
 
 export const generateRaisedToConsumedInfoStrings = (nodes: Node<CsmNodeProps>[]) => {
-    const infoStrings: string[] = []
-    const stateToRaisedEventsMap: Map<State,Event[]> = getRaisedEventsToStateMap(nodes)
-    const stateToConsumedEventsMap: Map<State,string[]> = getConsumedEventsToStateMap(nodes)
+    const infoStrings: string[] = [];
+    const stateToRaisedEventsMap: Map<State, Event[]> = getRaisedEventsToStateMap(nodes);
+    const stateToConsumedEventsMap: Map<State, string[]> = getConsumedEventsToStateMap(nodes);
 
     Array.from(stateToRaisedEventsMap.keys()).forEach((rk) => {
-        const raisedEvents = stateToRaisedEventsMap.get(rk)?.map((e) => e.name)
+        const raisedEvents = stateToRaisedEventsMap.get(rk)?.map((e) => e.name);
 
-        if(raisedEvents){
+        if (raisedEvents) {
             Array.from(stateToConsumedEventsMap.keys()).forEach((ck) => {
-                const consumedEvents = stateToConsumedEventsMap.get(ck)?.filter((e) => raisedEvents.includes(e))
+                const consumedEvents = stateToConsumedEventsMap.get(ck)?.filter((e) => raisedEvents.includes(e));
 
-                if(consumedEvents){
+                if (consumedEvents && consumedEvents.length > 0) {
                     consumedEvents.forEach((e) => {
-                        const infoString = `Event ${e} raised by state ${rk.name} is consumed by a transition out of state ${ck.name}`
-                        infoStrings.push(infoString)
-                    })
+                        const infoString = `Event ${e} raised by state ${rk.name} is consumed by a transition out of state ${ck.name}`;
+                        infoStrings.push(infoString);
+                    });
                 }
-            })
+            });
         }
-    })
+    });
 
-    return infoStrings
+    // Remove duplicate strings
+    const uniqueInfoStrings = Array.from(new Set(infoStrings));
 
-}
+    return uniqueInfoStrings;
+};
+
 
 
 

@@ -520,16 +520,6 @@ describe("ActionService - registerAction and deregisterAction", () => {
         expect(actionsOfType).not.toContain(action);
     });
 
-    test("should not register a TIMEOUT action without a name", () => {
-        const action = new Action("", ActionType.TIMEOUT);
-        const consoleErrorSpy = jest.spyOn(console, "error").mockImplementation();
-
-        const result = actionService.registerAction(action);
-
-        expect(result).toBe(false);
-        expect(consoleErrorSpy).toHaveBeenCalledWith("Timeout Action name cant be empty");
-        consoleErrorSpy.mockRestore();
-    });
 
     test("should log an error when trying to deregister a TIMEOUT action not in the map", () => {
         const action = new Action("MissingTimeout", ActionType.TIMEOUT);

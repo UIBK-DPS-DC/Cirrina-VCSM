@@ -1,6 +1,6 @@
-import React, { Dispatch, SetStateAction, useCallback, useEffect, useMemo } from "react";
+import React, {Dispatch, SetStateAction, useCallback, useContext, useEffect, useMemo} from "react";
 import { ActionType } from "../../enums.ts";
-import { renderEnumAsOptions } from "../../utils.tsx";
+import {ReactFlowContext, renderEnumAsOptions} from "../../utils.tsx";
 import Action from "../../classes/action.tsx";
 import RaiseEventActionForm from "../visualEditor/ActionForms/raiseEventActionForm.tsx";
 import InvokeActionForm from "../visualEditor/ActionForms/invokeActionForm.tsx";
@@ -10,6 +10,7 @@ import TimeoutActionForm from "../visualEditor/ActionForms/timeoutActionForm.tsx
 import TimeoutResetActionForm from "../visualEditor/ActionForms/timeoutResetActionForm.tsx";
 import { Form } from "react-bootstrap";
 import MatchActionForm from "../visualEditor/ActionForms/matchActionForm.tsx";
+import {ReactFlowContextProps} from "../../types.ts";
 
 const ACTION_TYPE_SELECT_NAME = "action-type-select";
 
@@ -24,6 +25,9 @@ export default function ActionDisplay(props: {
     setMatchActions: Dispatch<SetStateAction<Action[]>>,
     onSubmit?: () => void
 }) {
+
+    const context = useContext(ReactFlowContext) as ReactFlowContextProps
+    const {darkMode} = context
     const [selectedActionType, setSelectedActionType] = React.useState<string>(ActionType.INVOKE);
 
     const isDisabled = props.action !== undefined;
@@ -65,7 +69,7 @@ export default function ActionDisplay(props: {
     return (
         <div>
             <Form.Group className={"mb-3 mt-3"}>
-                <Form.Label style={{color: "#ffffff", textAlign: "center"}}>Action Type</Form.Label>
+                <Form.Label style={{color: darkMode ? "#ffffff" : "#000000", textAlign: "center"}}>Action Type</Form.Label>
                 <Form.Select
                     disabled={isDisabled}
                     onChange={onSelectedActionTypeChange}

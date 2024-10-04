@@ -12,7 +12,7 @@ import ContextCardDisplay from "../Context/contextCardDisplay.tsx";
 export default function CreateEventForm(props: { event: Event | undefined, onSubmit: (event: Event) => void, setVars?:  Dispatch<SetStateAction<ContextVariable[]>> }) {
 
     const context = useContext(ReactFlowContext) as ReactFlowContextProps;
-    const { eventService} = context;
+    const { eventService, darkMode} = context;
 
     const oldEventName = props.event?.name;
     const buttonText = () => props.event ? "Save Changes" : "Create Event";
@@ -113,7 +113,7 @@ export default function CreateEventForm(props: { event: Event | undefined, onSub
         <Form onSubmit={onSubmit}>
 
             <Form.Group className="mb-3">
-                <Form.Label style={{color: "#ffffff"}}>Name</Form.Label>
+                <Form.Label style={{color: darkMode ? "#ffffff" : "#000000"}}>Name</Form.Label>
                 <Form.Control
                     type={"text"}
                     value={eventNameInput}
@@ -125,14 +125,14 @@ export default function CreateEventForm(props: { event: Event | undefined, onSub
             </Form.Group>
 
             <Form.Group className="mb-3">
-                <Form.Label style={{color: "#ffffff"}}>EventChannel</Form.Label>
+                <Form.Label style={{color: darkMode ? "#ffffff" : "#000000"}}>EventChannel</Form.Label>
                 <Form.Select value={selectedEventChannel} onChange={onSelectedEventChannelChange} isValid={eventChannelIsValid}>
                     {renderEnumAsOptions(EventChannel)}
                 </Form.Select>
             </Form.Group>
 
             <Form.Group className={"mb-3"}>
-                <Form.Label style={{color: "#ffffff"}}>Context Variables</Form.Label>
+                <Form.Label style={{color: darkMode ? "#ffffff" : "#000000"}}>Context Variables</Form.Label>
                 <Row className={"mb-3"}>
                     <Col sm={6}>
                         <SelectContextsModal buttonName={"Select Context"} vars={selectedContextVariables} setVars={setSelectedContextVariables} />

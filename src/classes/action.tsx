@@ -42,7 +42,7 @@ export default class Action {
 
     constructor(name: string, type: ActionType, delay = 0) {
         this._id = Action.id++;
-        this._name = name;
+        this._name = name ? name : this.generateActionName(this._id)
         this._type = type;
         this._properties = {}
         this._delay = delay
@@ -106,6 +106,10 @@ export default class Action {
 
     set case(value: string | undefined) {
         this._case = value;
+    }
+
+    private generateActionName (id: number):string {
+        return `A${id}`
     }
 
 // Could be extended to compare fields for non named actions.
@@ -235,6 +239,7 @@ export default class Action {
                 }
                 const raiseEventAction = new Action("", ActionType.RAISE_EVENT)
                 raiseEventAction.properties = raiseEventActionProps
+                console.log(`RAISE EVENT PROPS : ${raiseEventActionProps.event.toDescription().name}`)
                 return raiseEventAction;
             }
 
@@ -254,7 +259,7 @@ export default class Action {
             case ActionType.ASSIGN: {
                 const assignActionDescription = description as AssignActionDescription
                 const assignActionProps: AssignActionProps = {
-                    expression:"" ,
+                    expression: assignActionDescription.variable.value ,
                     type: ActionType.ASSIGN,
                     variable: ContextVariable.fromDescription(assignActionDescription.variable)
 
@@ -295,7 +300,7 @@ export default class Action {
 
                 }
 
-                const newTimeOutAction = new Action("", ActionType.TIMEOUT)
+                const newTimeOutAction = new Action(timeOutActionDescription.name, ActionType.TIMEOUT)
                 newTimeOutAction.properties = timeOutActionProps
                 return newTimeOutAction;
 

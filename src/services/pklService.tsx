@@ -50,7 +50,7 @@ export default class PklService {
 
                 pkl += `${this.getIndent(indentLevel + 1)}done {\n`
                 invokeDescription.done.forEach(event => {
-                    pkl += `${this.eventToPKL(event, indentLevel +2)}\n`
+                    pkl += `${this.eventToPKL(event, indentLevel +2, true)}\n`
                 })
                 pkl += `${this.getIndent(indentLevel + 1)}}\n`
 
@@ -305,8 +305,8 @@ export default class PklService {
         return pkl
     }
 
-    public static eventToPKL(description : EventDescription, indentLevel = 0) {
-        let pkl = `${this.getIndent(indentLevel)}event {\n`
+    public static eventToPKL(description : EventDescription, indentLevel = 0, inInvokeAction:boolean = false) {
+        let pkl = `${this.getIndent(indentLevel)}${inInvokeAction ? "new " : "event"}{\n`
         pkl += `${this.getIndent(indentLevel + 1)}name = "${description.name}"\n`
         pkl += `${this.getIndent(indentLevel + 1)}data {\n`
         description.data.forEach((context) =>{

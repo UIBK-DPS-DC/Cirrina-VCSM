@@ -73,7 +73,8 @@ export default function Flow() {
         recalculateTransitions,
         setRecalculateTransitions,
         initialOrTerminalChange,
-        setInitialOrTerminalChange
+        setInitialOrTerminalChange,
+        darkMode
     } = context;
 
     const { getIntersectingNodes, screenToFlowPosition } = useReactFlow();
@@ -221,6 +222,16 @@ export default function Flow() {
                 })
             })
         }
+
+        edges.forEach((e) => {
+            if(e.target === e.source){
+                const sourceNode = nodes.find((n) => n.id === e.source)
+                if(sourceNode && isState(sourceNode.data)){
+                    sourceNode.data.state.removeSourceHandle(e.sourceHandle || "")
+                    console.log(`Removed source handle ${e.sourceHandle}`)
+                }
+            }
+        })
 
 
         setRecalculateTransitions(!recalculateTransitions);
@@ -433,8 +444,65 @@ export default function Flow() {
         event.preventDefault();
 
         if(isState(node.data)){
+
+            let sourceHandle = ""
+            let targetHandle: string
+
+            State.INTERNAL_SOURCE_HANDLES.every((handle) => {
+                if(isState(node.data)){
+
+                    if(!node.data.state.isSourceHandleUsed(handle)){
+                        sourceHandle = handle
+                        return false
+                    }
+                }
+
+                return true
+
+            })
+
+
+            switch (sourceHandle) {
+                case "s" : {
+                    targetHandle = "t"
+                    break
+                }
+
+                case "s-1" : {
+                    targetHandle = "t-1"
+                    break
+                }
+
+                case "s-2" : {
+                    targetHandle = "t-2"
+                    break
+                }
+
+                case "s-3" : {
+                    targetHandle = "t-3"
+                    break
+                }
+
+                default: {
+                    targetHandle = ""
+                }
+
+
+            }
+
+            if(!targetHandle || !sourceHandle){
+                return
+            }
+
+
+
+
+
+
+
+
             const connection: Connection = {
-                source: node.id, sourceHandle: "s", target: node.id, targetHandle: "t"
+                source: node.id, sourceHandle: sourceHandle, target: node.id, targetHandle: targetHandle
 
             }
             const newTransition = transitionService.connectionToTransition(connection);
@@ -456,6 +524,7 @@ export default function Flow() {
             }
 
             node.data.state.addOnTransition(newTransition)
+            node.data.state.addSourceHandle(sourceHandle)
 
 
             setEdges(eds => addEdge(newEdge, eds));
@@ -638,9 +707,19 @@ export default function Flow() {
                                // If there is at least one common event, perform the necessary action
                                if (hasCommonEvent) {
 
+
+
                                    // Dynamically set source and target handle depending on position
-                                   const sourceHandle:string = otherNode.position.x > n.position.x ? "c" : "a"
-                                   const targetHandle: string = otherNode.position.x > n.position.x ? "b" : "d"
+                                   let sourceHandle:string = otherNode.position.x > n.position.x ? "c" : "a"
+                                   let targetHandle: string = otherNode.position.x > n.position.x ? "b" : "d"
+
+                                   edgesToAdd.forEach((e)  => {
+                                       if(e.source === otherNode.id && e.target === n.id){
+                                           sourceHandle = e.sourceHandle || sourceHandle
+                                           targetHandle = e.targetHandle || targetHandle
+
+                                       }
+                                   })
 
                                    console.log(`Node ${otherNode.id} consumes an event raised by Node ${n.id}`);
                                    const connection: Connection = {
@@ -683,6 +762,10 @@ export default function Flow() {
 
         // Here
 
+        edgesToAdd.forEach((e) => {
+            console.log(e.sourceHandle)
+        })
+
         setEdges((prev) => [...prev, ...edgesToAdd])
 
         console.log(parentMap); // To verify the result
@@ -706,7 +789,7 @@ export default function Flow() {
                 onPaneClick={onPaneClick}
                 onNodeClick={onNodeClick}
                 onNodeContextMenu={onNodeContextMenu}
-                colorMode={"dark"}
+                colorMode={darkMode ? "dark" : "light"}
                 onEdgeClick={onEdgeClick}
                 onEdgesDelete={onEdgesDelete}
                 onNodesDelete={onNodesDelete}

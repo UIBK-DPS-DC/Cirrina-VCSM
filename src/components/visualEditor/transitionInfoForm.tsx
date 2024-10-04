@@ -42,7 +42,13 @@ export default function TransitionInfoForm() {
     const {selectedEdge,
         showSidebar,
         setShowSidebar,
-        eventService, setRecalculateTransitions, recalculateTransitions, nodes , setEdges, edges, transitionService} = context
+        eventService,
+        setRecalculateTransitions,
+        recalculateTransitions,
+        nodes,
+        setEdges,
+        edges,
+        transitionService, darkMode} = context
 
     const instanceId = useRef(++idCounter).current;
     let formCount = 0
@@ -106,6 +112,12 @@ export default function TransitionInfoForm() {
         setAssignAction([])
         handleClose()
     }
+
+    useEffect(() => {
+        console.log(actions.length)
+        console.log("T ACTIONS")
+        console.log(selectedEdge?.data?.transition.getActions().length)
+    }, [selectedEdge]);
 
     const onRaiseEventActionSubmit = () => {
         setActions((prev) => [...prev, raiseEventAction[0]])
@@ -237,6 +249,8 @@ export default function TransitionInfoForm() {
 
             setGuards(selectedEdge.data.transition.getGuards())
 
+            setActions(selectedEdge.data.transition.getActions())
+
             if(!selectedEdge.data.transition.getElse().trim()){
                 setSelectedElse(NO_ELSE)
             }
@@ -336,7 +350,7 @@ export default function TransitionInfoForm() {
                            scroll={true} backdrop={false}
                            placement={"end"}
                            style={{ width: '30vw' }}
-                           data-bs-theme="dark">
+                           data-bs-theme={darkMode ? "dark" : "light"}>
 
                     <OffcanvasHeader closeButton={true} onClick={() => {setShowSidebar(false)}}>
                         <OffcanvasTitle>
@@ -450,14 +464,14 @@ export default function TransitionInfoForm() {
                                     </Col>
                                 </Row>
 
-                                <Modal show={showActionModal} size={"lg"} onHide={handleClose} data-bs-theme="dark" >
+                                <Modal show={showActionModal} size={"lg"} onHide={handleClose} data-bs-theme={darkMode ? "dark" : "light"} >
                                     <Modal.Header closeButton>
-                                        <Modal.Title style={{color: "#ffffff"}}>Add Action</Modal.Title>
+                                        <Modal.Title style={{color: darkMode ? "#ffffff" : "#000000"}}>Add Action</Modal.Title>
                                     </Modal.Header>
 
                                     <ModalBody>
                                         <Row className={"mb-3"}>
-                                            <Form.Label column sm={"4"} style={{color: "#ffffff"}} >Action type:</Form.Label>
+                                            <Form.Label column sm={"4"} style={{color: darkMode ? "#ffffff" : "#000000"}} >Action type:</Form.Label>
                                             <Col sm={8}>
                                                 <Form.Select value={selectedActionType} onChange={onSelectedActionTypeChange}>
                                                     {renderEnumAsOptions(ActionType)}

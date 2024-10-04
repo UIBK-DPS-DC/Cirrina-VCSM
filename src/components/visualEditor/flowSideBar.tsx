@@ -43,7 +43,8 @@ export default function FlowSideBar() {
                         bottom: "200px", //
                     }}
                 >
-                    <CreateEventModal event={undefined} onSubmit={onNewEventSubmit} buttonVariant={"light"} buttonSize={"lg"}></CreateEventModal>
+
+                    {/**<CreateEventModal event={undefined} onSubmit={onNewEventSubmit} buttonVariant={"light"} buttonSize={"lg"}></CreateEventModal>*/}
                 </div>
             </aside>
         </div>

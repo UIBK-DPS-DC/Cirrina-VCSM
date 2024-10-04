@@ -168,6 +168,7 @@ export type ReactFlowContextProps = {
     setHideFlowEdges: React.Dispatch<React.SetStateAction<boolean>>
     showEdgeLabels: boolean
     setShowEdgeLabels: React.Dispatch<React.SetStateAction<boolean>>
+    darkMode: boolean
 }
 
 

@@ -15,9 +15,7 @@ import {
     CsmNodeProps,
     isState,
     isStateMachine,
-    RaiseEventActionProps,
     ReactFlowContextProps,
-    TimeoutActionProps,
 } from "../types.ts";
 import State from "../classes/state.ts";
 import {Edge, MarkerType, Node} from "@xyflow/react";
@@ -34,6 +32,7 @@ import ContextVariableService from "../services/contextVariableService.tsx";
 import { ActionType } from "../enums.ts";
 import EventService from "../services/eventService.tsx";
 import GuardService from "../services/guardService.tsx";
+import Event from "../classes/event.ts";
 import {
     getNewEdgeId,
     getNewGuardId,
@@ -48,12 +47,12 @@ const rootLayoutOptions = {
     "elk.allowEdgeNodeOverlap": "false",
     "elk.layered.spacing.nodeNodeBetweenLayers": "200", // Increased spacing between layers
     "elk.layered.spacing.edgeNodeBetweenLayers": "200", // Increased spacing between layers
-    "elk.spacing.nodeNode": "400", // Increased spacing between nodes in the same layer
+    "elk.spacing.nodeNode": "100", // Increased spacing between nodes in the same layer
     "elk.spacing.edgeEdge": "150",
     "elk.spacing.edgeNode": "200",
 
     "portConstraints": "FIXED_ORDER",
-    "elk.margins": "200",
+    "elk.margins": "100",
      "elk.partitioning.activate": "true",
     "elk.layered.nodePlacement.strategy": "SIMPLE",
     "elk.padding": "50",
@@ -65,15 +64,15 @@ const parentLayoutOptions = {
     "elk.edgeRouting": "ORTHOGONAL",
     "elk.allowEdgeNodeOverlap": "false",
     "elk.layered.spacing.nodeNodeBetweenLayers": "200", // Increased spacing between layers
-    "elk.layered.spacing.edgeNodeBetweenLayers": "200", // Increased spacing between layers
-    "elk.spacing.nodeNode": "500", // Increased spacing between nodes in the same layer
-    "elk.spacing.edgeEdge": "250",
-    "elk.spacing.edgeNode": "300",
+    "elk.layered.spacing.edgeNodeBetweenLayers": "250", // Increased spacing between layers
+    "elk.spacing.nodeNode": "100", // Increased spacing between nodes in the same layer
+    "elk.spacing.edgeEdge": "100",
+    "elk.spacing.edgeNode": "200",
     "portConstraints": "FIXED_ORDER",
     "elk.partitioning.activate": "true",
     "elk.margins": "200",
     "elk.layered.nodePlacement.strategy": "SIMPLE",
-    "elk.padding": "50", // Increased padding for parent nodes
+    "elk.padding": "100", // Increased padding for parent nodes
 };
 
 const childLayoutOptions = {
@@ -84,9 +83,9 @@ const childLayoutOptions = {
     "portConstraints": "FIXED_ORDER",
     "elk.layered.spacing.nodeNodeBetweenLayers": "200", // Increased spacing between layers
     "elk.layered.spacing.edgeNodeBetweenLayers": "200", // Increased spacing between layers
-    "elk.spacing.nodeNode": "500", // Increased spacing between nodes in the same layer
+    "elk.spacing.nodeNode": "200", // Increased spacing between nodes in the same layer
     "elk.spacing.edgeEdge": "250",
-    "elk.spacing.edgeNode": "300",
+    "elk.spacing.edgeNode": "150",
     "elk.partitioning.activate": "true",
     "elk.margins": "200",
     "elk.layered.nodePlacement.strategy": "SIMPLE",
@@ -211,6 +210,8 @@ export default function Import() {
         });
     };
 
+
+    // TODO get events raised by a transition
     const setupEventService = (
         service: EventService,
         nodes: Node<CsmNodeProps>[]
@@ -218,30 +219,22 @@ export default function Import() {
         // Get raise event actions
         // Get timeout actions that are raise event actions
 
-        let raiseActions: Action[] = [];
+        let raisedEvents: Event[] = [];
+
 
         nodes.forEach((node) => {
             if (isState(node.data)) {
-                raiseActions = raiseActions.concat(
-                    node.data.state.getAllActions().filter((a) => a.type === ActionType.RAISE_EVENT)
-                );
-
-                const timeOutActions = node.data.state
-                    .getAllActions()
-                    .filter((a) => a.type == ActionType.TIMEOUT);
-                timeOutActions.forEach((a) => {
-                    const timeoutProps = a.properties as TimeoutActionProps;
-                    if (timeoutProps.action.type === ActionType.RAISE_EVENT) {
-                        raiseActions.push(timeoutProps.action);
-                    }
-                });
+                raisedEvents = raisedEvents.concat(node.data.state.getAllRaisedEvents())
             }
+
         });
 
-        raiseActions.forEach((a) => {
-            const raiseEventProps = a.properties as RaiseEventActionProps;
-            service.registerEvent(raiseEventProps.event);
-        });
+        raisedEvents.forEach((e) => {
+            service.registerEvent(e);
+        })
+
+
+
     };
 
     const setupGuardService = (service: GuardService, edges: Edge<CsmEdgeProps>[]) => {
@@ -255,11 +248,64 @@ export default function Import() {
         });
     };
 
-    const adjustInternalTransitionHandles = (edges: Edge<CsmEdgeProps>[]) => {
+    const adjustInternalTransitionHandles = (edges: Edge<CsmEdgeProps>[], nodes: Node<CsmNodeProps>[]) => {
         edges.forEach((e) => {
             if(e.source === e.target){
-                e.sourceHandle = "s"
-                e.targetHandle = "t"
+                const sourceNode = nodes.find((n) => n.id === e.source)
+                if(sourceNode && isState(sourceNode.data)) {
+
+                    let sourceHandle = ""
+                    let targetHandle: string
+
+                    State.INTERNAL_SOURCE_HANDLES.every((handle) => {
+                        if(isState(sourceNode.data)){
+
+                            if(!sourceNode.data.state.isSourceHandleUsed(handle)){
+                                sourceHandle = handle
+                                return false
+                            }
+                        }
+
+                        return true
+
+                    })
+
+
+                    switch (sourceHandle) {
+                        case "s" : {
+                            targetHandle = "t"
+                            break
+                        }
+
+                        case "s-1" : {
+                            targetHandle = "t-1"
+                            break
+                        }
+
+                        case "s-2" : {
+                            targetHandle = "t-2"
+                            break
+                        }
+
+                        case "s-3" : {
+                            targetHandle = "t-3"
+                            break
+                        }
+
+                        default: {
+                            targetHandle = ""
+                        }
+
+
+                    }
+
+                    e.sourceHandle = sourceHandle
+                    e.targetHandle = targetHandle
+                    sourceNode.data.state.addSourceHandle(sourceHandle)
+                }
+
+
+
             }
             // Adjust else edges to have same source handle as edge with else.
             if(e.data?.transition.isElseEdge){
@@ -346,15 +392,28 @@ export default function Import() {
     const transitionToEdge = (
         sourceState: StateOrStateMachine,
         transition: Transition,
-        nodes: Node<CsmNodeProps>[]
+        nodes: Node<CsmNodeProps>[],
+        parentId: string | undefined
     ) => {
-        const target = nodes.find((n) => {
-            if (isState(n.data)) {
-                return n.data.state.name === transition.getTarget();
-            }
-            return false;
-        });
+        // Handle internal
+        let target: Node<CsmNodeProps> | undefined
 
+        if(transition.getTarget().trim() === ""){
+            target = nodes.find((n) => {
+                if(isState(n.data)){
+                    return n.data.state.name === sourceState.name && n.parentId === parentId
+                }
+                return false
+            })
+        }
+        else {
+            target = nodes.find((n) => {
+                if (isState(n.data)) {
+                    return n.data.state.name === transition.getTarget() && n.parentId === parentId;
+                }
+                return false;
+            });
+        }
 
 
         if (!target) {
@@ -372,7 +431,7 @@ export default function Import() {
             // targetHandle: 'l-t',
             type: "csm-edge",
             data: { transition: transition },
-            zIndex: 1,
+            zIndex: transition.isElseEdge ? 0 : 1,
             markerEnd: { type: MarkerType.ArrowClosed },
         };
 
@@ -387,6 +446,9 @@ export default function Import() {
             description
         );
 
+        console.log(`DESCIRPTION : 
+            ${description.stateMachines}`)
+
         // Generate nodes and edges
         const nodes = generateNodes(topLevelStatemachines);
         let edges: Edge<CsmEdgeProps>[] = [];
@@ -395,40 +457,53 @@ export default function Import() {
             if (isState(node.data)) {
                 const sourceState = node.data.state;
                 sourceState.on.forEach((transition) => {
-                    const edge = transitionToEdge(sourceState, transition, nodes);
+                    const edge = transitionToEdge(sourceState, transition, nodes, node.parentId);
                     if (edge) {
                         edges.push(edge);
                     }
                 });
 
                 sourceState.always.forEach((transition) => {
-                    const edge = transitionToEdge(sourceState, transition, nodes);
+                    const edge = transitionToEdge(sourceState, transition, nodes, node.parentId);
                     if (edge) {
                         edges.push(edge);
                     }
                 });
 
-                const elseTransitions = edges.filter((e) => e.data?.transition.getElse().trim() !== "")
-                elseTransitions.forEach((edge) => {
-                    const targetNode: Node<CsmNodeProps> | undefined = nodes.find((n) => isState(n.data) && n.data.state.name === edge.data?.transition.getElse() && n.parentId === node.parentId)
-
-
-                    if (targetNode && isState(node.data) && isState(targetNode.data)) {
-                        console.log(`${edge.source}  - ${edge.target}`);
-                        const newTransition = new Transition(node.data.state.name,targetNode.data.state.name, false, true, edge.data?.transition.getId())
-                        const newEdge = transitionToEdge(sourceState, newTransition, nodes);
-                        if (newEdge) {
-                            edges.push(newEdge);
-                        }
-
-
-                    }
-
-                })
-
 
             }
-        });
+        })
+
+        const elseTransitions = edges.filter((e) => e.data?.transition.getElse().trim() !== "")
+        console.log(`ELSE LENGTH ${elseTransitions.length}`);
+
+
+        console.log("AAAAAAAAAAAAAAAAAEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE")
+        elseTransitions.forEach((e) => console.log(e.data?.transition.getSource() + "=>" + e.data?.transition.getElse()))
+
+        elseTransitions.forEach((edge) => {
+            const sourceNode = nodes.find((n) => n.id === edge.source)
+            if(sourceNode){
+                const targetNode: Node<CsmNodeProps> | undefined = nodes.find((n) => isState(n.data) && n.data.state.name === edge.data?.transition.getElse() && n.parentId === sourceNode.parentId)
+                if (targetNode && isState(sourceNode.data) && isState(targetNode.data)) {
+                    console.log(`${edge.source}  - ${edge.target}`);
+                    const newTransition = new Transition(sourceNode.data.state.name,targetNode.data.state.name, false, true, edge.data?.transition.getId())
+                    const newEdge = transitionToEdge(sourceNode.data.state, newTransition, nodes, sourceNode.parentId);
+                    if (newEdge) {
+                        edges.push(newEdge);
+                    }
+
+
+                }
+            }
+
+
+
+
+
+        })
+
+        ;
 
         try {
             // Reset services
@@ -592,7 +667,7 @@ export default function Import() {
 
                     return edge;
                 });
-                adjustInternalTransitionHandles(layoutedEdges)
+                adjustInternalTransitionHandles(layoutedEdges, layoutedNodes )
                 console.log(`NUM EDGES ${layoutedEdges.length}`)
                 setEdges(layoutedEdges);
             });
