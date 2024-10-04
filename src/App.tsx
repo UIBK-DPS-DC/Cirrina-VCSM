@@ -43,8 +43,6 @@ export default function App() {
     const [hideFlowEdges, setHideFlowEdges] = useState<boolean>(false)
     const [initialOrTerminalChange, setInitialOrTerminalChange] = useState<boolean>(false)
     const hideStatemachineEdgesButtonText = () => hideFlowEdges ? "Show Statemachine Edges" : "Hide Statemachine Edges";
-    // TODO: Add conditional selection to all relevant data-bs-theme fields
-    // Toggle Button in App.tsx
     const [darkMode,setDarkMode] = useState<boolean>(true)
 
     const [showEdgeLabels, setShowEdgeLabels] = useState<boolean>(true)
