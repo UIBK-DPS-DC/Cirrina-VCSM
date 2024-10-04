@@ -15,6 +15,7 @@ import {ReactFlowContext} from './utils.tsx';
 import CsmlEditor from "./components/csmlEditor/csmlEditor.tsx";
 import Export from "./components/export.tsx";
 import Import from "./components/import.tsx";
+import {Button} from "react-bootstrap";
 
 
 const initialNodes: Node<CsmNodeProps>[] = [];
@@ -42,6 +43,8 @@ export default function App() {
     const [hideFlowEdges, setHideFlowEdges] = useState<boolean>(false)
     const [initialOrTerminalChange, setInitialOrTerminalChange] = useState<boolean>(false)
     const hideStatemachineEdgesButtonText = () => hideFlowEdges ? "Show Statemachine Edges" : "Hide Statemachine Edges";
+    // TODO: Add conditional selection to all relevant data-bs-theme fields
+    // Toggle Button in App.tsx
     const [darkMode,setDarkMode] = useState<boolean>(true)
 
     const [showEdgeLabels, setShowEdgeLabels] = useState<boolean>(true)
@@ -66,6 +69,10 @@ export default function App() {
         setShowEdgeLabels(!showEdgeLabels)
 
     },[setShowEdgeLabels, showEdgeLabels])
+
+    const onDarkModeButtonClick = () => {
+        setDarkMode(!darkMode)
+    }
 
 
     //TODO: split into multiple contexts or use prop drilling when applicable
@@ -111,6 +118,9 @@ export default function App() {
                 <div className={"topBar"}>
                     <h2> VCSM Editor </h2>
                     <div className={"buttons"}>
+                        <Button onClick={onDarkModeButtonClick}>
+                            <i className="bi bi-moon-stars"></i>
+                        </Button>
                         <Export></Export>
                         <Import></Import>
                         <button className={"button"} onClick={onHideEdgeLabelsButtonClick}>{hideEdgeLabelsButtonText()}</button>

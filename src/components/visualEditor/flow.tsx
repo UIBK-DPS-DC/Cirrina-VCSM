@@ -73,7 +73,8 @@ export default function Flow() {
         recalculateTransitions,
         setRecalculateTransitions,
         initialOrTerminalChange,
-        setInitialOrTerminalChange
+        setInitialOrTerminalChange,
+        darkMode
     } = context;
 
     const { getIntersectingNodes, screenToFlowPosition } = useReactFlow();
@@ -788,7 +789,7 @@ export default function Flow() {
                 onPaneClick={onPaneClick}
                 onNodeClick={onNodeClick}
                 onNodeContextMenu={onNodeContextMenu}
-                colorMode={"dark"}
+                colorMode={darkMode ? "dark" : "light"}
                 onEdgeClick={onEdgeClick}
                 onEdgesDelete={onEdgesDelete}
                 onNodesDelete={onNodesDelete}
