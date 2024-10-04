@@ -16,7 +16,7 @@ export default function SelectContextsModal(props: {buttonName: string | undefin
     const context = useContext(ReactFlowContext) as ReactFlowContextProps;
     const {nodes,
     selectedNode,
-    contextService, selectedEdge} = context
+    contextService, selectedEdge, darkMode} = context
 
     const PERSISTENT_CONTEXT_MULTISELECT_NAME = "selected-persistent-context"
     const LOCAL_CONTEXT_MULTISELECT_NAME = "selected-local-context"
@@ -294,7 +294,7 @@ export default function SelectContextsModal(props: {buttonName: string | undefin
             </Button>
 
             <Modal show={show}
-            onHide={handleClose} data-bs-theme="dark">
+            onHide={handleClose} data-bs-theme={darkMode ? "dark" : "light"}>
 
                 <Modal.Header closeButton style={{color: "#ffffff"}}>
                     <Modal.Title>Select Context</Modal.Title>
