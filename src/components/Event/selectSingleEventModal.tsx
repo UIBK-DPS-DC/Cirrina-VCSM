@@ -11,7 +11,7 @@ import {EventChannel} from "../../enums.ts";
 export default function SelectSingleEventModal(props: {event: Event | undefined, setEvent: React.Dispatch<SetStateAction<Event | undefined>>, buttonText?: string, modalTitle?: string}) {
 
     const context = useContext(ReactFlowContext) as ReactFlowContextProps
-    const {eventService} = context
+    const {eventService, darkMode} = context
 
     const buttonText = () => props.buttonText ? props.buttonText : "Select Event"
     const modalTitle = () => props.modalTitle ? props.modalTitle : buttonText()
@@ -184,7 +184,7 @@ export default function SelectSingleEventModal(props: {event: Event | undefined,
                 {buttonText()}
             </Button>
 
-            <Modal show={show} onHide={handleClose} data-bs-theme="dark">
+            <Modal show={show} onHide={handleClose} data-bs-theme={darkMode ? "dark" : "light"}>
                 <Modal.Header closeButton={true}>
                     <Modal.Title style={{color: "#ffffff"}}>
                         {modalTitle()}
