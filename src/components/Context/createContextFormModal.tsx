@@ -36,7 +36,7 @@ export default function CreateContextFormModal(props: { variable: ContextVariabl
             </Button>
 
             <Modal show={show} onHide={handleClose} data-bs-theme={darkMode ? "dark" : "light"} backdrop="static" >
-                <Modal.Header closeButton style={{color: "#ffffff"}}>
+                <Modal.Header closeButton style={{color: darkMode ? "#ffffff" : "#000000"}}>
                     <Modal.Title>{modalTitle()}</Modal.Title>
                 </Modal.Header>
 

@@ -34,7 +34,7 @@ export default function CreateEventModal(props: {event: Event | undefined, onSub
                 {buttonText()}
             </Button>
             <Modal show={show} onHide={handleClose} backdrop={"static"} data-bs-theme={darkMode ? "dark" : "light"}>
-                <Modal.Header closeButton style={{color: "#ffffff"}}>
+                <Modal.Header closeButton style={{color: darkMode ? "#ffffff" : "#000000"}}>
                     <Modal.Title>{modalTitle()}</Modal.Title>
                 </Modal.Header
                 >

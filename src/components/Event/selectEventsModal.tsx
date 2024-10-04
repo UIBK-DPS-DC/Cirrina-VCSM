@@ -229,7 +229,7 @@ export default function SelectEventsModal(props:{buttonName: string | undefined,
             
             <Modal show={show} onHide={handleClose} data-bs-theme={darkMode ? "dark" : "light"}>
                 <Modal.Header closeButton={true}>
-                        <Modal.Title style={{color: "#ffffff"}}>
+                        <Modal.Title style={{color: darkMode ? "#ffffff" : "#000000"}}>
                             {modalTitle()}
                         </Modal.Title>
                 </Modal.Header>
@@ -255,7 +255,7 @@ export default function SelectEventsModal(props:{buttonName: string | undefined,
                                                          value={selectedInternalEvents}
                                                          onChange={onSelectedInternalEventsChange}
                                                          onCreateOption={onInternalEventCreate}
-                                                         styles={customSelectStyles}>
+                                                         styles={darkMode ? customSelectStyles : undefined}>
                                         </CreatableSelect>
                                 </Row>
                             </Form.Group>
@@ -272,7 +272,7 @@ export default function SelectEventsModal(props:{buttonName: string | undefined,
                                                          value={selectedExternalEvents}
                                                          onChange={onSelectedExternalEventsChange}
                                                          onCreateOption={onExternalEventCreate}
-                                                         styles={customSelectStyles}>
+                                                         styles={darkMode ? customSelectStyles : undefined}>
                                         </CreatableSelect>
                                 </Row>
                             </Form.Group>
@@ -289,7 +289,7 @@ export default function SelectEventsModal(props:{buttonName: string | undefined,
                                                          value={selectedGlobalEvents}
                                                          onChange={onSelectedGlobalEventsChange}
                                                          onCreateOption={onGlobalEventCreate}
-                                                         styles={customSelectStyles}>
+                                                         styles={darkMode ? customSelectStyles : undefined}>
                                         </CreatableSelect>
                                 </Row>
                             </Form.Group>
@@ -307,7 +307,7 @@ export default function SelectEventsModal(props:{buttonName: string | undefined,
                                                          value={selectedPeripheralEvents}
                                                          onChange={onSelectedPeripheralEventsChange}
                                                          onCreateOption={onPeripheralEventCreate}
-                                                         styles={customSelectStyles}>
+                                                         styles={darkMode ? customSelectStyles : undefined}>
                                         </CreatableSelect>
                                 </Row>
                             </Form.Group>

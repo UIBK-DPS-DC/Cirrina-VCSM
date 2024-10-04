@@ -119,7 +119,12 @@ export default function App() {
                     <h2> VCSM Editor </h2>
                     <div className={"buttons"}>
                         <Button onClick={onDarkModeButtonClick}>
-                            <i className="bi bi-moon-stars"></i>
+                            {darkMode && (
+                                <i className="bi bi-brightness-high-fill"></i>
+                            ) || (
+                                <i className="bi bi-moon-stars"></i>
+                                )}
+
                         </Button>
                         <Export></Export>
                         <Import></Import>

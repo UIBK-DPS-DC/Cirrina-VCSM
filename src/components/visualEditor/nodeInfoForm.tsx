@@ -43,7 +43,8 @@ export default function NodeInfoForm() {
         nodes,
         edges,
         initialOrTerminalChange,
-        setInitialOrTerminalChange
+        setInitialOrTerminalChange,
+        darkMode
 
     } = context;
 
@@ -172,7 +173,8 @@ export default function NodeInfoForm() {
     return (
         selectedNode && (
             <div >
-                <Offcanvas show={showSidebar} scroll={true} backdrop={false} placement={"end"} style={{ width: '30vw' }} data-bs-theme="dark">
+                <Offcanvas show={showSidebar} scroll={true} backdrop={false} placement={"end"} style={{ width: '30vw' }}
+                           data-bs-theme={darkMode ? "dark" : "light"}>
                     <OffcanvasHeader closeButton={true} onClick={() => {setShowSidebar(false)}}>
                         <Offcanvas.Title>{stateOrStateMachineService.getName(selectedNode.data)}</Offcanvas.Title>
                     </OffcanvasHeader>
@@ -215,9 +217,9 @@ export default function NodeInfoForm() {
                                     <br/>
                                     <Container>
                                         <Modal show={show} onHide={handleClose} backdrop={"static"} size="lg" centered
-                                               data-bs-theme="dark">
+                                               data-bs-theme={darkMode ? "dark" : "light"}>
                                             <Modal.Header closeButton={true}>
-                                                <Modal.Title style={{color: "#ffffff"}}>Create Action</Modal.Title>
+                                                <Modal.Title style={{color: darkMode ? "#ffffff" : "#000000"}}>Create Action</Modal.Title>
                                             </Modal.Header>
 
                                             <ModalBody>

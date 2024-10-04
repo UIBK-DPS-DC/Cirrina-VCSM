@@ -296,7 +296,7 @@ export default function SelectContextsModal(props: {buttonName: string | undefin
             <Modal show={show}
             onHide={handleClose} data-bs-theme={darkMode ? "dark" : "light"}>
 
-                <Modal.Header closeButton style={{color: "#ffffff"}}>
+                <Modal.Header closeButton style={{color: darkMode ? "#ffffff" : "#000000"}}>
                     <Modal.Title>Select Context</Modal.Title>
                 </Modal.Header>
 
@@ -312,7 +312,7 @@ export default function SelectContextsModal(props: {buttonName: string | undefin
 
                         <Form.Group controlId={"fromPersistentContext"}>
                             <Row>
-                                <Form.Label style={{color: "#ffffff"}}>Persistent Context</Form.Label>
+                                <Form.Label style={{color: darkMode ? "#ffffff" : "#000000"}}>Persistent Context</Form.Label>
                             </Row>
 
                             <Row className={"mb-3"}>
@@ -331,7 +331,7 @@ export default function SelectContextsModal(props: {buttonName: string | undefin
 
                         <Form.Group controlId={"fromLocalContext"}>
                             <Row>
-                                <Form.Label style={{color: "#ffffff"}}>Local Context</Form.Label>
+                                <Form.Label style={{color: darkMode ? "#ffffff" : "#000000"}}>Local Context</Form.Label>
                             </Row>
                             <Row className={"mb-3"}>
                                 {getKnownLocalContext().length > 0 && (
@@ -344,7 +344,7 @@ export default function SelectContextsModal(props: {buttonName: string | undefin
 
                             <Form.Group controlId={"fromStaticContext"}>
                                 <Row>
-                                    <Form.Label style={{color: "#ffffff"}}>Static Context</Form.Label>
+                                    <Form.Label style={{color: darkMode ? "#ffffff" : "#000000"}}>Static Context</Form.Label>
                                 </Row>
                                 <Row className={"mb-3"}>
                                     {getKnownStaticContext().length > 0 && (
