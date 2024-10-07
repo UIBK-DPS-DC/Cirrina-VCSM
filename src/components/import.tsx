@@ -1,18 +1,12 @@
 // Ensure all required imports are correct and in place
-import { Button } from "react-bootstrap";
-import React, { useCallback, useContext, useRef } from "react";
-import {
-    CollaborativeStateMachineDescription,
-} from "../pkl/bindings/collaborative_state_machine_description.pkl.ts";
-import {
-    colorMap,
-    fromCollaborativeStatemachineDescription,
-    ReactFlowContext,
-} from "../utils.tsx";
+import {Button} from "react-bootstrap";
+import React, {useCallback, useContext, useRef} from "react";
+import {CollaborativeStateMachineDescription,} from "../pkl/bindings/collaborative_state_machine_description.pkl.ts";
+import {colorMap, fromCollaborativeStatemachineDescription, ReactFlowContext,} from "../utils.tsx";
 import {
     CreateActionProps,
     CsmEdgeProps,
-    CsmNodeProps,
+    CsmNodeProps, InvokeActionProps,
     isState,
     isStateMachine,
     ReactFlowContextProps,
@@ -23,21 +17,16 @@ import StateMachine from "../classes/stateMachine.ts";
 import ELK from "elkjs/lib/elk.bundled.js";
 import Transition from "../classes/transition.ts";
 import StateOrStateMachine from "../classes/stateOrStateMachine.ts";
-import StateOrStateMachineService, {
-    NO_PARENT,
-} from "../services/stateOrStateMachineService.tsx";
+import StateOrStateMachineService, {NO_PARENT,} from "../services/stateOrStateMachineService.tsx";
 import ActionService from "../services/actionService.tsx";
 import Action from "../classes/action.tsx";
 import ContextVariableService from "../services/contextVariableService.tsx";
-import { ActionType } from "../enums.ts";
+import {ActionType} from "../enums.ts";
 import EventService from "../services/eventService.tsx";
 import GuardService from "../services/guardService.tsx";
 import Event from "../classes/event.ts";
-import {
-    getNewEdgeId,
-    getNewGuardId,
-    getNewNodeId,
-} from "./visualEditor/flow.tsx";
+import {getNewEdgeId, getNewGuardId, getNewNodeId,} from "./visualEditor/flow.tsx";
+import ServiceTypeService from "../services/serviceTypeService.tsx";
 
 // Define the layout options for ELK
 const rootLayoutOptions = {
@@ -109,7 +98,8 @@ export default function Import() {
         contextService,
         guardService,
         eventService,
-        setHideFlowEdges
+        setHideFlowEdges,
+        serviceTypeService
     } = context;
 
     // Function to handle file input button click
@@ -129,6 +119,7 @@ export default function Import() {
         contextService.resetService();
         guardService.resetService();
         eventService.resetService();
+        serviceTypeService.resetService()
     };
 
     const setupStateOrStatemachineService = (
@@ -209,6 +200,18 @@ export default function Import() {
             }
         });
     };
+
+    const setUpServiceTypeService = (service: ServiceTypeService, nodes: Node<CsmNodeProps>[]) => {
+        nodes.forEach((node) => {
+            if(isState(node.data)){
+                node.data.state.getAllActions()
+                    .filter((a) => a.type === ActionType.INVOKE).forEach((i) => {
+                        const invokeActionProps = i.properties as InvokeActionProps;
+                        service.registerServiceType(invokeActionProps.serviceType)
+                })
+            }
+        })
+    }
 
 
     // TODO get events raised by a transition
@@ -475,10 +478,7 @@ export default function Import() {
         })
 
         const elseTransitions = edges.filter((e) => e.data?.transition.getElse().trim() !== "")
-        console.log(`ELSE LENGTH ${elseTransitions.length}`);
 
-
-        console.log("AAAAAAAAAAAAAAAAAEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE")
         elseTransitions.forEach((e) => console.log(e.data?.transition.getSource() + "=>" + e.data?.transition.getElse()))
 
         elseTransitions.forEach((edge) => {
@@ -520,6 +520,8 @@ export default function Import() {
             setupActionService(actionService, nodes, edges);
             setupEventService(eventService, nodes);
             setupGuardService(guardService, edges);
+            setUpServiceTypeService(serviceTypeService, nodes);
+
 
 
 
