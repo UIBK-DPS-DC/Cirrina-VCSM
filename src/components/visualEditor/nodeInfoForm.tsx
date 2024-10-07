@@ -1,5 +1,5 @@
 import React, {useCallback, useContext, useEffect, useState} from "react";
-import { isState, ReactFlowContextProps} from "../../types.ts";
+import {isState, isStateMachine, ReactFlowContextProps} from "../../types.ts";
 import Action from "../../classes/action.tsx";
 import {ReactFlowContext, setInitialState, setStateAsTerminal} from "../../utils.tsx";
 import RenameNodeComponent from "./renameNodeComponent.tsx";
@@ -134,6 +134,10 @@ export default function NodeInfoForm() {
             setStaticContext(selectedNode.data.state.staticContext)
 
         }
+        if(selectedNode && isStateMachine(selectedNode.data)){
+            setPersistentContext(selectedNode.data.stateMachine.persistentContext)
+            setLocalContext(selectedNode.data.stateMachine.localContext)
+        }
 
     }, [selectedNode]);
 
@@ -156,11 +160,14 @@ export default function NodeInfoForm() {
 
 
     const renderContexts = useCallback(() => {
-        if(selectedNode && isState(selectedNode.data)){
+        if(selectedNode){
            return(<div className={"mb-3"}>
                    <ContextCardDisplay vars={localContext} headerText={"Local Context"} setVars={setLocalContext} deregisterOnRemove={true} onRemove={onContextRemove} />
-                   <ContextCardDisplay vars={staticContext} headerText={"Static Context"} setVars={setStaticContext} deregisterOnRemove={true} onRemove={onContextRemove} />
-                   <ContextCardDisplay vars={staticContext} headerText={"Persistent Context"} setVars={setPersistentContext} deregisterOnRemove={true} onRemove={onContextRemove} />
+                   <ContextCardDisplay vars={persistentContext} headerText={"Persistent Context"} setVars={setPersistentContext} deregisterOnRemove={true} onRemove={onContextRemove} />
+                   {/** Static context does not exist on statemachines*/}
+                   {isState(selectedNode.data) && (
+                       <ContextCardDisplay vars={staticContext} headerText={"Static Context"} setVars={setStaticContext} deregisterOnRemove={true} onRemove={onContextRemove} />
+           )}
            </div>
            )
         }
@@ -308,10 +315,11 @@ export default function NodeInfoForm() {
                                                             onSubmit={undefined}></CreateContextFormModal>
                                 </div>
 
-                                {renderContexts()}
+
 
                             </Container>
                         )}
+                        {renderContexts()}
                     </OffcanvasBody>
                 </Offcanvas>
             </div>

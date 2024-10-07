@@ -24,6 +24,7 @@ import {
 import ContextVariable from "./classes/contextVariable.tsx";
 import MatchCase from "./classes/MatchCase.tsx";
 import ServiceTypeService from "./services/serviceTypeService.tsx";
+import {CollaborativeStateMachineDescription} from "./pkl/bindings/collaborative_state_machine_description.pkl.ts";
 
 
 
@@ -171,6 +172,7 @@ export type ReactFlowContextProps = {
     setShowEdgeLabels: React.Dispatch<React.SetStateAction<boolean>>
     darkMode: boolean
     serviceTypeService: ServiceTypeService
+    csm: CollaborativeStateMachineDescription
 }
 
 

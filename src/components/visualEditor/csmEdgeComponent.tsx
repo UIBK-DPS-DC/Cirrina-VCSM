@@ -226,6 +226,7 @@ export default function CsmEdge({
                         id={id}
                         path={smEdgePath}
                         style={{ opacity: hideFlowEdges ? 0 : 1 }}
+
                     />
                     <circle r="10" fill="#ff0073" opacity={hideFlowEdges ? 0 : 1}>
                         <animateMotion

@@ -11,12 +11,13 @@ import EventService from "./services/eventService.tsx";
 import ContextVariableService from "./services/contextVariableService.tsx";
 import GuardService from "./services/guardService.tsx";
 import {Edge, Node, useEdgesState, useNodesState} from "@xyflow/react";
-import {ReactFlowContext} from './utils.tsx';
+import {generateCsmSkeleton, ReactFlowContext} from './utils.tsx';
 import CsmlEditor from "./components/csmlEditor/csmlEditor.tsx";
 import Export from "./components/export.tsx";
 import Import from "./components/import.tsx";
 import {Button} from "react-bootstrap";
 import ServiceTypeService from "./services/serviceTypeService.tsx";
+import {CollaborativeStateMachineDescription} from "./pkl/bindings/collaborative_state_machine_description.pkl.ts";
 
 
 const initialNodes: Node<CsmNodeProps>[] = [];
@@ -31,6 +32,7 @@ export default function App() {
     const contextService: ContextVariableService = useMemo(() => new ContextVariableService(), []);
     const guardService: GuardService = useMemo(() => new GuardService(), [])
     const serviceTypeService: ServiceTypeService = useMemo(() => new ServiceTypeService(),[])
+    const csm: CollaborativeStateMachineDescription = useMemo(() => generateCsmSkeleton(),[])
 
 
 
@@ -50,6 +52,7 @@ export default function App() {
 
     const [showEdgeLabels, setShowEdgeLabels] = useState<boolean>(true)
     const hideEdgeLabelsButtonText = () => showEdgeLabels ? "Hide Edge Labels" : "Show Edge Labels"
+
 
 
 
@@ -110,7 +113,8 @@ export default function App() {
         showEdgeLabels,
         setShowEdgeLabels,
         darkMode,
-        serviceTypeService
+        serviceTypeService,
+        csm
     };
 
 

@@ -279,6 +279,15 @@ export const getAllStateNamesInExtent = (node: Node<CsmNodeProps>, nodes: Node<C
 
 };
 
+export const generateCsmSkeleton = (): CollaborativeStateMachineDescription => {
+    const csm: CollaborativeStateMachineDescription = {
+        localContext: {variables: []}, name: "csm", persistentContext: {variables: []}, stateMachines: [], version: "2.0"
+
+    }
+
+    return csm
+}
+
 export const fromCollaborativeStatemachineDescription = (description: CollaborativeStateMachineDescription): StateMachine[] => {
     // Get all statemachines
     return description.stateMachines.map((sm) => StateMachine.fromDescription(sm))
