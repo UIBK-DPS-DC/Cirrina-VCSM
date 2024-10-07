@@ -63,14 +63,14 @@ const parentLayoutOptions = {
     "elk.direction": "RIGHT",
     "elk.edgeRouting": "ORTHOGONAL",
     "elk.allowEdgeNodeOverlap": "false",
-    "elk.layered.spacing.nodeNodeBetweenLayers": "200", // Increased spacing between layers
-    "elk.layered.spacing.edgeNodeBetweenLayers": "250", // Increased spacing between layers
+    "elk.layered.spacing.nodeNodeBetweenLayers": "100", // Increased spacing between layers
+    "elk.layered.spacing.edgeNodeBetweenLayers": "100", // Increased spacing between layers
     "elk.spacing.nodeNode": "100", // Increased spacing between nodes in the same layer
     "elk.spacing.edgeEdge": "100",
     "elk.spacing.edgeNode": "200",
     "portConstraints": "FIXED_ORDER",
     "elk.partitioning.activate": "true",
-    "elk.margins": "200",
+    "elk.margins": "100",
     "elk.layered.nodePlacement.strategy": "SIMPLE",
     "elk.padding": "100", // Increased padding for parent nodes
 };

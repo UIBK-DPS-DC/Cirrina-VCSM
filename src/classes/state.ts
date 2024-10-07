@@ -6,7 +6,7 @@ import Guard from "./guard.tsx";
 import Event from "./event.ts";
 import {StateDescription} from "../pkl/bindings/collaborative_state_machine_description.pkl.ts";
 import {ActionType} from "../enums.ts";
-import {InvokeActionProps, RaiseEventActionProps, TimeoutActionProps} from "../types.ts";
+import {InvokeActionProps, MatchActionProps, RaiseEventActionProps, TimeoutActionProps} from "../types.ts";
 import {NO_PARENT} from "../services/stateOrStateMachineService.tsx";
 
 
@@ -232,7 +232,35 @@ export default class State implements StateOrStateMachine {
     }
 
 
-    // TODO: Edges can also raise events.
+    private getAllNestedRaiseActions (action: Action, invokeActions:Action[] = []){
+        let raiseActions: Action[] = []
+        if(action.type !== ActionType.MATCH){
+            return raiseActions
+        }
+
+        const matchActionProps = (action.properties as MatchActionProps).cases
+        matchActionProps.forEach((a) => {
+            if(a.action.type === ActionType.RAISE_EVENT){
+                raiseActions.push(a.action)
+            }
+            if(a.action.type === ActionType.INVOKE){
+                invokeActions.push(a.action)
+            }
+            if(a.action.type === ActionType.MATCH){
+                raiseActions = raiseActions.concat(this.getAllNestedRaiseActions(a.action, invokeActions))
+            }
+
+
+        })
+
+
+        return raiseActions
+
+    }
+
+
+
+
     public getAllRaisedEvents(): Event[] {
 
 
@@ -263,11 +291,23 @@ export default class State implements StateOrStateMachine {
                 }
                 if(a.type === ActionType.INVOKE) {
                     invokeActions.push(a)
-
                 }
+                if(a.type === ActionType.MATCH){
+                    this.getAllNestedRaiseActions(a, invokeActions).forEach((ra) => {
+                        const raiseProps = ra.properties as RaiseEventActionProps
+                        raiseEventEvents.push(raiseProps.event)
+                    })
+                }
+
             })
         })
 
+        this.getAllActions().filter((a) => a.type === ActionType.MATCH).forEach((a) => {
+            this.getAllNestedRaiseActions(a, invokeActions).forEach((ra) => {
+                const raiseProps = ra.properties as RaiseEventActionProps
+                raiseEventEvents.push(raiseProps.event)
+            })
+        })
 
         invokeActions.forEach((a) => {
             const invokeProps = a.properties as InvokeActionProps

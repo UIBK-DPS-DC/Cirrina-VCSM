@@ -2,7 +2,7 @@ import Action from "../../../classes/action.tsx";
 import Event from "../../../classes/event.ts";
 import {Button, Card, Col, Form, Row} from "react-bootstrap";
 import {ActionCategory, ActionType, ServiceType} from "../../../enums.ts";
-import {ReactFlowContext, renderEnumAsOptions} from "../../../utils.tsx";
+import {customSelectStyles, ReactFlowContext, renderEnumAsOptions} from "../../../utils.tsx";
 import React, {Dispatch, SetStateAction, useContext, useEffect, useState} from "react";
 import CreateContextFormModal from "../../Context/createContextFormModal.tsx";
 import SelectContextsModal from "../../Context/selectContextsModal.tsx";
@@ -12,6 +12,8 @@ import CreateEventModal from "../../Event/createEventModal.tsx";
 import SelectEventsModal from "../../Event/selectEventsModal.tsx";
 import EventCardDisplay from "../../Event/eventCardDisplay.tsx";
 import {InvokeActionProps, isState, ReactFlowContextProps} from "../../../types.ts";
+import CreatableSelect from "react-select/creatable";
+import {ActionMeta, OnChangeValue} from "react-select";
 
 
 
@@ -25,7 +27,7 @@ export default function InvokeActionForm(props: {action: Action | undefined,
     const context = useContext(ReactFlowContext) as ReactFlowContextProps;
     const {selectedNode,
     stateOrStateMachineService,
-    actionService, selectedEdge} = context;
+    actionService, selectedEdge, darkMode, serviceTypeService} = context;
 
 
     const submitButtonText = () => props.action ? "Save Changes" : "Create Action"
@@ -37,7 +39,7 @@ export default function InvokeActionForm(props: {action: Action | undefined,
     const [serviceIsLocalCheckbox, setServiceIsLocalCheckbox] = useState<boolean>(false);
     const [selectedOutputContextVariables, setSelectedOutputContextVariables] = useState<ContextVariable[]>([]);
     const [selectedEventsWhenDone, setSelectedEventsWhenDone] = useState<Event[]>([]);
-    const [selectedServiceType, setSelectedServiceType] = useState<string>(ServiceType.LOCAL)
+    const [selectedServiceType, setSelectedServiceType] =  useState<{value:string, label:string}>()
     const [selectedActionCategory, setSelectedActionCategory] = useState<string>(ActionCategory.ENTRY_ACTION)
 
     const [selectedEventVars, setSelectedEventVars] = useState<ContextVariable[]>([]);
@@ -64,7 +66,7 @@ export default function InvokeActionForm(props: {action: Action | undefined,
             setServiceIsLocalCheckbox(invokeActionProps.isLocal)
             setSelectedOutputContextVariables(invokeActionProps.output)
             setSelectedEventsWhenDone(invokeActionProps.done)
-            setSelectedServiceType(invokeActionProps.serviceType)
+            setSelectedServiceType({value: invokeActionProps.serviceType, label: invokeActionProps.serviceType})
             setActionNameInput(props.action.name)
 
             if(selectedNode){
@@ -90,8 +92,31 @@ export default function InvokeActionForm(props: {action: Action | undefined,
         setServiceIsLocalCheckbox(event.currentTarget.checked);
     }
 
-    const onSelectedServiceTypeChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-        setSelectedServiceType(event.target.value);
+    const onSelectedServiceTypeChange = (
+        newValue: OnChangeValue<{value: string, label: string}, false>,
+        actionMeta: ActionMeta<{value: string, label: string}>
+    ) => {
+        if (actionMeta.action === 'clear') {
+            setSelectedServiceType(undefined);
+        } else if (newValue) {
+            setSelectedServiceType(newValue);
+        }
+    };
+
+    const onNewServiceTypeCreate = (serviceTypeName: string) => {
+        const res = serviceTypeService.registerServiceType(serviceTypeName)
+        if(res){
+            setSelectedServiceType({value: serviceTypeName, label: serviceTypeName})
+            return
+        }
+        console.error(`Service with name ${serviceTypeName} already exists`)
+        return
+    }
+
+    const renderServiceTypesAsOptions = () => {
+        return serviceTypeService.getAllServiceTypes().map((s) => {
+            return {value: s, label: s};
+        })
     }
 
     const onSelectedActionCategoryChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
@@ -201,7 +226,7 @@ export default function InvokeActionForm(props: {action: Action | undefined,
             input: selectedInputContextVariables,
             isLocal: serviceIsLocalCheckbox,
             output: selectedOutputContextVariables,
-            serviceType: selectedServiceType as ServiceType,
+            serviceType: selectedServiceType?.value as ServiceType,
             type: ActionType.INVOKE,
         };
 
@@ -323,9 +348,14 @@ export default function InvokeActionForm(props: {action: Action | undefined,
                             ServiceType
                         </Form.Label>
                         <Col sm="9">
-                            <Form.Select value={selectedServiceType} onChange={onSelectedServiceTypeChange}>
-                                {renderEnumAsOptions(ServiceType)}
-                            </Form.Select>
+                            <CreatableSelect closeMenuOnSelect={false}
+                            value={selectedServiceType}
+                            isClearable={true}
+                            onChange={onSelectedServiceTypeChange}
+                            styles={darkMode ? customSelectStyles : undefined} onCreateOption={onNewServiceTypeCreate} options={renderServiceTypesAsOptions()}
+
+                            />
+
                             <Form.Text className={"text-muted"}>
                                 The Actions Service Type
                             </Form.Text>

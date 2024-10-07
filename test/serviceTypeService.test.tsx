@@ -91,4 +91,60 @@ describe('ServiceTypeService', () => {
         expect(serviceTypeService.isServiceTypeNameUnique('non-existent')).toBe(true);
     });
 
+    describe('getAllServiceTypes', () => {
+        test('should return an empty array when no service types are registered', () => {
+            const serviceTypes = serviceTypeService.getAllServiceTypes();
+            expect(serviceTypes).toEqual([]);
+        });
+
+        test('should return an array with one service type after registering one', () => {
+            serviceTypeService.registerServiceType('ServiceType1');
+            const serviceTypes = serviceTypeService.getAllServiceTypes();
+            expect(serviceTypes).toEqual(['ServiceType1']);
+        });
+
+        test('should return an array with multiple service types after registering multiple', () => {
+            serviceTypeService.registerServiceType('ServiceType1');
+            serviceTypeService.registerServiceType('ServiceType2');
+            serviceTypeService.registerServiceType('ServiceType3');
+            const serviceTypes = serviceTypeService.getAllServiceTypes();
+            expect(serviceTypes).toEqual(expect.arrayContaining(['ServiceType1', 'ServiceType2', 'ServiceType3']));
+            expect(serviceTypes.length).toBe(3);
+        });
+
+        test('should not include duplicate service types', () => {
+            serviceTypeService.registerServiceType('ServiceType1');
+            serviceTypeService.registerServiceType('ServiceType1'); // Attempt to register duplicate
+            const serviceTypes = serviceTypeService.getAllServiceTypes();
+            expect(serviceTypes).toEqual(['ServiceType1']);
+        });
+
+        test('should return all service types after deregistering one', () => {
+            serviceTypeService.registerServiceType('ServiceType1');
+            serviceTypeService.registerServiceType('ServiceType2');
+            serviceTypeService.deregisterServiceType('ServiceType1');
+            const serviceTypes = serviceTypeService.getAllServiceTypes();
+            expect(serviceTypes).toEqual(['ServiceType2']);
+        });
+    });
+
+    describe('resetService', () => {
+        test('should clear all registered service types after resetService is called', () => {
+            serviceTypeService.registerServiceType('ServiceType1');
+            serviceTypeService.registerServiceType('ServiceType2');
+            serviceTypeService.resetService();
+            const serviceTypes = serviceTypeService.getAllServiceTypes();
+            expect(serviceTypes).toEqual([]);
+        });
+
+        test('should allow re-registration of service types after reset', () => {
+            serviceTypeService.registerServiceType('ServiceType1');
+            serviceTypeService.resetService();
+            const result = serviceTypeService.registerServiceType('ServiceType1');
+            expect(result).toBe(true);
+            const serviceTypes = serviceTypeService.getAllServiceTypes();
+            expect(serviceTypes).toEqual(['ServiceType1']);
+        });
+    });
+
 });
