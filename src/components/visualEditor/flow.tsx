@@ -296,6 +296,8 @@ export default function Flow() {
             stateOrStateMachineService.linkStateNameToStatemachine(new_name, parentId, true);
             stateOrStateMachineService.linkNode(newNode.id, newNode.data);
 
+            onNodeDragStop({} as React.MouseEvent,newNode)
+
 
 
             setRecalculateTransitions(!recalculateTransitions)
@@ -308,8 +310,10 @@ export default function Flow() {
         (_: React.MouseEvent, node: Node<CsmNodeProps>) => {
             const intersections = getIntersectingNodes(node, false);
             const intersectedBlock = intersections.findLast((n) => n.type === "state-machine-node");
-
+            console.log(`Intersected Block ${intersectedBlock}`)
             const parentId = node.parentId || NO_PARENT;
+
+
 
             setNodes((ns: Node<CsmNodeProps>[]) => {
                 return ns.map((n) => {
@@ -324,6 +328,11 @@ export default function Flow() {
             });
 
             if (intersectedBlock) {
+
+                if(intersectedBlock.position.x + 50 > node.position.x || intersectedBlock.position.y + 50 > node.position.y) {
+                    return
+                }
+
                 if (node.parentId === intersectedBlock.id) return;
 
                 const blockStateNames = getAllStateNamesInExtent(intersectedBlock as Node<CsmNodeProps>, nodes, stateOrStateMachineService);
@@ -369,8 +378,8 @@ export default function Flow() {
                                 ...n,
                                 parentId: intersectedBlock.id,
                                 extent: "parent",
-                                position: n.parentId !== intersectedBlock.id ? { x: 10, y: 10 } : n.position,
-                                expandParent: false
+                                position: n.parentId !== intersectedBlock.id ? { x: n.position.x - intersectedBlock.position.x, y: n.position.y - intersectedBlock.position.y } : n.position,
+                                expandParent: true
                             };
                         }
                         return n;
