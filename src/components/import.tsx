@@ -28,6 +28,7 @@ import Event from "../classes/event.ts";
 import {getNewEdgeId, getNewGuardId, getNewNodeId,} from "./visualEditor/flow.tsx";
 import ServiceTypeService from "../services/serviceTypeService.tsx";
 
+
 // Define the layout options for ELK
 const rootLayoutOptions = {
     "elk.algorithm": "layered",
@@ -99,7 +100,8 @@ export default function Import() {
         guardService,
         eventService,
         setHideFlowEdges,
-        serviceTypeService
+        serviceTypeService,
+        setCsm
     } = context;
 
     // Function to handle file input button click
@@ -445,7 +447,7 @@ export default function Import() {
 
     // Function to load the CSM and generate nodes and edges
     const loadCSM = async (description: CollaborativeStateMachineDescription) => {
-        const topLevelStatemachines = fromCollaborativeStatemachineDescription(
+        const collaborativeStateMachine = fromCollaborativeStatemachineDescription(
             description
         );
 
@@ -453,7 +455,7 @@ export default function Import() {
             ${description.stateMachines}`)
 
         // Generate nodes and edges
-        const nodes = generateNodes(topLevelStatemachines);
+        const nodes = generateNodes(collaborativeStateMachine.stateMachines);
         let edges: Edge<CsmEdgeProps>[] = [];
 
         nodes.forEach((node) => {
@@ -533,6 +535,7 @@ export default function Import() {
 
             stateOrStateMachineService.showStatemachineStateNames();
             setHideFlowEdges(true)
+            setCsm(collaborativeStateMachine)
 
 
         } catch (error) {

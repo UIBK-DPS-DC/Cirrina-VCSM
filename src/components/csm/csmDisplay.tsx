@@ -1,4 +1,4 @@
-import {useCallback, useContext, useEffect, useState} from "react";
+import React, {useCallback, useContext, useEffect, useState} from "react";
 import {ReactFlowContext} from "../../utils.tsx";
 import {ReactFlowContextProps, Version} from "../../types.ts";
 import {Button, Col, Container, Form, Row} from "react-bootstrap";
@@ -71,6 +71,16 @@ export default function CsmDisplay() {
         });
     }
 
+    const onCsmNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setCsmName(event.target.value);
+    }
+
+    useEffect(() => {
+        if(csmName.trim().length > 0){
+            csm.name = csmName.trim();
+        }
+    }, [csmName]);
+
 
 
     useEffect(() => {
@@ -106,7 +116,7 @@ export default function CsmDisplay() {
                     <Form.Group className="mb-3" as={Row}>
                         <Form.Label column sm={"4"} style={{color: darkMode ? "#ffffff" : "#000000"}}>Collaborative State Machine Name</Form.Label>
                         <Col sm={8}>
-                            <Form.Control  type={"text"} value={csmName}/>
+                            <Form.Control  type={"text"} value={csmName} onChange={onCsmNameChange}/>
                         </Col>
                     </Form.Group>
 

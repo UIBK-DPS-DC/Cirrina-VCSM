@@ -24,7 +24,7 @@ const initialNodes: Node<CsmNodeProps>[] = [];
 const initialEdges: Edge<CsmEdgeProps>[] = [];
 
 const DEFAULT_CSM_NAME = "csm"
-const DEFAULT_VERSION = "2.0"
+const DEFAULT_CSM_VERSION = "2.0"
 
 export default function App() {
 
@@ -35,10 +35,10 @@ export default function App() {
     const contextService: ContextVariableService = useMemo(() => new ContextVariableService(), []);
     const guardService: GuardService = useMemo(() => new GuardService(), [])
     const serviceTypeService: ServiceTypeService = useMemo(() => new ServiceTypeService(),[])
-    const csm: CollaborativeStateMachine = useMemo(() => new CollaborativeStateMachine(DEFAULT_CSM_NAME,DEFAULT_VERSION),[])
 
 
 
+    const [csm,setCsm] = useState<CollaborativeStateMachine>(() => new CollaborativeStateMachine(DEFAULT_CSM_NAME,DEFAULT_CSM_VERSION))
     const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
     const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
     const [selectedNode, setSelectedNode] = useState<Node<CsmNodeProps> | null>(null);
@@ -117,7 +117,8 @@ export default function App() {
         setShowEdgeLabels,
         darkMode,
         serviceTypeService,
-        csm
+        csm,
+        setCsm
     };
 
 

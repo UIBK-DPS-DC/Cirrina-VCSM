@@ -175,6 +175,7 @@ export type ReactFlowContextProps = {
     darkMode: boolean
     serviceTypeService: ServiceTypeService
     csm: CollaborativeStateMachine
+    setCsm: React.Dispatch<React.SetStateAction<CollaborativeStateMachine>>
 }
 
 

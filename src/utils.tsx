@@ -9,6 +9,7 @@ import {CollaborativeStateMachineDescription} from "./pkl/bindings/collaborative
 import StateMachine from "./classes/stateMachine.ts";
 import State from "./classes/state.ts";
 import Event from "./classes/event.ts";
+import CollaborativeStateMachine from "./classes/collaborativeStateMachine.tsx";
 
 
 const DEBUG = false
@@ -288,10 +289,15 @@ export const generateCsmSkeleton = (): CollaborativeStateMachineDescription => {
     return csm
 }
 
-export const fromCollaborativeStatemachineDescription = (description: CollaborativeStateMachineDescription): StateMachine[] => {
+export const fromCollaborativeStatemachineDescription = (description: CollaborativeStateMachineDescription): CollaborativeStateMachine => {
     // Get all statemachines
-    return description.stateMachines.map((sm) => StateMachine.fromDescription(sm))
+    const collaborativeStateMachine = new CollaborativeStateMachine(description.name, description.version)
+    collaborativeStateMachine.persistentContext = description.persistentContext?.variables.map((v) => ContextVariable.fromDescription(v)) || []
+    collaborativeStateMachine.localContext = description.localContext?.variables.map((v) => ContextVariable.fromDescription(v)) || []
+    collaborativeStateMachine.stateMachines = description.stateMachines.map((s) => StateMachine.fromDescription(s))
+    return collaborativeStateMachine;
 }
+
 
 
 // Custom styles for dark mode
