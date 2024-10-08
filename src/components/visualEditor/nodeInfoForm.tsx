@@ -75,6 +75,7 @@ export default function NodeInfoForm() {
 
     const [show, setShow] = useState(false);
 
+
     const handleClose = () => setShow(false);
     const handleShow = () => setShow(true);
 
@@ -211,9 +212,6 @@ export default function NodeInfoForm() {
                                 </div>
 
 
-
-
-
                                 <div className={"mb-5"}>
 
                                     <div>
@@ -226,7 +224,8 @@ export default function NodeInfoForm() {
                                         <Modal show={show} onHide={handleClose} backdrop={"static"} size="lg" centered
                                                data-bs-theme={darkMode ? "dark" : "light"}>
                                             <Modal.Header closeButton={true}>
-                                                <Modal.Title style={{color: darkMode ? "#ffffff" : "#000000"}}>Create Action</Modal.Title>
+                                                <Modal.Title style={{color: darkMode ? "#ffffff" : "#000000"}}>Create
+                                                    Action</Modal.Title>
                                             </Modal.Header>
 
                                             <ModalBody>
@@ -310,15 +309,13 @@ export default function NodeInfoForm() {
 
                                 </div>
 
-                                <div className={"mb-3"}>
-                                    <CreateContextFormModal variable={undefined} buttonName={"Add Context Variable to State"}
-                                                            onSubmit={undefined}></CreateContextFormModal>
-                                </div>
-
-
 
                             </Container>
                         )}
+                        <div className={"mb-3"}>
+                            <CreateContextFormModal variable={undefined} buttonName={"Add Context Variable"}
+                                                    onSubmit={undefined}></CreateContextFormModal>
+                        </div>
                         {renderContexts()}
                     </OffcanvasBody>
                 </Offcanvas>

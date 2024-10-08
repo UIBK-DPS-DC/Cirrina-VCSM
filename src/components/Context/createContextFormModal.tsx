@@ -7,7 +7,7 @@ import CreateContextForm from "./createContextForm.tsx";
 import {ReactFlowContext} from "../../utils.tsx";
 import {ReactFlowContextProps} from "../../types.ts";
 
-export default function CreateContextFormModal(props: { variable: ContextVariable | undefined, buttonName: string | undefined, onSubmit: ((updatedVariable: ContextVariable) => void) | undefined, noCascadeClose?: boolean, noRegister?: boolean }) {
+export default function CreateContextFormModal(props: { variable: ContextVariable | undefined, buttonName: string | undefined, onSubmit: ((updatedVariable: ContextVariable) => void) | undefined, noCascadeClose?: boolean, noRegister?: boolean, dontAddToState?: boolean }) {
 
     const [show, setShow] = useState(false);
     const context = useContext(ReactFlowContext) as ReactFlowContextProps
@@ -41,7 +41,7 @@ export default function CreateContextFormModal(props: { variable: ContextVariabl
                 </Modal.Header>
 
                 <Modal.Body>
-                    <CreateContextForm variable={props.variable} onClose={handleClose} onSubmit={handleFormSubmit} noRegister={props.noRegister} />
+                    <CreateContextForm variable={props.variable} onClose={handleClose} onSubmit={handleFormSubmit} noRegister={props.noRegister} dontAddToState={props.dontAddToState} />
                 </Modal.Body>
 
                 <Modal.Footer>

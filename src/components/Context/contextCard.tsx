@@ -1,5 +1,5 @@
 import {Dispatch, SetStateAction, useContext} from "react";
-import {Button, Card, Container} from "react-bootstrap";
+import {Button, Card, Col, Container, Row} from "react-bootstrap";
 import {ReactFlowContext} from "../../utils.tsx";
 import {ReactFlowContextProps} from "../../types.ts";
 import CreateContextFormModal from "./createContextFormModal.tsx";
@@ -13,7 +13,7 @@ export default function ContextCard(props: {contextVariable: ContextVariable,
     deregisterOnRemove?: boolean,
     event?: Event,
     onEventEdit?: (event: Event) => void,
-    onRemove?: (variable: ContextVariable) => void}) {
+    onRemove?: (variable: ContextVariable) => void, noInfoText?: boolean}) {
     const context = useContext(ReactFlowContext) as ReactFlowContextProps;
     const {contextService} = context;
 
@@ -60,11 +60,22 @@ export default function ContextCard(props: {contextVariable: ContextVariable,
                         <Card.Text>Value: {props.contextVariable.value}</Card.Text>
                     </Card.Body>
                     <Card.Footer className="text-muted">
-                        <Card.Text>{footerText()}</Card.Text>
-                        <CreateContextFormModal variable={props.contextVariable} buttonName={"Edit"} onSubmit={handleContextEdit} noRegister={props.noRegister}/>
-                        {!props.noRemove &&(
-                            <Button variant={"danger"} className={"right"} onClick={handleClick}>Remove</Button>
+                        {!props.noInfoText && (
+                            <Card.Text>{footerText()}</Card.Text>
                         )}
+                        <Row>
+
+                            <Col sm={3}>
+                                <CreateContextFormModal variable={props.contextVariable} buttonName={"Edit"} onSubmit={handleContextEdit} noRegister={props.noRegister}/>
+                            </Col>
+
+                            <Col sm={3}>
+                                {!props.noRemove &&(
+                                    <Button variant={"danger"} className={"right"} onClick={handleClick}>Remove</Button>
+                                )}
+                            </Col>
+
+                        </Row>
 
                     </Card.Footer>
                 </Card>

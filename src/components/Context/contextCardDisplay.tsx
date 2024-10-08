@@ -11,7 +11,8 @@ export default function ContextCardDisplay(props: {vars: ContextVariable[],
     event?: Event,
     onEventEdit?: (event: Event) => void,
     onRemove? : (variable: ContextVariable) => void,
-    deregisterOnRemove?: boolean,}) {
+    deregisterOnRemove?: boolean,
+    noInfoText?: boolean}) {
 
     const headerText = () => props.headerText || "Display Context Variables";
 
@@ -40,13 +41,13 @@ export default function ContextCardDisplay(props: {vars: ContextVariable[],
                     {props.vars.length > 0 && props.event && (
                         <CardGroup>
                             {filterVars(props.event).map((v) => (
-                                <ContextCard key={`${v.name}-card`} contextVariable={v} setVars={props.setVars} event={props.event} onEventEdit={props.onEventEdit} />
+                                <ContextCard key={`${v.name}-card`} contextVariable={v} setVars={props.setVars} event={props.event} onEventEdit={props.onEventEdit} noInfoText={props.noInfoText} />
                             ))}
                         </CardGroup>
                     ) || props.vars.length > 0 && (
                         <CardGroup>
                             {props.vars.map((v) => (
-                                <ContextCard key={`${v.name}-card`} contextVariable={v} setVars={props.setVars} onRemove={props.onRemove} deregisterOnRemove={props.deregisterOnRemove}/>
+                                <ContextCard key={`${v.name}-card`} contextVariable={v} setVars={props.setVars} onRemove={props.onRemove} deregisterOnRemove={props.deregisterOnRemove} noInfoText={props.noInfoText}/>
                             ))}
                         </CardGroup>
                     )  ||(<h3 className={"text-muted"}>No Variables Selected</h3>)}
