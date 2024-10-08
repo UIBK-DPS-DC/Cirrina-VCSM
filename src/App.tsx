@@ -11,17 +11,20 @@ import EventService from "./services/eventService.tsx";
 import ContextVariableService from "./services/contextVariableService.tsx";
 import GuardService from "./services/guardService.tsx";
 import {Edge, Node, useEdgesState, useNodesState} from "@xyflow/react";
-import {generateCsmSkeleton, ReactFlowContext} from './utils.tsx';
+import { ReactFlowContext} from './utils.tsx';
 import CsmlEditor from "./components/csmlEditor/csmlEditor.tsx";
 import Export from "./components/export.tsx";
 import Import from "./components/import.tsx";
 import {Button} from "react-bootstrap";
 import ServiceTypeService from "./services/serviceTypeService.tsx";
-import {CollaborativeStateMachineDescription} from "./pkl/bindings/collaborative_state_machine_description.pkl.ts";
+import CollaborativeStateMachine from "./classes/collaborativeStateMachine.tsx";
 
 
 const initialNodes: Node<CsmNodeProps>[] = [];
 const initialEdges: Edge<CsmEdgeProps>[] = [];
+
+const DEFAULT_CSM_NAME = "csm"
+const DEFAULT_VERSION = "2.0"
 
 export default function App() {
 
@@ -32,7 +35,7 @@ export default function App() {
     const contextService: ContextVariableService = useMemo(() => new ContextVariableService(), []);
     const guardService: GuardService = useMemo(() => new GuardService(), [])
     const serviceTypeService: ServiceTypeService = useMemo(() => new ServiceTypeService(),[])
-    const csm: CollaborativeStateMachineDescription = useMemo(() => generateCsmSkeleton(),[])
+    const csm: CollaborativeStateMachine = useMemo(() => new CollaborativeStateMachine(DEFAULT_CSM_NAME,DEFAULT_VERSION),[])
 
 
 

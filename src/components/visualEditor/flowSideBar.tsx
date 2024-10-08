@@ -3,6 +3,7 @@ import {NodeType, ReactFlowContextProps} from "../../types.ts";
 import {ReactFlowContext} from "../../utils.tsx";
 import CreateEventModal from "../Event/createEventModal.tsx";
 import Event from "../../classes/event.ts";
+import CsmDisplay from "../csm/csmDisplay.tsx";
 
 export default function FlowSideBar() {
     const onDragStart = (event: React.DragEvent<HTMLDivElement>, nodeType: NodeType) => {
@@ -43,6 +44,8 @@ export default function FlowSideBar() {
                         bottom: "200px", //
                     }}
                 >
+
+                    <CsmDisplay/>
 
                     {/** <CreateEventModal event={undefined} onSubmit={onNewEventSubmit} buttonVariant={"light"} buttonSize={"lg"}></CreateEventModal>*/}
 

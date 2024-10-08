@@ -24,7 +24,8 @@ import {
 import ContextVariable from "./classes/contextVariable.tsx";
 import MatchCase from "./classes/MatchCase.tsx";
 import ServiceTypeService from "./services/serviceTypeService.tsx";
-import {CollaborativeStateMachineDescription} from "./pkl/bindings/collaborative_state_machine_description.pkl.ts";
+
+import CollaborativeStateMachine from "./classes/collaborativeStateMachine.tsx";
 
 
 
@@ -42,6 +43,7 @@ export type NodeType =
     | 'state-node'
     | 'state-machine-node'
 
+export type Version = "2.0"
 
 export type OptionEnums = typeof ActionType | typeof ServiceType | typeof ServiceLevel | typeof ActionCategory
     | typeof TimeUnit | typeof MemoryUnit | typeof ContextType | typeof EventChannel
@@ -172,7 +174,7 @@ export type ReactFlowContextProps = {
     setShowEdgeLabels: React.Dispatch<React.SetStateAction<boolean>>
     darkMode: boolean
     serviceTypeService: ServiceTypeService
-    csm: CollaborativeStateMachineDescription
+    csm: CollaborativeStateMachine
 }
 
 
