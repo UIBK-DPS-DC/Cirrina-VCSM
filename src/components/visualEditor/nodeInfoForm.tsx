@@ -71,6 +71,7 @@ export default function NodeInfoForm() {
 
     const [isInitial,setIsInitial] = useState<boolean>(false)
     const [isTerminal, setIsTerminal] = useState<boolean>(false)
+    const [submitted, setSubmitted] = useState<boolean>(false)
 
 
     const [show, setShow] = useState(false);
@@ -140,7 +141,7 @@ export default function NodeInfoForm() {
             setLocalContext(selectedNode.data.stateMachine.localContext)
         }
 
-    }, [selectedNode]);
+    }, [selectedNode, localContext, staticContext, persistentContext, setPersistentContext, setLocalContext, setStaticContext,submitted]);
 
 
     const onActionFormSubmit = () => {
@@ -172,7 +173,7 @@ export default function NodeInfoForm() {
            </div>
            )
         }
-    },[selectedNode, localContext, persistentContext, staticContext, setLocalContext, setStaticContext, setPersistentContext, selectedNode?.data])
+    },[selectedNode, localContext, persistentContext, staticContext, setLocalContext, setStaticContext, setPersistentContext, selectedNode?.data,submitted])
 
 
 
@@ -314,7 +315,7 @@ export default function NodeInfoForm() {
                         )}
                         <div className={"mb-3"}>
                             <CreateContextFormModal variable={undefined} buttonName={"Add Context Variable"}
-                                                    onSubmit={undefined}></CreateContextFormModal>
+                                                    onSubmit={() => setSubmitted(!submitted)}></CreateContextFormModal>
                         </div>
                         {renderContexts()}
                     </OffcanvasBody>

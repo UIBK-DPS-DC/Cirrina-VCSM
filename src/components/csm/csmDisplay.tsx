@@ -15,8 +15,8 @@ export default function CsmDisplay() {
     const [show,setShow] = useState(false);
     const [csmName,setCsmName] = useState<string>("")
     const [csmVersion, setCsmVersion] = useState<Version>("2.0")
-    const [csmLocalContext, setCsmLocalContext] = useState<ContextVariable[]>([]);
-    const [csmPersistentContext, setCsmPersistentContext] = useState<ContextVariable[]>([]);
+    const [csmLocalContext, setCsmLocalContext] = useState<ContextVariable[]>(csm.localContext);
+    const [csmPersistentContext, setCsmPersistentContext] = useState<ContextVariable[]>(csm.persistentContext);
 
 
 
@@ -81,6 +81,14 @@ export default function CsmDisplay() {
 
     }, [csm,show]);
 
+    useEffect(() => {
+        csm.localContext = csmLocalContext
+    }, [csmLocalContext]);
+
+    useEffect(() => {
+        csm.persistentContext = csmPersistentContext
+    }, [csmPersistentContext]);
+
     // TODO: Continue
     return (
         <Container>
@@ -112,10 +120,10 @@ export default function CsmDisplay() {
                     <Container>
                         <Row className="mb-3">
                             <Col sm={6}>
-                                <CreateContextFormModal variable={undefined} buttonName={"Create Local Context Variable"} onSubmit={onLocalContextSubmit} dontAddToState={true}/>
+                                <CreateContextFormModal variable={undefined} buttonName={"Create Local Context Variable"} onSubmit={onLocalContextSubmit} dontAddToState={true} noTypeSelect={true}/>
                             </Col>
                             <Col sm={6}>
-                                <CreateContextFormModal variable={undefined} buttonName={"Create Persistent Context Variable"} onSubmit={onPersistentContextSubmit} dontAddToState={true}/>
+                                <CreateContextFormModal variable={undefined} buttonName={"Create Persistent Context Variable"} onSubmit={onPersistentContextSubmit} dontAddToState={true} noTypeSelect={true}/>
                             </Col>
                         </Row>
                     </Container>

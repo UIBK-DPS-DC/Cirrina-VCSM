@@ -1,6 +1,7 @@
 import {Version} from "../types.ts";
 import StateMachine from "./stateMachine.ts";
 import ContextVariable from "./contextVariable.tsx";
+import {CollaborativeStateMachineDescription} from "../pkl/bindings/collaborative_state_machine_description.pkl.ts";
 
 
 export default class CollaborativeStateMachine {
@@ -58,5 +59,18 @@ export default class CollaborativeStateMachine {
 
     set persistentContext(value: ContextVariable[]) {
         this._persistentContext = value;
+    }
+
+    public toDescription(): CollaborativeStateMachineDescription {
+        const description: CollaborativeStateMachineDescription = {
+            localContext: {variables: this.localContext.map((c) => c.toDescription())},
+            name: this.name,
+            persistentContext: {variables: this.persistentContext.map((c) => c.toDescription())},
+            stateMachines: this.stateMachines.map((s) => s.toDescription()),
+            version: this.version
+
+        }
+
+        return description
     }
 }

@@ -2,13 +2,12 @@ import {useCallback, useContext} from "react";
 import {isState, isStateMachine, ReactFlowContextProps} from "../types.ts";
 import {ReactFlowContext} from "../utils.tsx";
 import StateMachine from "../classes/stateMachine.ts";
-import {CollaborativeStateMachineDescription} from "../pkl/bindings/collaborative_state_machine_description.pkl.ts";
 import PklService from "../services/pklService.tsx";
 
 
 export default function Export () {
     const context = useContext(ReactFlowContext) as ReactFlowContextProps;
-    const {nodes, stateOrStateMachineService} = context;
+    const {nodes, stateOrStateMachineService, csm} = context;
 
     const addStatesToStatemachines = useCallback(() => {
         nodes.forEach((node) => {
@@ -55,14 +54,9 @@ export default function Export () {
         console.log(topLevelSM.toDescription())
 
 
-        const collaborativeStateMachineDescription: CollaborativeStateMachineDescription = {
-            localContext: {variables: []},
-            name: "Collaborative StateMachine",
-            persistentContext: {variables: []},
-            stateMachines: topLevelSM.getAllStateMachines().map((sm) => sm.toDescription()),
-            version: "2.0"
+        csm.stateMachines = topLevelSM.getAllStateMachines()
 
-        }
+        const collaborativeStateMachineDescription = csm.toDescription()
 
         const pkl: string = PklService.collaborativeStateMachineToPKL(collaborativeStateMachineDescription);
 

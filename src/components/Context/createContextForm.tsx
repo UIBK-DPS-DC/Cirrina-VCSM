@@ -5,7 +5,7 @@ import {isState, ReactFlowContextProps} from "../../types.ts";
 import {Button, Form} from "react-bootstrap";
 import {ContextType} from "../../enums.ts";
 
-export default function CreateContextForm(props: {variable: ContextVariable | undefined, onClose: () => void, onSubmit: (updatedVariable: ContextVariable) => void, noRegister?:boolean, dontAddToState?: boolean}) {
+export default function CreateContextForm(props: {variable: ContextVariable | undefined, onClose: () => void, onSubmit: (updatedVariable: ContextVariable) => void, noRegister?:boolean, dontAddToState?: boolean, noTypeSelect? :boolean}) {
 
     const context = useContext(ReactFlowContext) as ReactFlowContextProps;
     const {contextService, selectedNode, darkMode} = context;
@@ -180,25 +180,27 @@ export default function CreateContextForm(props: {variable: ContextVariable | un
                 </Form.Text>
             </Form.Group>
 
-            <Form.Group controlId={"form-variable-context"} className={"mb-3"}>
-                <Form.Label style={{color: darkMode ? "#ffffff" : "#000000"}}>Context Type</Form.Label>
-                <Form.Select
-                    name={CONTEXT_TYPE_FIELD_NAME}
-                    value={contextTypeValue}
-                    onChange={onContextTypeValueChange}
-                    isValid={contextTypeIsValid}
-                    isInvalid={!contextTypeIsValid}
-                >
-                    {selectedNode && isState(selectedNode.data) ? renderEnumAsOptions(ContextType)
-                        : renderStringsAsOptions([ContextType.PERSISTENT,ContextType.LOCAL])}
-                </Form.Select>
-                <Form.Control.Feedback type="invalid">
-                    Please select a valid context type.
-                </Form.Control.Feedback>
-                <Form.Text className={"text-muted"}>
-                    The Context Type of the variable affects its visibility.
-                </Form.Text>
-            </Form.Group>
+            {!props.noTypeSelect && (
+                <Form.Group controlId={"form-variable-context"} className={"mb-3"}>
+                    <Form.Label style={{color: darkMode ? "#ffffff" : "#000000"}}>Context Type</Form.Label>
+                    <Form.Select
+                        name={CONTEXT_TYPE_FIELD_NAME}
+                        value={contextTypeValue}
+                        onChange={onContextTypeValueChange}
+                        isValid={contextTypeIsValid}
+                        isInvalid={!contextTypeIsValid}
+                    >
+                        {selectedNode && isState(selectedNode.data) ? renderEnumAsOptions(ContextType)
+                            : renderStringsAsOptions([ContextType.PERSISTENT,ContextType.LOCAL])}
+                    </Form.Select>
+                    <Form.Control.Feedback type="invalid">
+                        Please select a valid context type.
+                    </Form.Control.Feedback>
+                    <Form.Text className={"text-muted"}>
+                        The Context Type of the variable affects its visibility.
+                    </Form.Text>
+                </Form.Group>
+            )}
 
             <Button variant="primary" type="submit" disabled={!formIsValid}>
                 {buttonText()}
