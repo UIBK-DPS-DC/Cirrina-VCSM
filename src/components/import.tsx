@@ -40,6 +40,7 @@ const rootLayoutOptions = {
     "elk.spacing.nodeNode": "100", // Increased spacing between nodes in the same layer
     "elk.spacing.edgeEdge": "150",
     "elk.spacing.edgeNode": "200",
+    "elk.contentAlignment": "V_CENTER",
 
     "portConstraints": "FIXED_ORDER",
     "elk.margins": "100",
@@ -62,12 +63,13 @@ const parentLayoutOptions = {
     "elk.partitioning.activate": "true",
     "elk.margins": "100",
     "elk.layered.nodePlacement.strategy": "SIMPLE",
+    "elk.contentAlignment": "V_CENTER",
     "elk.padding": "100", // Increased padding for parent nodes
 };
 
 const childLayoutOptions = {
     "elk.algorithm": "layered",
-    "elk.direction": "RIGHT",
+    "elk.direction": "DOWN",
     "elk.edgeRouting": "ORTHOGONAL",
     "elk.allowEdgeNodeOverlap": "false",
     "portConstraints": "FIXED_ORDER",
@@ -606,23 +608,19 @@ export default function Import() {
                 // Function to update node positions recursively
                 const updateNodePositions = (
                     elkNode: any,
-                    parentX = 0,
-                    parentY = 0
                 ) => {
                     const node = nodeMap.get(elkNode.id);
 
                     if (node) {
                         node.position = {
-                            x: (elkNode.x ?? 0) + parentX,
-                            y: (elkNode.y ?? 0) + parentY,
+                            x: (elkNode.x ?? 0),
+                            y: (elkNode.y ?? 0),
                         };
                     }
                     if (elkNode.children) {
                         elkNode.children.forEach((childElkNode: any) => {
                             updateNodePositions(
                                 childElkNode,
-                                node?.position.x || 0,
-                                node?.position.y || 0
                             );
                         });
                     }
