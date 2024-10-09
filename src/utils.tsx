@@ -1,6 +1,6 @@
 import {Edge, Node} from "@xyflow/react";
 import {CsmEdgeProps, CsmNodeProps, isState, isStateMachine, OptionEnums, ReactFlowContextProps} from "./types.ts";
-import {createContext} from "react";
+import React, {createContext} from "react";
 import StateInfoForm from "./components/visualEditor/stateInfoForm.tsx";
 import StateMachineInfoForm from "./components/visualEditor/stateMachineInfoForm.tsx";
 import ContextVariable from "./classes/contextVariable.tsx";
@@ -297,6 +297,35 @@ export const fromCollaborativeStatemachineDescription = (description: Collaborat
     collaborativeStateMachine.stateMachines = description.stateMachines.map((s) => StateMachine.fromDescription(s))
     return collaborativeStateMachine;
 }
+
+export const hasHiddenAncestor = (
+    node: Node<CsmNodeProps>,
+    nodes: Node<CsmNodeProps>[]
+): boolean => {
+    const parent = getParentNode(node, nodes);
+    if (parent) {
+        return parent.hidden ? true : hasHiddenAncestor(parent, nodes);
+    } else {
+        return false;
+    }
+};
+
+export const saveNodePositions = (setNodes: (value: React.SetStateAction<Node<CsmNodeProps>[]>) => void) => {
+    setNodes((ns: Node<CsmNodeProps>[]) => {
+        return ns.map((n) => {
+            if (isState(n.data) && !n.hidden) {
+                n.data.prevPosition = { x: n.position.x, y: n.position.y };
+            }
+            if (isStateMachine(n.data) && n.data.draggable) {
+                n.data.prevPosition = { x: n.position.x, y: n.position.y };
+            }
+            return n;
+        });
+    });
+}
+
+
+
 
 
 

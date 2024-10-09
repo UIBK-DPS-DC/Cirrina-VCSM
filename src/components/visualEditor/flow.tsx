@@ -24,7 +24,14 @@ import {CsmEdgeProps, CsmNodeProps, isState, isStateMachine, ReactFlowContextPro
 import StateMachine from "../../classes/stateMachine.ts";
 import State from "../../classes/state.ts";
 import CsmEdge from "./csmEdgeComponent.tsx";
-import {colorMap, getAllStateNamesInExtent, getParentNode, ReactFlowContext} from "../../utils.tsx";
+import {
+    colorMap,
+    getAllStateNamesInExtent,
+    getParentNode,
+    hasHiddenAncestor,
+    ReactFlowContext,
+    saveNodePositions
+} from "../../utils.tsx";
 import {NO_PARENT} from "../../services/stateOrStateMachineService.tsx";
 
 const nodeTypes = {
@@ -270,8 +277,9 @@ export default function Flow() {
                     border: '1px solid black',
                     padding: 5,
                     borderRadius: 15,
-                    height: 150,
-                    backgroundColor: colorMap(0)
+                    height: 400,
+                    width: 400,
+                    backgroundColor: colorMap(0),
                 };
 
                 newNode = {
@@ -282,50 +290,110 @@ export default function Flow() {
                 if (isStateMachine(newNode.data)) {
                     newNode.data.prevSize = {
                         height: newNode.height,
-                        width: newNode.width
+                        width: newNode.width,
                     };
                 }
             }
 
-            setNodes(nds => {
+            // Create a Rect representing the new node's position and size
+            const nodeWidth = newNode.width || (type === 'state-machine-node' ? 150 : 100);
+            const nodeHeight = newNode.height || (type === 'state-machine-node' ? 150 : 50);
+
+            const nodeRect = {
+                x: position.x,
+                y: position.y,
+                width: nodeWidth,
+                height: nodeHeight,
+            };
+
+            // Find intersecting nodes
+            const intersectingNodes = getIntersectingNodes(nodeRect, false);
+
+            const intersectedBlock = intersectingNodes.findLast(
+                (n) => n.type === 'state-machine-node'
+            );
+
+            if (intersectedBlock) {
+                newNode = {
+                    ...newNode,
+                    parentId: intersectedBlock.id,
+                    extent: 'parent',
+                    position: {
+                        x: position.x - intersectedBlock.position.x,
+                        y: position.y - intersectedBlock.position.y,
+                    },
+                    expandParent: true,
+                };
+
+                stateOrStateMachineService.linkStateNameToStatemachine(
+                    stateOrStateMachineService.getName(newNode.data),
+                    intersectedBlock.id,
+                    true
+                );
+            } else {
+                const parentId = newNode.parentId || NO_PARENT;
+                stateOrStateMachineService.linkStateNameToStatemachine(
+                    new_name,
+                    parentId,
+                    true
+                );
+            }
+
+            setNodes((nds) => {
                 updateNodeHistory([...nds, newNode]);
                 return [...nds, newNode];
             });
 
-            const parentId = newNode.parentId || NO_PARENT;
-            stateOrStateMachineService.linkStateNameToStatemachine(new_name, parentId, true);
             stateOrStateMachineService.linkNode(newNode.id, newNode.data);
 
-            onNodeDragStop({} as React.MouseEvent,newNode)
+            setRecalculateTransitions((prev) => !prev);
 
 
+            // Check if no initial.
+            if(isState(newNode.data)){
+                const initial = nodes.filter((n) => n.parentId === intersectedBlock?.id &&
+                    isState(n.data) &&
+                    n.data.state.initial)
 
-            setRecalculateTransitions(!recalculateTransitions)
+                newNode.data.state.initial = initial.length <= 0;
 
+                setInitialOrTerminalChange(!initialOrTerminalChange)
+
+            }
         },
-        [screenToFlowPosition, setNodes, stateOrStateMachineService, updateNodeHistory,recalculateTransitions]
+        [
+            screenToFlowPosition,
+            setNodes,
+            stateOrStateMachineService,
+            updateNodeHistory,
+            recalculateTransitions,
+            getIntersectingNodes,
+            setInitialOrTerminalChange,
+            nodes
+        ]
     );
+
+
 
     const onNodeDragStop = useCallback(
         (_: React.MouseEvent, node: Node<CsmNodeProps>) => {
-            const intersections = getIntersectingNodes(node, false);
+            const nodeWidth = node.width || (node.type === 'state-machine-node' ? 150 : 100);
+            const nodeHeight = node.height || (node.type === 'state-machine-node' ? 150 : 50);
+
+            const nodeRect = {
+                x: node.position.x,
+                y: node.position.y,
+                width: nodeWidth,
+                height: nodeHeight,
+            };
+            const intersections = getIntersectingNodes(nodeRect, false);
             const intersectedBlock = intersections.findLast((n) => n.type === "state-machine-node");
-            console.log(`Intersected Block ${intersectedBlock}`)
+            console.log(`Intersected Block ${intersectedBlock?.id}`)
             const parentId = node.parentId || NO_PARENT;
 
 
 
-            setNodes((ns: Node<CsmNodeProps>[]) => {
-                return ns.map((n) => {
-                    if (isState(n.data) && !n.hidden) {
-                        n.data.prevPosition = { x: n.position.x, y: n.position.y };
-                    }
-                    if (isStateMachine(n.data) && n.data.draggable) {
-                        n.data.prevPosition = { x: n.position.x, y: n.position.y };
-                    }
-                    return n;
-                });
-            });
+            saveNodePositions(setNodes)
 
             if (intersectedBlock) {
 
@@ -404,7 +472,7 @@ export default function Flow() {
             }
 
         },
-        [setNodes, getIntersectingNodes, nodes, stateOrStateMachineService]
+        [setNodes, getIntersectingNodes, nodes, stateOrStateMachineService, onDrop]
     );
 
     const onNodesDelete = useCallback(
@@ -594,6 +662,14 @@ export default function Flow() {
             });
         });
 
+        // Second pass to ensure correct hiding
+        setNodes((prev) => {
+            return prev.map((n) => {
+                return hasHiddenAncestor(n,nodes) ? hideNode(n,true) : n
+            })
+        })
+
+
         connectedEdges.filter((value, index, array) => array.indexOf(value) === index);
 
         setEdges((eds) => {
@@ -610,7 +686,6 @@ export default function Flow() {
 
     const onEdgeClick = useCallback(
         (_: React.MouseEvent, edge: Edge<CsmEdgeProps>) => {
-            console.log("JO")
             if (selectedNode) {
                 setSelectedNode(null);
             }

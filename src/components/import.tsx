@@ -2,7 +2,7 @@
 import {Button} from "react-bootstrap";
 import React, {useCallback, useContext, useRef} from "react";
 import {CollaborativeStateMachineDescription,} from "../pkl/bindings/collaborative_state_machine_description.pkl.ts";
-import {colorMap, fromCollaborativeStatemachineDescription, ReactFlowContext,} from "../utils.tsx";
+import {colorMap, fromCollaborativeStatemachineDescription, ReactFlowContext, saveNodePositions,} from "../utils.tsx";
 import {
     CreateActionProps,
     CsmEdgeProps,
@@ -675,6 +675,10 @@ export default function Import() {
                 adjustInternalTransitionHandles(layoutedEdges, layoutedNodes )
                 console.log(`NUM EDGES ${layoutedEdges.length}`)
                 setEdges(layoutedEdges);
+                saveNodePositions(setNodes)
+
+
+
             });
         },
         [setNodes, setEdges]
