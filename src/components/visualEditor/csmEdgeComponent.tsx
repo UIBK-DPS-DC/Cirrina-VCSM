@@ -78,7 +78,7 @@ export default function CsmEdge({
         if (actions.length > 0) {
             actionString += '\u2192 '; // u2192 is the unicode for a right facing arrow
             actions.forEach((action, i) => {
-                actionString += action.name;
+                actionString += action.name; // TODO: GENERATE ACTION INFO FUNCTION HERE
                 if (i !== actions.length - 1) {
                     actionString += ', ';
                 }

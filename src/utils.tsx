@@ -127,7 +127,8 @@ export const getParentNode = (node: Node<CsmNodeProps>, nodes: Node<CsmNodeProps
     return nodes.find((n) => n.id === node.parentId);
 };
 
-const getNodeDepth = (node: Node<CsmNodeProps>, nodes: Node<CsmNodeProps>[]): number => {
+const getNodeDepth = (node: Node<CsmNodeProps> | undefined, nodes: Node<CsmNodeProps>[]): number => {
+    if(!node) return 0
     if(isStateMachine(node.data)){
         const parentNode = getParentNode(node, nodes)
         if(parentNode){

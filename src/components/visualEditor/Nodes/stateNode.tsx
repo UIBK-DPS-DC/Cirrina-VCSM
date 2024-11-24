@@ -20,10 +20,11 @@ export function StateNode({ data }: NodeProps<StateNode>) {
     }, [initialOrTerminalChange, setInitialOrTerminalChange]);
 
     // Optional: Add this effect to log when the state changes, if needed for debugging
-    useEffect(() => {
+    /*useEffect(() => {
         console.log(`Initial: ${data.state.initial}, Terminal: ${data.state.terminal}`);
+        console.log(`Node:${selectedNode?.id} || Parent:${selectedNode?.parentId}`);
     }, [data.state.initial, data.state.terminal, selectedNode]);
-
+    */
     return (
         <div className={`react-flow__node-default  ${border}`}>
             <Handle className={"source-handle source-handle-top"}  type={"source"} position={Position.Top} id={"t-s"} isConnectableStart={true}/>

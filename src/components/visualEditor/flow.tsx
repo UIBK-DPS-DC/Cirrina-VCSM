@@ -109,7 +109,10 @@ export default function Flow() {
         return children;
     }, [nodes]);
 
-    const getNodeDepth = useCallback((node: Node<CsmNodeProps>): number => {
+    const getNodeDepth = useCallback((node: Node<CsmNodeProps> | undefined): number => {
+        if(!node){
+            return 0
+        }
         if(isStateMachine(node.data)){
             const parentNode = getParentNode(node, nodes)
             if(parentNode){
@@ -396,12 +399,22 @@ export default function Flow() {
             saveNodePositions(setNodes)
 
             if (intersectedBlock) {
-
+                console.log(node.parentId)
                 if(intersectedBlock.position.x + 50 > node.position.x || intersectedBlock.position.y + 50 > node.position.y) {
                     return
                 }
 
+                // Dont allow switch to sm on same dephth
                 if (node.parentId === intersectedBlock.id) return;
+                if(node.parentId && intersectedBlock.parentId === node.parentId ) return;
+
+                let parentNode = getParentNode(node,nodes)
+                let intersectedParentNode = getParentNode(intersectedBlock as Node<CsmNodeProps>,nodes)
+
+                if(getNodeDepth(intersectedParentNode) === getNodeDepth(parentNode) && node.parentId !== undefined) {
+                    return
+                }
+
 
                 const blockStateNames = getAllStateNamesInExtent(intersectedBlock as Node<CsmNodeProps>, nodes, stateOrStateMachineService);
                 stateOrStateMachineService.unlinkStateNameFromStatemachine(stateOrStateMachineService.getName(node.data), parentId);
