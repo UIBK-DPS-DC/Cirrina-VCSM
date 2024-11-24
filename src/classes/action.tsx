@@ -120,6 +120,37 @@ export default class Action {
         return this === other;
     }
 
+    public getInfoString():string {
+        let info = "";
+        switch(this.type){
+            case ActionType.ASSIGN: {
+                return info;
+            }
+            case ActionType.CREATE: {
+                return info;
+            }
+            case ActionType.INVOKE: {
+                return info;
+            }
+            case ActionType.MATCH: {
+                return info;
+            }
+            case ActionType.RAISE_EVENT: {
+                return info;
+            }
+            case ActionType.TIMEOUT: {
+                return info;
+            }
+            case ActionType.TIMEOUT_RESET: {
+                return info;
+            }
+            default: {
+                return info;
+            }
+        }
+
+    }
+
     public toDescription():ActionDescription {
         switch(this.type){
             case ActionType.RAISE_EVENT: {
