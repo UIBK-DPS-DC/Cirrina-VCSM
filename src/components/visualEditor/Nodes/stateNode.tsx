@@ -1,12 +1,12 @@
 import {Handle, NodeProps, Position} from "@xyflow/react";
 import {ReactFlowContextProps, type StateNode} from "../../../types.ts";
-import {useContext, useEffect, useMemo} from "react";
+import {useContext, useMemo} from "react";
 import {ReactFlowContext} from "../../../utils.tsx";
 import "../../../StateNode.css";
 
 export function StateNode({ data }: NodeProps<StateNode>) {
     const context = useContext(ReactFlowContext) as ReactFlowContextProps;
-    const {selectedNode, initialOrTerminalChange, setInitialOrTerminalChange } = context;
+    const {initialOrTerminalChange, setInitialOrTerminalChange } = context;
 
     // Use useMemo to compute the className based on the state changes
     const border = useMemo(() => {

@@ -26,7 +26,7 @@ import State from "../../classes/state.ts";
 import CsmEdge from "./csmEdgeComponent.tsx";
 import {
     colorMap,
-    getAllStateNamesInExtent,
+    getAllStateNamesInExtent, getMostDistantAncestorNode,
     getParentNode,
     hasHiddenAncestor,
     ReactFlowContext,
@@ -404,7 +404,7 @@ export default function Flow() {
                     return
                 }
 
-                // Dont allow switch to sm on same dephth
+                // Don't allow switch to sm on same depth
                 if (node.parentId === intersectedBlock.id) return;
                 if(node.parentId && intersectedBlock.parentId === node.parentId ) return;
 
@@ -412,6 +412,11 @@ export default function Flow() {
                 let intersectedParentNode = getParentNode(intersectedBlock as Node<CsmNodeProps>,nodes)
 
                 if(getNodeDepth(intersectedParentNode) === getNodeDepth(parentNode) && node.parentId !== undefined) {
+                    return
+                }
+
+                // Odd react flow behavior sometimes causes intersections to be detected in a way that nodes switch to other branches of the tree. This is to prevent this
+                if(node.parentId !== undefined && (getMostDistantAncestorNode(node,nodes).id !== getMostDistantAncestorNode(intersectedBlock as Node<CsmNodeProps>,nodes).id)){
                     return
                 }
 
