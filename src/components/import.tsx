@@ -103,7 +103,8 @@ export default function Import() {
         eventService,
         setHideFlowEdges,
         serviceTypeService,
-        setCsm
+        setCsm,
+        setShowStateDescriptions
     } = context;
 
     // Function to handle file input button click
@@ -537,6 +538,7 @@ export default function Import() {
 
             stateOrStateMachineService.showStatemachineStateNames();
             setHideFlowEdges(true)
+            setShowStateDescriptions(false)
             setCsm(collaborativeStateMachine)
 
 

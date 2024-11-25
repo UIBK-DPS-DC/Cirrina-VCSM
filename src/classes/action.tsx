@@ -126,41 +126,41 @@ export default class Action {
         switch(this.type){
             case ActionType.ASSIGN: {
                 const assignActionDescription = this.toDescription() as AssignActionDescription;
-                info = `Assigns value ${assignActionDescription.variable.value} to ${assignActionDescription.variable.name}`
+                info = `Assigns value \"${assignActionDescription.variable.value}\" to ${assignActionDescription.variable.name}. `
                 return info;
             }
             case ActionType.CREATE: {
                 const createActionDescription = this.toDescription() as CreateActionDescription;
-                info = `Creates variable ${createActionDescription.variable.name}`
+                info = `Creates variable \"${createActionDescription.variable.name}\". `
                 return info;
             }
             case ActionType.INVOKE: {
                 const invokeActionDescription = this.toDescription() as InvokeActionDescription;
-                info = `Invokes service ${invokeActionDescription.serviceType}`
+                info = `Invokes service \"${invokeActionDescription.serviceType}\"`
                 if(invokeActionDescription.done.length > 0){
-                    info+= ` and raises events ${invokeActionDescription.done.map((e) => e.name).toString()} when done.`
+                    info+= ` and raises events ${invokeActionDescription.done.map((e) => e.name).toString()} when done. `
                 }
                 return info;
             }
             case ActionType.MATCH: {
                 const matchActionDescription = this.toDescription() as MatchActionDescription;
                 // Not sure if this is too much, adjust if needed.
-                info+= `Matches ${matchActionDescription.value} to cases\n ${matchActionDescription.cases.map((a) => a.case + ` : ${Action.fromDescription(a.action).getInfoString()}\n`)}`
+                info+= `Matches \"${matchActionDescription.value}\" to cases\n ${matchActionDescription.cases.map((a) => a.case + ` : ${Action.fromDescription(a.action).getInfoString()}\n`)} `
                 return info;
             }
             case ActionType.RAISE_EVENT: {
                 const raiseEventActionDescription = this.toDescription() as RaiseActionDescription
-                info+= `Raises event \"${raiseEventActionDescription.event.name}\"`
+                info+= `Raises event \"${raiseEventActionDescription.event.name}\". `
                 return info;
             }
             case ActionType.TIMEOUT: {
                 const timeoutActionDescription = this.toDescription() as TimeoutActionDescription
-                info+= `After ${timeoutActionDescription.delay} trigger action ${timeoutActionDescription.name}`
+                info+= `After ${timeoutActionDescription.delay} trigger action \"${timeoutActionDescription.name}\". `
                 return info;
             }
             case ActionType.TIMEOUT_RESET: {
                 const timeoutResetActionDescription = this.toDescription() as TimeoutResetActionDescription
-                info+= `Reset timer of action ${timeoutResetActionDescription.action}`
+                info+= `Reset timer of action \"${timeoutResetActionDescription.action}\". `
                 return info;
             }
             default: {

@@ -56,6 +56,9 @@ export default function App() {
     const [showEdgeLabels, setShowEdgeLabels] = useState<boolean>(true)
     const hideEdgeLabelsButtonText = () => showEdgeLabels ? "Hide Edge Labels" : "Show Edge Labels"
 
+    const [showStateDescriptions, setShowStateDescriptions] = useState(true)
+    const showStateDescriptionText = () => showStateDescriptions ? "Hide State Descriptions" : "Show State Descriptions"
+
 
 
 
@@ -76,6 +79,12 @@ export default function App() {
         setShowEdgeLabels(!showEdgeLabels)
 
     },[setShowEdgeLabels, showEdgeLabels])
+
+    const onShowStateDescriptionsButtonClick = useCallback((event: React.MouseEvent<HTMLButtonElement>) => {
+        event.preventDefault()
+        event.stopPropagation()
+        setShowStateDescriptions(!showStateDescriptions)
+    },[setShowStateDescriptions, showStateDescriptions])
 
     const onDarkModeButtonClick = () => {
         setDarkMode(!darkMode)
@@ -118,7 +127,9 @@ export default function App() {
         darkMode,
         serviceTypeService,
         csm,
-        setCsm
+        setCsm,
+        showStateDescriptions,
+        setShowStateDescriptions
     };
 
 
@@ -138,6 +149,7 @@ export default function App() {
                         </Button>
                         <Export></Export>
                         <Import></Import>
+                        <button className={"button"} onClick={onShowStateDescriptionsButtonClick}>{showStateDescriptionText()}</button>
                         <button className={"button"} onClick={onHideEdgeLabelsButtonClick}>{hideEdgeLabelsButtonText()}</button>
                         <button className={"button"} onClick={onHideButtonClick}>{hideStatemachineEdgesButtonText()}</button>
                     </div>

@@ -6,7 +6,7 @@ import "../../../StateNode.css";
 
 export function StateNode({ data }: NodeProps<StateNode>) {
     const context = useContext(ReactFlowContext) as ReactFlowContextProps;
-    const {initialOrTerminalChange, setInitialOrTerminalChange } = context;
+    const {initialOrTerminalChange, setInitialOrTerminalChange, showStateDescriptions } = context;
 
     // Use useMemo to compute the className based on the state changes
     const border = useMemo(() => {
@@ -25,6 +25,46 @@ export function StateNode({ data }: NodeProps<StateNode>) {
         console.log(`Node:${selectedNode?.id} || Parent:${selectedNode?.parentId}`);
     }, [data.state.initial, data.state.terminal, selectedNode]);
     */
+
+    const infoString = () => {
+        let info = ""
+        if(data.state.entry.length > 0) {
+            info += "Entry:\n"
+            data.state.entry.forEach(e => {
+                info+= e.getInfoString()
+                info+= "\n"
+            })
+        }
+
+        if(data.state.while.length > 0) {
+            info+= "\nWhile:\n"
+            data.state.while.forEach(e => {
+                info+= e.getInfoString()
+                info+= "\n"
+            })
+        }
+
+        if(data.state.after.length > 0) {
+            info+= "\nAfter:\n"
+            data.state.after.forEach(e => {
+                info+= e.getInfoString()
+                info+= "\n"
+            })
+
+        }
+
+        if(data.state.exit.length > 0) {
+            info+= "\nExit:\n"
+            data.state.exit.forEach(e => {
+                info+= e.getInfoString()
+                info+= "\n"
+            })
+
+        }
+
+        return info;
+    }
+
     return (
         <div className={`react-flow__node-default  ${border}`}>
             <Handle className={"source-handle source-handle-top"}  type={"source"} position={Position.Top} id={"t-s"} isConnectableStart={true}/>
@@ -66,7 +106,17 @@ export function StateNode({ data }: NodeProps<StateNode>) {
                 style={{visibility: "hidden",left: "70%" }}
             />
 
-            {data.state.name && <div>{data.state.name}</div>}
+            {data.state.name &&
+                <div>
+                    <div>
+                        {data.state.name}
+                    </div>
+                    {showStateDescriptions && (
+                        <div>
+                            {infoString()}
+                        </div>
+                    )}
+                </div>}
 
             <Handle
                 type={"target"}
