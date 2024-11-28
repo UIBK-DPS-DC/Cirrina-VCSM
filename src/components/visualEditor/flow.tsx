@@ -33,6 +33,7 @@ import {
     saveNodePositions
 } from "../../utils.tsx";
 import {NO_PARENT} from "../../services/stateOrStateMachineService.tsx";
+import {toast} from "react-toastify";
 
 const nodeTypes = {
     'state-node': StateNode,
@@ -389,7 +390,8 @@ export default function Flow() {
                 width: nodeWidth,
                 height: nodeHeight,
             };
-            const intersections = getIntersectingNodes(nodeRect, false);
+            const intersections = node.parentId || node.type === "state-machine-node" ? getIntersectingNodes(node, false) : getIntersectingNodes(nodeRect, true);
+            console.log(intersections)
             const intersectedBlock = intersections.findLast((n) => n.type === "state-machine-node");
             console.log(`Intersected Block ${intersectedBlock?.id}`)
             const parentId = node.parentId || NO_PARENT;
@@ -400,27 +402,24 @@ export default function Flow() {
 
             if (intersectedBlock) {
                 console.log(node.parentId)
-                if(intersectedBlock.position.x + 50 > node.position.x || intersectedBlock.position.y + 50 > node.position.y) {
-                    return
-                }
 
+                console.log("A")
                 // Don't allow switch to sm on same depth
                 if (node.parentId === intersectedBlock.id) return;
-                if(node.parentId && intersectedBlock.parentId === node.parentId ) return;
-
+                console.log("B")
                 let parentNode = getParentNode(node,nodes)
-                let intersectedParentNode = getParentNode(intersectedBlock as Node<CsmNodeProps>,nodes)
 
-                if(getNodeDepth(intersectedParentNode) === getNodeDepth(parentNode) && node.parentId !== undefined) {
+                console.log(`PARENTNODE ${parentNode?.id}`)
+                if(getNodeDepth(intersectedBlock as Node<CsmNodeProps>) === getNodeDepth(parentNode) && node.parentId !== undefined) {
                     return
                 }
-
+                console.log("C")
                 // Odd react flow behavior sometimes causes intersections to be detected in a way that nodes switch to other branches of the tree. This is to prevent this
                 if(node.parentId !== undefined && (getMostDistantAncestorNode(node,nodes).id !== getMostDistantAncestorNode(intersectedBlock as Node<CsmNodeProps>,nodes).id)){
                     return
                 }
 
-
+                console.log(`INTERSECTED BLOCK ID${intersectedBlock.id}`)
                 const blockStateNames = getAllStateNamesInExtent(intersectedBlock as Node<CsmNodeProps>, nodes, stateOrStateMachineService);
                 stateOrStateMachineService.unlinkStateNameFromStatemachine(stateOrStateMachineService.getName(node.data), parentId);
 
@@ -440,11 +439,18 @@ export default function Flow() {
                 }
 
                 if (isStateMachine(node.data)) {
+                    console.log("D")
+                    console.log(blockStateNames)
                     if (blockStateNames && blockStateNames.has(node.data.stateMachine.name)) {
                         stateOrStateMachineService.linkStateNameToStatemachine(stateOrStateMachineService.getName(node.data), parentId);
+                        toast.error(`Statemachine with name ${node.data.stateMachine.name} already exists in extent!`, {
+                            position: "bottom-right", // You can customize the position
+                            autoClose: 5000
+
+                        });
                         return;
                     }
-
+                    console.log("E")
                     setNodes((ns: Node<CsmNodeProps>[]) => {
                         const children = getAllDescendants(node);
                         const newNodes = ns.filter(i => i.id !== node.id && !children.includes(i));

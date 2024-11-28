@@ -265,6 +265,7 @@ export const generateRaisedToConsumedInfoStrings = (nodes: Node<CsmNodeProps>[])
 
 export const getAllStateNamesInExtent = (node: Node<CsmNodeProps>, nodes: Node<CsmNodeProps>[], service: StateOrStateMachineService): Set<string> => {
     const root = getMostDistantAncestorNode(node,nodes)
+    console.log(`ROOT ${root.id}`)
     const rootName = service.getName(root.data)
     const stateMachineChildren = getAllStatemachineDescendants(root, nodes)
     const stateNames = (service.getStateNames(root.id) || new Set()).add(rootName)
