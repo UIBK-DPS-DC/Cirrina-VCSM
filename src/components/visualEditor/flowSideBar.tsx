@@ -1,7 +1,6 @@
 import React from "react";
 import {NodeType} from "../../types.ts";
 
-import CsmDisplay from "../csm/csmDisplay.tsx";
 
 export default function FlowSideBar() {
     const onDragStart = (event: React.DragEvent<HTMLDivElement>, nodeType: NodeType) => {
