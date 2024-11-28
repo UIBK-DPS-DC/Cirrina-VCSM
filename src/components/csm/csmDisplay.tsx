@@ -101,7 +101,7 @@ export default function CsmDisplay() {
 
     // TODO: Continue
     return (
-        <Container>
+        <>
             <Button onClick={handleShow} variant="primary">
                 {showModalButtonText()}
             </Button>
@@ -144,7 +144,7 @@ export default function CsmDisplay() {
                     {renderContexts()}
                 </Modal.Body>
             </Modal>
-        </Container>
+        </>
     )
 
 

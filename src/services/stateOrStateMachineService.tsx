@@ -7,6 +7,7 @@ import {CsmNodeProps, isState, isStateMachine} from "../types.ts";
 import StateOrStateMachine from "../classes/stateOrStateMachine.ts";
 import Action from "../classes/action.tsx";
 import {ActionCategory} from "../enums.ts";
+import {toast} from "react-toastify";
 
 
 export type NO_PARENT = "0"
@@ -49,6 +50,11 @@ export default class StateOrStateMachineService {
         if (!stateNames) {
             if (!create) {
                 console.error(`Statemachine ${stateMachineID} does not exist.\n`);
+                toast.error(`Statemachine ${stateMachineID} does not exist.\n`, {
+                    position: "bottom-right", // You can customize the position
+                    autoClose: 5000
+
+                });
                 return;
             }
             // Create new entry for state machine if 'create' is true
@@ -70,6 +76,11 @@ export default class StateOrStateMachineService {
         }
         else{
             console.error(`State ${name} already exist on Statemachine ${stateMachineID}`)
+            toast.error(`State ${name} already exist on Statemachine ${stateMachineID}`, {
+                position: "bottom-right", // You can customize the position
+                autoClose: 5000
+
+            });
         }
     }
 

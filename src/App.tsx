@@ -20,6 +20,7 @@ import ServiceTypeService from "./services/serviceTypeService.tsx";
 import CollaborativeStateMachine from "./classes/collaborativeStateMachine.tsx";
 import {ToastContainer} from "react-toastify";
 import 'react-toastify/dist/ReactToastify.min.css';
+import CsmDisplay from "./components/csm/csmDisplay.tsx";
 
 
 const initialNodes: Node<CsmNodeProps>[] = [];
@@ -150,6 +151,7 @@ export default function App() {
                                     )}
 
                             </Button>
+                            <CsmDisplay/>
                             <Export></Export>
                             <Import></Import>
                             <button className={"button"} onClick={onShowStateDescriptionsButtonClick}>{showStateDescriptionText()}</button>
