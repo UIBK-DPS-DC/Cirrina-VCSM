@@ -5,7 +5,13 @@ import {isState, ReactFlowContextProps} from "../../types.ts";
 import {Button, Form} from "react-bootstrap";
 import {ContextType} from "../../enums.ts";
 
-export default function CreateContextForm(props: {variable: ContextVariable | undefined, onClose: () => void, onSubmit: (updatedVariable: ContextVariable) => void, noRegister?:boolean, dontAddToState?: boolean, noTypeSelect? :boolean}) {
+export default function CreateContextForm(props: {variable: ContextVariable | undefined,
+    onClose: () => void,
+    onSubmit: (updatedVariable: ContextVariable) => void,
+    noRegister?:boolean,
+    dontAddToState?: boolean,
+    noTypeSelect? :boolean,
+    csmVar?: boolean}) {
 
     const context = useContext(ReactFlowContext) as ReactFlowContextProps;
     const {contextService, selectedNode, darkMode} = context;
@@ -120,6 +126,9 @@ export default function CreateContextForm(props: {variable: ContextVariable | un
 
         } else {
             const newContext = new ContextVariable(variableName, expression);
+            if(!props.noRegister && props.csmVar){
+                contextService.registerContext(newContext)
+            }
             if(!props.noRegister && selectedNode) {
                 contextService.registerContext(newContext);
                 if(!props.dontAddToState){
