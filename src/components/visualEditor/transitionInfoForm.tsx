@@ -228,6 +228,13 @@ export default function TransitionInfoForm() {
         }
     }
 
+    const onEventClear = () => {
+        if(selectedEdge?.data?.transition) {
+            selectedEdge.data.transition.setEvent("")
+        }
+    }
+
+
 
 
     useEffect(() => {
@@ -306,6 +313,7 @@ export default function TransitionInfoForm() {
             const newTransition = transitionService.connectionToTransition(connection);
             if (newTransition) {
                 newTransition.isElseEdge = true
+                newTransition.elseSourceId = selectedEdge.data.transition.getId()
                 const edge: Edge<CsmEdgeProps> = { id: getNewEdgeId(),
                     ...connection,
                     type: 'csm-edge',
@@ -421,7 +429,7 @@ export default function TransitionInfoForm() {
                                             </Col>
                                         )}
                                         <Col sm={onEvent ? 5 : 10}>
-                                            <SelectSingleEventModal event={onEvent} setEvent={setOnEvent}></SelectSingleEventModal>
+                                            <SelectSingleEventModal event={onEvent} setEvent={setOnEvent} onClear={onEventClear}></SelectSingleEventModal>
                                         </Col>
                                     </Form.Group>
 

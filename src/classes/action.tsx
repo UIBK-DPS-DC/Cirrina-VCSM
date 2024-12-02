@@ -137,15 +137,21 @@ export default class Action {
             case ActionType.INVOKE: {
                 const invokeActionDescription = this.toDescription() as InvokeActionDescription;
                 info = `Invokes \"${invokeActionDescription.serviceType}\"`
+                if(invokeActionDescription.input.length > 0){
+                    info+= ` with [${invokeActionDescription.input.map((i) => `\"${i.name}\"`).toString()}]`
+                }
+                if(invokeActionDescription.output.length > 0){
+                    info += `, sets [${invokeActionDescription.output.map((i) => `\"${i.reference}\"`).toString()}]`
+                }
                 if(invokeActionDescription.done.length > 0){
-                    info+= ` and raises ${invokeActionDescription.done.map((e) => e.name).toString()}. `
+                    info+= `, raises [${invokeActionDescription.done.map((e) => `\"${e.name}\"`).toString()}]. `
                 }
                 return info;
             }
             case ActionType.MATCH: {
                 const matchActionDescription = this.toDescription() as MatchActionDescription;
                 // Not sure if this is too much, adjust if needed.
-                info+= `Matches \"${matchActionDescription.value}\" to \n ${matchActionDescription.cases.map((a) => a.case + ` : ${Action.fromDescription(a.action).getInfoString()}\n`)} `
+                info+= `Match \"${matchActionDescription.value}\" \n ${matchActionDescription.cases.map((a) => "if " + a.case + `  ${Action.fromDescription(a.action).getInfoString()}\n`).toString()} `
                 return info;
             }
             case ActionType.RAISE_EVENT: {
@@ -227,6 +233,7 @@ export default class Action {
                     type: ActionType.ASSIGN,
                     variable: assignActionProps.variable.toDescription()
                 }
+                assignActionDescription.variable.value = assignActionProps.expression
 
                 return assignActionDescription
             }

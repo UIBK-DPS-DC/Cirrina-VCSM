@@ -27,6 +27,7 @@ import GuardService from "../services/guardService.tsx";
 import Event from "../classes/event.ts";
 import {getNewEdgeId, getNewGuardId, getNewNodeId,} from "./visualEditor/flow.tsx";
 import ServiceTypeService from "../services/serviceTypeService.tsx";
+import CollaborativeStateMachine from "../classes/collaborativeStateMachine.tsx";
 
 
 // Define the layout options for ELK
@@ -207,6 +208,7 @@ export default function Import() {
     };
 
     const setUpServiceTypeService = (service: ServiceTypeService, nodes: Node<CsmNodeProps>[]) => {
+
         nodes.forEach((node) => {
             if(isState(node.data)){
                 node.data.state.getAllActions()
@@ -255,6 +257,11 @@ export default function Import() {
             }
         });
     };
+
+    const registerCsmContext = (csm: CollaborativeStateMachine) => {
+        csm.persistentContext.forEach((v) => contextService.registerContext(v))
+        csm.localContext.forEach((v) => contextService.registerContext(v));
+    }
 
     const adjustInternalTransitionHandles = (edges: Edge<CsmEdgeProps>[], nodes: Node<CsmNodeProps>[]) => {
         edges.forEach((e) => {
@@ -539,6 +546,7 @@ export default function Import() {
             stateOrStateMachineService.showStatemachineStateNames();
             setHideFlowEdges(true)
             setShowStateDescriptions(false)
+            registerCsmContext(collaborativeStateMachine)
             setCsm(collaborativeStateMachine)
 
 

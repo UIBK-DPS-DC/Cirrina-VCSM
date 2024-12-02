@@ -8,7 +8,10 @@ import CreatableSelect from "react-select/creatable";
 import {ActionMeta, OnChangeValue} from "react-select";
 import {EventChannel} from "../../enums.ts";
 
-export default function SelectSingleEventModal(props: {event: Event | undefined, setEvent: React.Dispatch<SetStateAction<Event | undefined>>, buttonText?: string, modalTitle?: string}) {
+export default function SelectSingleEventModal(props: {event: Event | undefined,
+    setEvent: React.Dispatch<SetStateAction<Event | undefined>>,
+    buttonText?: string,
+    modalTitle?: string, onClear?: () => void}) {
 
     const context = useContext(ReactFlowContext) as ReactFlowContextProps
     const {eventService, darkMode} = context
@@ -150,6 +153,9 @@ export default function SelectSingleEventModal(props: {event: Event | undefined,
             //Event was cleared
             if(!selectedEvent){
                 props.setEvent(undefined)
+                if(props.onClear){
+                    props.onClear()
+                }
                 handleClose()
                 return;
             }

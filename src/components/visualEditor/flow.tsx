@@ -34,6 +34,7 @@ import {
 } from "../../utils.tsx";
 import {NO_PARENT} from "../../services/stateOrStateMachineService.tsx";
 import {toast} from "react-toastify";
+import * as e from "cors";
 
 const nodeTypes = {
     'state-node': StateNode,
@@ -218,11 +219,11 @@ export default function Flow() {
         [setEdges, transitionService, nodes, selectedEdge]
     );
 
-    const onEdgesDelete = useCallback((edges: Edge<CsmEdgeProps>[]) => {
+    const onEdgesDelete = useCallback((deletedEdges: Edge<CsmEdgeProps>[]) => {
 
-        const sources = edges.map((e) => e.source)
+        const sources = deletedEdges.map((e) => e.source)
             .map((s) => stateOrStateMachineService.getLinkedStateOrStatemachine(s))
-        const transitions = edges.map((e) => e.data?.transition)
+        const transitions = deletedEdges.map((e) => e.data?.transition)
 
         if(sources.length > 0 && transitions.length > 0){
             sources.forEach((s) => {
@@ -234,7 +235,7 @@ export default function Flow() {
             })
         }
 
-        edges.forEach((e) => {
+        deletedEdges.forEach((e) => {
             if(e.target === e.source){
                 const sourceNode = nodes.find((n) => n.id === e.source)
                 if(sourceNode && isState(sourceNode.data)){
@@ -243,6 +244,17 @@ export default function Flow() {
                 }
             }
         })
+
+        const deletedEdgeIds = deletedEdges.map((e) => e.data?.transition.getId()) as number[]
+        const elseEdges = edges.filter((e) => e?.data?.transition.isElseEdge).filter((e) => e.data?.transition.elseSourceId && deletedEdgeIds.includes(e.data?.transition.elseSourceId))
+        console.log(`ELSE EDGES ${elseEdges}`)
+        setEdges((prev) => {
+            return prev.filter((e) => ! elseEdges.includes(e))
+        })
+
+
+
+
 
 
         setRecalculateTransitions(!recalculateTransitions);

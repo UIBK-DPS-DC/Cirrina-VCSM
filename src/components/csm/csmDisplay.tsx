@@ -50,9 +50,11 @@ export default function CsmDisplay() {
                 // Update the properties of the existing variable (maintain reference)
                 existingVar.name = newVar.name;
                 existingVar.value = newVar.value;
+                contextService.renameContext(existingVar, newVar.name);
                 return [...prevVars];
             } else {
                 // Add the new variable if it doesn't exist
+                contextService.registerContext(newVar)
                 return [...prevVars, newVar];
             }
         });
