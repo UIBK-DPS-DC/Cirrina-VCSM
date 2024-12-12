@@ -144,7 +144,9 @@ export default class Action {
                     info += `, sets [${invokeActionDescription.output.map((i) => `\"${i.reference}\"`).toString()}]`
                 }
                 if(invokeActionDescription.done.length > 0){
-                    info+= `, raises [${invokeActionDescription.done.map((e) => `\"${e.name}\"`).toString()}]. `
+                    info+= `, raises ${invokeActionDescription.done.map((e) => `\"${e.name}\"
+                    ${e.data.length > 0 ? `and sets [${e.data.map((d) => `\"${d.name}\"`)}` : ""}`).toString()}]`
+                    info+= ". "
                 }
                 return info;
             }
@@ -156,7 +158,11 @@ export default class Action {
             }
             case ActionType.RAISE_EVENT: {
                 const raiseEventActionDescription = this.toDescription() as RaiseActionDescription
-                info+= `Raises \"${raiseEventActionDescription.event.name}\". `
+                info+= `Raises \"${raiseEventActionDescription.event.name}\" `
+                if (raiseEventActionDescription.event.data.length > 0) {
+                    info+= `and sets [${raiseEventActionDescription.event.data.map((d) => d.name)}] `
+                }
+                info+= ". "
                 return info;
             }
             case ActionType.TIMEOUT: {
