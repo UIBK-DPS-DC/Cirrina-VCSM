@@ -120,18 +120,26 @@ export default class Action {
         return this === other;
     }
 
-    public getInfoString():string {
+    public getInfoString(periods = true):string {
         let info = "";
 
         switch(this.type){
             case ActionType.ASSIGN: {
                 const assignActionDescription = this.toDescription() as AssignActionDescription;
-                info = `Assigns \"${assignActionDescription.variable.value}\" to ${assignActionDescription.variable.name}. `
+                info = `Assigns \"${assignActionDescription.variable.value}\" to ${assignActionDescription.variable.name}`
+                if(periods){
+                    info+= "."
+                }
+                info+=" "
                 return info;
             }
             case ActionType.CREATE: {
                 const createActionDescription = this.toDescription() as CreateActionDescription;
-                info = `Creates var \"${createActionDescription.variable.name}\". `
+                info = `Creates var \"${createActionDescription.variable.name}\"`
+                if(periods){
+                    info+= "."
+                }
+                info+=" "
                 return info;
             }
             case ActionType.INVOKE: {
@@ -146,14 +154,22 @@ export default class Action {
                 if(invokeActionDescription.done.length > 0){
                     info+= `, raises ${invokeActionDescription.done.map((e) => `\"${e.name}\"
                     ${e.data.length > 0 ? `and sets [${e.data.map((d) => `\"${d.name}\"`)}` : ""}`).toString()}]`
-                    info+= ". "
                 }
+                if(periods){
+                    info+= "."
+                }
+                info+=" "
                 return info;
             }
             case ActionType.MATCH: {
                 const matchActionDescription = this.toDescription() as MatchActionDescription;
                 // Not sure if this is too much, adjust if needed.
-                info+= `Match \"${matchActionDescription.value}\" \n ${matchActionDescription.cases.map((a) => "if " + a.case + `  ${Action.fromDescription(a.action).getInfoString()}\n`).toString()} `
+                info+= `Match \"${matchActionDescription.value}\" \n ${matchActionDescription.cases.map((a) => "if " + a.case + `  ${Action.fromDescription(a.action).getInfoString(false)}\n`).toString()}`
+                if(periods){
+                    info+= "."
+                }
+                info+=" "
+
                 return info;
             }
             case ActionType.RAISE_EVENT: {
@@ -162,17 +178,28 @@ export default class Action {
                 if (raiseEventActionDescription.event.data.length > 0) {
                     info+= `and sets [${raiseEventActionDescription.event.data.map((d) => d.name)}] `
                 }
-                info+= ". "
+                if(periods){
+                    info+= "."
+                }
+                info+=" "
                 return info;
             }
             case ActionType.TIMEOUT: {
                 const timeoutActionDescription = this.toDescription() as TimeoutActionDescription
-                info+= `After ${timeoutActionDescription.delay} trigger \"${timeoutActionDescription.name}\". `
+                info+= `After ${timeoutActionDescription.delay} trigger \"${timeoutActionDescription.name}\"`
+                if(periods){
+                    info+= "."
+                }
+                info+=" "
                 return info;
             }
             case ActionType.TIMEOUT_RESET: {
                 const timeoutResetActionDescription = this.toDescription() as TimeoutResetActionDescription
-                info+= `Reset timer of \"${timeoutResetActionDescription.action}\". `
+                info+= `Reset timer of \"${timeoutResetActionDescription.action}\"`
+                if(periods){
+                    info+= "."
+                }
+                info+=" "
                 return info;
             }
             default: {

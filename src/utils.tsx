@@ -181,6 +181,43 @@ export const getMostDistantAncestorNode = (
     return getMostDistantAncestorNode(ancestor, nodes, visited);
 };
 
+export const getAllContextInExtent = (node: Node<CsmNodeProps>, nodes: Node<CsmNodeProps>[],initial=true) => {
+    let contextNames: ContextVariable[] = []
+    if(initial){
+        const ancestor = getMostDistantAncestorNode(node, nodes);
+        if(isStateMachine(ancestor.data)){
+            contextNames = contextNames.concat(ancestor.data.stateMachine.getAllContextVariables())
+        }
+        const children = nodes.filter((n) => n.parentId === ancestor.id)
+        children.forEach((c) => {
+            if(isState(c.data)){
+                contextNames = contextNames.concat(c.data.state.getAllContextVariables())
+            }
+            if(isStateMachine(c.data)){
+                contextNames = contextNames.concat(getAllContextInExtent(c,nodes,false))
+            }
+        })
+        return contextNames;
+    }
+    else {
+        if(isStateMachine(node.data)){
+            const children = nodes.filter((n) => n.parentId === node.id)
+            children.forEach((c) => {
+                if(isState(c.data)){
+                    contextNames = contextNames.concat(c.data.state.getAllContextVariables())
+                }
+                if(isStateMachine(c.data)){
+                    contextNames = contextNames.concat(getAllContextInExtent(c,nodes,false))
+                }
+            })
+        }
+    }
+
+    return contextNames;
+
+
+}
+
 export const getAllStatemachineDescendants = (root: Node<CsmNodeProps>,
                                               nodes: Node<CsmNodeProps>[],
                                               visited: Set<string> = new Set()
