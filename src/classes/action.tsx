@@ -176,7 +176,7 @@ export default class Action {
                 const raiseEventActionDescription = this.toDescription() as RaiseActionDescription
                 info+= `Raises \"${raiseEventActionDescription.event.name}\" `
                 if (raiseEventActionDescription.event.data.length > 0) {
-                    info+= `and sets [${raiseEventActionDescription.event.data.map((d) => d.name)}] `
+                    info+= `and sends [${raiseEventActionDescription.event.data.map((d) => d.name)}] `
                 }
                 if(periods){
                     info+= "."
