@@ -158,7 +158,7 @@ export default class PklService {
         pkl += `${this.getIndent(indentLevel + 1)}name = "${description.name}"\n`
         pkl += `${this.getIndent(indentLevel + 1)}initial = ${description.initial}\n`
         pkl += `${this.getIndent(indentLevel + 1)}terminal = ${description.terminal}\n`
-
+        // TODO: dont print if no entries
         pkl += `${this.getIndent(indentLevel + 1)}entry {\n`
         description.entry.forEach((action) =>{
             pkl += `${this.actionToPKL(action,indentLevel + 2)}\n`
