@@ -159,36 +159,44 @@ export default class PklService {
         pkl += `${this.getIndent(indentLevel + 1)}initial = ${description.initial}\n`
         pkl += `${this.getIndent(indentLevel + 1)}terminal = ${description.terminal}\n`
         // TODO: dont print if no entries
-        pkl += `${this.getIndent(indentLevel + 1)}entry {\n`
-        description.entry.forEach((action) =>{
-            pkl += `${this.actionToPKL(action,indentLevel + 2)}\n`
-        })
-        pkl += `${this.getIndent(indentLevel + 1)}}\n`
 
-        pkl += `${this.getIndent(indentLevel + 1)}exit {\n`
-        description.exit.forEach((action) =>{
-            pkl += `${this.actionToPKL(action,indentLevel + 2)}\n`
-        })
-        pkl += `${this.getIndent(indentLevel + 1)}}\n`
+        if(description.entry.length > 0) {
+            pkl += `${this.getIndent(indentLevel + 1)}entry {\n`
+            description.entry.forEach((action) =>{
+                pkl += `${this.actionToPKL(action,indentLevel + 2)}\n`
+            })
+            pkl += `${this.getIndent(indentLevel + 1)}}\n`
+        }
+        if(description.exit.length > 0) {
+            pkl += `${this.getIndent(indentLevel + 1)}exit {\n`
+            description.exit.forEach((action) =>{
+                pkl += `${this.actionToPKL(action,indentLevel + 2)}\n`
+            })
+            pkl += `${this.getIndent(indentLevel + 1)}}\n`
+        }
+        if(description.while.length > 0) {
+            pkl += `${this.getIndent(indentLevel + 1)}while {\n`
+            description.while.forEach((action) =>{
+                pkl += `${this.actionToPKL(action,indentLevel + 2)}\n`
+            })
+            pkl += `${this.getIndent(indentLevel + 1)}}\n`
+        }
 
-        pkl += `${this.getIndent(indentLevel + 1)}while {\n`
-        description.while.forEach((action) =>{
-            pkl += `${this.actionToPKL(action,indentLevel + 2)}\n`
-        })
-        pkl += `${this.getIndent(indentLevel + 1)}}\n`
+        if(description.after.length > 0) {
+            pkl += `${this.getIndent(indentLevel + 1)}after {\n`
+            description.after.forEach((action) =>{
+                pkl += `${this.actionToPKL(action,indentLevel + 2)}\n`
+            })
+            pkl += `${this.getIndent(indentLevel + 1)}}\n`
+        }
 
-        pkl += `${this.getIndent(indentLevel + 1)}after {\n`
-        description.after.forEach((action) =>{
-            pkl += `${this.actionToPKL(action,indentLevel + 2)}\n`
-        })
-        pkl += `${this.getIndent(indentLevel + 1)}}\n`
-
-        pkl += `${this.getIndent(indentLevel + 1)}on {\n`
-        description.on.forEach((action) =>{
-            pkl += `${this.onTransitionDescriptionToPKL(action,indentLevel + 2)}\n`
-        })
-        pkl += `${this.getIndent(indentLevel + 1)}}\n`
-
+        if(description.on.length > 0) {
+            pkl += `${this.getIndent(indentLevel + 1)}on {\n`
+            description.on.forEach((action) =>{
+                pkl += `${this.onTransitionDescriptionToPKL(action,indentLevel + 2)}\n`
+            })
+            pkl += `${this.getIndent(indentLevel + 1)}}\n`
+        }
 
         if(description.always.length > 0){
             pkl += `${this.getIndent(indentLevel + 1)}always {\n`
