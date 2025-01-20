@@ -27,7 +27,7 @@ import CsmEdge from "./csmEdgeComponent.tsx";
 import {
     colorMap,
     getAllStateNamesInExtent, getMostDistantAncestorNode,
-    getParentNode,
+    getParentNode, getParentOffsets,
     hasHiddenAncestor,
     ReactFlowContext,
     saveNodePositions
@@ -329,14 +329,17 @@ export default function Flow() {
                 (n) => n.type === 'state-machine-node'
             );
 
+
             if (intersectedBlock) {
+                const parentOffset = getParentOffsets(intersectedBlock as Node<CsmNodeProps>, nodes)
+                console.log(`INTERSECTED BLOCK ${intersectedBlock.id}`);
                 newNode = {
                     ...newNode,
                     parentId: intersectedBlock.id,
                     extent: 'parent',
                     position: {
-                        x: position.x - intersectedBlock.position.x,
-                        y: position.y - intersectedBlock.position.y,
+                        x: position.x - intersectedBlock.position.x - parentOffset.x,
+                        y: position.y - intersectedBlock.position.y - parentOffset.y,
                     },
                     expandParent: true,
                 };

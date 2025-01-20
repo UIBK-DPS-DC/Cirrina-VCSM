@@ -319,6 +319,17 @@ export const getAllStateNamesInExtent = (node: Node<CsmNodeProps>, nodes: Node<C
 
 };
 
+// When a node is dragged from the sidebar into a nested structure all parent offsets need to accounted for in order for the node to have the correct relative position.
+export const getParentOffsets = (node: Node<CsmNodeProps>, nodes: Node<CsmNodeProps>[]) => {
+   let offset = {x:0, y:0}
+    let parent = getParentNode(node,nodes);
+    while(parent){
+       offset = {x: offset.x + parent.position.x, y:offset.y + parent.position.y};
+       parent = getParentNode(parent, nodes);
+   }
+   return offset;
+}
+
 export const generateCsmSkeleton = (): CollaborativeStateMachineDescription => {
     const csm: CollaborativeStateMachineDescription = {
         localContext: {variables: []}, name: "csm", persistentContext: {variables: []}, stateMachines: [], version: "2.0"

@@ -38,7 +38,7 @@ const rootLayoutOptions = {
     "elk.allowEdgeNodeOverlap": "false",
     "elk.layered.spacing.nodeNodeBetweenLayers": "200", // Increased spacing between layers
     "elk.layered.spacing.edgeNodeBetweenLayers": "200", // Increased spacing between layers
-    "elk.spacing.nodeNode": "100", // Increased spacing between nodes in the same layer
+    "elk.spacing.nodeNode": "1000", // Increased spacing between nodes in the same layer
     "elk.spacing.edgeEdge": "150",
     "elk.spacing.edgeNode": "200",
     "elk.contentAlignment": "V_CENTER",
@@ -57,7 +57,7 @@ const parentLayoutOptions = {
     "elk.allowEdgeNodeOverlap": "false",
     "elk.layered.spacing.nodeNodeBetweenLayers": "100", // Increased spacing between layers
     "elk.layered.spacing.edgeNodeBetweenLayers": "100", // Increased spacing between layers
-    "elk.spacing.nodeNode": "100", // Increased spacing between nodes in the same layer
+    "elk.spacing.nodeNode": "500", // Increased spacing between nodes in the same layer
     "elk.spacing.edgeEdge": "100",
     "elk.spacing.edgeNode": "200",
     "portConstraints": "FIXED_ORDER",
@@ -640,7 +640,16 @@ export default function Import() {
                     updateNodePositions(elkNode);
                 });
 
-                const layoutedNodes = Array.from(nodeMap.values());
+                const layoutedNodes = Array.from(nodeMap.values()).map((node) => {
+                    if(node.parentId){
+                        node.position = {x:node.position.x,y:node.position.y + 50};
+                        return node
+                    }
+                    else{
+                        return node
+                    }
+                });
+
 
                 setNodes(layoutedNodes);
 
