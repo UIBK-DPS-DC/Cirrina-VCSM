@@ -696,6 +696,7 @@ export default function Import() {
                                     )
                                 ) {
                                     // Shift current node’s x to the right and y to the bottom
+                                    // If you ever want different spacing adjust these values
                                     x = placedNode.position.x + placedWidth + 30;
                                     y = placedNode.position.y + placedHeight + 60;
                                     hasOverlap = true;
