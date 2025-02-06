@@ -262,30 +262,25 @@ export default function SelectContextsModal(props: {buttonName: string | undefin
         const persistentVars: ContextVariable[] = []
         selectedPersistentVariables.forEach(variable => {
             const context = contextService.getContextByName(variable.value)
-            console.log(`FOUND CONTEXT ${context}`)
             if(context){
                 persistentVars.push(context)
-                console.log(`FOUND CONTEXT ${context}`)
+
             }
         })
 
         const localVars: ContextVariable[] = []
         selectedLocalVariables.forEach(variable => {
             const context = contextService.getContextByName(variable.value)
-            console.log(`FOUND CONTEXT ${context}`)
             if(context){
                 localVars.push(context)
-                console.log(`FOUND CONTEXT ${context}`)
             }
         })
 
         const staticVars: ContextVariable[] = []
         selectedStaticVariables.forEach(variable => {
             const context = contextService.getContextByName(variable.value)
-            console.log(`FOUND CONTEXT ${context}`)
             if(context){
                 staticVars.push(context)
-                console.log(`FOUND CONTEXT ${context}`)
             }
         })
 
