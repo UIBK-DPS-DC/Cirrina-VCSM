@@ -1,0 +1,18 @@
+/* styles.css or your CSS file */
+.fixed-label {
+    width: auto;
+    max-width: 140px;/* Fixed width */
+    height: auto; /* Fixed height */
+    overflow: hidden; /* Hide overflowing content */
+    text-overflow: ellipsis; /* Add ellipsis to indicate truncated text */
+    white-space: normal;
+    display: flex;
+    align-items: center;
+
+    justify-content: center;
+    background: #34c9eb;
+    padding: 3px;
+    border-radius: 5px;
+    font-size: 10px;
+    font-weight: 100;
+}

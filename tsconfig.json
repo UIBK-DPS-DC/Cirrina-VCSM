@@ -20,6 +20,11 @@
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true
   },
+  "ts-node": {
+    "transpileOnly": true,
+    "experimentalSpecifierResolution": "node",
+    "esm": true
+  },
   "include": ["src"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

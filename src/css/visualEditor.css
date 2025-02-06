@@ -1,0 +1,71 @@
+.visualEditor {
+    display: flex;
+    flex-grow: 1;
+    flex-direction: row;
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
+    position: relative;
+}
+
+.flowSideBar {
+    max-width: 15%;
+    border-right: 1px solid #eee;
+    padding: 15px 10px;
+    font-size: 12px;
+    background: #fcfcfc;
+    position: relative;
+    left: 0;
+    top: 0;
+}
+
+.flowSideBar aside .description {
+    margin-bottom: 10px;
+}
+
+.flowSideBar .dndnode {
+    height: 50px ;
+    padding: 4px;
+    border: 1px solid #1a192b;
+    border-radius: 2px;
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: grab;
+}
+
+.flow-container {
+    flex-grow: 1;
+    background-color: white;
+    display: flex;
+    position: relative;
+}
+
+.node-form {
+    width: 300px;
+    padding: 20px;,
+    backgroundColor: #f1f1f1;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+    position: absolute;
+    top: 0;
+    right: 0;
+}
+
+.edge-form {
+    width: 300px;
+    padding: 20px;,
+    backgroundColor: #f1f1f1;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+    position: absolute;
+    top: 0;
+    right: 0;
+}
+
+.state-machine-node {
+    height: 50px;
+    border: 1px solid #eee;
+    padding: 5px;
+    border-radius: 5px;
+    background: white;
+}

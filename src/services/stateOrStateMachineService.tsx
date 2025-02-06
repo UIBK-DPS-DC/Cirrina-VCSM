@@ -3,16 +3,163 @@
 
 import State from "../classes/state.ts";
 import StateMachine from "../classes/stateMachine.ts";
-import {CsmNodeProps, isExitOrEntry, isState, isStateMachine} from "../types.ts";
+import {CsmNodeProps, isState, isStateMachine} from "../types.ts";
+import StateOrStateMachine from "../classes/stateOrStateMachine.ts";
+import Action from "../classes/action.tsx";
+import {ActionCategory} from "../enums.ts";
+import {toast} from "react-toastify";
+
+
+export type NO_PARENT = "0"
+export const NO_PARENT: NO_PARENT = "0"
 
 export default class StateOrStateMachineService {
     private id: number = 0
     private stateOrStatemachineNames : Set<string>;
+    private nodeIdToStateOrStatemachineMap = new Map<string,StateOrStateMachine>
+    private statemachineIDToStateNamesMap = new Map<string,Set<string>>
+
+
 
     public constructor() {
         this.stateOrStatemachineNames = new Set();
+        this.nodeIdToStateOrStatemachineMap = new Map();
+        this.statemachineIDToStateNamesMap = new Map();
+        this.statemachineIDToStateNamesMap.set(NO_PARENT, new Set<string>());
+
 
     }
+
+
+
+    /**
+     * Links a state name to a state machine in the internal mapping.
+     *
+     * This method attempts to link a given state `name` to a state machine identified by `stateMachineID`.
+     * If the state machine doesn't exist and the `create` flag is true, a new entry is created for that
+     * state machine. If the `create` flag is false and the state machine doesn't exist, an error is logged.
+     * The function also ensures no duplicate state names are added to the state machine.
+     *
+     * @param {string} name - The name of the state to link.
+     * @param {string} stateMachineID - The ID of the state machine to link the state to.
+     * @param {boolean} [create=false] - Optional flag to create the state machine if it doesn't exist.
+     */
+    public linkStateNameToStatemachine(name: string, stateMachineID: string | NO_PARENT, create?: boolean) {
+        let stateNames = this.statemachineIDToStateNamesMap.get(stateMachineID);
+
+        if (!stateNames) {
+            if (!create) {
+                console.error(`Statemachine ${stateMachineID} does not exist.\n`);
+                toast.error(`Statemachine ${stateMachineID} does not exist.\n`, {
+                    position: "bottom-right", // You can customize the position
+                    autoClose: 5000
+
+                });
+                return;
+            }
+            // Create new entry for state machine if 'create' is true
+
+            stateNames = new Set([]);
+            const stateMachine = this.getLinkedStateOrStatemachine(stateMachineID)
+            if(stateMachine){
+                stateNames.add(stateMachine.name)
+                console.log(`Statemachine ${stateMachine.name} has been added to initial stateNames!`);
+            }
+            this.statemachineIDToStateNamesMap.set(stateMachineID, stateNames);
+        }
+
+        // Avoid duplicates before pushing the state name
+        if (!stateNames.has(name)) {
+            stateNames.add(name);
+            console.log(`${name} has been linked to ${stateMachineID}`)
+            return
+        }
+        else{
+            console.error(`State ${name} already exist on Statemachine ${stateMachineID}`)
+            toast.error(`State ${name} already exist on Statemachine ${stateMachineID}`, {
+                position: "bottom-right", // You can customize the position
+                autoClose: 5000
+
+            });
+        }
+    }
+
+
+    public getStateNames(stateMachineID: string): Set<string> | undefined {
+        let stateNames = this.statemachineIDToStateNamesMap.get(stateMachineID);
+        if (stateNames === undefined) {
+            console.log(`No States are linked to ${stateMachineID}`);
+            return stateNames;
+        }
+        return stateNames;
+    }
+
+    /**
+     * Unlinks a state name from a state machine in the internal mapping.
+     *
+     * This method attempts to unlink a given state `name` from a state machine identified by `stateMachineID`.
+     * If the state exists, it is removed from the state machine. If the state machine no longer has any states
+     * after the removal, the state machine entry is deleted. If the state or state machine doesn't exist,
+     * an appropriate message is logged.
+     *
+     * @param {string} name - The name of the state to unlink.
+     * @param {string} stateMachineID - The ID of the state machine to unlink the state from.
+     * @returns {boolean} - Returns `true` if the state was successfully unlinked, `false` if the state or
+     *                      state machine does not exist.
+     */
+    public unlinkStateNameFromStatemachine(name: string, stateMachineID: string): boolean {
+        const states = this.statemachineIDToStateNamesMap.get(stateMachineID);
+
+        if (states) {
+            const deleted = states.delete(name);
+
+            if (!deleted) {
+                console.log(`State ${name} does not exist in Statemachine ${stateMachineID}.\n`);
+                return false;
+            } else {
+                console.log(`${name} has been unlinked from statemachine with ID ${stateMachineID}`);
+            }
+
+            // If no states are left, remove the entire state machine entry
+            if (states.size === 0) {
+                this.statemachineIDToStateNamesMap.delete(stateMachineID);
+                console.log(`Statemachine ${stateMachineID} has no more states and has been removed.`);
+            }
+
+            return true;
+        } else {
+            console.log(`Statemachine ${stateMachineID} does not exist.\n`);
+            return false;
+        }
+    }
+
+
+
+    /**
+     * Checks if a state machine contains a specific state.
+     *
+     * This method checks whether a state machine, identified by `stateMachineID`, contains a state
+     * with the name `stateName`. If the state machine doesn't exist, an appropriate message is logged,
+     * and `false` is returned.
+     *
+     * @param {string} stateName - The name of the state to check.
+     * @param {string} stateMachineID - The ID of the state machine to search.
+     * @returns {boolean} - Returns `true` if the state machine contains the state, `false` if the state or
+     *                      state machine does not exist.
+     */
+    public stateMachineHasState(stateName: string, stateMachineID: string): boolean {
+        const stateNames = this.statemachineIDToStateNamesMap.get(stateMachineID);
+        if (!stateNames) {
+            console.log(`Statemachine ${stateMachineID} does not exist.\n`);
+            return false;
+        }
+
+        return stateNames.has(stateName);
+    }
+
+
+
+
 
     /**
      * Registers a state or state machine name.
@@ -135,45 +282,235 @@ export default class StateOrStateMachineService {
      */
     public setName(newName: string, data: CsmNodeProps): CsmNodeProps {
         if (isState(data)) {
-            return { ...data, state: { ...data.state, name: newName } };
+            const updatedState = data.state
+            updatedState.name = newName;
+            return { ...data, state: updatedState };
         }
         if (isStateMachine(data)) {
-            return { ...data, stateMachine: { ...data.stateMachine, name: newName } };
+            const updatedStatemachine = data.stateMachine
+            updatedStatemachine.name = newName;
+            return { ...data, stateMachine: updatedStatemachine };
         }
-        if (isExitOrEntry(data)) {
+        if (data.name !== undefined) {
             return { ...data, name: newName };
         }
-        return data;
+        return data;  // Return original data unchanged if it doesn't match any type
+    }
+
+    /**
+     * Adds an action to the specified category of a state.
+     *
+     * This method adds an `Action` to a specified category within a `State` object contained in the `data` parameter.
+     * It modifies the `State` object directly, adding the `Action` to the appropriate array (entry, exit, after, while)
+     * based on the provided `actionCategory`.
+     *
+     * @param {CsmNodeProps} data - The data object containing the state or state machine.
+     * @param {Action} action - The action to be added to the state.
+     * @param {ActionCategory} actionCategory - The category to which the action belongs (entry, exit, timeout, or while).
+     * @returns {CsmNodeProps} - The modified data object with the action added to the appropriate category.
+     */
+    public addActionToState(data: CsmNodeProps, action: Action, actionCategory: ActionCategory): CsmNodeProps {
+            if(isState(data)) {
+                switch (actionCategory) {
+                    case ActionCategory.ENTRY_ACTION: {
+                        if(!data.state.entry.includes(action)){
+                            data.state.entry.push(action);
+                        }
+                        else{
+                            console.error(`${action.name} already exists in ${data.state.name}'s ${actionCategory} actions`)
+                        }
+                        break;
+                    }
+                    case ActionCategory.EXIT_ACTION: {
+                        if(!data.state.exit.includes(action)){
+                            data.state.exit.push(action);
+                        }
+                        else{
+                            console.error(`${action.name} already exists in ${data.state.name}'s ${actionCategory} actions`)
+                        }
+                        break;
+                    }//TODO: Handle timeout stuff
+                    case ActionCategory.TIMEOUT: {
+                        if(!data.state.after.includes(action)){
+                            data.state.after.push(action);
+                        }
+                        else{
+                            console.error(`${action.name} already exists in ${data.state.name}'s ${actionCategory} actions`)
+                        }
+                        break;
+                    }
+                    case ActionCategory.WHILE_ACTION: {
+                        if(!data.state.while.includes(action)){
+                            data.state.while.push(action);
+                        }
+                        else{
+                            console.error(`${action.name} already exists in ${data.state.name}'s ${actionCategory} actions`)
+                        }
+                        break;
+                    }
+                    default:
+                        break;
+
+                }
+                return data;
+            }
+
+            // TODO: Separate logic for statemachines ?
+            return data;
+
+
+    }
+
+    /**
+     * Removes an action from all action arrays within a state.
+     *
+     * This method takes an `Action` and a `CsmNodeProps` data object,
+     * and if the `data` contains a valid state, it attempts to remove the action
+     * from the state's `entry`, `while`, `exit`, and `after` action arrays.
+     * The removal is performed by filtering out the specified action from each array.
+     *
+     * - The function checks if `data` contains a valid state using the `isState` helper.
+     * - It iterates through each of the state's action arrays (`entry`, `while`, `exit`, `after`)
+     *   and removes any occurrence of the given `action` by filtering the array.
+     *
+     * If the `data` is not a valid state, no action is taken, and the function returns immediately.
+     *
+     * @param {Action} action - The action to be removed from the state.
+     * @param {CsmNodeProps} data - The node properties, which could contain a state.
+     *                               The function will modify the state's action arrays if the state is valid.
+     */
+    public removeActionFromState(action: Action, data: CsmNodeProps) {
+        if(isState(data)){
+            data.state.entry = data.state.entry.filter((a) => a !== action)
+            data.state.while = data.state.while.filter((a) => a !== action)
+            data.state.exit = data.state.exit.filter((a) => a !== action)
+            data.state.after = data.state.after.filter((a) => a !== action)
+
+        }
+        return;
+    }
+
+    /**
+     * Links a node to a state or state machine.
+     *
+     * This method associates a given node ID with a corresponding state or state machine based on the provided data.
+     * It updates the internal mapping of node IDs to states or state machines.
+     * If the data represents a state, it links the node to the state.
+     * If the data represents a state machine, it links the node to the state machine.
+     * If the data type is unknown, it logs an error message.
+     *
+     * @param {string} nodeId - The ID of the node to be linked.
+     * @param {CsmNodeProps} data - The data object containing the state or state machine information.
+     */
+    public linkNode(nodeId: string, data: CsmNodeProps) {
+        console.log("Entering link node")
+        if(isState(data)) {
+            this.nodeIdToStateOrStatemachineMap.set(nodeId, data.state);
+            console.log(`Linked ${nodeId} to ${data.state.name}`)
+            return;
+        }
+        if(isStateMachine(data)){
+            this.nodeIdToStateOrStatemachineMap.set(nodeId,data.stateMachine);
+            console.log(`Linked ${nodeId} to ${data.stateMachine.name}`)
+            return;
+        }
+
+        console.error(`Node could not be linked, unknown type of data ${data}`);
+        return;
+
+    }
+
+    /**
+     * Unlinks a node from its associated state or state machine.
+     *
+     * This method removes the association of a given node ID from the internal mapping of node IDs to states or state machines.
+     * If the node ID is not found in the mapping, it logs a message indicating that the node was not found.
+     *
+     * @param {string} nodeId - The ID of the node to be unlinked.
+     */
+    public unlinkNode(nodeId: string) {
+        const res = this.nodeIdToStateOrStatemachineMap.delete(nodeId)
+        if(!res){
+            console.log(`Node: ${nodeId} not found!`);
+        }
+        console.log(`${nodeId} has been unlinked!`);
+    }
+
+    /**
+     * Retrieves the state or state machine linked to a given node ID.
+     *
+     * This method fetches the state or state machine associated with the provided node ID from the internal mapping.
+     * If the node ID is not found in the mapping, it logs an error message and returns `undefined`.
+     *
+     * @param {string} nodeId - The ID of the node whose linked state or state machine is to be retrieved.
+     * @returns {StateOrStateMachine | undefined} - The state or state machine linked to the node ID, or `undefined` if not found.
+     */
+    public getLinkedStateOrStatemachine(nodeId: string): StateOrStateMachine | undefined {
+        const stateOrStateMachine = this.nodeIdToStateOrStatemachineMap.get(nodeId);
+        if(stateOrStateMachine === undefined){
+            console.error(`State or Statemachine with id ${nodeId} could not be found`)
+            return stateOrStateMachine;
+        }
+        return stateOrStateMachine
+    }
+
+    /**
+     * Gets the state or state machine by name.
+     *
+     * @param name - The name of the state or state machine to find.
+     * @returns The state or state machine if found, otherwise undefined.
+     */
+    public getStateOrStateMachineByName(name: string): StateOrStateMachine | undefined {
+        for (const stateOrStateMachine of this.nodeIdToStateOrStatemachineMap.values()) {
+            if (stateOrStateMachine.name === name) {
+                return stateOrStateMachine;
+            }
+        }
+        console.log(`Statemachine ${name} not found!`);
+        return undefined;
+    }
+
+    public addStateToStatemachine(stateMachine :StateMachine, data: CsmNodeProps ) {
+        if(isState(data)){
+            stateMachine.addState(data.state);
+            console.log(`Added ${data.state.name} to ${stateMachine.name} as state!`);
+            return;
+        }
+        if(isStateMachine(data)){
+            console.log(`Added ${data.stateMachine.name} to ${stateMachine.name} as state!`);
+            stateMachine.addState(data.stateMachine)
+            return;
+        }
+        console.error("Unknown data type")
+        return;
     }
 
 
-    public getDefaultState(name: string): State {
+    public getDefaultState(name: string, id: string): State {
         // add default config here
+        const newState = new State(name)
+        newState.nodeId = id
         return new State(name);
     }
 
-    public getDefaultStateMachine(name: string): StateMachine {
+    public getDefaultStateMachine(name: string, id: string): StateMachine {
         // add default config here
-        return new StateMachine(name);
+        const newStatemachine =  new StateMachine(name);
+        newStatemachine.nodeId = id
+        return newStatemachine
     }
 
-    public getDefaultData(type: string, name :string) {
+    public getDefaultData(type: string, name :string, id: string, resizeVisible = true, draggable = true) {
         switch (type) {
             case "state-node":
                 return {
-                    "state": this.getDefaultState(name ? name : "" ),
+                    "state": this.getDefaultState(name ? name : "" , id),
                 };
             case "state-machine-node":
                 return {
-                    "stateMachine": this.getDefaultStateMachine(name ? name : ""),
-                };
-            case "entry-node":
-                return {
-                    "name": name ? name : "",
-                };
-            case "exit-node":
-                return {
-                    "name": name ? name : "",
+                    "stateMachine": this.getDefaultStateMachine(name ? name : "", id),
+                    "visibleResize": resizeVisible,
+                    "draggable": draggable
                 };
             default:
                 return{
@@ -183,5 +520,17 @@ export default class StateOrStateMachineService {
         }
     }
 
+    public showStatemachineStateNames() {
+        console.log(this.statemachineIDToStateNamesMap)
+    }
+
+    public resetService():void {
+        this.stateOrStatemachineNames = new Set();
+        this.nodeIdToStateOrStatemachineMap = new Map();
+        this.statemachineIDToStateNamesMap = new Map();
+        this.statemachineIDToStateNamesMap.set(NO_PARENT, new Set<string>());
+    }
+
 }
+
 
