@@ -113,11 +113,6 @@ export default function TransitionInfoForm() {
         handleClose()
     }
 
-    useEffect(() => {
-        console.log(actions.length)
-        console.log("T ACTIONS")
-        console.log(selectedEdge?.data?.transition.getActions().length)
-    }, [selectedEdge]);
 
     const onRaiseEventActionSubmit = () => {
         setActions((prev) => [...prev, raiseEventAction[0]])

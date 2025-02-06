@@ -36,6 +36,8 @@ import {NO_PARENT} from "../../services/stateOrStateMachineService.tsx";
 import {toast} from "react-toastify";
 import * as e from "cors";
 
+const DEBUG = false;
+
 const nodeTypes = {
     'state-node': StateNode,
     'state-machine-node': StateMachineNode,
@@ -162,22 +164,28 @@ export default function Flow() {
 
             // SM has just been hidden. Backing up properties
             if (node.style && node.style?.border === "hidden") {
-                console.log(node.style);
-                console.log("Setting");
+                if(DEBUG){
+                    console.log(node.style);
+                    console.log("Setting");
+                }
                 node.data.prevSize = {
                     height: node.height,
                     width: node.width
                 };
-                console.log(node.data.prevSize);
+
                 node.height = 0;
                 node.width = 0;
-                console.log("Hiding ");
-                console.log(`${node.style.height}`);
+                if(DEBUG){
+                    console.log(node.data.prevSize);
+                    console.log("Hiding ");
+                    console.log(`${node.style.height}`);
+                }
+
 
             }
             // SM has just been unhidden. Restore previous properties
             else {
-                console.log(`Restoring ${node.id} to previous sizes`)
+
                 // Statemachine node has a default height of 150 and undefined width
                 node.height = node.data.prevSize?.height || 150;
                 node.width = node.data.prevSize?.width || undefined
@@ -186,11 +194,16 @@ export default function Flow() {
                     node.position.x = node.data?.prevPosition?.x || 0
                     node.position.y = node.data?.prevPosition?.y || 0
 
-                    console.log(node.position.x, node.position.y)
                     updateNodeInternals(node.id)
                 }
+                if(DEBUG){
+                    console.log(`Restoring ${node.id} to previous sizes`)
+                    console.log(`Height: ${node.height}, Width ${node.width}`)
+                    if(hidden){
+                        console.log(node.position.x, node.position.y)
+                    }
+                }
 
-                console.log(`Height: ${node.height}, Width ${node.width}`)
             }
         }
         updateNodeInternals(node.id)
@@ -240,14 +253,15 @@ export default function Flow() {
                 const sourceNode = nodes.find((n) => n.id === e.source)
                 if(sourceNode && isState(sourceNode.data)){
                     sourceNode.data.state.removeSourceHandle(e.sourceHandle || "")
-                    console.log(`Removed source handle ${e.sourceHandle}`)
+                    if(DEBUG){
+                        console.log(`Removed source handle ${e.sourceHandle}`)
+                    }
                 }
             }
         })
 
         const deletedEdgeIds = deletedEdges.map((e) => e.data?.transition.getId()) as number[]
         const elseEdges = edges.filter((e) => e?.data?.transition.isElseEdge).filter((e) => e.data?.transition.elseSourceId && deletedEdgeIds.includes(e.data?.transition.elseSourceId))
-        console.log(`ELSE EDGES ${elseEdges}`)
         setEdges((prev) => {
             return prev.filter((e) => ! elseEdges.includes(e))
         })
@@ -416,19 +430,14 @@ export default function Flow() {
             saveNodePositions(setNodes)
 
             if (intersectedBlock) {
-                console.log(node.parentId)
 
-                console.log("A")
                 // Don't allow switch to sm on same depth
                 if (node.parentId === intersectedBlock.id) return;
-                console.log("B")
                 let parentNode = getParentNode(node,nodes)
 
-                console.log(`PARENTNODE ${parentNode?.id}`)
                 if(getNodeDepth(intersectedBlock as Node<CsmNodeProps>) === getNodeDepth(parentNode) && node.parentId !== undefined) {
                     return
                 }
-                console.log("C")
                 // Odd react flow behavior sometimes causes intersections to be detected in a way that nodes switch to other branches of the tree. This is to prevent this
                 if(node.parentId !== undefined && (getMostDistantAncestorNode(node,nodes).id !== getMostDistantAncestorNode(intersectedBlock as Node<CsmNodeProps>,nodes).id)){
                     return
@@ -454,8 +463,6 @@ export default function Flow() {
                 }
 
                 if (isStateMachine(node.data)) {
-                    console.log("D")
-                    console.log(blockStateNames)
                     if (blockStateNames && blockStateNames.has(node.data.stateMachine.name)) {
                         stateOrStateMachineService.linkStateNameToStatemachine(stateOrStateMachineService.getName(node.data), parentId);
                         toast.error(`Statemachine with name ${node.data.stateMachine.name} already exists in extent!`, {
@@ -465,7 +472,6 @@ export default function Flow() {
                         });
                         return;
                     }
-                    console.log("E")
                     setNodes((ns: Node<CsmNodeProps>[]) => {
                         const children = getAllDescendants(node);
                         const newNodes = ns.filter(i => i.id !== node.id && !children.includes(i));
@@ -806,8 +812,7 @@ export default function Flow() {
 
             })
 
-            console.log("Raise event map: ", statemachineToRaisedEvents)
-            console.log("consumedEvents map", statemachineConsumedEvents)
+
 
             //Iterate over group nodes and if one group node consumes and event that another raises add edge
             groupNodes.forEach((n) => {
@@ -844,7 +849,6 @@ export default function Flow() {
                                        }
                                    })
 
-                                   console.log(`Node ${otherNode.id} consumes an event raised by Node ${n.id}`);
                                    const connection: Connection = {
                                        source: n.id, sourceHandle: sourceHandle, target: otherNode.id, targetHandle: targetHandle
 
@@ -883,15 +887,12 @@ export default function Flow() {
 
         })
 
-        // Here
-
         edgesToAdd.forEach((e) => {
             console.log(e.sourceHandle)
         })
 
         setEdges((prev) => [...prev, ...edgesToAdd])
 
-        console.log(parentMap); // To verify the result
 
 
 
