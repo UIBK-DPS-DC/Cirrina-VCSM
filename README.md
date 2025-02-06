@@ -6,7 +6,7 @@
 Ensure you have the following installed before running the project:
 - [Node.js](https://nodejs.org/)
 - [npm](https://www.npmjs.com/)
-- [PKL](https://pkl-lang.org/index.html)
+- [PKL](https://pkl-lang.org/index.html) (Needed for import functionality to work.)
 
 ## Getting Started
 
