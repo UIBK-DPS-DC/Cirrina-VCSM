@@ -78,7 +78,7 @@ export default function CsmEdge({
         if (actions.length > 0) {
             actionString += '\u2192 '; // u2192 is the unicode for a right facing arrow
             actions.forEach((action, i) => {
-                actionString += action.name;
+                actionString += action.getInfoString(); // TODO: GENERATE ACTION INFO FUNCTION HERE
                 if (i !== actions.length - 1) {
                     actionString += ', ';
                 }
@@ -212,6 +212,7 @@ export default function CsmEdge({
                                     translate(-50%, -50%)
                                     translate(${midPoint.x + internalTransitionXOffset}px, ${midPoint.y + internalTransitionYOffset}px)`,
                                     zIndex: 2
+
                                 }}
                                 className="nodrag nopan fixed-label"
                             >

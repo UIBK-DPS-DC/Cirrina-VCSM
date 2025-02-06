@@ -18,6 +18,9 @@ import Import from "./components/import.tsx";
 import {Button} from "react-bootstrap";
 import ServiceTypeService from "./services/serviceTypeService.tsx";
 import CollaborativeStateMachine from "./classes/collaborativeStateMachine.tsx";
+import {ToastContainer} from "react-toastify";
+import 'react-toastify/dist/ReactToastify.min.css';
+import CsmDisplay from "./components/csm/csmDisplay.tsx";
 
 
 const initialNodes: Node<CsmNodeProps>[] = [];
@@ -56,6 +59,9 @@ export default function App() {
     const [showEdgeLabels, setShowEdgeLabels] = useState<boolean>(true)
     const hideEdgeLabelsButtonText = () => showEdgeLabels ? "Hide Edge Labels" : "Show Edge Labels"
 
+    const [showStateDescriptions, setShowStateDescriptions] = useState(true)
+    const showStateDescriptionText = () => showStateDescriptions ? "Hide State Descriptions" : "Show State Descriptions"
+
 
 
 
@@ -76,6 +82,12 @@ export default function App() {
         setShowEdgeLabels(!showEdgeLabels)
 
     },[setShowEdgeLabels, showEdgeLabels])
+
+    const onShowStateDescriptionsButtonClick = useCallback((event: React.MouseEvent<HTMLButtonElement>) => {
+        event.preventDefault()
+        event.stopPropagation()
+        setShowStateDescriptions(!showStateDescriptions)
+    },[setShowStateDescriptions, showStateDescriptions])
 
     const onDarkModeButtonClick = () => {
         setDarkMode(!darkMode)
@@ -118,43 +130,48 @@ export default function App() {
         darkMode,
         serviceTypeService,
         csm,
-        setCsm
+        setCsm,
+        showStateDescriptions,
+        setShowStateDescriptions
     };
 
 
     return (
         <div className={"app-container"}>
-            <ReactFlowContext.Provider value={contextValue}>
-                <div className={"topBar"}>
-                    <h2> VCSM Editor </h2>
-                    <div className={"buttons"}>
-                        <Button onClick={onDarkModeButtonClick}>
-                            {darkMode && (
-                                <i className="bi bi-brightness-high-fill"></i>
-                            ) || (
-                                <i className="bi bi-moon-stars"></i>
-                                )}
+            <ToastContainer/>
+                <ReactFlowContext.Provider value={contextValue}>
+                    <div className={"topBar"}>
+                        <h2> VCSM Editor </h2>
+                        <div className={"buttons"}>
+                            <Button onClick={onDarkModeButtonClick}>
+                                {darkMode && (
+                                    <i className="bi bi-brightness-high-fill"></i>
+                                ) || (
+                                    <i className="bi bi-moon-stars"></i>
+                                    )}
 
-                        </Button>
-                        <Export></Export>
-                        <Import></Import>
-                        <button className={"button"} onClick={onHideEdgeLabelsButtonClick}>{hideEdgeLabelsButtonText()}</button>
-                        <button className={"button"} onClick={onHideButtonClick}>{hideStatemachineEdgesButtonText()}</button>
+                            </Button>
+                            <CsmDisplay/>
+                            <Export></Export>
+                            <Import></Import>
+                            <button className={"button"} onClick={onShowStateDescriptionsButtonClick}>{showStateDescriptionText()}</button>
+                            <button className={"button"} onClick={onHideEdgeLabelsButtonClick}>{hideEdgeLabelsButtonText()}</button>
+                            <button className={"button"} onClick={onHideButtonClick}>{hideStatemachineEdgesButtonText()}</button>
+                        </div>
                     </div>
-                </div>
-                <Tabs >
-                    <TabList style={{backgroundColor: "grey"}}>
-                        <Tab>Visual Editor</Tab>
-                    </TabList>
+                    <Tabs >
+                        <TabList style={{backgroundColor: "grey"}}>
+                            <Tab>Visual Editor</Tab>
+                        </TabList>
 
-                    <TabPanel>
-                        <VisualEditor/>
-                    </TabPanel>
-                    <TabPanel>
-                        <CsmlEditor/>
-                    </TabPanel>
-                </Tabs>
-            </ReactFlowContext.Provider>
+                        <TabPanel>
+                            <VisualEditor/>
+                        </TabPanel>
+                        <TabPanel>
+                            <CsmlEditor/>
+                        </TabPanel>
+                    </Tabs>
+                </ReactFlowContext.Provider>
         </div>
     );
 }

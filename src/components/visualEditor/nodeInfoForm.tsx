@@ -158,6 +158,10 @@ export default function NodeInfoForm() {
         if(selectedNode?.data && isState(selectedNode.data)) {
             selectedNode.data.state.removeContext(variable)
         }
+        if(selectedNode?.data && isStateMachine(selectedNode.data)) {
+            selectedNode.data.stateMachine.removeContext(variable)
+        }
+
     }
 
 

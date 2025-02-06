@@ -1,14 +1,20 @@
 import ContextVariable from "../../classes/contextVariable.tsx";
 import React, {ChangeEvent, useCallback, useContext, useEffect, useState} from "react";
-import {ReactFlowContext, renderEnumAsOptions, renderStringsAsOptions} from "../../utils.tsx";
+import {getAllContextInExtent, ReactFlowContext, renderEnumAsOptions, renderStringsAsOptions} from "../../utils.tsx";
 import {isState, ReactFlowContextProps} from "../../types.ts";
 import {Button, Form} from "react-bootstrap";
 import {ContextType} from "../../enums.ts";
 
-export default function CreateContextForm(props: {variable: ContextVariable | undefined, onClose: () => void, onSubmit: (updatedVariable: ContextVariable) => void, noRegister?:boolean, dontAddToState?: boolean, noTypeSelect? :boolean}) {
+export default function CreateContextForm(props: {variable: ContextVariable | undefined,
+    onClose: () => void,
+    onSubmit: (updatedVariable: ContextVariable) => void,
+    noRegister?:boolean,
+    dontAddToState?: boolean,
+    noTypeSelect? :boolean,
+    csmVar?: boolean}) {
 
     const context = useContext(ReactFlowContext) as ReactFlowContextProps;
-    const {contextService, selectedNode, darkMode} = context;
+    const {contextService, selectedNode, darkMode, nodes} = context;
 
     const VARIABLE_NAME_FIELD_NAME = "variable-name";
     const EXPRESSION_FIELD_NAME = "expression";
@@ -54,7 +60,7 @@ export default function CreateContextForm(props: {variable: ContextVariable | un
             return true;
         }
 
-        return contextService.isContextNameUnique(name);
+        return contextService.isContextNameUnique(name) || !!(selectedNode && ! getAllContextInExtent(selectedNode,nodes).map((n) => n.name).includes(name));
     }, [props.variable, oldName, contextService]);
 
     const validateExpression = useCallback((e: string) => {
@@ -120,6 +126,9 @@ export default function CreateContextForm(props: {variable: ContextVariable | un
 
         } else {
             const newContext = new ContextVariable(variableName, expression);
+            if(!props.noRegister && props.csmVar){
+                contextService.registerContext(newContext)
+            }
             if(!props.noRegister && selectedNode) {
                 contextService.registerContext(newContext);
                 if(!props.dontAddToState){

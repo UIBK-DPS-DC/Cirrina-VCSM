@@ -9,7 +9,7 @@ import CreateContextFormModal from "../Context/createContextFormModal.tsx";
 
 export default function CsmDisplay() {
     const context = useContext(ReactFlowContext) as ReactFlowContextProps
-    const {csm, darkMode} = context
+    const {csm, darkMode, contextService} = context
 
 
     const [show,setShow] = useState(false);
@@ -28,12 +28,15 @@ export default function CsmDisplay() {
     const showModalButtonText = () => "CSM Properties"
     const modalTitleText = () => "Collaborative State Machine Properties"
 
+    const onContextRemove = (context: ContextVariable) => {
+        contextService.deregisterContextByName(context.name)
+    }
 
     const renderContexts = useCallback(() => {
         return(
             <div className={"mb3"}>
-                <ContextCardDisplay vars={csmLocalContext} headerText={"Local Context"} setVars={setCsmLocalContext} noInfoText={true}/>
-                <ContextCardDisplay vars={csmPersistentContext} headerText={"Persistent Context"} setVars={setCsmPersistentContext} noInfoText={true}/>
+                <ContextCardDisplay vars={csmLocalContext} headerText={"Local Context"} setVars={setCsmLocalContext} noInfoText={true} onRemove={onContextRemove} />
+                <ContextCardDisplay vars={csmPersistentContext} headerText={"Persistent Context"} setVars={setCsmPersistentContext} noInfoText={true} onRemove={onContextRemove} />
             </div>
         )
     },[csm, csmLocalContext, csmPersistentContext, setCsmLocalContext, setCsmPersistentContext])
@@ -47,9 +50,11 @@ export default function CsmDisplay() {
                 // Update the properties of the existing variable (maintain reference)
                 existingVar.name = newVar.name;
                 existingVar.value = newVar.value;
+                contextService.renameContext(existingVar, newVar.name);
                 return [...prevVars];
             } else {
                 // Add the new variable if it doesn't exist
+                contextService.registerContext(newVar)
                 return [...prevVars, newVar];
             }
         });
@@ -101,7 +106,7 @@ export default function CsmDisplay() {
 
     // TODO: Continue
     return (
-        <Container>
+        <>
             <Button onClick={handleShow} variant="primary">
                 {showModalButtonText()}
             </Button>
@@ -130,10 +135,10 @@ export default function CsmDisplay() {
                     <Container>
                         <Row className="mb-3">
                             <Col sm={6}>
-                                <CreateContextFormModal variable={undefined} buttonName={"Create Local Context Variable"} onSubmit={onLocalContextSubmit} dontAddToState={true} noTypeSelect={true}/>
+                                <CreateContextFormModal variable={undefined} buttonName={"Create Local Context Variable"} onSubmit={onLocalContextSubmit} dontAddToState={true} noTypeSelect={true} csmVar={true}/>
                             </Col>
                             <Col sm={6}>
-                                <CreateContextFormModal variable={undefined} buttonName={"Create Persistent Context Variable"} onSubmit={onPersistentContextSubmit} dontAddToState={true} noTypeSelect={true}/>
+                                <CreateContextFormModal variable={undefined} buttonName={"Create Persistent Context Variable"} onSubmit={onPersistentContextSubmit} dontAddToState={true} noTypeSelect={true} csmVar={true}/>
                             </Col>
                         </Row>
                     </Container>
@@ -144,7 +149,7 @@ export default function CsmDisplay() {
                     {renderContexts()}
                 </Modal.Body>
             </Modal>
-        </Container>
+        </>
     )
 
 

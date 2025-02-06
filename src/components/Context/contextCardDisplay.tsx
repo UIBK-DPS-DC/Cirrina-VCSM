@@ -3,7 +3,6 @@ import Event from "../../classes/event.ts";
 import ContextCard from "./contextCard.tsx";
 import {Dispatch, SetStateAction} from "react";
 import ContextVariable from "../../classes/contextVariable.tsx";
-import { useEffect } from "react";
 
 export default function ContextCardDisplay(props: {vars: ContextVariable[],
     headerText: string | undefined,
@@ -22,13 +21,6 @@ export default function ContextCardDisplay(props: {vars: ContextVariable[],
 
 
 
-    useEffect(() => {
-        console.log("CONTEXT-CARD-DISPLAY: Vars updated:", props.vars);
-    }, [props.vars]);
-
-    useEffect(() => {
-        console.log("CONTEXT-CARD-DISPLAY: Event updated:", props.event);
-    }, [props.event]);
 
 
 

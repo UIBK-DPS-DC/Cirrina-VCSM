@@ -27,6 +27,7 @@ import GuardService from "../services/guardService.tsx";
 import Event from "../classes/event.ts";
 import {getNewEdgeId, getNewGuardId, getNewNodeId,} from "./visualEditor/flow.tsx";
 import ServiceTypeService from "../services/serviceTypeService.tsx";
+import CollaborativeStateMachine from "../classes/collaborativeStateMachine.tsx";
 
 
 // Define the layout options for ELK
@@ -37,7 +38,7 @@ const rootLayoutOptions = {
     "elk.allowEdgeNodeOverlap": "false",
     "elk.layered.spacing.nodeNodeBetweenLayers": "200", // Increased spacing between layers
     "elk.layered.spacing.edgeNodeBetweenLayers": "200", // Increased spacing between layers
-    "elk.spacing.nodeNode": "100", // Increased spacing between nodes in the same layer
+    "elk.spacing.nodeNode": "1000", // Increased spacing between nodes in the same layer
     "elk.spacing.edgeEdge": "150",
     "elk.spacing.edgeNode": "200",
     "elk.contentAlignment": "V_CENTER",
@@ -56,7 +57,7 @@ const parentLayoutOptions = {
     "elk.allowEdgeNodeOverlap": "false",
     "elk.layered.spacing.nodeNodeBetweenLayers": "100", // Increased spacing between layers
     "elk.layered.spacing.edgeNodeBetweenLayers": "100", // Increased spacing between layers
-    "elk.spacing.nodeNode": "100", // Increased spacing between nodes in the same layer
+    "elk.spacing.nodeNode": "500", // Increased spacing between nodes in the same layer
     "elk.spacing.edgeEdge": "100",
     "elk.spacing.edgeNode": "200",
     "portConstraints": "FIXED_ORDER",
@@ -103,7 +104,8 @@ export default function Import() {
         eventService,
         setHideFlowEdges,
         serviceTypeService,
-        setCsm
+        setCsm,
+        setShowStateDescriptions
     } = context;
 
     // Function to handle file input button click
@@ -206,6 +208,7 @@ export default function Import() {
     };
 
     const setUpServiceTypeService = (service: ServiceTypeService, nodes: Node<CsmNodeProps>[]) => {
+
         nodes.forEach((node) => {
             if(isState(node.data)){
                 node.data.state.getAllActions()
@@ -254,6 +257,11 @@ export default function Import() {
             }
         });
     };
+
+    const registerCsmContext = (csm: CollaborativeStateMachine) => {
+        csm.persistentContext.forEach((v) => contextService.registerContext(v))
+        csm.localContext.forEach((v) => contextService.registerContext(v));
+    }
 
     const adjustInternalTransitionHandles = (edges: Edge<CsmEdgeProps>[], nodes: Node<CsmNodeProps>[]) => {
         edges.forEach((e) => {
@@ -537,6 +545,8 @@ export default function Import() {
 
             stateOrStateMachineService.showStatemachineStateNames();
             setHideFlowEdges(true)
+            setShowStateDescriptions(false)
+            registerCsmContext(collaborativeStateMachine)
             setCsm(collaborativeStateMachine)
 
 
@@ -630,7 +640,76 @@ export default function Import() {
                     updateNodePositions(elkNode);
                 });
 
-                const layoutedNodes = Array.from(nodeMap.values());
+                // A helper to detect bounding-box overlap of two rectangles
+                function rectsOverlap(x1: number, y1: number, w1: any, h1: any, x2: number, y2: number, w2: any, h2: any) {
+                    return (
+                        x1 < x2 + w2 &&
+                        x1 + w1 > x2 &&
+                        y1 < y2 + h2 &&
+                        y1 + h1 > y2
+                    );
+                }
+
+                const layoutedNodes = [];
+
+                const allNodes = Array.from(nodeMap.values());
+
+                /**
+                 * Final layout pass:
+                 * 1. Move child nodes down by 50 on the y-axis, this is to combat the tendency of the layout to place nodes on the draggable part of a node.
+                 * 2. For parent-less nodes, shift x and y if they overlap.
+                 *  Not pretty, but I found no way to solve this using ELK
+                 */
+                for (const node of allNodes) {
+                    if (node.parentId) {
+                        // Shift all non-root nodes by 50 on the y direction
+                        node.position = {
+                            x: node.position.x,
+                            y: node.position.y + 50,
+                        };
+                        layoutedNodes.push(node);
+                    } else {
+                        // Keep the original (x, y) but ensure no overlap by shifting x y as needed
+                        const nodeWidth = node?.width ?? 150;   // fallback width
+                        const nodeHeight = node?.height ?? 50;  // fallback height
+
+                        let { x, y } = node.position;
+
+                        // Keep pushing the node to the right and down until it no longer overlaps
+                        let hasOverlap = true;
+                        while (hasOverlap) {
+                            hasOverlap = false;
+                            for (const placedNode of layoutedNodes) {
+                                // Only care about nodes that actually exist in the flow
+                                const placedWidth = placedNode?.width ?? 150;
+                                const placedHeight = placedNode?.height ?? 50;
+                                if (
+                                    rectsOverlap(
+                                        x,
+                                        y,
+                                        nodeWidth,
+                                        nodeHeight,
+                                        placedNode.position.x,
+                                        placedNode.position.y,
+                                        placedWidth,
+                                        placedHeight
+                                    )
+                                ) {
+                                    // Shift current node’s x to the right and y to the bottom
+                                    // If you ever want different spacing adjust these values
+                                    x = placedNode.position.x + placedWidth + 30;
+                                    y = placedNode.position.y + placedHeight + 60;
+                                    hasOverlap = true;
+                                }
+                            }
+                        }
+
+                        // Update the node’s final position
+                        node.position = { x, y };
+                        layoutedNodes.push(node);
+                    }
+                }
+
 
                 setNodes(layoutedNodes);
 

@@ -176,6 +176,8 @@ export type ReactFlowContextProps = {
     serviceTypeService: ServiceTypeService
     csm: CollaborativeStateMachine
     setCsm: React.Dispatch<React.SetStateAction<CollaborativeStateMachine>>
+    showStateDescriptions: boolean
+    setShowStateDescriptions: React.Dispatch<React.SetStateAction<boolean>>
 }
 
 

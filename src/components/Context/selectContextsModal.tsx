@@ -16,7 +16,7 @@ export default function SelectContextsModal(props: {buttonName: string | undefin
     const context = useContext(ReactFlowContext) as ReactFlowContextProps;
     const {nodes,
     selectedNode,
-    contextService, selectedEdge, darkMode} = context
+    contextService, selectedEdge, darkMode, csm} = context
 
     const PERSISTENT_CONTEXT_MULTISELECT_NAME = "selected-persistent-context"
     const LOCAL_CONTEXT_MULTISELECT_NAME = "selected-local-context"
@@ -48,7 +48,7 @@ export default function SelectContextsModal(props: {buttonName: string | undefin
      *   1. The local context variables.
      *   2. The static context variables.
      */
-    const getKnownContextVariables = useCallback((node: Node<CsmNodeProps>) => {
+    const getKnownContextVariables = useCallback((node: Node<CsmNodeProps>, addCsmVariables = true) => {
         let localContext: ContextVariable[] = []
         let staticContext: ContextVariable[] = []
 
@@ -62,11 +62,15 @@ export default function SelectContextsModal(props: {buttonName: string | undefin
                     staticContext = staticContext.concat(contextService.getStaticContext(n.data));
                 }
                 if(n.id === node.parentId){
-                    const parentRes = getKnownContextVariables(n)
+                    const parentRes = getKnownContextVariables(n, false)
                     localContext = localContext.concat(parentRes[0])
                     staticContext = staticContext.concat(parentRes[1])
                 }
             })
+        }
+
+        if(addCsmVariables){
+            localContext = localContext.concat(csm.localContext)
         }
 
         return [localContext, staticContext]
@@ -156,6 +160,7 @@ export default function SelectContextsModal(props: {buttonName: string | undefin
         nodes.forEach((node: Node<CsmNodeProps>) => {
              persistentContext = persistentContext.concat(contextService.getPersistentContext(node.data))
         })
+        persistentContext = persistentContext.concat(csm.persistentContext)
         return persistentContext.filter((value, index, vars) => {
             return vars.indexOf(value) === index;
         });
@@ -259,6 +264,7 @@ export default function SelectContextsModal(props: {buttonName: string | undefin
             const context = contextService.getContextByName(variable.value)
             if(context){
                 persistentVars.push(context)
+
             }
         })
 
@@ -277,6 +283,7 @@ export default function SelectContextsModal(props: {buttonName: string | undefin
                 staticVars.push(context)
             }
         })
+
 
         props.setVars([...persistentVars,...localVars,...staticVars]);
         handleClose()

@@ -42,7 +42,9 @@ export default class MatchCase {
     }
 
     public static fromDescription(description: MatchCaseDescription): MatchCase {
-        return new MatchCase(description.case, Action.fromDescription(description.action))
+        const action = Action.fromDescription(description.action)
+        action.case = description.case
+        return new MatchCase(description.case, action)
     }
 
 

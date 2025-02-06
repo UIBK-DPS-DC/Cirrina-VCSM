@@ -27,7 +27,8 @@ function CaseForm(props: {
 
 
     const formId = useRef(`form-${Math.random().toString(36).substring(2, 15)}`).current;
-
+    const context = useContext(ReactFlowContext) as ReactFlowContextProps;
+    const {selectedNode,selectedEdge} = context
 
     useEffect(() => {
         console.log(`FORM ID : ${formId}`)
@@ -147,8 +148,9 @@ function CaseForm(props: {
             setAction(props.action);
             setSelectedActionType(props.action.type);
             setCaseInput(props.action.case || "");
+            console.log(`CASE FORM: ${props.action.case}`)
         }
-    }, [props.action]);
+    }, [props.action, selectedEdge,selectedNode]);
 
     const renderActionForm = () => {
         switch (selectedActionType) {

@@ -120,6 +120,95 @@ export default class Action {
         return this === other;
     }
 
+    public getInfoString(periods = true):string {
+        let info = "";
+
+        switch(this.type){
+            case ActionType.ASSIGN: {
+                const assignActionDescription = this.toDescription() as AssignActionDescription;
+                info = `Assigns \"${assignActionDescription.variable.value}\" to ${assignActionDescription.variable.name}`
+                if(periods){
+                    info+= "."
+                }
+                info+=" "
+                return info;
+            }
+            case ActionType.CREATE: {
+                const createActionDescription = this.toDescription() as CreateActionDescription;
+                info = `Creates var \"${createActionDescription.variable.name}\"`
+                if(periods){
+                    info+= "."
+                }
+                info+=" "
+                return info;
+            }
+            case ActionType.INVOKE: {
+                const invokeActionDescription = this.toDescription() as InvokeActionDescription;
+                info = `Invokes \"${invokeActionDescription.serviceType}\"`
+                if(invokeActionDescription.input.length > 0){
+                    info+= ` with [${invokeActionDescription.input.map((i) => `\"${i.name}\"`).toString()}]`
+                }
+                if(invokeActionDescription.output.length > 0){
+                    info += `, sets [${invokeActionDescription.output.map((i) => `\"${i.reference}\"`).toString()}]`
+                }
+                if(invokeActionDescription.done.length > 0){
+                    info+= `, raises ${invokeActionDescription.done.map((e) => `\"${e.name}\"
+                    ${e.data.length > 0 ? `and sets [${e.data.map((d) => `\"${d.name}\"`)}` : ""}`).toString()}]`
+                }
+                if(periods){
+                    info+= "."
+                }
+                info+=" "
+                return info;
+            }
+            case ActionType.MATCH: {
+                const matchActionDescription = this.toDescription() as MatchActionDescription;
+                // Not sure if this is too much, adjust if needed.
+                info+= `Match \"${matchActionDescription.value}\" \n ${matchActionDescription.cases.map((a) => "if " + a.case + `  ${Action.fromDescription(a.action).getInfoString(false)}\n`).toString()}`
+                if(periods){
+                    info+= "."
+                }
+                info+=" "
+
+                return info;
+            }
+            case ActionType.RAISE_EVENT: {
+                const raiseEventActionDescription = this.toDescription() as RaiseActionDescription
+                info+= `Raises \"${raiseEventActionDescription.event.name}\" `
+                if (raiseEventActionDescription.event.data.length > 0) {
+                    info+= `and sends [${raiseEventActionDescription.event.data.map((d) => d.name)}] `
+                }
+                if(periods){
+                    info+= "."
+                }
+                info+=" "
+                return info;
+            }
+            case ActionType.TIMEOUT: {
+                const timeoutActionDescription = this.toDescription() as TimeoutActionDescription
+                info+= `After ${timeoutActionDescription.delay} trigger \"${timeoutActionDescription.name}\"`
+                if(periods){
+                    info+= "."
+                }
+                info+=" "
+                return info;
+            }
+            case ActionType.TIMEOUT_RESET: {
+                const timeoutResetActionDescription = this.toDescription() as TimeoutResetActionDescription
+                info+= `Reset timer of \"${timeoutResetActionDescription.action}\"`
+                if(periods){
+                    info+= "."
+                }
+                info+=" "
+                return info;
+            }
+            default: {
+                return info;
+            }
+        }
+
+    }
+
     public toDescription():ActionDescription {
         switch(this.type){
             case ActionType.RAISE_EVENT: {
@@ -177,6 +266,7 @@ export default class Action {
                     type: ActionType.ASSIGN,
                     variable: assignActionProps.variable.toDescription()
                 }
+                assignActionDescription.variable.value = assignActionProps.expression
 
                 return assignActionDescription
             }

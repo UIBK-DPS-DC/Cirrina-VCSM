@@ -127,7 +127,8 @@ export const getParentNode = (node: Node<CsmNodeProps>, nodes: Node<CsmNodeProps
     return nodes.find((n) => n.id === node.parentId);
 };
 
-const getNodeDepth = (node: Node<CsmNodeProps>, nodes: Node<CsmNodeProps>[]): number => {
+const getNodeDepth = (node: Node<CsmNodeProps> | undefined, nodes: Node<CsmNodeProps>[]): number => {
+    if(!node) return 0
     if(isStateMachine(node.data)){
         const parentNode = getParentNode(node, nodes)
         if(parentNode){
@@ -179,6 +180,43 @@ export const getMostDistantAncestorNode = (
 
     return getMostDistantAncestorNode(ancestor, nodes, visited);
 };
+
+export const getAllContextInExtent = (node: Node<CsmNodeProps>, nodes: Node<CsmNodeProps>[],initial=true) => {
+    let contextNames: ContextVariable[] = []
+    if(initial){
+        const ancestor = getMostDistantAncestorNode(node, nodes);
+        if(isStateMachine(ancestor.data)){
+            contextNames = contextNames.concat(ancestor.data.stateMachine.getAllContextVariables())
+        }
+        const children = nodes.filter((n) => n.parentId === ancestor.id)
+        children.forEach((c) => {
+            if(isState(c.data)){
+                contextNames = contextNames.concat(c.data.state.getAllContextVariables())
+            }
+            if(isStateMachine(c.data)){
+                contextNames = contextNames.concat(getAllContextInExtent(c,nodes,false))
+            }
+        })
+        return contextNames;
+    }
+    else {
+        if(isStateMachine(node.data)){
+            const children = nodes.filter((n) => n.parentId === node.id)
+            children.forEach((c) => {
+                if(isState(c.data)){
+                    contextNames = contextNames.concat(c.data.state.getAllContextVariables())
+                }
+                if(isStateMachine(c.data)){
+                    contextNames = contextNames.concat(getAllContextInExtent(c,nodes,false))
+                }
+            })
+        }
+    }
+
+    return contextNames;
+
+
+}
 
 export const getAllStatemachineDescendants = (root: Node<CsmNodeProps>,
                                               nodes: Node<CsmNodeProps>[],
@@ -264,6 +302,7 @@ export const generateRaisedToConsumedInfoStrings = (nodes: Node<CsmNodeProps>[])
 
 export const getAllStateNamesInExtent = (node: Node<CsmNodeProps>, nodes: Node<CsmNodeProps>[], service: StateOrStateMachineService): Set<string> => {
     const root = getMostDistantAncestorNode(node,nodes)
+    console.log(`ROOT ${root.id}`)
     const rootName = service.getName(root.data)
     const stateMachineChildren = getAllStatemachineDescendants(root, nodes)
     const stateNames = (service.getStateNames(root.id) || new Set()).add(rootName)
@@ -279,6 +318,17 @@ export const getAllStateNamesInExtent = (node: Node<CsmNodeProps>, nodes: Node<C
     return stateNames
 
 };
+
+// When a node is dragged from the sidebar into a nested structure all parent offsets need to accounted for in order for the node to have the correct relative position.
+export const getParentOffsets = (node: Node<CsmNodeProps>, nodes: Node<CsmNodeProps>[]) => {
+   let offset = {x:0, y:0}
+    let parent = getParentNode(node,nodes);
+    while(parent){
+       offset = {x: offset.x + parent.position.x, y:offset.y + parent.position.y};
+       parent = getParentNode(parent, nodes);
+   }
+   return offset;
+}
 
 export const generateCsmSkeleton = (): CollaborativeStateMachineDescription => {
     const csm: CollaborativeStateMachineDescription = {

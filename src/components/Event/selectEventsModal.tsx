@@ -25,8 +25,6 @@ export default function SelectEventsModal(props:{buttonName: string | undefined,
 
     const [show,setShow]=React.useState(false);
 
-    const allowMultiple = () => props.multiple !== undefined ? props.multiple : true
-    const isSelectDisabled = () => !allowMultiple() && ((selectedExternalEvents.length + selectedInternalEvents.length + selectedGlobalEvents.length + selectedPeripheralEvents.length) > 0)
 
     const handleShow = () => setShow(true)
     const handleClose = () => setShow(false);
@@ -158,16 +156,6 @@ export default function SelectEventsModal(props:{buttonName: string | undefined,
         console.error(`Event with name ${eventName} already exists`)
     }
 
-
-    useEffect(() => {
-        console.log(`Is Select disabled : ${isSelectDisabled()}`)
-        console.log(`Allow Multiple ${allowMultiple()}`)
-        console.log(`Total events length ${selectedExternalEvents.length + selectedInternalEvents.length + selectedGlobalEvents.length + selectedPeripheralEvents.length}`)
-        console.log(`EXTERNAL ${selectedExternalEvents}`)
-        console.log(`INTERNAL ${selectedInternalEvents}`)
-        console.log(`GLOBAL ${selectedGlobalEvents}`)
-        console.log(`PERIPERAL ${selectedPeripheralEvents}`)
-    }, [selectedPeripheralEvents,selectedGlobalEvents,selectedExternalEvents,selectedInternalEvents]);
 
 
     useEffect(() => {
